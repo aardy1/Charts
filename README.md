@@ -30,3 +30,14 @@ gradle -Ptarget=X clean nativeCompile nativeLink nativePackage nativeInstall nat
 
 I have tested it on MacOS X building for host, ios and ios-sim. I haven't tested on Android.
 
+## Running the App (using JVM or native on a desktop)
+
+To run the app you will need some charts, which must be ESRI shape files.
+
+Shape files are big, too big to attach here. Email me :-)
+
+You need to unzip the file, and put it in `HOME/Documents/Knowtipy Charts`, where `HOME` is your home directory.
+
+
+
+
