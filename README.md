@@ -58,15 +58,17 @@ You will need some charts -- follow the steps for [running the app as a JVM buil
 
 ## Running the App on a Phone or Tablet
 
-To run the app as a native image for platform X do:
-```
-gradle -Ptarget=X nativeCompile nativeLink nativePackage nativeInstall nativeRun
-```
-(or just `gradle -Ptarget=X nativeRun` if you have already built it).
+To build a native image for iOS you must be on a Mac running OS X.
 
-You will need some charts -- follow the steps for running the app as a JVM build.
+To build a native image for Android you must be running Linux.
 
+You build the native image as above `gradle -Ptarget=X nativeCompile ...`, with X = ios or X = android.
 
+Now comes the hacky bit :-)
+
+The `nativeRun`gradle task install the app on your phone ... to do ...
+
+You need a chart on your phone. On iOS download the shape file example above to 
 
 
 
