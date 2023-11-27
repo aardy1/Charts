@@ -21,11 +21,11 @@ A quite simple charts file is:
 
 ## Running the App using a JVM
 
-You need to unzip the charts file into `HOME/Documents/Knowtipy Charts`, where `HOME` is your home directory.
+To run using a JVM, you first need to unzip the charts file into `HOME/Documents/Knowtipy Charts`, where `HOME` is your home directory.
 
 You should then be able to run the app out of your IDE.
 
-## Building A Native Image
+## Building a Native Image
 
 The gradle build is configured to allow native image builds using Graal.
 
@@ -36,21 +36,37 @@ To get the build to work you will need a couple of things:
 
 In theory that should be it :-)
 
-To build a native image for platform X do:
+To build and run a native image for platform X do:
 ```
-gradle -Ptarget=X clean nativeCompile nativeLink nativePackage nativeInstall nativeRun
+gradle -Ptarget=X nativeCompile nativeLink nativePackage nativeInstall
 ```
 (X = host (host = the platform you are running gradle on), ios, ios-sim, android)
 
-I have tested it on MacOS X building for host, ios and ios-sim. I haven't tested on Android.
+The native image will be installed under `X/build/gluonfx/A` where X is the project root, and A is your architecture and operating system (e.g. aarch64-darwin).
 
-## Running the App (using JVM or native on a desktop)
+I have tested it on MacOS X building for host, ios and ios-sim.
 
-To run the app you will need some charts, which must be ESRI shape files.
+## Running the App Native on a Desktop
 
-Shape files are big, too big to attach here. Email me :-)
+To run the app as a native image for a desktop platform X do:
+```
+gradle -Ptarget=X nativeCompile nativeLink nativePackage nativeInstall nativeRun
+```
+(or just `gradle -Ptarget=X nativeRun` if you have already built it).
 
-You need to unzip the file, and put it in `HOME/Documents/Knowtipy Charts`, where `HOME` is your home directory.
+You will need some charts -- follow the steps for running the app as a JVM build.
+
+## Running the App on a Phone or Tablet
+
+To run the app as a native image for platform X do:
+```
+gradle -Ptarget=X nativeCompile nativeLink nativePackage nativeInstall nativeRun
+```
+(or just `gradle -Ptarget=X nativeRun` if you have already built it).
+
+You will need some charts -- follow the steps for running the app as a JVM build.
+
+
 
 
 
