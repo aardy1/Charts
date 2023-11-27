@@ -1,15 +1,11 @@
-# Charts
+# Knowtiphy Charts
 
-This project has two goals:
+This project has two parts:
 
-1. get a "clone" of [OpenCPN](https://opencpn.org) running natively on all desktop and mobile platforms
-2. build a pure JavaFX ESRI shape file renderer (so no use of AWT or bridges to AWT)
+1. a "clone" of [OpenCPN](https://opencpn.org) running natively on all desktop and mobile platforms
+2. a pure JavaFX ESRI shape file renderer (so no use of AWT or bridges to AWT)
 
-The point of goal 2. is that JavaFX runs on mobile platforms so it can be used to achieve goal 1.
-
-The source is split up to reflect these goals -- the shape file renderer is in `src/main/java/org/knowtiphy/shapemap`, and the "clone" is in `src/main/java/org/knowtiphy/charts`.
-
-The current base works quite well, but lacks features, could be faster, and could use less memory.
+The code runs just fine, but needs a lot of work of course.
 
 ## Building with a JVM
 
