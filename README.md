@@ -11,6 +11,20 @@ I use Gradle 8.3 installed via the wonderful [sdkman](https://sdkman.io/).
 2. Load it in your favorite IDE.
 3. Do whatever you do there for gradle builds.
 
+## Running the App
+
+To run the app you will need some charts, which must be ESRI shape files.
+
+A quite simple charts file is:
+
+[ENC.zip](https://github.com/aardy1/Charts/files/13471740/ENC.zip)
+
+## Running the App using a JVM
+
+You need to unzip the charts file into `HOME/Documents/Knowtipy Charts`, where `HOME` is your home directory.
+
+You should then be able to run the app out of your IDE.
+
 ## Building A Native Image
 
 The gradle build is configured to allow native image builds using Graal.
