@@ -54,7 +54,7 @@ gradle -Ptarget=X nativeCompile nativeLink nativePackage nativeInstall nativeRun
 ```
 (or just `gradle -Ptarget=X nativeRun` if you have already built it).
 
-You will need some charts -- follow the steps for running the app as a JVM build.
+You will need some charts -- follow the steps for [running the app as a JVM build](https://github.com/aardy1/Charts/blob/main/README.md#running-the-app-using-a-jvm)
 
 ## Running the App on a Phone or Tablet
 
