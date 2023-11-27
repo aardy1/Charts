@@ -1,0 +1,48 @@
+{
+    "resources": {
+        "includes": [
+            {
+                "pattern": "\\Qorg/geotools/metadata/i18n/Loggings.utf\\E"
+            },
+            {
+                "pattern": "\\Qorg/geotools/metadata/i18n/Vocabulary.utf\\E"
+            },
+            {
+                "pattern": "\\Qorg/geotools/referencing/factory/DatumAliasesTable.txt\\E"
+            },
+            {
+                "pattern": ".*\\.sld$"
+            }
+        ]
+    },
+    "bundles": [
+        {
+            "name": "org.geotools.metadata.i18n.Loggings",
+            "classNames": [
+                "org.geotools.metadata.i18n.Loggings",
+                "org.geotools.metadata.i18n.Loggings_en"
+            ]
+        },
+        {
+            "name": "org.geotools.metadata.i18n.Vocabulary",
+            "classNames": [
+                "org.geotools.metadata.i18n.Vocabulary",
+                "org.geotools.metadata.i18n.Vocabulary_en"
+            ]
+        },
+        {
+            "name": "com/sun/javafx/scene/control/skin/resources/controls",
+            "locales": [
+                "en",
+                "und"
+            ]
+        },
+        {
+            "name": "controlsfx",
+            "locales": [
+                "en",
+                "und"
+            ]
+        }
+    ]
+}

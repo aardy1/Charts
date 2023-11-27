@@ -1,0 +1,106 @@
+plugins {
+    id "application"
+    id "org.openjfx.javafxplugin" version "0.1.0"
+    id 'com.gluonhq.gluonfx-gradle-plugin' version '1.0.21'
+}
+
+repositories {
+    maven { url  'https://repo.osgeo.org/repository/release/' }
+    maven { url  'https://repo.osgeo.org/repository/snapshot/' }
+    maven { url 'https://nexus.gluonhq.com/nexus/content/repositories/releases/' }
+    maven { url 'https://jitpack.io' }
+    mavenCentral()
+}
+
+dependencies {
+
+    implementation  project(':shapemap')
+    implementation libs.geotools.shapefile
+    implementation libs.geotools.sld
+    implementation libs.geotools.metadata
+
+    implementation libs.fx.base
+    implementation libs.fx.graphics
+    implementation libs.fx.controls
+
+    implementation libs.attach.display
+    implementation libs.attach.lifecycle
+    implementation libs.attach.statusbar
+    implementation libs.attach.storage
+    implementation libs.attach.util
+
+    implementation libs.connect
+
+    implementation libs.commons.lang3
+    implementation libs.stax.api
+
+    implementation libs.reactfx
+    implementation libs.controlsfx
+
+    implementation 'com.github.hervegirod:fxsvgimage:1.1'
+}
+
+tasks.withType(JavaExec) {
+    enableAssertions = true
+}
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
+}
+
+javafx {
+    version = "21"
+    platform = "macos-aarch64"
+    modules = [ 'javafx.base', 'javafx.graphics', 'javafx.controls' ]
+}
+
+application {
+    mainClassName = "org.knowtiphy.charts.KnowtiphyCharts"
+    applicationDefaultJvmArgs = ['-Xms2G', '-Xmx2G']
+}
+
+println("Build target = " + findProperty('target'))
+
+gluonfx {
+
+    target = findProperty('target') ?: 'host'
+
+    attachConfig {
+        version = "$attach"
+        services 'display', 'lifecycle', 'statusbar', 'storage'
+    }
+
+    //verbose = true
+    enableSwRendering = false
+
+    release {
+        description = "Knowtiphy Charts"
+
+        // Android
+        appLabel = "Knowtiphy Charts Droid"
+        versionCode = "1"
+        versionName = "1.0"
+        providedKeyStorePath = ""
+        providedKeyStorePassword = ""
+        providedKeyAlias = ""
+        providedKeyAliasPassword = ""
+        // iOS
+        bundleName = "Knowtiphy Charts"
+        bundleVersion = "0.0.9"
+        appIdentifier = "KnowtiphyCharts.Knowtiphy-Charts"
+        providedSigningIdentity = "Apple Development: gym@orangedogsoftware.com (D42UBLKQAW)"
+        skipSigning = false
+        // iOS sim
+        simulatorDevice = "iPhone 15"
+    }
+}
+
+    //javaStaticSdkVersion = "17"
+    //javafxStaticSdkVersion = "21" // "22.1.0.1-Final"
+    //compilerArgs = ["-mmacosx-version-min=11"]
+    // linkerArgs may also need something like this "-mmacosx-version-min=12"
+    //["-Wl,-framework,Carbon"]
+    //linkerArgs = []
+        //bundleShortVersion = "BUND_NAME_SHORT"

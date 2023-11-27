@@ -1,0 +1,59 @@
+//  plugin configuration
+
+pluginManagement {
+    repositories {
+        mavenCentral()
+        gradlePluginPortal()
+        maven { url 'https://nexus.gluonhq.com/nexus/content/repositories/releases' }
+    }
+}
+
+//  libraries and library versions
+
+dependencyResolutionManagement {
+    versionCatalogs {
+        libs {
+
+            version('geotools', '31-SNAPSHOT')
+            version('commons-lang', '3.13.0')
+            version('fx', '21')
+            version('attach', '4.0.19')
+            version('connect', '2.0.1')
+            version('stax', '1.0-2')
+            version('reactfx', '1.4.1')
+            version('controlsfx', '11.1.2')
+
+            library('geotools-shapefile', 'org.geotools', 'gt-shapefile').versionRef('geotools')
+            library('geotools-sld', 'org.geotools.xsd', 'gt-xsd-sld').versionRef('geotools')
+            library('geotools-metadata', 'org.geotools', 'gt-metadata').versionRef('geotools')
+
+             library('fx-base', 'org.openjfx', 'javafx-base').versionRef('fx')
+             library('fx-graphics', 'org.openjfx', 'javafx-graphics').versionRef('fx')
+             library('fx-controls', 'org.openjfx', 'javafx-controls').versionRef('fx')
+
+            library('attach-display', 'com.gluonhq.attach', 'display').versionRef('attach')
+            library('attach-lifecycle', 'com.gluonhq.attach', 'lifecycle').versionRef('attach')
+            library('attach-statusbar', 'com.gluonhq.attach', 'statusbar').versionRef('attach')
+            library('attach-storage', 'com.gluonhq.attach', 'storage').versionRef('attach')
+            library('attach-util', 'com.gluonhq.attach', 'util').versionRef('attach')
+            library('connect', 'com.gluonhq', 'connect').versionRef('connect')
+
+            library('commons-lang3', 'org.apache.commons', 'commons-lang3').versionRef('commons-lang')
+            library('stax-api', 'javax.xml.stream', 'stax-api').versionRef('stax')
+            library('controlsfx', 'org.controlsfx', 'controlsfx').versionRef('controlsfx')
+            library('reactfx', 'org.reactfx', 'reactfx').versionRef('reactfx')
+    }
+}
+
+rootProject.name = 'charts'
+
+//  sub-projects
+
+include 'app'
+include 'shapemap'
+
+//      library('commons-lang3', 'org.apache.commons', 'commons-lang3').version {
+//       strictly '[3.8, 4.0['
+//    prefer '3.9'
+//   }
+        }

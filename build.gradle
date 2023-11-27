@@ -1,0 +1,8 @@
+//  this is the old school way of doing this, but it will do for the moment
+
+ext.mainClass = 'org.knowtiphy.charts.KnowtiphyCharts'
+//ext.target = 'host'
+ext.attach='4.0.19'
+ext.libraryVersions = [
+        javafx : '21'
+]
