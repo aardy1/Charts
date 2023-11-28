@@ -71,13 +71,13 @@ A quite simple charts file is:
 
 ## Running Knowtiphy Charts using a JVM
 
-To run using a JVM, you first need to unzip the charts file into `HOME/Documents/Knowtipy Charts`, where `HOME` is your home directory.
+To run using a JVM, you first need to unzip the charts file into `HOME/Documents/Knowtipy Charts`, where `HOME` is your home directory, so you will have `HOME/Documents/Knowtipy Charts/ENC/US_REGION08/*`.
 
-You should then be able to run the app out of your IDE.
+You should then be able to run the app out of your IDE, or by going to the root dir of the project and doing `gradle run`.
 
 ## Building a Native Image
 
-The gradle build is configured to allow native image builds using Graal.
+The gradle build is configured for native image builds using Graal.
 
 To get the build to work you will need a couple of things:
 
@@ -86,19 +86,19 @@ To get the build to work you will need a couple of things:
 
 In theory that should be it :-)
 
-To build and run a native image for platform X do:
+To build and run a native image for platform `X`, go the project root dir, and do:
 ```
 gradle -Ptarget=X nativeCompile nativeLink nativePackage nativeInstall
 ```
-(X = host (host = the platform you are running gradle on), ios, ios-sim, android)
+(`X = host` (host = the platform you are running gradle on), `ios`, `ios-sim`, or `android`)
 
 The native image will be installed under `X/build/gluonfx/A` where X is the project root, and A is your architecture and operating system (e.g. aarch64-darwin).
 
-I have tested it on MacOS X building for host, ios and ios-sim.
+I have tested this process on MacOS X building for `host`, `ios` and `ios-sim`.
 
 ## Running Knowtiphy Charts Native on a Desktop
 
-To run the app as a native image for a desktop platform X do:
+To run the app as a native image for a desktop platform `X` do:
 ```
 gradle -Ptarget=X nativeCompile nativeLink nativePackage nativeInstall nativeRun
 ```
@@ -106,13 +106,15 @@ gradle -Ptarget=X nativeCompile nativeLink nativePackage nativeInstall nativeRun
 
 You will need some charts -- follow the steps for [running the app as a JVM build](https://github.com/aardy1/Charts/blob/main/README.md#running-the-app-using-a-jvm)
 
-## Running the App on a Phone or Tablet
+Or just run the native built before by double clicking it.
 
-To build a native image for iOS you must be on a Mac running OS X.
+## Running Knowtiphy Charts Native on a Phone or Tablet
+
+To build a native image for iOS you must be on a Mac.
 
 To build a native image for Android you must be running Linux.
 
-You build the native image as above `gradle -Ptarget=X nativeCompile ...`, with X = ios or X = android.
+You build the native image as above `gradle -Ptarget=X nativeCompile ...`, with `X = ios` or `X = android`.
 
 Now comes the hacky bit :-)
 
