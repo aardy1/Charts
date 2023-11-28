@@ -9,7 +9,7 @@ The code runs just fine -- some screen recordings of it running on my iPhone wit
 
 * having 6 videos (there is a file size limit of 10MB here, so I had to split my screen recording up)
 * the video recording starting and ending wierdly wrt orientation -- it's the recording not the app itself!
-* the awfully non standard symbology on the map
+* the awfully non standard symbology on the chart
 
 
 **Videos**
@@ -19,12 +19,12 @@ The code runs just fine -- some screen recordings of it running on my iPhone wit
 https://github.com/aardy1/Charts/assets/54723230/5636f5b9-6eb2-4f21-972b-8fd62c46cb11
 
 
-2) Scrolling the chart, showing lights on the map:
+2) Scroll the chart, show lights on the chart:
 
 https://github.com/aardy1/Charts/assets/54723230/d54e6005-8797-474f-9c72-20d3f72e7092
 
 
-3) More scolling the chart, pinch zooming into Tampa Bay:
+3) Scroll the chart, pinch zoom into Tampa Bay:
 
 https://github.com/aardy1/Charts/assets/54723230/c9b7b9e6-b847-479b-8c68-6e7bd707d233
 
@@ -34,16 +34,9 @@ https://github.com/aardy1/Charts/assets/54723230/c9b7b9e6-b847-479b-8c68-6e7bd70
 https://github.com/aardy1/Charts/assets/54723230/32aae910-28ef-48a6-bde6-ffc80bfee012
 
 
-5) Scroll the new chart, add soundings, scroll, finally rotate phone (and get incorrect aspect ratio :-( )
+5) Scroll the new chart, add soundings, scroll, rotate phone (and get incorrect aspect ratio :-( )
 
 https://github.com/aardy1/Charts/assets/54723230/3602b7cf-607b-43ae-8dc6-891b80216174
-
-
-6) Scroll rotated chart, quit app
-
-https://github.com/aardy1/Charts/assets/54723230/ffcbc8ef-d3ce-4049-b9a4-807278bee31a
-
-
 
 
 ## Building with a JVM
