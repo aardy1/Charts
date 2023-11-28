@@ -8,7 +8,7 @@ This project has two parts:
 The code runs just fine -- some screen recordings of it running on my iPhone with the US_REGION08 ENC charts are below. Apologies for:
 
 * having 6 videos (there is a file size limit of 10MB here, so I had to split my screen recording up)
-* the video recording going upside down when I rotate the phone -- it's the recording not the app itself!
+* the video recording starting wierdly -- it's the recording not the app itself!
 * the awfully non standard symbology on the map
 
 
@@ -16,21 +16,18 @@ The code runs just fine -- some screen recordings of it running on my iPhone wit
 
 1) Launch, rotate screen, zoom with "+" button, one finger touch scroll of the chart:
 
-
-
 https://github.com/aardy1/Charts/assets/54723230/5636f5b9-6eb2-4f21-972b-8fd62c46cb11
-
-
 
 
 2) Scrolling the chart, showing lights on the map:
 
-https://github.com/aardy1/Charts/assets/54723230/170e110f-f431-47cb-9ddb-c31f93bf3369
+https://github.com/aardy1/Charts/assets/54723230/d54e6005-8797-474f-9c72-20d3f72e7092
 
 
 3) More scolling the chart, then pinch zooming into Tampa Bay:
 
-https://github.com/aardy1/Charts/assets/54723230/37cb0177-9781-4fdc-8545-aaeff26cb99a
+https://github.com/aardy1/Charts/assets/54723230/c9b7b9e6-b847-479b-8c68-6e7bd707d233
+
 
 
 4) Long tap on the chart to get max detail in Tampa Bay (this loads and displays a new chart), zoom and scroll the new chart:
