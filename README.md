@@ -7,9 +7,11 @@ This project has two parts:
 
 The code runs just fine -- some videos of it running in my iPhone are below (sorry for 6 videos (file size limit 10MB) and for the fact that the video recording goes upside down when I rotate the phone -- it's the recording not the app itself).
 
-Launch, rotate screen, zoom with "+" button, scrolling the map:
+Launch, rotate screen, zoom with "+" button, moving the map:
 
 https://github.com/aardy1/Charts/assets/54723230/5c284354-dd2b-40ea-a14d-b954ddab7e04
+
+Moving the map, showing lights on the map:
 
 https://github.com/aardy1/Charts/assets/54723230/170e110f-f431-47cb-9ddb-c31f93bf3369
 
