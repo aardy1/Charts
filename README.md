@@ -12,9 +12,15 @@ The code runs just fine -- some screen recordings of it running on my iPhone wit
 * the awfully non standard symbology on the map
 
 
+**Videos**
+
 1) Launch, rotate screen, zoom with "+" button, one finger touch scroll of the chart:
 
-https://github.com/aardy1/Charts/assets/54723230/5c284354-dd2b-40ea-a14d-b954ddab7e04
+
+
+https://github.com/aardy1/Charts/assets/54723230/5636f5b9-6eb2-4f21-972b-8fd62c46cb11
+
+
 
 
 2) Scrolling the chart, showing lights on the map:
