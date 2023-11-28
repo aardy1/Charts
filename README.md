@@ -5,7 +5,10 @@ This project has two parts:
 1. a partial "clone" of [OpenCPN](https://opencpn.org) running natively on all desktop and mobile platforms
 2. a pure JavaFX ESRI shape file renderer (so no use of AWT or bridges to AWT)
 
-The code runs just fine -- some videos of it running in my iPhone are below (sorry for 6 videos (file size limit 10MB) and for the fact that the video recording goes upside down when I rotate the phone -- it's the recording not the app itself).
+The code runs just fine -- some videos of it running in my iPhone are below. Apologies for
+* 6 videos (there is a file size limit of 10MB here, so I had to split it up)
+* the fact that the video recording goes upside down when I rotate the phone -- it's the recording not the app itself)
+* the awfully non standard symbology on the map
 
 
 Launch, rotate screen, zoom with "+" button, one finger touch scroll of the map:
@@ -23,12 +26,20 @@ More moving the map, then pinch zooming into Tampa Bay:
 https://github.com/aardy1/Charts/assets/54723230/37cb0177-9781-4fdc-8545-aaeff26cb99a
 
 
-Long tap on the map to get max detail in Tampa Bay (this loads and displays a new map):
+Long tap on the map to get max detail in Tampa Bay (this loads and displays a new map), zoom, and scroll:
 
 
 https://github.com/aardy1/Charts/assets/54723230/c79aa744-0634-4abe-98c8-93e688a58570
 
+
+Map scrolling, add soundings, scroll, finally rotate phone (and get incorrect aspect ratio :-( )
+
+
 https://github.com/aardy1/Charts/assets/54723230/dfa728cb-a003-405f-a9b7-3d3b5c2ca157
+
+
+Map scrolling, quit app
+
 
 https://github.com/aardy1/Charts/assets/54723230/3ae1d125-4603-4c78-be7f-ee2814a1cf18
 
