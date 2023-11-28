@@ -18,6 +18,10 @@ public class IOS extends BasePlatform implements IPlatform {
 		super(Services.get(StorageService.class).flatMap(StorageService::getPrivateStorage).get().toPath());
 	}
 
+	// public Path chartsDir() {
+	// return rootDir().resolve(Paths.get("ENC", "USREGION08"));
+	// }
+
 	@Override
 	public void setTitle(Stage stage, String title) {
 		// iOs apps do not have window titles

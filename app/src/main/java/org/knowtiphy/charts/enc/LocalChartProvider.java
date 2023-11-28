@@ -56,6 +56,7 @@ public class LocalChartProvider {
 			MapDisplayOptions displayOptions) throws IOException, XMLStreamException, TransformException,
 			FactoryException, NonInvertibleTransformException, StyleSyntaxException {
 
+		System.err.println("Desc = " + chartDescription);
 		var reader = new ChartBuilder(chartLocker, chartDescription.getDir(), chartDescription, styleReader,
 				displayOptions).read();
 		var map = reader.getMap();

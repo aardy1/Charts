@@ -1,5 +1,11 @@
 package org.knowtiphy.charts;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
@@ -122,8 +128,20 @@ public class KnowtiphyCharts extends Application {
 
 		System.err.println("Platform = " + platform.getClass().getCanonicalName());
 		System.err.println("File System root = " + platform.rootDir());
+		System.err.println("File System root = " + platform.rootDir().toFile().exists());
+		System.err.println("File System root ENC = " + Paths.get(platform.rootDir().toString(), "ENC"));
+		System.err
+				.println("File System root ENC = " + Paths.get(platform.rootDir().toString(), "ENC").toFile().exists());
 		System.err.println("Charts  dir = " + platform.chartsDir());
-		System.err.println("Screen dimesions = " + platform.screenDimensions());
+		System.err.println("Charts  dir = " + platform.chartsDir().toFile().exists());
+		try (var dave = Files.list(Paths.get(platform.rootDir().toString(), "ENC"))) {
+			var files = dave.map(Path::getFileName).map(Path::toString).toList();
+			System.err.println("Files = " + files);
+		}
+		catch (IOException ex) {
+			Logger.getLogger(KnowtiphyCharts.class.getName()).log(Level.SEVERE, null, ex);
+		}
+		System.err.println("Screen dimensions = " + platform.screenDimensions());
 		System.err.println("Screen ppi = " + platform.ppi());
 		System.err.println("Screen ppcm = " + platform.ppcm());
 		System.err.println("Default font = " + Font.getDefault());

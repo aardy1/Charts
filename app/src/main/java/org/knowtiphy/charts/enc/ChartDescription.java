@@ -53,4 +53,9 @@ public class ChartDescription {
 		return dir;
 	}
 
+	@Override
+	public String toString() {
+		return "ChartDescription{" + "cell=" + cell + ", dir=" + dir + '}';
+	}
+
 }
