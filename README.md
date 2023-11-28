@@ -2,7 +2,7 @@
 
 This project has two parts:
 
-1. a "clone" of [OpenCPN](https://opencpn.org) running natively on all desktop and mobile platforms
+1. a partial "clone" of [OpenCPN](https://opencpn.org) running natively on all desktop and mobile platforms
 2. a pure JavaFX ESRI shape file renderer (so no use of AWT or bridges to AWT)
 
 The code runs just fine, but needs a lot of work of course.
