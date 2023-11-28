@@ -2,11 +2,11 @@
 
 This project has two parts:
 
-1. a partial "clone" of [OpenCPN](https://opencpn.org) running natively on all desktop and mobile platforms
+1. an Electronic Navigation Chart (ENC) viewer (inspired by [OpenCPN](https://opencpn.org)) running natively on all desktop and mobile platforms
 2. a pure JavaFX ESRI shape file renderer (so no use of AWT or bridges to AWT)
 
 
-The code runs just fine -- some screen recordings of it running on my iPhone with the US_REGION08 ENC charts are below. Apologies for:
+The project runs just fine -- some screen recordings of it running on my iPhone with the US_REGION08 ENC charts are below. Apologies for:
 
 * having 6 videos (there is a file size limit of 10MB at github, so I had to split my screen recording up)
 * the video recording starting and ending wierdly wrt orientation -- it's the recording not the app itself
