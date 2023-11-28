@@ -6,6 +6,7 @@
 package org.knowtiphy.charts.platform;
 
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.layout.Region;
 import javafx.stage.Screen;
@@ -23,6 +24,10 @@ public abstract class BasePlatform {
 
 	public Path rootDir() {
 		return root;
+	}
+
+	public Path chartsDir() {
+		return rootDir().resolve(Paths.get("ENC", "REGION_08"));
 	}
 
 	public double ppi() {

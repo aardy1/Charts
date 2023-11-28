@@ -15,7 +15,7 @@ import javafx.stage.Stage;
 public abstract class Desktop extends BasePlatform {
 
 	Desktop() {
-		super(Paths.get(System.getProperty("user.home"), "Documents", "KnowtiphyCharts"));
+		super(Paths.get(System.getProperty("user.home"), "Documents", "Knowtiphy Charts"));
 	}
 
 	public void loadIcons(Stage stage, Class<?> cls) {

@@ -7,8 +7,6 @@ package org.knowtiphy.charts.platform;
 
 import com.gluonhq.attach.storage.StorageService;
 import com.gluonhq.attach.util.Services;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import javafx.stage.Stage;
 
 /**
@@ -23,11 +21,6 @@ public class IOS extends BasePlatform implements IPlatform {
 	@Override
 	public void setTitle(Stage stage, String title) {
 		// iOs apps do not have window titles
-	}
-
-	@Override
-	public Path chartsDir() {
-		return rootDir().resolve(Paths.get("Documents", "Region_08"));
 	}
 
 	@Override
