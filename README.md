@@ -38,7 +38,11 @@ https://github.com/aardy1/Charts/assets/54723230/32aae910-28ef-48a6-bde6-ffc80bf
 
 5) Scroll the new chart, add soundings, scroll, finally rotate phone (and get incorrect aspect ratio :-( )
 
-https://github.com/aardy1/Charts/assets/54723230/268c6aee-97d2-40db-8480-4151b0c9bb61
+
+
+https://github.com/aardy1/Charts/assets/54723230/061f5d33-0d25-47ec-9180-c986295b9f3e
+
+
 
 
 
