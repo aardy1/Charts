@@ -13,14 +13,16 @@ The project uses Gradle as it's build system.
 
 I use Gradle 8.3 installed via the wonderful [sdkman](https://sdkman.io/).
 
-1. Check the code out.
-2. Load it in your favorite IDE.
+1. Check the code out
+2. Load it in your favorite IDE
 3. Do whatever you need to do in your IDE to get JavaFX installed and useable
-4. Do whatever you do in your IDE to enable Gradle builds.
+4. Do whatever you need to do in your IDE to enable Gradle builds.
 
-Step 3. is usually a gigantic pain in the neck. So what I do is "cheat". I download an already configured JVM from [here](https://github.com/gluonhq/graal/releases/) (I use Java 17), and use that as my JVM in my IDE.
+Step 4. is usually nothing.
 
-You are going to need that JVM to build native images, so ...
+Step 3. is usually a gigantic pain in the neck. So what I do is download an already configured JVM from [here](https://github.com/gluonhq/graal/releases/) (I use Java 17), and use that as my JVM in my IDE.
+
+You are going to need this JVM to build native images ...
 
 ## Running the App
 
