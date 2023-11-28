@@ -8,7 +8,7 @@ This project has two parts:
 The code runs just fine -- some screen recordings of it running on my iPhone with the US_REGION08 ENC charts are below. Apologies for:
 
 * having 6 videos (there is a file size limit of 10MB here, so I had to split my screen recording up)
-* the video recording starting wierdly -- it's the recording not the app itself!
+* the video recording starting and ending wierdly wrt orientation -- it's the recording not the app itself!
 * the awfully non standard symbology on the map
 
 
@@ -34,22 +34,16 @@ https://github.com/aardy1/Charts/assets/54723230/c9b7b9e6-b847-479b-8c68-6e7bd70
 https://github.com/aardy1/Charts/assets/54723230/32aae910-28ef-48a6-bde6-ffc80bfee012
 
 
-
-
 5) Scroll the new chart, add soundings, scroll, finally rotate phone (and get incorrect aspect ratio :-( )
 
+https://github.com/aardy1/Charts/assets/54723230/3602b7cf-607b-43ae-8dc6-891b80216174
 
 
-https://github.com/aardy1/Charts/assets/54723230/061f5d33-0d25-47ec-9180-c986295b9f3e
+6) Scroll rotated chart, quit app
+
+https://github.com/aardy1/Charts/assets/54723230/ffcbc8ef-d3ce-4049-b9a4-807278bee31a
 
 
-
-
-
-
-6) Chart scrolling, quit app
-
-https://github.com/aardy1/Charts/assets/54723230/3ae1d125-4603-4c78-be7f-ee2814a1cf18
 
 
 ## Building with a JVM
