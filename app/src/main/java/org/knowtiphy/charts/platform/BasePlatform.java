@@ -27,7 +27,7 @@ public abstract class BasePlatform {
 	}
 
 	public Path chartsDir() {
-		return rootDir().resolve(Paths.get("ENC", "REGION_08"));
+		return rootDir().resolve(Paths.get("ENC", "US_REGION08"));
 	}
 
 	public double ppi() {
