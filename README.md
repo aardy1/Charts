@@ -5,32 +5,19 @@ This project has two parts:
 1. a partial "clone" of [OpenCPN](https://opencpn.org) running natively on all desktop and mobile platforms
 2. a pure JavaFX ESRI shape file renderer (so no use of AWT or bridges to AWT)
 
-The code runs just fine, but needs a lot of work of course.
-
-
-
-https://github.com/aardy1/Charts/assets/54723230/3ae1d125-4603-4c78-be7f-ee2814a1cf18
-
-
-
-https://github.com/aardy1/Charts/assets/54723230/dfa728cb-a003-405f-a9b7-3d3b5c2ca157
-
-
-
-https://github.com/aardy1/Charts/assets/54723230/c79aa744-0634-4abe-98c8-93e688a58570
-
-
-
-https://github.com/aardy1/Charts/assets/54723230/37cb0177-9781-4fdc-8545-aaeff26cb99a
-
-
-
-https://github.com/aardy1/Charts/assets/54723230/170e110f-f431-47cb-9ddb-c31f93bf3369
-
-
+The code runs just fine -- some videos of it running in my iPhone are below (sorry for 6 videos, but can't upload files larger than 10MB here).
 
 https://github.com/aardy1/Charts/assets/54723230/5c284354-dd2b-40ea-a14d-b954ddab7e04
 
+https://github.com/aardy1/Charts/assets/54723230/170e110f-f431-47cb-9ddb-c31f93bf3369
+
+https://github.com/aardy1/Charts/assets/54723230/37cb0177-9781-4fdc-8545-aaeff26cb99a
+
+https://github.com/aardy1/Charts/assets/54723230/c79aa744-0634-4abe-98c8-93e688a58570
+
+https://github.com/aardy1/Charts/assets/54723230/dfa728cb-a003-405f-a9b7-3d3b5c2ca157
+
+https://github.com/aardy1/Charts/assets/54723230/3ae1d125-4603-4c78-be7f-ee2814a1cf18
 
 
 ## Building with a JVM
