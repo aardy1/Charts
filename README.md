@@ -24,20 +24,23 @@ https://github.com/aardy1/Charts/assets/54723230/5636f5b9-6eb2-4f21-972b-8fd62c4
 https://github.com/aardy1/Charts/assets/54723230/d54e6005-8797-474f-9c72-20d3f72e7092
 
 
-3) More scolling the chart, then pinch zooming into Tampa Bay:
+3) More scolling the chart, pinch zooming into Tampa Bay:
 
 https://github.com/aardy1/Charts/assets/54723230/c9b7b9e6-b847-479b-8c68-6e7bd707d233
 
 
-
 4) Long tap on the chart to get max detail in Tampa Bay (this loads and displays a new chart), zoom and scroll the new chart:
 
-https://github.com/aardy1/Charts/assets/54723230/c79aa744-0634-4abe-98c8-93e688a58570
+https://github.com/aardy1/Charts/assets/54723230/32aae910-28ef-48a6-bde6-ffc80bfee012
 
 
-5) Scrolling the new chart, add soundings, scroll, finally rotate phone (and get incorrect aspect ratio :-( )
 
-https://github.com/aardy1/Charts/assets/54723230/dfa728cb-a003-405f-a9b7-3d3b5c2ca157
+
+5) Scroll the new chart, add soundings, scroll, finally rotate phone (and get incorrect aspect ratio :-( )
+
+https://github.com/aardy1/Charts/assets/54723230/268c6aee-97d2-40db-8480-4151b0c9bb61
+
+
 
 
 6) Chart scrolling, quit app
