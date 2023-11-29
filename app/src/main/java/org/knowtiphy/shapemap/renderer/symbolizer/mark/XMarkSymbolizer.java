@@ -25,19 +25,15 @@ public class XMarkSymbolizer extends BaseMarkSymbolizer {
 	@Override
 	public void render(RenderingContext context, SimpleFeature feature, Point pt, PointSymbolizer pointSymbolizer) {
 
-		if (fillInfo == null && strokeInfo == null)
+		var szo = pointSymbolizer.size().apply(feature, pt);
+		if (szo == null)
 			return;
+		var sz = Math.abs(((Number) szo).doubleValue());
 
-		var sz = pointSymbolizer.size().apply(feature, pt);
-		if (sz == null)
-			return;
-
-		var gc = context.graphicsContext();
-		var tx = context.worldToScreen();
-
-		tx.apply(pt.getX(), pt.getY());
-		var sizeX = ((Number) sz).doubleValue() * context.onePixelX();
-		var sizeY = ((Number) sz).doubleValue() * context.onePixelY();
+		var x = pt.getX();
+		var y = pt.getY();
+		var sizeX = sz * context.onePixelX();
+		var sizeY = sz * context.onePixelY();
 		var halfSizeX = sizeX / 2;
 		var halfSizeY = sizeY / 2;
 
@@ -47,10 +43,12 @@ public class XMarkSymbolizer extends BaseMarkSymbolizer {
 		// gc.fillRect(tx.getX() - halfSizeX, tx.getY() - halfSizeY, sizeX, sizeY);
 		// }
 
+		var gc = context.graphicsContext();
+
 		if (strokeInfo != null) {
 			Stroke.setup(context, strokeInfo);
-			gc.strokeLine(tx.getX() - halfSizeX, tx.getY() - halfSizeY, tx.getX() + halfSizeX, tx.getY() + halfSizeY);
-			gc.strokeLine(tx.getX() - halfSizeX, tx.getY() + halfSizeY, tx.getX() + halfSizeX, tx.getY() - halfSizeY);
+			gc.strokeLine(x - halfSizeX, y - halfSizeY, x + halfSizeX, y + halfSizeY);
+			gc.strokeLine(x - halfSizeX, y + halfSizeY, x + halfSizeX, y - halfSizeY);
 		}
 	}
 

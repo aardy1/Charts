@@ -209,7 +209,7 @@ public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView
 			var nearby = Queries.featuresNearXYWorld(chart, event.getX(), event.getY(), 1);
 
 			var tx = new Transformation(chart.viewPortScreenToWorld());
-			tx.reallyApply(event.getX(), event.getY());
+			tx.apply(event.getX(), event.getY());
 
 			// this is a bit weird since surely you can do it one query?
 			var textToDisplay = new StringBuilder();
@@ -303,7 +303,7 @@ public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView
 
 	private void setBoatPosition(Glyph boat, AISInformation aisInfo) {
 		var tx = new Transformation(chart.viewPortWorldToScreen());
-		tx.reallyApply(aisInfo.getPosition().x, aisInfo.getPosition().y);
+		tx.apply(aisInfo.getPosition().x, aisInfo.getPosition().y);
 		boat.setTranslateX(tx.getX());
 		boat.setTranslateY(tx.getY());
 	}

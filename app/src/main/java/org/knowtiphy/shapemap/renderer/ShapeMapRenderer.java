@@ -42,6 +42,7 @@ public class ShapeMapRenderer {
 
 		System.err.println("\nRepaint : " + paintArea + "\n");
 
+		// TODO -- get rid of this debugging code
 		count.set(count.get() + 1);
 		var start = System.currentTimeMillis();
 
@@ -56,8 +57,6 @@ public class ShapeMapRenderer {
 		pt2 = screenToWorld.transform(0, 1);
 		var onePixelY = Math.abs(pt2.getY() - pt1.getY());
 
-		graphics.save();
-		graphics.setTransform(worldToScreen);
 		var context = new RenderingContext(graphics, new Transformation(worldToScreen), onePixelX, onePixelY,
 				map.renderGeomCache(), index, viewportBounds);
 
@@ -68,6 +67,8 @@ public class ShapeMapRenderer {
 		// symbolizers)
 
 		try {
+			graphics.setTransform(worldToScreen);
+
 			var gStart = System.currentTimeMillis();
 
 			var appliedRule = new boolean[map.getTotalRuleCount()];
@@ -102,7 +103,7 @@ public class ShapeMapRenderer {
 			layerPos = 0;
 			rulePos = 0;
 
-			graphics.restore();
+			graphics.setTransform(Transformation.IDENTITY);
 
 			for (var layer : map.layers()) {
 				System.err.println("Layer " + layer.title() + " vis = " + layer.isVisible());

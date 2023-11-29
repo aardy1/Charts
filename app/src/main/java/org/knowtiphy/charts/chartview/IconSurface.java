@@ -153,7 +153,7 @@ public class IconSurface extends Pane {
 			polygon.setStrokeType(StrokeType.INSIDE);
 			// polygon.setClip(this);
 			for (var coord : coords) {
-				transform.reallyApply(coord.x, coord.y);
+				transform.apply(coord.x, coord.y);
 				pts.add(transform.getX());
 				pts.add(transform.getY());
 			}
@@ -166,7 +166,7 @@ public class IconSurface extends Pane {
 	}
 
 	private static void repositionPoint(Transformation transformation, Geometry point, Region region) {
-		transformation.reallyApply(point.getCoordinate().x, point.getCoordinate().y);
+		transformation.apply(point.getCoordinate().x, point.getCoordinate().y);
 		region.setTranslateX(transformation.getX());
 		region.setTranslateY(transformation.getY());
 	}

@@ -70,7 +70,7 @@ public class Coordinates {
 
 		// TODO -- why does this not center the view port on the x, y world coords?
 		var tx = new Transformation(map.viewPortScreenToWorld());
-		tx.reallyApply(x, y);
+		tx.apply(x, y);
 		// var worldPos = Transformation.screenToWorld(map, x, y);
 
 		var envelope = new ReferencedEnvelope(tx.getX() - defaultWidth, tx.getX() + defaultWidth,

@@ -1,12 +1,14 @@
 package org.knowtiphy.shapemap.renderer;
 
 import javafx.scene.transform.Affine;
-import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.LineString;
+import org.locationtech.jts.geom.Polygon;
 
 /**
  *
  */
 public class Transformation {
+	public static final Affine IDENTITY = new Affine();
 
 	private final Affine transformation;
 
@@ -28,51 +30,39 @@ public class Transformation {
 	}
 
 	public void apply(double x, double y) {
-		// src[0] = x;
-		// src[1] = y;
-		dest[0] = x;
-		dest[1] = y;
-		// transformation.transform2DPoints(src, 0, dest, 0, 1);
-	}
-
-	public void reallyApply(double x, double y) {
 		src[0] = x;
 		src[1] = y;
 		transformation.transform2DPoints(src, 0, dest, 0, 1);
 	}
 
-	public void apply(Coordinate pd) {
-		apply(pd.x, pd.y);
-	}
+	// TODO -- it would be nice to get rid of this -- maybe when we load the geoms?
+	public void copyCoordinatesG(LineString g) {
 
-	public void transformCoordinates(Coordinate[] coords) {
-
-		xs = new double[coords.length];
-		ys = new double[coords.length];
-		for (var i = 0; i < coords.length; i++) {
-			apply(coords[i].x, coords[i].y);
-			xs[i] = getX();
-			ys[i] = getY();
+		var numPts = g.getNumPoints();
+		xs = new double[numPts];
+		ys = new double[numPts];
+		for (var i = 0; i < numPts; i++) {
+			var coord = g.getCoordinateN(i);
+			xs[i] = coord.getX();
+			ys[i] = coord.getY();
 		}
 	}
-	//
-	// public void transformCoordinates(double[] xs, double[] ys) {
-	//
-	// for (var i = 0; i < xs.length; i++) {
-	// apply(xs[i], ys[i]);
-	// xs[i] = getX();
-	// ys[i] = getY();
-	// }
-	// }
-	//
-	// public void reallyTransformCoordinates(double[] xs, double[] ys) {
-	//
-	// for (var i = 0; i < xs.length; i++) {
-	// reallyApply(xs[i], ys[i]);
-	// xs[i] = getX();
-	// ys[i] = getY();
-	// }
-	// }
+
+	// TODO -- it would be nice to get rid of this -- maybe when we load the geoms?
+	// polys don't have a getCoordinate() method?!?!
+	public void copyCoordinatesG(Polygon g) {
+
+		var numPts = g.getNumPoints();
+		xs = new double[numPts];
+		ys = new double[numPts];
+		// TODO -- this is potentially a copy. JTS docs have a comment on how to avoid
+		// this
+		var coords = g.getCoordinates();
+		for (var i = 0; i < numPts; i++) {
+			xs[i] = coords[i].getX();
+			ys[i] = coords[i].getY();
+		}
+	}
 
 	public double getX() {
 		return dest[0];

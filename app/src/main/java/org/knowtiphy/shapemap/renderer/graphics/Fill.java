@@ -50,14 +50,12 @@ public class Fill {
 	}
 
 	private static void fillPoint(RenderingContext context, Point point) {
-		var tx = context.worldToScreen();
-		tx.apply(point.getX(), point.getY());
-		context.graphicsContext().fillRect(tx.getX(), tx.getY(), context.onePixelX(), context.onePixelY());
+		context.graphicsContext().fillRect(point.getX(), point.getY(), context.onePixelX(), context.onePixelY());
 	}
 
 	private static void fillLineString(RenderingContext context, LineString lineString) {
 		var tx = context.worldToScreen();
-		tx.transformCoordinates(lineString.getCoordinates());
+		tx.copyCoordinatesG(lineString);
 		context.graphicsContext().fillPolygon(tx.getXs(), tx.getYs(), tx.getXs().length);
 	}
 
@@ -80,7 +78,7 @@ public class Fill {
 			renderGeomCache.cache(polygon, renderGeom);
 		}
 
-		tx.transformCoordinates(renderGeom.getCoordinates());
+		tx.copyCoordinatesG((Polygon) renderGeom);
 		gc.fillPolygon(tx.getXs(), tx.getYs(), tx.getXs().length);
 	}
 

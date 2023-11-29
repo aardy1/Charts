@@ -86,7 +86,7 @@ public class CoordinateGrid extends Pane {
 		for (double longitude = startLongitude; longitude < extent.getMaxX(); longitude += delta) {
 			var line = makeLine(0, screenArea.getMinY(), 0, screenArea.getMaxY());
 			var label = makeLabel(labelLongitude(longitude), LONGITUDE_INSET);
-			transform.reallyApply(longitude, 0);
+			transform.apply(longitude, 0);
 			line.setTranslateX(transform.getX());
 			label.setTranslateX(transform.getX());
 			toAdd.add(line);
@@ -96,7 +96,7 @@ public class CoordinateGrid extends Pane {
 		for (double longitude = startLongitude - delta; longitude > extent.getMinX(); longitude -= delta) {
 			var line = makeLine(0, screenArea.getMinY(), 0, screenArea.getMaxY());
 			var label = makeLabel(labelLongitude(longitude), LONGITUDE_INSET);
-			transform.reallyApply(longitude, 0);
+			transform.apply(longitude, 0);
 			line.setTranslateX(transform.getX());
 			label.setTranslateX(transform.getX());
 			toAdd.add(line);
@@ -113,7 +113,7 @@ public class CoordinateGrid extends Pane {
 		for (double lattitude = startLattitude; lattitude < extent.getMaxY(); lattitude += delta) {
 			var line = makeLine(screenArea.getMinX(), 0, screenArea.getMaxX(), 0);
 			var label = makeLabel(labelLattitude(lattitude), LATTITUDE_INSET);
-			transform.reallyApply(0, lattitude);
+			transform.apply(0, lattitude);
 			line.setTranslateY(transform.getY());
 			label.setTranslateY(transform.getY());
 			toAdd.add(line);
@@ -123,7 +123,7 @@ public class CoordinateGrid extends Pane {
 		for (double lattitude = startLattitude - delta; lattitude > extent.getMinY(); lattitude -= delta) {
 			var line = makeLine(screenArea.getMinX(), 0, screenArea.getMaxX(), 0);
 			var label = makeLabel(labelLattitude(lattitude), LATTITUDE_INSET);
-			transform.reallyApply(0, lattitude);
+			transform.apply(0, lattitude);
 			line.setTranslateY(transform.getY());
 			label.setTranslateY(transform.getY());
 			toAdd.add(line);
@@ -148,7 +148,7 @@ public class CoordinateGrid extends Pane {
 		var bounds = chart.viewPortBounds();
 
 		var legend = new VBox();
-		transform.reallyApply(bounds.getMinX() + delta, 0);
+		transform.apply(bounds.getMinX() + delta, 0);
 		var line = new Line(0, 0, transform.getX(), 0);
 		line.setTranslateX(20);
 		line.getStyleClass().add("legendline");

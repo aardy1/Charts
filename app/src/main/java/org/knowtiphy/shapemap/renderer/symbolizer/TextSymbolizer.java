@@ -93,7 +93,7 @@ public class TextSymbolizer {
 					var tx = context.worldToScreen();
 					var blocked = context.blocked();
 
-					tx.reallyApply(point.getX(), point.getY());
+					tx.apply(point.getX(), point.getY());
 					// TODO -- this is wrong since it supposed to be from the bounding box
 					// of the pt feature?
 

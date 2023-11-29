@@ -29,7 +29,7 @@ public class Queries {
 			throws IOException {
 
 		var tx = new Transformation(map.viewPortScreenToWorld());
-		tx.reallyApply(x, y);
+		tx.apply(x, y);
 		var envelope = new ReferencedEnvelope(tx.getX() - DELTA, tx.getX() + DELTA, tx.getY() - DELTA,
 				tx.getY() + DELTA, map.crs());
 
@@ -59,7 +59,7 @@ public class Queries {
 		}
 
 		var tx = new Transformation(map.viewPortScreenToWorld());
-		tx.reallyApply(x, y);
+		tx.apply(x, y);
 
 		var pt = new GeometryFactory().createPoint(new Coordinate(tx.getX(), tx.getY()));
 		for (var f : foo) {
@@ -86,10 +86,10 @@ public class Queries {
 		 * also offers other, more accurate methods.
 		 */
 		Transformation tx = new Transformation(map.viewPortScreenToWorld());
-		tx.reallyApply(screenMinX, screenMinY);
+		tx.apply(screenMinX, screenMinY);
 		double minX = tx.getX();
 		double minY = tx.getY();
-		tx.reallyApply(screenMaxX, screenMaxY);
+		tx.apply(screenMaxX, screenMaxY);
 		double maxX = tx.getX();
 		double maxY = tx.getY();
 		double width = maxX - minX;

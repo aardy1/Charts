@@ -28,7 +28,6 @@ import org.knowtiphy.charts.Fonts;
 import org.knowtiphy.charts.enc.ChartDescription;
 import org.knowtiphy.charts.enc.ChartLocker;
 import org.knowtiphy.charts.enc.ENCChart;
-import org.knowtiphy.shapemap.renderer.Transformation;
 import org.knowtiphy.shapemap.style.parser.StyleSyntaxException;
 import org.knowtiphy.shapemap.viewmodel.MapDisplayOptions;
 
@@ -118,15 +117,13 @@ public class QuiltingSurface extends StackPane {
 	private void showQuilting(ChartDescription chartDescription) {
 
 		displaySurface.getChildren().clear();
-		var transform = new Transformation(chart.viewPortWorldToScreen());
 
 		for (var panel : chartDescription.getPanels()) {
 			var pts = new double[panel.getVertices().size() * 2];
 			for (int i = 0, j = 0; j < pts.length; i++, j += 2) {
 				var vertex = panel.getVertices().get(i);
-				transform.apply(vertex.x, vertex.y);
-				pts[j] = transform.getX();
-				pts[j + 1] = transform.getY();
+				pts[j] = vertex.x;
+				pts[j + 1] = vertex.y;
 			}
 
 			var poly = new Polygon(pts);

@@ -25,18 +25,14 @@ public class CrossMarkSymbolizer extends BaseMarkSymbolizer {
 	@Override
 	public void render(RenderingContext context, SimpleFeature feature, Point pt, PointSymbolizer pointSymbolizer) {
 
-		if (fillInfo == null && strokeInfo == null)
-			return;
-
 		var szo = pointSymbolizer.size().apply(feature, pt);
 		if (szo == null)
 			return;
+
+		var x = pt.getX();
+		var y = pt.getY();
 		var sz = Math.abs(((Number) szo).doubleValue());
 
-		var gc = context.graphicsContext();
-		var tx = context.worldToScreen();
-
-		tx.apply(pt.getX(), pt.getY());
 		var sizeX = sz * context.onePixelX();
 		var sizeY = sz * context.onePixelY();
 		var halfSizeX = sizeX / 2;
@@ -48,10 +44,12 @@ public class CrossMarkSymbolizer extends BaseMarkSymbolizer {
 		// gc.fillRect(tx.getX() - halfSizeX, tx.getY() - halfSizeY, sizeX, sizeY);
 		// }
 
+		var gc = context.graphicsContext();
+
 		if (strokeInfo != null) {
 			Stroke.setup(context, strokeInfo);
-			gc.strokeLine(tx.getX() - halfSizeX, tx.getY(), tx.getX() + halfSizeX, tx.getY());
-			gc.strokeLine(tx.getX(), tx.getY() - halfSizeY, tx.getX(), tx.getY() + halfSizeY);
+			gc.strokeLine(x - halfSizeX, y, x + halfSizeX, y);
+			gc.strokeLine(x, y - halfSizeY, x, y + halfSizeY);
 		}
 	}
 

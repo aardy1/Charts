@@ -5,12 +5,12 @@
 
 package org.knowtiphy.shapemap.renderer.symbolizer;
 
-import org.knowtiphy.shapemap.renderer.symbolizer.mark.BaseMarkSymbolizer;
 import javafx.scene.paint.Color;
 import org.geotools.api.feature.simple.SimpleFeature;
 import org.knowtiphy.shapemap.renderer.RenderingContext;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.FillInfo;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.StrokeInfo;
+import org.knowtiphy.shapemap.renderer.symbolizer.mark.BaseMarkSymbolizer;
 import org.locationtech.jts.geom.Point;
 
 /**
@@ -50,14 +50,14 @@ public class SVGPathSymbolizer extends BaseMarkSymbolizer {
 		var gc = context.graphicsContext();
 		var tx = context.worldToScreen();
 
-		tx.apply(pt.getX(), pt.getY());
-
-		System.err.println(dave.formatted((int) tx.getX(), (int) tx.getY()));
+		var x = pt.getX();
+		var y = pt.getY();
+		System.err.println(dave.formatted((int) x, (int) y));
 		gc.setLineWidth(1);
 		// gc.setFill(Color.RED);
 		gc.setStroke(Color.BLACK);
-		gc.appendSVGPath(dave.formatted((int) tx.getX(), (int) tx.getY()));
-		gc.closePath();
+		gc.appendSVGPath(dave.formatted((int) x, (int) y));
+		// gc.closePath();
 		// gc.fill();
 		gc.stroke();
 	}

@@ -6,6 +6,7 @@
 package org.knowtiphy.shapemap.renderer.graphics;
 
 import org.knowtiphy.shapemap.renderer.RenderingContext;
+import org.knowtiphy.shapemap.renderer.Transformation;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.StrokeInfo;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
@@ -41,8 +42,8 @@ public class Stroke {
 		// TODO -- switch on strings is brain dead
 		switch (geom.getGeometryType()) {
 			case Geometry.TYPENAME_POINT -> strokePoint(context, (Point) geom);
-			case Geometry.TYPENAME_LINESTRING -> strokeLineString(context, (LineString) geom);
-			case Geometry.TYPENAME_LINEARRING -> strokeLineString(context, (LineString) geom);
+			case Geometry.TYPENAME_LINESTRING -> strokeLineStringSVG(context, (LineString) geom);
+			case Geometry.TYPENAME_LINEARRING -> strokeLineStringSVG(context, (LineString) geom);
 			case Geometry.TYPENAME_POLYGON -> strokePolygon(context, (Polygon) geom);
 			case Geometry.TYPENAME_MULTIPOINT, Geometry.TYPENAME_MULTILINESTRING, Geometry.TYPENAME_MULTIPOLYGON,
 					Geometry.TYPENAME_GEOMETRYCOLLECTION ->
@@ -52,15 +53,34 @@ public class Stroke {
 	}
 
 	private static void strokePoint(RenderingContext context, Point point) {
-		var tx = context.worldToScreen();
-		tx.apply(point.getX(), point.getY());
-		context.graphicsContext().strokeOval(tx.getX(), tx.getY(), context.onePixelX(), context.onePixelY());
+		context.graphicsContext().strokeOval(point.getX(), point.getY(), context.onePixelX(), context.onePixelY());
 	}
 
 	private static void strokeLineString(RenderingContext context, LineString lineString) {
 		var tx = context.worldToScreen();
-		tx.transformCoordinates(lineString.getCoordinates());
+		tx.copyCoordinatesG(lineString);
 		context.graphicsContext().strokePolyline(tx.getXs(), tx.getYs(), tx.getXs().length);
+	}
+
+	// if we are scaling in world coordinates it is faster to use the lineString() code --
+	// need to know that in our styles
+	private static void strokeLineStringSVG(RenderingContext context, LineString lineString) {
+		var gc = context.graphicsContext();
+
+		gc.beginPath();
+
+		var start = lineString.getCoordinateN(0);
+		gc.moveTo(start.getX(), start.getY());
+
+		for (var i = 1; i < lineString.getNumPoints(); i++) {
+			var pt = lineString.getCoordinateN(i);
+			gc.lineTo(pt.getX(), pt.getY());
+		}
+		var foo = gc.getTransform();
+		gc.setTransform(Transformation.IDENTITY);
+		gc.setLineWidth(1);
+		gc.stroke();
+		gc.setTransform(foo);
 	}
 
 	public static void strokePolygon(RenderingContext context, Polygon polygon) {

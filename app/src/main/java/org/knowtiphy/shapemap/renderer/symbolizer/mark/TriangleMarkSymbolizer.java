@@ -24,47 +24,44 @@ public class TriangleMarkSymbolizer extends BaseMarkSymbolizer {
 	}
 
 	// TODO -- this is hacky
-	private static final double[] x = new double[4];
+	private static final double[] xs = new double[4];
 
-	private static final double[] y = new double[4];
+	private static final double[] ys = new double[4];
 
 	@Override
 	public void render(RenderingContext context, SimpleFeature feature, Point pt, PointSymbolizer pointSymbolizer) {
 
-		if (fillInfo == null && strokeInfo == null)
-			return;
-
 		var szo = pointSymbolizer.size().apply(feature, pt);
 		if (szo == null)
 			return;
+
+		var x = pt.getX();
+		var y = pt.getY();
 		var sz = ((Number) szo).doubleValue();
 
-		var gc = context.graphicsContext();
-		var tx = context.worldToScreen();
-
-		tx.apply(pt.getX(), pt.getY());
 		var sizeX = sz * context.onePixelX();
 		var sizeY = sz * context.onePixelY();
 		var halfSizeX = sizeX / 2;
 		var halfSizeY = sizeY / 2;
 
-		x[0] = tx.getX();
-		y[0] = tx.getY() + halfSizeY;
-		x[1] = tx.getX() - halfSizeX;
-		y[1] = tx.getY() - halfSizeY;
-		x[2] = tx.getX() + halfSizeX;
-		y[2] = tx.getY() - halfSizeY;
+		xs[0] = x;
+		ys[0] = y + halfSizeY;
+		xs[1] = x - halfSizeX;
+		ys[1] = y - halfSizeY;
+		xs[2] = x + halfSizeX;
+		ys[2] = y - halfSizeY;
 
+		var gc = context.graphicsContext();
 		if (fillInfo != null) {
 			Fill.setup(context, fillInfo);
-			gc.fillPolygon(x, y, 3);
+			gc.fillPolygon(xs, ys, 3);
 		}
 
 		if (strokeInfo != null) {
 			Stroke.setup(context, strokeInfo);
-			x[3] = tx.getX();
-			y[3] = tx.getY() + halfSizeY;
-			gc.strokePolyline(x, y, 4);
+			xs[3] = x;
+			ys[3] = y + halfSizeY;
+			gc.strokePolyline(xs, ys, 4);
 		}
 	}
 
