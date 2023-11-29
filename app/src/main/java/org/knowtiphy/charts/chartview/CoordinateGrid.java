@@ -47,24 +47,24 @@ public class CoordinateGrid extends Pane {
 
 		this.chart = chrt;
 		this.unitProfile = unitProfile;
-
-		widthProperty().addListener(cl -> updateGridLines());
-		heightProperty().addListener(cl -> updateGridLines());
 		setupListeners();
 	}
 
 	private void setupListeners() {
 		subscriptions.forEach(s -> s.unsubscribe());
 		subscriptions.clear();
-		subscriptions.add(chart.viewPortBoundsEvent.subscribe(extent -> updateGridLines()));
+		subscriptions.add(chart.viewPortBoundsEvent.subscribe(extent -> requestLayout()));
 		subscriptions.add(chart.newChartEvents.subscribe(newChart -> {
 			this.chart = newChart;
-			updateGridLines();
+			setupListeners();
+			requestLayout();
 		}));
 	}
 
-	private void updateGridLines() {
+	@Override
+	public void layoutChildren() {
 
+		System.err.println("Yeah baby");
 		getChildren().clear();
 
 		var transform = new Transformation(chart.viewPortWorldToScreen());
@@ -73,7 +73,7 @@ public class CoordinateGrid extends Pane {
 		var toAdd = new ArrayList<Node>();
 		longitudeLines(transform, delta, toAdd);
 		lattitudeLines(transform, delta, toAdd);
-		toAdd.add(makeLegend(transform, delta));
+		// toAdd.add(makeLegend(transform, delta));
 		getChildren().addAll(toAdd);
 	}
 

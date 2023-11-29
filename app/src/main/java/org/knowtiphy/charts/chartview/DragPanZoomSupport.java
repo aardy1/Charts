@@ -39,13 +39,13 @@ public class DragPanZoomSupport {
 			// this seems kind of bogus
 			var newPos = new Point2D(event.getDeltaX(), event.getDeltaY());
 			var result = map.viewPortScreenToWorld().transform(newPos);
-			var envelope = new ReferencedEnvelope(map.viewPortBounds());
-			envelope.translate(envelope.getMinimum(0) - result.getX(), envelope.getMaximum(1) - result.getY());
+
+			var newVPBounds = new ReferencedEnvelope(map.viewPortBounds());
+			newVPBounds.translate(newVPBounds.getMinimum(0) - result.getX(), newVPBounds.getMaximum(1) - result.getY());
 
 			try {
-				var bounds = map.bounds();
-				var newExtent = clip(bounds, envelope, map.crs());
-				if (!newExtent.equals(bounds)) {
+				var newExtent = clip(map.bounds(), newVPBounds, map.crs());
+				if (!newExtent.equals(map.viewPortBounds())) {
 					map.setViewPortBounds(newExtent);
 				}
 			}
@@ -94,12 +94,13 @@ public class DragPanZoomSupport {
 		dragState.startY = event.getY();
 		var newPos = new Point2D(difX, difY);
 		var result = map.viewPortScreenToWorld().transform(newPos);
-		var envelope = new ReferencedEnvelope(map.viewPortBounds());
-		envelope.translate(envelope.getMinimum(0) - result.getX(), envelope.getMaximum(1) - result.getY());
+
+		var newVPBounds = new ReferencedEnvelope(map.viewPortBounds());
+		newVPBounds.translate(newVPBounds.getMinimum(0) - result.getX(), newVPBounds.getMaximum(1) - result.getY());
+
 		try {
-			var bounds = map.bounds();
-			var newExtent = clip(bounds, envelope, map.crs());
-			if (!newExtent.equals(bounds)) {
+			var newExtent = clip(map.bounds(), newVPBounds, map.crs());
+			if (!newExtent.equals(map.viewPortBounds())) {
 				map.setViewPortBounds(newExtent);
 			}
 		}

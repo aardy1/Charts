@@ -47,10 +47,15 @@ public class Coordinates {
 	public static void zoom(MapViewModel map, double zoomFactor) {
 
 		try {
-			var bounds = map.bounds();
-			var newExtent = zoom(map.crs(), bounds, map.viewPortBounds(), zoomFactor);
-			if (!newExtent.equals(bounds)) {
+			var vpBounds = map.viewPortBounds();
+			var newExtent = zoom(map.crs(), map.bounds(), vpBounds, zoomFactor);
+			if (!newExtent.equals(vpBounds)) {
 				map.setViewPortBounds(newExtent);
+			}
+			else {
+				System.err.println("Skipping ");
+				System.err.println("bounds = " + vpBounds);
+				System.err.println("new bounds = " + newExtent);
 			}
 		}
 		catch (TransformException | NonInvertibleTransformException ex) {
