@@ -12,6 +12,6 @@ import org.locationtech.jts.geom.Polygon;
  */
 public interface IRenderablePolygonProvider {
 
-	Polygon renderablePolygon(Polygon polygon);
+	Polygon get(Polygon polygon);
 
 }

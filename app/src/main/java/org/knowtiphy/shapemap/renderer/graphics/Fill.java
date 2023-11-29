@@ -68,7 +68,7 @@ public class Fill {
 
 		var tx = context.worldToScreen();
 		var gc = context.graphicsContext();
-		var renderGeom = context.rendererContext().renderablePolygonProvider().renderablePolygon(polygon);
+		var renderGeom = context.rendererContext().renderablePolygonProvider().get(polygon);
 		tx.copyCoordinatesG((Polygon) renderGeom);
 		gc.fillPolygon(tx.getXs(), tx.getYs(), tx.getXs().length);
 	}

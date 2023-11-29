@@ -38,7 +38,7 @@ public class SVGMarkSymbolizer extends BaseMarkSymbolizer {
 
 		// TODO -- make the image fetcher into a feature function of some sort and put the
 		// provider in there
-		var image = context.rendererContext().svgProvider().fetch(pathInfo.name(), size);
+		var image = context.rendererContext().svgProvider().get(pathInfo.name(), size);
 		Stroke.setup(context, strokeInfo);
 		context.graphicsContext().drawImage(image, pt.getX(), pt.getY(), size * context.onePixelX(),
 				size * context.onePixelY());

@@ -4,7 +4,9 @@ import java.io.IOException;
 import org.geotools.api.data.FeatureSource;
 import org.geotools.api.feature.simple.SimpleFeature;
 import org.geotools.api.feature.simple.SimpleFeatureType;
+import org.geotools.feature.FeatureCollection;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.knowtiphy.charts.memstore.MemStoreQuery;
 import org.knowtiphy.shapemap.renderer.FeatureTypeStyle;
 
 public class MapLayer {
@@ -60,6 +62,11 @@ public class MapLayer {
 
 	public FeatureSource<SimpleFeatureType, SimpleFeature> getFeatureSource() {
 		return featureSource;
+	}
+
+	public FeatureCollection<SimpleFeatureType, SimpleFeature> getFeatures(ReferencedEnvelope bounds, boolean scaleLess)
+			throws IOException {
+		return getFeatureSource().getFeatures(new MemStoreQuery(bounds, scaleLess));
 	}
 
 	@Override

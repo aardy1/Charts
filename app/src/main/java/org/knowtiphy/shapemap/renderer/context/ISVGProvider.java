@@ -7,11 +7,8 @@ package org.knowtiphy.shapemap.renderer.context;
 
 import javafx.scene.image.Image;
 
-/**
- * @author graham
- */
 public interface ISVGProvider {
 
-	Image fetch(String name, int size);
+	Image get(String name, int size);
 
 }

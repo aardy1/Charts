@@ -15,7 +15,6 @@ import org.geotools.api.feature.simple.SimpleFeature;
 import org.geotools.api.referencing.FactoryException;
 import org.geotools.api.referencing.operation.TransformException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.knowtiphy.charts.memstore.MemStoreQuery;
 import org.knowtiphy.shapemap.renderer.context.RendererContext;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.Rule;
 import org.knowtiphy.shapemap.viewmodel.MapViewModel;
@@ -86,8 +85,7 @@ public class ShapeMapRenderer {
 					var style = layer.getStyle();
 
 					// TODO -- fix this
-					try (var iterator = layer.getFeatureSource()
-							.getFeatures(new MemStoreQuery(map.viewPortBounds(), layer.isScaleLess())).features()) {
+					try (var iterator = layer.getFeatures(map.viewPortBounds(), layer.isScaleLess()).features()) {
 						while (iterator.hasNext()) {
 							var feature = (SimpleFeature) iterator.next();
 							layerNeedsTextLayout[layerPos] |= applyStyle(style, context, feature, appliedRule, rulePos);
@@ -113,14 +111,13 @@ public class ShapeMapRenderer {
 				System.err.println("Layer " + layer.title() + " vis = " + layer.isVisible());
 				if (layerNeedsTextLayout[layerPos]) {
 					// TODO - fix this
-					try (var iterator = layer.getFeatureSource()
-							.getFeatures(new MemStoreQuery(map.viewPortBounds(), true)).features()) {
+					try (var iterator = layer.getFeatures(map.viewPortBounds(), true).features()) {
 						while (iterator.hasNext()) {
 							var feature = (SimpleFeature) iterator.next();
 							var rp = rulePos;
 							for (var rule : layer.getStyle().rules()) {
 								if (appliedRule[rp]) {
-									applyTextRule(rule, context, feature, index);
+									applyTextRule(rule, context, feature);
 								}
 
 								rp++;
@@ -192,7 +189,7 @@ public class ShapeMapRenderer {
 		return false;
 	}
 
-	private void applyTextRule(Rule rule, GraphicsRenderingContext context, SimpleFeature feature, Quadtree index) {
+	private void applyTextRule(Rule rule, GraphicsRenderingContext context, SimpleFeature feature) {
 
 		var filterResult = rule.filter().apply(feature, (Geometry) feature.getDefaultGeometry());
 		if (filterResult instanceof Boolean fr && fr) {

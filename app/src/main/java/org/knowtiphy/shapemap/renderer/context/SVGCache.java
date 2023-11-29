@@ -32,7 +32,7 @@ public class SVGCache implements ISVGProvider {
 	}
 
 	@Override
-	public Image fetch(String name, int size) {
+	public Image get(String name, int size) {
 		var image = cache.get(Pair.of(name, size));
 		if (image == null) {
 			var svgImage = SVGLoader.load(ChartView.class.getResource("markicons/" + name));
