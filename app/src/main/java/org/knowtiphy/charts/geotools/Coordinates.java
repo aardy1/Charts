@@ -47,8 +47,11 @@ public class Coordinates {
 	public static void zoom(MapViewModel map, double zoomFactor) {
 
 		try {
-			var newExtent = zoom(map.crs(), map.bounds(), map.viewPortBounds(), zoomFactor);
-			map.setViewPortBounds(newExtent);
+			var bounds = map.bounds();
+			var newExtent = zoom(map.crs(), bounds, map.viewPortBounds(), zoomFactor);
+			if (!newExtent.equals(bounds)) {
+				map.setViewPortBounds(newExtent);
+			}
 		}
 		catch (TransformException | NonInvertibleTransformException ex) {
 			Logger.getLogger(Coordinates.class.getName()).log(Level.SEVERE, null, ex);
@@ -71,7 +74,6 @@ public class Coordinates {
 		// TODO -- why does this not center the view port on the x, y world coords?
 		var tx = new Transformation(map.viewPortScreenToWorld());
 		tx.apply(x, y);
-		// var worldPos = Transformation.screenToWorld(map, x, y);
 
 		var envelope = new ReferencedEnvelope(tx.getX() - defaultWidth, tx.getX() + defaultWidth,
 				tx.getY() - defaultHeight, tx.getY() + defaultHeight, map.crs());

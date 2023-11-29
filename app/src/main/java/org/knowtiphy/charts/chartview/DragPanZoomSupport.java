@@ -43,8 +43,11 @@ public class DragPanZoomSupport {
 			envelope.translate(envelope.getMinimum(0) - result.getX(), envelope.getMaximum(1) - result.getY());
 
 			try {
-				var newExtent = clip(map.bounds(), envelope, map.crs());
-				map.setViewPortBounds(newExtent);
+				var bounds = map.bounds();
+				var newExtent = clip(bounds, envelope, map.crs());
+				if (!newExtent.equals(bounds)) {
+					map.setViewPortBounds(newExtent);
+				}
 			}
 			catch (TransformException | NonInvertibleTransformException ex) {
 				Logger.getLogger(DragPanZoomSupport.class.getName()).log(Level.SEVERE, null, ex);
@@ -94,8 +97,11 @@ public class DragPanZoomSupport {
 		var envelope = new ReferencedEnvelope(map.viewPortBounds());
 		envelope.translate(envelope.getMinimum(0) - result.getX(), envelope.getMaximum(1) - result.getY());
 		try {
-			var newExtent = clip(map.bounds(), envelope, map.crs());
-			map.setViewPortBounds(newExtent);
+			var bounds = map.bounds();
+			var newExtent = clip(bounds, envelope, map.crs());
+			if (!newExtent.equals(bounds)) {
+				map.setViewPortBounds(newExtent);
+			}
 		}
 		catch (TransformException | NonInvertibleTransformException ex) {
 			Logger.getLogger(DragPanZoomSupport.class.getName()).log(Level.SEVERE, null, ex);
