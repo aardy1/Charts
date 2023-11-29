@@ -58,7 +58,7 @@ public class ShapeMapRenderer {
 		var onePixelY = Math.abs(pt2.getY() - pt1.getY());
 
 		var context = new RenderingContext(graphics, new Transformation(worldToScreen), onePixelX, onePixelY,
-				map.renderGeomCache(), index, viewportBounds);
+				map.renderGeomCache(), map.svgCache(), index, viewportBounds);
 
 		// pass 1 -- do graphics -- point, line and polygon symbolizers
 		// We keep track of:

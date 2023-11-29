@@ -9,15 +9,15 @@
         <UserStyle>
             <FeatureTypeStyle>
                 <FeatureTypeName>CTNARE</FeatureTypeName>
-                <Rule>
+                <!--                <Rule>
                     <LineSymbolizer>
                         <Stroke>
                             <CssParameter name="stroke">#C97DD4</CssParameter>
                             <CssParameter name="stroke-width">1</CssParameter>
-                            <!--                            <CssParameter name="stroke-dasharray">3</CssParameter>-->
+                                                        <CssParameter name="stroke-dasharray">3</CssParameter>
                         </Stroke>
                     </LineSymbolizer>
-                </Rule>
+                </Rule>-->
                 <VendorOption name="composite-base">true</VendorOption>
             </FeatureTypeStyle>
         </UserStyle>

@@ -13,6 +13,29 @@
                     <PointSymbolizer>
                         <Graphic>
                             <Mark>
+                                <WellKnownName>s52:plane</WellKnownName>
+                                <Stroke>
+                                    <CssParameter name="stroke">#FF0000</CssParameter>
+                                    <CssParameter name="stroke-width">1</CssParameter>
+                                </Stroke>
+                            </Mark>
+                            <Size>12</Size>
+                        </Graphic>
+
+                        <!--   <PointSymbolizer uom="http://www.opengeospatial.org/se/units/metre">
+                                <Size>
+                                    <ogc:mul>
+                                        <ogc:PropertyName>VALNMR</ogc:PropertyName>
+                                        <ogc:literal>1852</ogc:literal>
+                                    </ogc:mul>
+                                </Size>
+                            </Graphic>
+                            <VendorOption name= "labelObstacle">true</VendorOption>
+                        </PointSymbolizer>-->
+                    </PointSymbolizer>
+                    <PointSymbolizer>
+                        <Graphic>
+                            <Mark>
                                 <WellKnownName>circle</WellKnownName>
                                 <Stroke>
                                     <CssParameter name="stroke">#f3d948</CssParameter>

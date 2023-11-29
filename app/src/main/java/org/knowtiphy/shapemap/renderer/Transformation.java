@@ -8,6 +8,7 @@ import org.locationtech.jts.geom.Polygon;
  *
  */
 public class Transformation {
+
 	public static final Affine IDENTITY = new Affine();
 
 	private final Affine transformation;
@@ -28,6 +29,13 @@ public class Transformation {
 	public Affine getTransformation() {
 		return transformation;
 	}
+
+	/**
+	 * Apply the transformation to coordinate (x,y) placing the result into coordinate
+	 * (dest[0], dest[1])
+	 * @param x x
+	 * @param y y
+	 */
 
 	public void apply(double x, double y) {
 		src[0] = x;
