@@ -5,16 +5,11 @@
 
 package org.knowtiphy.shapemap.style.parser.symbolizer;
 
-import java.io.File;
-import java.net.MalformedURLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiFunction;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
-import org.girod.javafx.svgimage.SVGLoader;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.FillInfo;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.PathInfo;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.StrokeInfo;
@@ -50,18 +45,11 @@ public class MarkSymbolizerParser {
 	);
 	//@formatter:on
 
-	private static final Map<String, BiFunction<FillInfo, StrokeInfo, IMarkSymbolizer>> S52 = new HashMap<>();
+	public static final Map<String, BiFunction<FillInfo, StrokeInfo, IMarkSymbolizer>> S52 = new HashMap<>();
 	static {
-		try {
-			var image = SVGLoader.load(new File("/Users/graham/Desktop/foo.svg").toURI().toURL());
-			S52.put("plane", (f, s) -> new SVGMarkSymbolizer(new PathInfo("plane", image), f, s));
-		}
-		catch (MalformedURLException ex) {
-			Logger.getLogger(CircleMarkSymbolizer.class.getName()).log(Level.SEVERE, null, ex);
-
-		}
+		S52.put("Hazard-Lighthouse", (f, s) -> new SVGMarkSymbolizer(new PathInfo("Hazard-Lighthouse.svg"), f, s));
+		S52.put("Hazard-Oil-Platform", (f, s) -> new SVGMarkSymbolizer(new PathInfo("Hazard-Oil-Platform.svg"), f, s));
 	}
-	//@formatter:on
 
 	public static IMarkSymbolizer parse(XMLEventReader reader) throws XMLStreamException, StyleSyntaxException {
 

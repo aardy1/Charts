@@ -7,7 +7,7 @@ package org.knowtiphy.shapemap.renderer.symbolizer;
 
 import org.knowtiphy.shapemap.renderer.symbolizer.mark.IMarkSymbolizer;
 import org.geotools.api.feature.simple.SimpleFeature;
-import org.knowtiphy.shapemap.renderer.RenderingContext;
+import org.knowtiphy.shapemap.renderer.GraphicsRenderingContext;
 import org.knowtiphy.shapemap.renderer.graphics.DrawPoint;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.IFeatureFunction;
 import org.locationtech.jts.geom.Geometry;
@@ -34,7 +34,7 @@ public class PointSymbolizer implements ISymbolizer {
 	}
 
 	@Override
-	public void render(RenderingContext context, SimpleFeature feature) {
+	public void render(GraphicsRenderingContext context, SimpleFeature feature) {
 
 		DrawPoint.setup(context, opacity);
 		var geom = (Geometry) feature.getDefaultGeometry();

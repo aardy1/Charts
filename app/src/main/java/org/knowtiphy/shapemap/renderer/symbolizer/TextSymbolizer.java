@@ -12,7 +12,7 @@ import org.geotools.api.geometry.BoundingBox;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.crs.DefaultEngineeringCRS;
 import org.knowtiphy.charts.Fonts;
-import org.knowtiphy.shapemap.renderer.RenderingContext;
+import org.knowtiphy.shapemap.renderer.GraphicsRenderingContext;
 import org.knowtiphy.shapemap.renderer.graphics.Fill;
 import org.knowtiphy.shapemap.renderer.graphics.Text;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.FillInfo;
@@ -50,7 +50,7 @@ public class TextSymbolizer {
 		this.labelPlacement = labelPlacement;
 	}
 
-	public void render(RenderingContext context, SimpleFeature feature) {
+	public void render(GraphicsRenderingContext context, SimpleFeature feature) {
 
 		if (fillInfo != null) {
 			Fill.setup(context, fillInfo);
@@ -67,7 +67,7 @@ public class TextSymbolizer {
 		text(context, feature, (Geometry) feature.getDefaultGeometry());
 	}
 
-	private void text(RenderingContext context, SimpleFeature feature, Geometry geom) {
+	private void text(GraphicsRenderingContext context, SimpleFeature feature, Geometry geom) {
 
 		// TODO -- switch on strings is brain dead
 		switch (geom.getGeometryType()) {
@@ -81,7 +81,7 @@ public class TextSymbolizer {
 		}
 	}
 
-	private void textPoint(RenderingContext context, SimpleFeature feature, Point point) {
+	private void textPoint(GraphicsRenderingContext context, SimpleFeature feature, Point point) {
 
 		if (point != null && label != null) {
 			var text = label.apply(feature, point);
@@ -127,7 +127,7 @@ public class TextSymbolizer {
 	// TODO -- text along line strings ...
 
 	// only necessary if a multi-X, can contain another multi-X, rather than just X's
-	private void recurse(RenderingContext context, SimpleFeature feature, Geometry geom) {
+	private void recurse(GraphicsRenderingContext context, SimpleFeature feature, Geometry geom) {
 		for (int i = 0; i < geom.getNumGeometries(); i++) {
 			text(context, feature, geom.getGeometryN(i));
 		}

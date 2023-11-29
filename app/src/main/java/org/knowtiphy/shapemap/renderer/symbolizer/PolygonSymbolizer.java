@@ -6,7 +6,7 @@
 package org.knowtiphy.shapemap.renderer.symbolizer;
 
 import org.geotools.api.feature.simple.SimpleFeature;
-import org.knowtiphy.shapemap.renderer.RenderingContext;
+import org.knowtiphy.shapemap.renderer.GraphicsRenderingContext;
 import org.knowtiphy.shapemap.renderer.graphics.Fill;
 import org.knowtiphy.shapemap.renderer.graphics.Stroke;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.FillInfo;
@@ -28,7 +28,7 @@ public class PolygonSymbolizer implements ISymbolizer {
 	}
 
 	@Override
-	public void render(RenderingContext context, SimpleFeature feature) {
+	public void render(GraphicsRenderingContext context, SimpleFeature feature) {
 
 		if (fillInfo != null) {
 			Fill.setup(context, fillInfo);

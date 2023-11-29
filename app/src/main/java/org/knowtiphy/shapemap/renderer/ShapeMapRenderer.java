@@ -16,6 +16,7 @@ import org.geotools.api.referencing.FactoryException;
 import org.geotools.api.referencing.operation.TransformException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.knowtiphy.charts.memstore.MemStoreQuery;
+import org.knowtiphy.shapemap.renderer.context.RendererContext;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.Rule;
 import org.knowtiphy.shapemap.viewmodel.MapViewModel;
 import org.locationtech.jts.geom.Geometry;
@@ -28,12 +29,15 @@ public class ShapeMapRenderer {
 
 	private final MapViewModel map;
 
+	private final RendererContext rendererContext;
+
 	private final GraphicsContext graphics;
 
 	public static IntegerProperty count = new SimpleIntegerProperty(0);
 
-	public ShapeMapRenderer(MapViewModel map, GraphicsContext graphics) {
+	public ShapeMapRenderer(MapViewModel map, RendererContext rendererContext, GraphicsContext graphics) {
 		this.map = map;
+		this.rendererContext = rendererContext;
 		this.graphics = graphics;
 	}
 
@@ -57,8 +61,8 @@ public class ShapeMapRenderer {
 		pt2 = screenToWorld.transform(0, 1);
 		var onePixelY = Math.abs(pt2.getY() - pt1.getY());
 
-		var context = new RenderingContext(graphics, new Transformation(worldToScreen), onePixelX, onePixelY,
-				map.renderGeomCache(), map.svgCache(), index, viewportBounds);
+		var context = new GraphicsRenderingContext(rendererContext, graphics, new Transformation(worldToScreen),
+				onePixelX, onePixelY, index, viewportBounds);
 
 		// pass 1 -- do graphics -- point, line and polygon symbolizers
 		// We keep track of:
@@ -140,7 +144,7 @@ public class ShapeMapRenderer {
 		}
 	}
 
-	private boolean applyStyle(FeatureTypeStyle style, RenderingContext context, SimpleFeature feature,
+	private boolean applyStyle(FeatureTypeStyle style, GraphicsRenderingContext context, SimpleFeature feature,
 			boolean[] appliedRule, int startPos) {
 
 		var appliedSomeRule = false;
@@ -172,7 +176,7 @@ public class ShapeMapRenderer {
 		return appliedSomeRule;
 	}
 
-	private boolean applyGraphicsRule(Rule rule, RenderingContext context, SimpleFeature feature) {
+	private boolean applyGraphicsRule(Rule rule, GraphicsRenderingContext context, SimpleFeature feature) {
 
 		if (rule.filter() != null) {
 			var filterResult = rule.filter().apply(feature, (Geometry) feature.getDefaultGeometry());
@@ -188,7 +192,7 @@ public class ShapeMapRenderer {
 		return false;
 	}
 
-	private void applyTextRule(Rule rule, RenderingContext context, SimpleFeature feature, Quadtree index) {
+	private void applyTextRule(Rule rule, GraphicsRenderingContext context, SimpleFeature feature, Quadtree index) {
 
 		var filterResult = rule.filter().apply(feature, (Geometry) feature.getDefaultGeometry());
 		if (filterResult instanceof Boolean fr && fr) {

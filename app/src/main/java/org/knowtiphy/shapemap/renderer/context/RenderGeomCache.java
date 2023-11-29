@@ -3,7 +3,7 @@
  * All rights reserved.
  */
 
-package org.knowtiphy.shapemap.renderer;
+package org.knowtiphy.shapemap.renderer.context;
 
 import java.util.HashMap;
 import java.util.Map;

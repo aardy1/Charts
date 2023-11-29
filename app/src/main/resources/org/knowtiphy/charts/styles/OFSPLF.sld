@@ -13,13 +13,13 @@
                     <PointSymbolizer>
                         <Graphic>
                             <Mark>
-                                <WellKnownName>triangle</WellKnownName>
+                                <WellKnownName>s52:Hazard-Oil-Platform</WellKnownName>
                                 <Stroke>
                                     <CssParameter name="stroke">#000000</CssParameter>
                                     <CssParameter name="stroke-Width">1</CssParameter>
                                 </Stroke>
                             </Mark>
-                            <Size>6</Size>
+                            <Size>8</Size>
                         </Graphic>
                     </PointSymbolizer>
                     <TextSymbolizer>

@@ -5,7 +5,7 @@
 
 package org.knowtiphy.shapemap.renderer.graphics;
 
-import org.knowtiphy.shapemap.renderer.RenderingContext;
+import org.knowtiphy.shapemap.renderer.GraphicsRenderingContext;
 import org.knowtiphy.shapemap.renderer.Transformation;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.StrokeInfo;
 import org.locationtech.jts.geom.Geometry;
@@ -21,7 +21,7 @@ public class Stroke {
 	 * @param strokeInfo the stroke information
 	 */
 
-	public static void setup(RenderingContext context, StrokeInfo strokeInfo) {
+	public static void setup(GraphicsRenderingContext context, StrokeInfo strokeInfo) {
 		var gc = context.graphicsContext();
 		gc.setStroke(strokeInfo.stroke());
 		// TODO -- hmm?
@@ -37,7 +37,7 @@ public class Stroke {
 	 * @param geom the geometry to render
 	 */
 
-	public static void stroke(RenderingContext context, Geometry geom) {
+	public static void stroke(GraphicsRenderingContext context, Geometry geom) {
 
 		// TODO -- switch on strings is brain dead
 		switch (geom.getGeometryType()) {
@@ -52,11 +52,11 @@ public class Stroke {
 		}
 	}
 
-	private static void strokePoint(RenderingContext context, Point point) {
+	private static void strokePoint(GraphicsRenderingContext context, Point point) {
 		context.graphicsContext().strokeOval(point.getX(), point.getY(), context.onePixelX(), context.onePixelY());
 	}
 
-	private static void strokeLineString(RenderingContext context, LineString lineString) {
+	private static void strokeLineString(GraphicsRenderingContext context, LineString lineString) {
 		var tx = context.worldToScreen();
 		tx.copyCoordinatesG(lineString);
 		context.graphicsContext().strokePolyline(tx.getXs(), tx.getYs(), tx.getXs().length);
@@ -64,7 +64,7 @@ public class Stroke {
 
 	// if we are scaling in world coordinates it is faster to use the lineString() code --
 	// need to know that in our styles
-	private static void strokeLineStringSVG(RenderingContext context, LineString lineString) {
+	private static void strokeLineStringSVG(GraphicsRenderingContext context, LineString lineString) {
 		var gc = context.graphicsContext();
 
 		gc.beginPath();
@@ -83,7 +83,7 @@ public class Stroke {
 		gc.setTransform(foo);
 	}
 
-	public static void strokePolygon(RenderingContext context, Polygon polygon) {
+	public static void strokePolygon(GraphicsRenderingContext context, Polygon polygon) {
 		stroke(context, polygon.getBoundary());
 		for (var i = 0; i < polygon.getNumInteriorRing(); i++) {
 			stroke(context, polygon.getInteriorRingN(i));
@@ -92,7 +92,7 @@ public class Stroke {
 
 	// this is only necessary because I am not sure if a multi-X, can contain another
 	// multi-X, or just X's
-	private static void recurse(RenderingContext context, Geometry geom) {
+	private static void recurse(GraphicsRenderingContext context, Geometry geom) {
 		for (var i = 0; i < geom.getNumGeometries(); i++) {
 			stroke(context, geom.getGeometryN(i));
 		}

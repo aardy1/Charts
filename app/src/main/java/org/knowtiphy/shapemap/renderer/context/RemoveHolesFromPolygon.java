@@ -3,33 +3,52 @@
  * All rights reserved.
  */
 
-package org.knowtiphy.shapemap.renderer;
+package org.knowtiphy.shapemap.renderer.context;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import org.apache.commons.lang3.tuple.Pair;
+import org.knowtiphy.shapemap.renderer.context.IRenderablePolygonProvider;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LinearRing;
 import org.locationtech.jts.geom.Polygon;
 
-public class RemoveHolesFromPolygon {
+public class RemoveHolesFromPolygon implements IRenderablePolygonProvider {
 
 	private static final GeometryFactory GF = new GeometryFactory();
 
-	public static Polygon remove(Polygon poly) {
+	private final RenderGeomCache renderGeomCache;
 
-		if (poly.getNumInteriorRing() == 0)
-			return poly;
+	public RemoveHolesFromPolygon(RenderGeomCache renderGeomCache) {
+		this.renderGeomCache = renderGeomCache;
+	}
+
+	@Override
+	public Polygon renderablePolygon(Polygon polygon) {
+
+		var renderGeom = renderGeomCache.fetch(polygon);
+		if (renderGeom == null) {
+			renderGeom = remove(polygon);
+			renderGeomCache.cache(polygon, renderGeom);
+		}
+
+		return (Polygon) renderGeom;
+	}
+
+	private Polygon remove(Polygon polygon) {
+
+		if (polygon.getNumInteriorRing() == 0)
+			return polygon;
 		else {
 			// get the holes in the polygon
-			var holes = holes(poly);
+			var holes = holes(polygon);
 
 			// copy the boundary of the polygon
 			List<Coordinate> newBoundary = new ArrayList<>();
-			var extRing = poly.getExteriorRing();
+			var extRing = polygon.getExteriorRing();
 			for (int i = 0; i < extRing.getNumPoints(); i++) {
 				newBoundary.add(extRing.getCoordinateN(i));
 			}
@@ -50,7 +69,7 @@ public class RemoveHolesFromPolygon {
 	 * @return
 	 */
 
-	private static List<Pair<LinearRing, Integer>> holes(Polygon polygon) {
+	private List<Pair<LinearRing, Integer>> holes(Polygon polygon) {
 
 		var map = new HashMap<LinearRing, Integer>();
 		var result = new ArrayList<LinearRing>();
@@ -72,15 +91,15 @@ public class RemoveHolesFromPolygon {
 		return result.stream().map(ring -> Pair.of(ring, map.get(ring))).toList();
 	}
 
-	private static int compareY(Coordinate a, Coordinate b) {
+	private int compareY(Coordinate a, Coordinate b) {
 		return -Double.compare(a.y, b.y);
 	}
 
-	private static boolean northOf(Coordinate a, Coordinate b) {
+	private boolean northOf(Coordinate a, Coordinate b) {
 		return compareY(a, b) < 0;
 	}
 
-	private static List<Coordinate> removeHole(Pair<LinearRing, Integer> hole, List<Coordinate> polygon) {
+	private List<Coordinate> removeHole(Pair<LinearRing, Integer> hole, List<Coordinate> polygon) {
 
 		var ring = hole.getLeft();
 		var holeTop = ring.getCoordinateN(hole.getRight());
@@ -155,7 +174,7 @@ public class RemoveHolesFromPolygon {
 	 * all possible choices for i
 	 */
 
-	private static int boundaryIntersection(Coordinate pt, List<Coordinate> poly) {
+	private int boundaryIntersection(Coordinate pt, List<Coordinate> poly) {
 
 		var res = -1;
 

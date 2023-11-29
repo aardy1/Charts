@@ -5,7 +5,7 @@
 
 package org.knowtiphy.shapemap.renderer.graphics;
 
-import org.knowtiphy.shapemap.renderer.RenderingContext;
+import org.knowtiphy.shapemap.renderer.GraphicsRenderingContext;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.StrokeInfo;
 
 public class Text {
@@ -16,7 +16,7 @@ public class Text {
 	 * @param strokeInfo the stroke information
 	 */
 
-	public static void setup(RenderingContext context, StrokeInfo strokeInfo) {
+	public static void setup(GraphicsRenderingContext context, StrokeInfo strokeInfo) {
 		var gc = context.graphicsContext();
 		gc.setStroke(strokeInfo.stroke());
 		gc.setLineWidth(strokeInfo.strokeWidth());

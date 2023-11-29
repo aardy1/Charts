@@ -16,6 +16,8 @@ import org.geotools.api.referencing.operation.TransformException;
 import org.knowtiphy.charts.chartview.ChartView.EventModel;
 import org.knowtiphy.charts.enc.ENCChart;
 import org.knowtiphy.shapemap.renderer.ShapeMapRenderer;
+import org.knowtiphy.shapemap.renderer.context.RemoveHolesFromPolygon;
+import org.knowtiphy.shapemap.renderer.context.RendererContext;
 import org.knowtiphy.shapemap.view.ShapeMapBaseSkin;
 import org.knowtiphy.shapemap.view.ShapeMapView;
 import org.reactfx.Subscription;
@@ -92,7 +94,9 @@ public class CanvasShapeMapSkin extends ShapeMapBaseSkin {
 		graphics.setFill(Color.LIGHTGREY);
 		graphics.fillRect(0, 0, width, height);
 
-		var renderer = new ShapeMapRenderer(chart, graphics);
+		var renderablePolygonProvider = new RemoveHolesFromPolygon(chart.renderGeomCache());
+		var rendererContext = new RendererContext(renderablePolygonProvider, chart.svgCache());
+		var renderer = new ShapeMapRenderer(chart, rendererContext, graphics);
 		try {
 			renderer.paint(new Rectangle2D(0, 0, width, height), chart.viewPortBounds());
 			borderPane.setCenter(canvas);

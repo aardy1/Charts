@@ -6,8 +6,7 @@
 package org.knowtiphy.shapemap.renderer.graphics;
 
 import org.geotools.geometry.jts.JTS;
-import org.knowtiphy.shapemap.renderer.RemoveHolesFromPolygon;
-import org.knowtiphy.shapemap.renderer.RenderingContext;
+import org.knowtiphy.shapemap.renderer.GraphicsRenderingContext;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.FillInfo;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
@@ -22,7 +21,7 @@ public class Fill {
 	 * @param fillInfo the fill information
 	 */
 
-	public static void setup(RenderingContext context, FillInfo fillInfo) {
+	public static void setup(GraphicsRenderingContext context, FillInfo fillInfo) {
 		context.graphicsContext().setFill(fillInfo.fill());
 		context.graphicsContext().setGlobalAlpha(fillInfo.opacity());
 	}
@@ -35,7 +34,7 @@ public class Fill {
 	 * @param geom the geometry to render
 	 */
 
-	public static void fill(RenderingContext context, Geometry geom) {
+	public static void fill(GraphicsRenderingContext context, Geometry geom) {
 
 		// TODO -- switch on strings is brain dead
 		switch (geom.getGeometryType()) {
@@ -49,17 +48,17 @@ public class Fill {
 		}
 	}
 
-	private static void fillPoint(RenderingContext context, Point point) {
+	private static void fillPoint(GraphicsRenderingContext context, Point point) {
 		context.graphicsContext().fillRect(point.getX(), point.getY(), context.onePixelX(), context.onePixelY());
 	}
 
-	private static void fillLineString(RenderingContext context, LineString lineString) {
+	private static void fillLineString(GraphicsRenderingContext context, LineString lineString) {
 		var tx = context.worldToScreen();
 		tx.copyCoordinatesG(lineString);
 		context.graphicsContext().fillPolygon(tx.getXs(), tx.getYs(), tx.getXs().length);
 	}
 
-	private static void fillPolygon(RenderingContext context, Polygon polygon) {
+	private static void fillPolygon(GraphicsRenderingContext context, Polygon polygon) {
 
 		// TODO -- sort this out -- finding stuff not in the bounding box
 		if (!polygon.intersects(JTS.toGeometry(context.bounds()))) {
@@ -69,21 +68,13 @@ public class Fill {
 
 		var tx = context.worldToScreen();
 		var gc = context.graphicsContext();
-		var renderGeomCache = context.renderGeomCache();
-
-		// TODO -- we could compute this at load time
-		var renderGeom = renderGeomCache.fetch(polygon);
-		if (renderGeom == null) {
-			renderGeom = RemoveHolesFromPolygon.remove(polygon);
-			renderGeomCache.cache(polygon, renderGeom);
-		}
-
+		var renderGeom = context.rendererContext().renderablePolygonProvider().renderablePolygon(polygon);
 		tx.copyCoordinatesG((Polygon) renderGeom);
 		gc.fillPolygon(tx.getXs(), tx.getYs(), tx.getXs().length);
 	}
 
 	// only necessary if a multi-X, can contain another multi-X, rather than just X's
-	private static void recurse(RenderingContext context, Geometry geom) {
+	private static void recurse(GraphicsRenderingContext context, Geometry geom) {
 		for (int i = 0; i < geom.getNumGeometries(); i++) {
 			fill(context, geom.getGeometryN(i));
 		}

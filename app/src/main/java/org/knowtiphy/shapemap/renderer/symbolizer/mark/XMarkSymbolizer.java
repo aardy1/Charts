@@ -6,7 +6,7 @@
 package org.knowtiphy.shapemap.renderer.symbolizer.mark;
 
 import org.geotools.api.feature.simple.SimpleFeature;
-import org.knowtiphy.shapemap.renderer.RenderingContext;
+import org.knowtiphy.shapemap.renderer.GraphicsRenderingContext;
 import org.knowtiphy.shapemap.renderer.graphics.Stroke;
 import org.knowtiphy.shapemap.renderer.symbolizer.PointSymbolizer;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.FillInfo;
@@ -23,7 +23,7 @@ public class XMarkSymbolizer extends BaseMarkSymbolizer {
 	}
 
 	@Override
-	public void render(RenderingContext context, SimpleFeature feature, Point pt, PointSymbolizer pointSymbolizer) {
+	public void render(GraphicsRenderingContext context, SimpleFeature feature, Point pt, PointSymbolizer pointSymbolizer) {
 
 		var szo = pointSymbolizer.size().apply(feature, pt);
 		if (szo == null)

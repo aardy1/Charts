@@ -6,13 +6,13 @@
 package org.knowtiphy.shapemap.renderer.symbolizer;
 
 import org.geotools.api.feature.simple.SimpleFeature;
-import org.knowtiphy.shapemap.renderer.RenderingContext;
+import org.knowtiphy.shapemap.renderer.GraphicsRenderingContext;
 
 /**
  * @author graham
  */
 public interface ISymbolizer {
 
-	void render(RenderingContext context, SimpleFeature feature);
+	void render(GraphicsRenderingContext context, SimpleFeature feature);
 
 }

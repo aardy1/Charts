@@ -5,10 +5,8 @@
 
 package org.knowtiphy.shapemap.renderer.symbolizer.mark;
 
-import javafx.scene.SnapshotParameters;
-import javafx.scene.paint.Color;
 import org.geotools.api.feature.simple.SimpleFeature;
-import org.knowtiphy.shapemap.renderer.RenderingContext;
+import org.knowtiphy.shapemap.renderer.GraphicsRenderingContext;
 import org.knowtiphy.shapemap.renderer.graphics.Stroke;
 import org.knowtiphy.shapemap.renderer.symbolizer.PointSymbolizer;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.FillInfo;
@@ -21,11 +19,6 @@ import org.locationtech.jts.geom.Point;
  */
 public class SVGMarkSymbolizer extends BaseMarkSymbolizer {
 
-	private static final SnapshotParameters SVG_RENDERING_PARAMETERS = new SnapshotParameters();
-	static {
-		SVG_RENDERING_PARAMETERS.setFill(Color.TRANSPARENT);
-	}
-
 	private final PathInfo pathInfo;
 
 	public SVGMarkSymbolizer(PathInfo pathInfo, FillInfo fillInfo, StrokeInfo strokeInfo) {
@@ -34,7 +27,8 @@ public class SVGMarkSymbolizer extends BaseMarkSymbolizer {
 	}
 
 	@Override
-	public void render(RenderingContext context, SimpleFeature feature, Point pt, PointSymbolizer pointSymbolizer) {
+	public void render(GraphicsRenderingContext context, SimpleFeature feature, Point pt,
+			PointSymbolizer pointSymbolizer) {
 
 		var szo = pointSymbolizer.size().apply(feature, pt);
 		if (szo == null)
@@ -42,16 +36,9 @@ public class SVGMarkSymbolizer extends BaseMarkSymbolizer {
 
 		var size = ((Number) szo).intValue();
 
-		System.err.println("Size = " + size);
-		System.err.println("Size x = " + size * context.onePixelX());
-		System.err.println("Size y = " + size * context.onePixelY());
-
-		var image = context.svgCache().fetch(pathInfo.name(), size);
-		if (image == null) {
-			image = pathInfo.image().toImage(SVG_RENDERING_PARAMETERS);
-			context.svgCache().cache(pathInfo.name(), size, image);
-		}
-
+		// TODO -- make the image fetcher into a feature function of some sort and put the
+		// provider in there
+		var image = context.rendererContext().svgProvider().fetch(pathInfo.name(), size);
 		Stroke.setup(context, strokeInfo);
 		context.graphicsContext().drawImage(image, pt.getX(), pt.getY(), size * context.onePixelX(),
 				size * context.onePixelY());

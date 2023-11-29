@@ -6,7 +6,7 @@
 package org.knowtiphy.shapemap.renderer.symbolizer;
 
 import org.geotools.api.feature.simple.SimpleFeature;
-import org.knowtiphy.shapemap.renderer.RenderingContext;
+import org.knowtiphy.shapemap.renderer.GraphicsRenderingContext;
 import org.knowtiphy.shapemap.renderer.graphics.Stroke;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.StrokeInfo;
 import org.locationtech.jts.geom.Geometry;
@@ -23,7 +23,7 @@ public class LineSymbolizer implements ISymbolizer {
 	}
 
 	@Override
-	public void render(RenderingContext context, SimpleFeature feature) {
+	public void render(GraphicsRenderingContext context, SimpleFeature feature) {
 		Stroke.setup(context, strokeInfo);
 		Stroke.stroke(context, (Geometry) feature.getDefaultGeometry());
 	}

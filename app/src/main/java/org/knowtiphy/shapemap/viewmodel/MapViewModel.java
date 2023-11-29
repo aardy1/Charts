@@ -11,8 +11,9 @@ import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.api.referencing.operation.TransformException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.knowtiphy.charts.ontology.S57;
-import org.knowtiphy.shapemap.renderer.RenderGeomCache;
-import org.knowtiphy.shapemap.renderer.SVGCache;
+import org.knowtiphy.shapemap.renderer.context.ISVGProvider;
+import org.knowtiphy.shapemap.renderer.context.RenderGeomCache;
+import org.knowtiphy.shapemap.renderer.context.SVGCache;
 import org.reactfx.Change;
 import org.reactfx.EventSource;
 
@@ -34,7 +35,7 @@ public class MapViewModel {
 
 	private final RenderGeomCache renderGeomCache = new RenderGeomCache();
 
-	private final SVGCache svgCache = new SVGCache();
+	private final ISVGProvider svgCache = new SVGCache();
 
 	// possibly shouldnt be here -- but it makes for faster rendering
 	private int totalRuleCount;
@@ -132,7 +133,7 @@ public class MapViewModel {
 		return renderGeomCache;
 	}
 
-	public SVGCache svgCache() {
+	public ISVGProvider svgCache() {
 		return svgCache;
 	}
 
