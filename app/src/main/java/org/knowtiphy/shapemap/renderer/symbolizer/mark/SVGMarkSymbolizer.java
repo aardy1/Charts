@@ -7,7 +7,6 @@ package org.knowtiphy.shapemap.renderer.symbolizer.mark;
 
 import org.geotools.api.feature.simple.SimpleFeature;
 import org.knowtiphy.shapemap.renderer.GraphicsRenderingContext;
-import org.knowtiphy.shapemap.renderer.graphics.Stroke;
 import org.knowtiphy.shapemap.renderer.symbolizer.PointSymbolizer;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.FillInfo;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.PathInfo;
@@ -34,13 +33,19 @@ public class SVGMarkSymbolizer extends BaseMarkSymbolizer {
 		if (szo == null)
 			return;
 
+		var x = pt.getX();
+		var y = pt.getY();
 		var size = ((Number) szo).intValue();
+
+		var sizeX = size * context.onePixelX();
+		var sizeY = sizeX * context.onePixelY();
+		var halfSizeX = sizeX / 2;
+		var halfSizeY = sizeY / 2;
 
 		// TODO -- make the image fetcher into a feature function of some sort and put the
 		// provider in there
 		var image = context.rendererContext().svgProvider().get(pathInfo.name(), size);
-		Stroke.setup(context, strokeInfo);
-		context.graphicsContext().drawImage(image, pt.getX(), pt.getY(), size * context.onePixelX(),
+		context.graphicsContext().drawImage(image, x - halfSizeX, y - halfSizeY, size * context.onePixelX(),
 				size * context.onePixelY());
 	}
 
