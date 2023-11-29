@@ -33,20 +33,18 @@ public class SVGMarkSymbolizer extends BaseMarkSymbolizer {
 		if (szo == null)
 			return;
 
+		var image = context.rendererContext().svgProvider().get(pathInfo.name(), ((Number) szo).intValue());
+
 		var x = pt.getX();
 		var y = pt.getY();
-		var size = ((Number) szo).intValue();
-
-		var sizeX = size * context.onePixelX();
-		var sizeY = sizeX * context.onePixelY();
+		var sizeX = image.getWidth() * context.onePixelX();
+		var sizeY = image.getHeight() * context.onePixelY();
 		var halfSizeX = sizeX / 2;
 		var halfSizeY = sizeY / 2;
 
 		// TODO -- make the image fetcher into a feature function of some sort and put the
 		// provider in there
-		var image = context.rendererContext().svgProvider().get(pathInfo.name(), size);
-		context.graphicsContext().drawImage(image, x - halfSizeX, y - halfSizeY, size * context.onePixelX(),
-				size * context.onePixelY());
+		context.graphicsContext().drawImage(image, x - halfSizeX, y - halfSizeY, sizeX, sizeY);
 	}
 
 }

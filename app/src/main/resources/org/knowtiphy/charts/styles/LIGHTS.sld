@@ -14,10 +14,6 @@
                         <Graphic>
                             <Mark>
                                 <WellKnownName>s52:Hazard-Lighthouse</WellKnownName>
-                                <Stroke>
-                                    <CssParameter name="stroke">#FF0000</CssParameter>
-                                    <CssParameter name="stroke-width">1</CssParameter>
-                                </Stroke>
                             </Mark>
                             <Size>12</Size>
                         </Graphic>
