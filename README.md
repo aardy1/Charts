@@ -1,10 +1,11 @@
 # Knowtiphy Charts
 
-This project has two parts:
+This project has two goals two parts:
 
-1. an Electronic Navigation Chart (ENC) viewer (inspired by [OpenCPN](https://opencpn.org)) running natively on all desktop and mobile platforms
-2. a pure JavaFX ESRI shape file renderer (so no use of AWT or bridges to AWT)
+1. a pure JavaFX ESRI shape file renderer (so no use of AWT or bridges to AWT)
+2. an Electronic Navigation Chart (ENC) viewer (inspired by [OpenCPN](https://opencpn.org)) running natively on all desktop and mobile platforms
 
+Part 1 enables part 2, because JavaFX runs on all platforns, including mobile.
 
 The project runs just fine -- some screen recordings of it running on my iPhone with the US_REGION08 ENC charts are below. Apologies for:
 
