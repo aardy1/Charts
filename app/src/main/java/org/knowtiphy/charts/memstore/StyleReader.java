@@ -1,6 +1,5 @@
 package org.knowtiphy.charts.memstore;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import javax.xml.stream.XMLStreamException;
@@ -32,16 +31,8 @@ public class StyleReader {
 		return new StyledLayerDescriptorParser(stream).read();
 	}
 
-	private InputStream toSLDFile(String featureName) throws FileNotFoundException {
-		System.err.println("styles/" + featureName + SLD);
-		var dave = dir.getResourceAsStream("styles/" + featureName + SLD);
-		System.err.println("stream = " + dave);
-		return dave;
-		// return dir.getResourceAsStream("styles/" + featureName + SLD);
-
-		// var path = dir.resolve(featureName + SLD);
-		// System.err.println("path = " + path);
-		// return new FileInputStream(new File(path.toString()));
+	private InputStream toSLDFile(String featureName) {
+		return dir.getResourceAsStream("styles/" + featureName + SLD);
 	}
 
 }

@@ -52,11 +52,6 @@ public class Coordinates {
 			if (!newExtent.equals(vpBounds)) {
 				map.setViewPortBounds(newExtent);
 			}
-			else {
-				System.err.println("Skipping ");
-				System.err.println("bounds = " + vpBounds);
-				System.err.println("new bounds = " + newExtent);
-			}
 		}
 		catch (TransformException | NonInvertibleTransformException ex) {
 			Logger.getLogger(Coordinates.class.getName()).log(Level.SEVERE, null, ex);
@@ -152,8 +147,6 @@ public class Coordinates {
 	}
 
 	public static double getMapScale(MapViewModel map, int screenWidth, double dpi) {
-		// return RendererUtilities.calculateOGCScale(map.viewPortBounds(), screenWidth,
-		// Map.of("dpi", dpi));
 		// if it's geodetic, we're dealing with lat/lon unit measures
 		var crs = map.viewPortBounds().getCoordinateReferenceSystem();
 		double width = map.viewPortBounds().getWidth();

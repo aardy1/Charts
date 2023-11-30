@@ -10,6 +10,7 @@ import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.transform.Affine;
 import javafx.scene.transform.NonInvertibleTransformException;
 import org.geotools.api.feature.simple.SimpleFeature;
 import org.geotools.api.referencing.FactoryException;
@@ -17,7 +18,7 @@ import org.geotools.api.referencing.operation.TransformException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.knowtiphy.shapemap.renderer.context.RendererContext;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.Rule;
-import org.knowtiphy.shapemap.viewmodel.MapViewModel;
+import org.knowtiphy.shapemap.viewmodel.IMapViewModel;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.index.quadtree.Quadtree;
 
@@ -26,7 +27,7 @@ import org.locationtech.jts.index.quadtree.Quadtree;
  */
 public class ShapeMapRenderer {
 
-	private final MapViewModel map;
+	private final IMapViewModel map;
 
 	private final RendererContext rendererContext;
 
@@ -34,7 +35,7 @@ public class ShapeMapRenderer {
 
 	public static IntegerProperty count = new SimpleIntegerProperty(0);
 
-	public ShapeMapRenderer(MapViewModel map, RendererContext rendererContext, GraphicsContext graphics) {
+	public ShapeMapRenderer(IMapViewModel map, RendererContext rendererContext, GraphicsContext graphics) {
 		this.map = map;
 		this.rendererContext = rendererContext;
 		this.graphics = graphics;
@@ -50,86 +51,35 @@ public class ShapeMapRenderer {
 		var start = System.currentTimeMillis();
 
 		var worldToScreen = RendererUtilities.worldToScreenTransform(viewportBounds, paintArea, map.crs());
-		var index = new Quadtree();
-
 		var screenToWorld = worldToScreen.createInverse();
-		var pt1 = screenToWorld.transform(0, 0);
-		var pt2 = screenToWorld.transform(1, 0);
-		var onePixelX = Math.abs(pt2.getX() - pt1.getX());
-		pt1 = screenToWorld.transform(0, 0);
-		pt2 = screenToWorld.transform(0, 1);
-		var onePixelY = Math.abs(pt2.getY() - pt1.getY());
 
-		var context = new GraphicsRenderingContext(rendererContext, graphics, new Transformation(worldToScreen),
-				onePixelX, onePixelY, index, viewportBounds);
+		var onePixelX = onePixelX(screenToWorld);
+		var onePixelY = onePixelY(screenToWorld);
 
-		// pass 1 -- do graphics -- point, line and polygon symbolizers
-		// We keep track of:
-		// a) which rules were applied
-		// b) which layers need text layour (so had rules that were applied and have text
-		// symbolizers)
+		var index = new Quadtree();
+		var graphicsRenderingContext = new GraphicsRenderingContext(rendererContext, graphics,
+				new Transformation(worldToScreen), onePixelX, onePixelY, index, viewportBounds);
 
 		try {
-			graphics.setTransform(worldToScreen);
+			// pass 1 -- do graphics -- point, line and polygon symbolizers
+			// We keep track of:
+			// a) which rules were applied
+			// b) which layers need text layout (had rules that were applied and have text
+			// symbolizers
 
-			var gStart = System.currentTimeMillis();
-
-			var appliedRule = new boolean[map.getTotalRuleCount()];
+			var appliedRule = new boolean[map.totalRuleCount()];
 			var layerNeedsTextLayout = new boolean[map.layers().size()];
 
-			var layerPos = 0;
-			var rulePos = 0;
-
-			for (var layer : map.layers()) {
-				if (layer.isVisible()) {
-					var style = layer.getStyle();
-
-					// TODO -- fix this
-					try (var iterator = layer.getFeatures(map.viewPortBounds(), layer.isScaleLess()).features()) {
-						while (iterator.hasNext()) {
-							var feature = (SimpleFeature) iterator.next();
-							layerNeedsTextLayout[layerPos] |= applyStyle(style, context, feature, appliedRule, rulePos);
-						}
-					}
-
-					layerNeedsTextLayout[layerPos] &= style.hasTextSymbolizers();
-				}
-				layerPos++;
-				rulePos += layer.getStyle().rules().size();
-			}
-
+			var gStart = System.currentTimeMillis();
+			graphics.setTransform(worldToScreen);
+			renderGraphics(graphicsRenderingContext, appliedRule, layerNeedsTextLayout);
 			System.err.println("Graphics time = " + (System.currentTimeMillis() - gStart));
 
+			// pass 2 -- render text using the information computed in pass 1
+
 			var tStart = System.currentTimeMillis();
-
-			layerPos = 0;
-			rulePos = 0;
-
 			graphics.setTransform(Transformation.IDENTITY);
-
-			for (var layer : map.layers()) {
-				System.err.println("Layer " + layer.title() + " vis = " + layer.isVisible());
-				if (layerNeedsTextLayout[layerPos]) {
-					// TODO - fix this
-					try (var iterator = layer.getFeatures(map.viewPortBounds(), true).features()) {
-						while (iterator.hasNext()) {
-							var feature = (SimpleFeature) iterator.next();
-							var rp = rulePos;
-							for (var rule : layer.getStyle().rules()) {
-								if (appliedRule[rp]) {
-									applyTextRule(rule, context, feature);
-								}
-
-								rp++;
-							}
-						}
-					}
-				}
-
-				layerPos++;
-				rulePos += layer.getStyle().rules().size();
-			}
-
+			renderText(graphicsRenderingContext, appliedRule, layerNeedsTextLayout);
 			System.err.println("Text time = " + (System.currentTimeMillis() - tStart));
 
 			System.err.println("Rendering time " + (System.currentTimeMillis() - start));
@@ -139,6 +89,63 @@ public class ShapeMapRenderer {
 			System.err.println("Rendering exception");
 			ex.printStackTrace(System.err);
 		}
+	}
+
+	private void renderGraphics(GraphicsRenderingContext context, boolean[] appliedRule, boolean[] layerNeedsTextLayout)
+			throws IOException {
+
+		var layerPos = 0;
+		var rulePos = 0;
+
+		for (var layer : map.layers()) {
+			if (layer.isVisible()) {
+				var style = layer.getStyle();
+
+				// TODO -- fix this
+				try (var iterator = layer.getFeatures(map.viewPortBounds(), layer.isScaleLess()).features()) {
+					while (iterator.hasNext()) {
+						var feature = (SimpleFeature) iterator.next();
+						layerNeedsTextLayout[layerPos] |= applyStyle(style, context, feature, appliedRule, rulePos);
+					}
+				}
+
+				layerNeedsTextLayout[layerPos] &= style.hasTextSymbolizers();
+			}
+
+			layerPos++;
+			rulePos += layer.getStyle().rules().size();
+		}
+	}
+
+	private void renderText(GraphicsRenderingContext context, boolean[] appliedRule, boolean[] layerNeedsTextLayout)
+			throws IOException {
+
+		var layerPos = 0;
+		var rulePos = 0;
+
+		for (var layer : map.layers()) {
+			System.err.println("Layer " + layer.title() + " vis = " + layer.isVisible());
+			if (layerNeedsTextLayout[layerPos]) {
+				// TODO - fix this
+				try (var iterator = layer.getFeatures(map.viewPortBounds(), true).features()) {
+					while (iterator.hasNext()) {
+						var feature = (SimpleFeature) iterator.next();
+						var rp = rulePos;
+						for (var rule : layer.getStyle().rules()) {
+							if (appliedRule[rp]) {
+								applyTextRule(rule, context, feature);
+							}
+
+							rp++;
+						}
+					}
+				}
+			}
+
+			layerPos++;
+			rulePos += layer.getStyle().rules().size();
+		}
+
 	}
 
 	private boolean applyStyle(FeatureTypeStyle style, GraphicsRenderingContext context, SimpleFeature feature,
@@ -195,8 +202,21 @@ public class ShapeMapRenderer {
 		if (filterResult instanceof Boolean fr && fr) {
 			for (var symbolizer : rule.textSymbolizers()) {
 				symbolizer.render(context, feature);
+
 			}
 		}
+	}
+
+	private double onePixelX(Affine screenToWorld) throws NonInvertibleTransformException {
+		var pt1 = screenToWorld.transform(0, 0);
+		var pt2 = screenToWorld.transform(1, 0);
+		return Math.abs(pt2.getX() - pt1.getX());
+	}
+
+	private double onePixelY(Affine screenToWorld) throws NonInvertibleTransformException {
+		var pt1 = screenToWorld.transform(0, 0);
+		var pt2 = screenToWorld.transform(0, 1);
+		return Math.abs(pt2.getY() - pt1.getY());
 	}
 
 }

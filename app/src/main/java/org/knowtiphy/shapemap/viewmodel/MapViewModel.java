@@ -16,7 +16,7 @@ import org.knowtiphy.shapemap.renderer.context.RenderGeomCache;
 import org.reactfx.Change;
 import org.reactfx.EventSource;
 
-public class MapViewModel {
+public class MapViewModel implements IMapViewModel {
 
 	public final EventSource<Change<Boolean>> layerVisibilityEvent = new EventSource<>();
 
@@ -63,6 +63,7 @@ public class MapViewModel {
 		checkViewportCRS();
 	}
 
+	@Override
 	public Collection<MapLayer> layers() {
 		return layers.values();
 	}
@@ -79,7 +80,7 @@ public class MapViewModel {
 		return displayOptions;
 	}
 
-	public int getTotalRuleCount() {
+	public int totalRuleCount() {
 		return totalRuleCount;
 	}
 
@@ -91,6 +92,7 @@ public class MapViewModel {
 		return layers.get(type);
 	}
 
+	@Override
 	public ReferencedEnvelope viewPortBounds() {
 		return viewport.getBounds();
 	}
@@ -121,6 +123,7 @@ public class MapViewModel {
 		return viewport.getWorldToScreen();
 	}
 
+	@Override
 	public CoordinateReferenceSystem crs() {
 		return bounds.getCoordinateReferenceSystem();
 	}
