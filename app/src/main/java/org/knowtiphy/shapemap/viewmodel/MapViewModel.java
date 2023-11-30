@@ -13,7 +13,6 @@ import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.knowtiphy.charts.ontology.S57;
 import org.knowtiphy.shapemap.renderer.context.ISVGProvider;
 import org.knowtiphy.shapemap.renderer.context.RenderGeomCache;
-import org.knowtiphy.shapemap.renderer.context.SVGCache;
 import org.reactfx.Change;
 import org.reactfx.EventSource;
 
@@ -35,17 +34,18 @@ public class MapViewModel {
 
 	private final RenderGeomCache renderGeomCache = new RenderGeomCache();
 
-	private final ISVGProvider svgCache = new SVGCache();
+	private final ISVGProvider svgCache;
 
 	// possibly shouldnt be here -- but it makes for faster rendering
 	private int totalRuleCount;
 
-	public MapViewModel(String title, ReferencedEnvelope envelope, MapDisplayOptions displayOptions)
-			throws TransformException, NonInvertibleTransformException, FactoryException {
+	public MapViewModel(String title, ReferencedEnvelope envelope, MapDisplayOptions displayOptions,
+			ISVGProvider svgCache) throws TransformException, NonInvertibleTransformException, FactoryException {
 
 		this.title = title;
 		this.bounds = envelope;
 		this.displayOptions = displayOptions;
+		this.svgCache = svgCache;
 
 		viewport = new MapViewport();
 		viewport.setBounds(envelope);

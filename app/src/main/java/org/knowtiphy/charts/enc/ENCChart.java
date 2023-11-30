@@ -10,6 +10,8 @@ import javafx.scene.transform.NonInvertibleTransformException;
 import org.geotools.api.referencing.FactoryException;
 import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.api.referencing.operation.TransformException;
+import org.knowtiphy.charts.chartview.markicons.ResourceLoader;
+import org.knowtiphy.shapemap.renderer.context.SVGCache;
 import org.knowtiphy.shapemap.viewmodel.MapDisplayOptions;
 import org.knowtiphy.shapemap.viewmodel.MapViewModel;
 import org.reactfx.EventSource;
@@ -27,7 +29,8 @@ public class ENCChart extends MapViewModel {
 			MapDisplayOptions displayOptions)
 			throws TransformException, FactoryException, NonInvertibleTransformException {
 
-		super(chartDescription.getName(), chartDescription.getBounds(crs), displayOptions);
+		super(chartDescription.getName(), chartDescription.getBounds(crs), displayOptions,
+				new SVGCache(ResourceLoader.class));
 		this.chartDescription = chartDescription;
 		// TODO -- need to unsubscibe?
 		newChartEvents.feedFrom(chartLocker.chartLoadedEvents);

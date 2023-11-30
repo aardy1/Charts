@@ -13,7 +13,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.transform.Rotate;
 import org.apache.commons.lang3.tuple.Pair;
 import org.girod.javafx.svgimage.SVGLoader;
-import org.knowtiphy.charts.chartview.ChartView;
 
 /**
  * @author graham
@@ -27,6 +26,12 @@ public class SVGCache implements ISVGProvider {
 		SVG_RENDERING_PARAMETERS.setTransform(new Rotate(180));
 	}
 
+	private final Class<?> resourceClass;
+
+	public SVGCache(Class<?> resourceClass) {
+		this.resourceClass = resourceClass;
+	}
+
 	//@formatter:on
 	private final Map<Pair<String, Integer>, Image> cache = new HashMap<>();
 
@@ -38,7 +43,7 @@ public class SVGCache implements ISVGProvider {
 	public Image get(String name, int size) {
 		var image = cache.get(Pair.of(name, size));
 		if (image == null) {
-			var svgImage = SVGLoader.load(ChartView.class.getResource("markicons/" + name));
+			var svgImage = SVGLoader.load(resourceClass.getResource(name));
 			svgImage.setScaleX(size / svgImage.getWidth());
 			svgImage.setScaleY(size / svgImage.getHeight());
 			image = svgImage.toImage(SVG_RENDERING_PARAMETERS);

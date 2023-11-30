@@ -11,7 +11,7 @@ import org.geotools.api.feature.simple.SimpleFeature;
 import org.geotools.api.geometry.BoundingBox;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.crs.DefaultEngineeringCRS;
-import org.knowtiphy.charts.Fonts;
+import org.knowtiphy.shapemap.renderer.Fonts;
 import org.knowtiphy.shapemap.renderer.GraphicsRenderingContext;
 import org.knowtiphy.shapemap.renderer.graphics.Fill;
 import org.knowtiphy.shapemap.renderer.graphics.Text;
