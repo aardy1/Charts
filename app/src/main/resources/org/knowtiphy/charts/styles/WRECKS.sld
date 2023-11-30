@@ -13,10 +13,7 @@
                     <PointSymbolizer>
                         <Graphic>
                             <Mark>
-                                <WellKnownName>square</WellKnownName>
-                                <Fill>
-                                    <CssParameter name="fill">#000000</CssParameter>
-                                </Fill>
+                                <WellKnownName>s52:Hazard-Wreck</WellKnownName>
                             </Mark>
                             <Size>6</Size>
                         </Graphic>

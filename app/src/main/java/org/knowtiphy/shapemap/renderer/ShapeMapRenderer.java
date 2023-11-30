@@ -101,7 +101,6 @@ public class ShapeMapRenderer {
 			if (layer.isVisible()) {
 				var style = layer.getStyle();
 
-				// TODO -- fix this
 				try (var iterator = layer.getFeatures(map.viewPortBounds(), layer.isScaleLess()).features()) {
 					while (iterator.hasNext()) {
 						var feature = (SimpleFeature) iterator.next();
@@ -124,9 +123,9 @@ public class ShapeMapRenderer {
 		var rulePos = 0;
 
 		for (var layer : map.layers()) {
-			System.err.println("Layer " + layer.title() + " vis = " + layer.isVisible());
+			// System.err.println("Layer " + layer.title() + " vis = " +
+			// layer.isVisible());
 			if (layerNeedsTextLayout[layerPos]) {
-				// TODO - fix this
 				try (var iterator = layer.getFeatures(map.viewPortBounds(), true).features()) {
 					while (iterator.hasNext()) {
 						var feature = (SimpleFeature) iterator.next();
