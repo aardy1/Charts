@@ -21,16 +21,24 @@ public class PointSymbolizer implements ISymbolizer {
 
 	private final IFeatureFunction<Number> size;
 
+	private final IFeatureFunction<Number> rotation;
+
 	private final double opacity;
 
-	public PointSymbolizer(IMarkSymbolizer markSymbolizer, IFeatureFunction<Number> size, double opacity) {
+	public PointSymbolizer(IMarkSymbolizer markSymbolizer, IFeatureFunction<Number> size, double opacity,
+			IFeatureFunction<Number> rotation) {
 		this.markSymbolizer = markSymbolizer;
 		this.size = size;
 		this.opacity = opacity;
+		this.rotation = rotation;
 	}
 
 	public IFeatureFunction<Number> size() {
 		return size;
+	}
+
+	public IFeatureFunction<Number> rotation() {
+		return rotation;
 	}
 
 	@Override

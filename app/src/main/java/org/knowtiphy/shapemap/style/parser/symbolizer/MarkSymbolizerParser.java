@@ -50,6 +50,7 @@ public class MarkSymbolizerParser {
 		S52.put("Hazard-Lighthouse", (f, s) -> new SVGMarkSymbolizer(new PathInfo("Hazard-Lighthouse.svg"), f, s));
 		S52.put("Hazard-Oil-Platform", (f, s) -> new SVGMarkSymbolizer(new PathInfo("Hazard-Oil-Platform.svg"), f, s));
 		S52.put("Hazard-Wreck", (f, s) -> new SVGMarkSymbolizer(new PathInfo("Hazard-Wreck2.svg"), f, s));
+		S52.put("Arrow", (f, s) -> new SVGMarkSymbolizer(new PathInfo("Arrow.svg"), f, s));
 	}
 
 	public static IMarkSymbolizer parse(XMLEventReader reader) throws XMLStreamException, StyleSyntaxException {

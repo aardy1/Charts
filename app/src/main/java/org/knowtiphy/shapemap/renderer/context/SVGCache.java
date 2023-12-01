@@ -11,7 +11,7 @@ import javafx.scene.SnapshotParameters;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.transform.Rotate;
-import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.tuple.Triple;
 import org.girod.javafx.svgimage.SVGLoader;
 
 /**
@@ -23,7 +23,7 @@ public class SVGCache implements ISVGProvider {
 	static {
 		SVG_RENDERING_PARAMETERS.setFill(Color.TRANSPARENT);
 		// for some reason SVGLoader loads the images upside down ...
-		SVG_RENDERING_PARAMETERS.setTransform(new Rotate(180));
+		// SVG_RENDERING_PARAMETERS.setTransform(new Rotate(180));
 	}
 
 	private final Class<?> resourceClass;
@@ -33,21 +33,22 @@ public class SVGCache implements ISVGProvider {
 	}
 
 	//@formatter:on
-	private final Map<Pair<String, Integer>, Image> cache = new HashMap<>();
+	private final Map<Triple<String, Integer, Double>, Image> cache = new HashMap<>();
 
-	public void cache(String svg, int size, Image image) {
-		cache.put(Pair.of(svg, size), image);
+	public void cache(String name, int size, double rotation, Image image) {
+		cache.put(Triple.of(name, size, rotation), image);
 	}
 
 	@Override
-	public Image get(String name, int size) {
-		var image = cache.get(Pair.of(name, size));
+	public Image get(String name, int size, double rotation) {
+		var image = cache.get(Triple.of(name, size, rotation));
 		if (image == null) {
 			var svgImage = SVGLoader.load(resourceClass.getResource(name));
 			svgImage.setScaleX(size / svgImage.getWidth());
 			svgImage.setScaleY(size / svgImage.getHeight());
+			SVG_RENDERING_PARAMETERS.setTransform(new Rotate(180 - rotation));
 			image = svgImage.toImage(SVG_RENDERING_PARAMETERS);
-			cache(name, size, image);
+			cache(name, size, rotation, image);
 		}
 
 		return image;

@@ -42,6 +42,8 @@ public class PointSymbolizerParser {
 					case XML.SIZE ->
 						builder.size(ExpressionParser.parseOrLiteral(reader, XML.SIZE, Utils::parseDouble));
 					case XML.OPACITY -> builder.opacity(Utils.parseDouble(reader.nextEvent()));
+					case XML.ROTATION ->
+						builder.rotation(ExpressionParser.parseOrLiteral(reader, XML.ROTATION, Utils::parseDouble));
 					case XML.VENDOR_OPTION -> VendorOptionParser.parse(reader);
 					default -> throw new IllegalArgumentException(startElement.toString());
 				}

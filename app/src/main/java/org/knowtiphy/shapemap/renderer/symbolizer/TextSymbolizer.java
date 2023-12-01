@@ -85,6 +85,10 @@ public class TextSymbolizer {
 
 		if (point != null && label != null) {
 			var text = label.apply(feature, point);
+
+			// TODO -- get rid of debugging
+			var bill = feature.getFeatureType().getName().getLocalPart().contains("CURENT");
+
 			if (!StringUtils.isBlank(text)) {
 
 				var graphicsContext = context.graphicsContext();
@@ -107,16 +111,18 @@ public class TextSymbolizer {
 				if (!overlaps(textBounds, blocked)) {
 
 					if (fillInfo != null) {
-						graphicsContext.fillText(text, tx.getX(), tx.getY());
+						graphicsContext.fillText(text, x, y);
 					}
 
 					if (strokeInfo != null) {
-						graphicsContext.strokeText(text, tx.getX(), tx.getY());
+						graphicsContext.strokeText(text, x, y);
 					}
 
 					// TODO -- set bounds from greater of fill or stroke
 					blocked.insert(textBounds, textBounds);
 				}
+				else if (bill)
+					System.err.println(text + " : " + " blocked");
 			}
 		}
 	}

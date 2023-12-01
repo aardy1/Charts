@@ -54,6 +54,8 @@ public class XML {
 
 	public static final String OPACITY = "opacity";
 
+	public static final String ROTATION = "rotation";
+
 	public static final String CSS_PARAMETER = "cssparameter";
 
 	public static final String LABEL = "label";

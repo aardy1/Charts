@@ -16,8 +16,8 @@ import org.geotools.api.feature.simple.SimpleFeatureType;
 import org.geotools.data.store.ContentEntry;
 import org.geotools.data.store.ContentFeatureSource;
 import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.knowtiphy.charts.ontology.S57;
 import org.knowtiphy.charts.enc.ENCChart;
+import org.knowtiphy.charts.ontology.S57;
 import org.locationtech.jts.index.strtree.STRtree;
 
 /**
@@ -70,10 +70,12 @@ public class MemStoreFeatureSource extends ContentFeatureSource {
 
 			sbounds = System.currentTimeMillis() - sbounds;
 
-			System.err.println("Source " + featureType.getTypeName() + ", #In Bounds = " + featuresInBounds.size()
-					+ " : " + ebounds + " millis, #In Scale = " + featuresInScale.size() + " : " + sbounds
-					+ " millis, current scale = " + currentScale + ", scaleLess = " + scaleLess);
-
+			// System.err.println("Source " + featureType.getTypeName() + ", #In Bounds =
+			// " + featuresInBounds.size()
+			// + " : " + ebounds + " millis, #In Scale = " + featuresInScale.size() + " :
+			// " + sbounds
+			// + " millis, current scale = " + currentScale + ", scaleLess = " +
+			// scaleLess);
 		}
 		else {
 			var ebounds = System.currentTimeMillis();

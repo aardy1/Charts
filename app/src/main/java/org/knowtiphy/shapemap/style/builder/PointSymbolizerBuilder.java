@@ -25,6 +25,8 @@ public class PointSymbolizerBuilder {
 
 	private IFeatureFunction<Number> size = DEFAULT_SIZE;
 
+	private IFeatureFunction<Number> rotation;
+
 	private double opacity = 1;
 
 	public PointSymbolizerBuilder markSymbolizer(IMarkSymbolizer markSymbolizer) {
@@ -42,10 +44,15 @@ public class PointSymbolizerBuilder {
 		return this;
 	}
 
+	public PointSymbolizerBuilder rotation(IFeatureFunction<Number> rotation) {
+		this.rotation = rotation;
+		return this;
+	}
+
 	public ISymbolizer build() throws StyleSyntaxException {
 
 		expect(markSymbolizer, "Expected a mark symbolizer");
-		return new PointSymbolizer(markSymbolizer, size, opacity);
+		return new PointSymbolizer(markSymbolizer, size, opacity, rotation);
 	}
 
 }

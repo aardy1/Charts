@@ -33,7 +33,9 @@ public class SVGMarkSymbolizer extends BaseMarkSymbolizer {
 		if (szo == null)
 			return;
 
-		var image = context.rendererContext().svgProvider().get(pathInfo.name(), szo.intValue());
+		var rotationO = pointSymbolizer.rotation() == null ? null : pointSymbolizer.rotation().apply(feature, pt);
+		var rotation = rotationO == null ? 0 : rotationO.doubleValue();
+		var image = context.rendererContext().svgProvider().get(pathInfo.name(), szo.intValue(), rotation);
 
 		var x = pt.getX();
 		var y = pt.getY();

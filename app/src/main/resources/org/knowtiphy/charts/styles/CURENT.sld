@@ -10,10 +10,11 @@
             <FeatureTypeStyle>
                 <FeatureTypeName>CURENT</FeatureTypeName>
                 <Rule>
-                    <!--                    <PointSymbolizer>
-                                 <Graphic>
-                                                 <Mark>
-                                <WellKnownName>extshape://arrow?hr=4&amp;ab=0.8</WellKnownName>
+                    <PointSymbolizer>
+                        <Graphic>
+                            <Mark>
+                                <!--                                <WellKnownName>extshape://arrow?hr=4&amp;ab=0.8</WellKnownName>-->
+                                <WellKnownName>s52::Arrow</WellKnownName>
                                 <Fill>
                                     <CssParameter name="fill">#A8B9BD</CssParameter>
                                 </Fill>
@@ -21,10 +22,11 @@
                             <Rotation>
                                 <PropertyName>ORIENT</PropertyName>
                             </Rotation>
-                            <Size>16</Size>
+                            <Opacity>0.5</Opacity>
+                            <Size>8</Size>
                         </Graphic>
                         <VendorOption name= "labelObstacle">true</VendorOption>
-                    </PointSymbolizer>-->
+                    </PointSymbolizer>
                     <TextSymbolizer>
                         <Label>
                             <ogc:PropertyName>CURVEL</ogc:PropertyName>

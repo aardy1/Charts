@@ -9,6 +9,6 @@ import javafx.scene.image.Image;
 
 public interface ISVGProvider {
 
-	Image get(String name, int size);
+	Image get(String name, int size, double rotation);
 
 }

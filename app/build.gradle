@@ -39,9 +39,9 @@ dependencies {
     implementation libs.fxsvgimage
 }
 
-//tasks.withType(JavaExec) {
-//    enableAssertions = true
-//}
+tasks.withType(JavaExec) {
+    enableAssertions = true
+}
 
 java {
     toolchain {
