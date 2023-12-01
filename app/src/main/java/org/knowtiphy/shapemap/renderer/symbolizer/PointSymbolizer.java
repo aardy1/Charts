@@ -5,11 +5,11 @@
 
 package org.knowtiphy.shapemap.renderer.symbolizer;
 
-import org.knowtiphy.shapemap.renderer.symbolizer.mark.IMarkSymbolizer;
 import org.geotools.api.feature.simple.SimpleFeature;
 import org.knowtiphy.shapemap.renderer.GraphicsRenderingContext;
 import org.knowtiphy.shapemap.renderer.graphics.DrawPoint;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.IFeatureFunction;
+import org.knowtiphy.shapemap.renderer.symbolizer.mark.IMarkSymbolizer;
 import org.locationtech.jts.geom.Geometry;
 
 /**
@@ -19,7 +19,7 @@ public class PointSymbolizer implements ISymbolizer {
 
 	private final IMarkSymbolizer markSymbolizer;
 
-	private final IFeatureFunction size;
+	private final IFeatureFunction<Number> size;
 
 	private final double opacity;
 
@@ -29,7 +29,7 @@ public class PointSymbolizer implements ISymbolizer {
 		this.opacity = opacity;
 	}
 
-	public IFeatureFunction size() {
+	public IFeatureFunction<Number> size() {
 		return size;
 	}
 

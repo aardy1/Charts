@@ -5,14 +5,13 @@
 
 package org.knowtiphy.shapemap.style.builder;
 
-import org.knowtiphy.shapemap.renderer.symbolizer.basic.IFeatureFunction;
-import org.knowtiphy.shapemap.renderer.symbolizer.basic.Rule;
 import java.util.ArrayList;
 import java.util.List;
 import org.geotools.api.feature.simple.SimpleFeature;
-import org.knowtiphy.shapemap.style.*;
 import org.knowtiphy.shapemap.renderer.symbolizer.ISymbolizer;
 import org.knowtiphy.shapemap.renderer.symbolizer.TextSymbolizer;
+import org.knowtiphy.shapemap.renderer.symbolizer.basic.IFeatureFunction;
+import org.knowtiphy.shapemap.renderer.symbolizer.basic.Rule;
 import org.locationtech.jts.geom.Geometry;
 
 /**
@@ -20,7 +19,7 @@ import org.locationtech.jts.geom.Geometry;
  */
 public class RuleBuilder {
 
-	private IFeatureFunction filter = RuleBuilder::defaultRuleFilter;
+	private IFeatureFunction<?> filter = RuleBuilder::defaultRuleFilter;
 
 	private final List<ISymbolizer> graphicSymbolizers = new ArrayList<>();
 

@@ -33,7 +33,7 @@ public class SVGMarkSymbolizer extends BaseMarkSymbolizer {
 		if (szo == null)
 			return;
 
-		var image = context.rendererContext().svgProvider().get(pathInfo.name(), ((Number) szo).intValue());
+		var image = context.rendererContext().svgProvider().get(pathInfo.name(), szo.intValue());
 
 		var x = pt.getX();
 		var y = pt.getY();

@@ -12,6 +12,6 @@ import org.locationtech.jts.geom.Geometry;
 /**
  * @author graham
  */
-public interface IFeatureFunction extends BiFunction<SimpleFeature, Geometry, Object> {
+public interface IFeatureFunction<T> extends BiFunction<SimpleFeature, Geometry, T> {
 
 }

@@ -29,7 +29,8 @@ public class TriangleMarkSymbolizer extends BaseMarkSymbolizer {
 	private static final double[] ys = new double[4];
 
 	@Override
-	public void render(GraphicsRenderingContext context, SimpleFeature feature, Point pt, PointSymbolizer pointSymbolizer) {
+	public void render(GraphicsRenderingContext context, SimpleFeature feature, Point pt,
+			PointSymbolizer pointSymbolizer) {
 
 		var szo = pointSymbolizer.size().apply(feature, pt);
 		if (szo == null)
@@ -37,7 +38,7 @@ public class TriangleMarkSymbolizer extends BaseMarkSymbolizer {
 
 		var x = pt.getX();
 		var y = pt.getY();
-		var sz = ((Number) szo).doubleValue();
+		var sz = szo.doubleValue();
 
 		var sizeX = sz * context.onePixelX();
 		var sizeY = sz * context.onePixelY();

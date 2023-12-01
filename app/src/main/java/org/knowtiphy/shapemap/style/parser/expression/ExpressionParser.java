@@ -28,7 +28,7 @@ public class ExpressionParser {
 
 	public static IFeatureFunction parse(XMLEventReader reader, String finishTag) throws XMLStreamException {
 
-		var stack = new LinkedList<LinkedList<IFeatureFunction>>();
+		var stack = new LinkedList<LinkedList<IFeatureFunction<?>>>();
 		startFrame(stack);
 
 		var done = false;
@@ -108,7 +108,7 @@ public class ExpressionParser {
 		return endFrame(stack).pop();
 	}
 
-	public static <T> IFeatureFunction parseOrLiteral(XMLEventReader reader, String finishTag,
+	public static <T> IFeatureFunction<T> parseOrLiteral(XMLEventReader reader, String finishTag,
 			Function<XMLEvent, T> literalParser) throws XMLStreamException {
 
 		// this is a bit hacky
@@ -122,15 +122,15 @@ public class ExpressionParser {
 		}
 	}
 
-	private static void startFrame(LinkedList<LinkedList<IFeatureFunction>> stack) {
+	private static void startFrame(LinkedList<LinkedList<IFeatureFunction<?>>> stack) {
 		stack.push(new LinkedList<>());
 	}
 
-	private static LinkedList<IFeatureFunction> endFrame(LinkedList<LinkedList<IFeatureFunction>> stack) {
+	private static LinkedList<IFeatureFunction<?>> endFrame(LinkedList<LinkedList<IFeatureFunction<?>>> stack) {
 		return stack.pop();
 	}
 
-	private static void push(LinkedList<LinkedList<IFeatureFunction>> stack, IFeatureFunction function) {
+	private static void push(LinkedList<LinkedList<IFeatureFunction<?>>> stack, IFeatureFunction<?> function) {
 		stack.peek().push(function);
 	}
 
@@ -152,7 +152,7 @@ public class ExpressionParser {
 		return name;
 	}
 
-	private static IFeatureFunction makeFunctionCall(LinkedList<IFeatureFunction> frame) throws XMLStreamException {
+	private static IFeatureFunction makeFunctionCall(LinkedList<IFeatureFunction<?>> frame) throws XMLStreamException {
 
 		int size = frame.size();
 		var funArgs = new ArrayList<IFeatureFunction>();
@@ -181,8 +181,9 @@ public class ExpressionParser {
 		};
 	}
 
-	private static IFeatureFunction mkBop(LinkedList<IFeatureFunction> frame,
-			BiFunction<IFeatureFunction, IFeatureFunction, IFeatureFunction> operator) throws XMLStreamException {
+	private static IFeatureFunction mkBop(LinkedList<IFeatureFunction<?>> frame,
+			BiFunction<IFeatureFunction<?>, IFeatureFunction<?>, IFeatureFunction<?>> operator)
+			throws XMLStreamException {
 
 		var right = frame.pop();
 		var left = frame.pop();

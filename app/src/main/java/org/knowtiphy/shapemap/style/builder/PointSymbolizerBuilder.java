@@ -5,10 +5,10 @@
 
 package org.knowtiphy.shapemap.style.builder;
 
-import org.knowtiphy.shapemap.renderer.symbolizer.mark.IMarkSymbolizer;
 import org.knowtiphy.shapemap.renderer.symbolizer.ISymbolizer;
 import org.knowtiphy.shapemap.renderer.symbolizer.PointSymbolizer;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.IFeatureFunction;
+import org.knowtiphy.shapemap.renderer.symbolizer.mark.IMarkSymbolizer;
 import org.knowtiphy.shapemap.style.parser.StyleSyntaxException;
 
 import static org.knowtiphy.shapemap.style.parser.StyleSyntaxException.expect;
@@ -23,7 +23,7 @@ public class PointSymbolizerBuilder {
 
 	private IMarkSymbolizer markSymbolizer;
 
-	private IFeatureFunction size = DEFAULT_SIZE;
+	private IFeatureFunction<Number> size = DEFAULT_SIZE;
 
 	private double opacity = 1;
 
@@ -32,7 +32,7 @@ public class PointSymbolizerBuilder {
 		return this;
 	}
 
-	public PointSymbolizerBuilder size(IFeatureFunction size) {
+	public PointSymbolizerBuilder size(IFeatureFunction<Number> size) {
 		this.size = size;
 		return this;
 	}

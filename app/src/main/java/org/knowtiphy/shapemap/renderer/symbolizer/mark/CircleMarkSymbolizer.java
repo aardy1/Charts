@@ -24,7 +24,8 @@ public class CircleMarkSymbolizer extends BaseMarkSymbolizer {
 	}
 
 	@Override
-	public void render(GraphicsRenderingContext context, SimpleFeature feature, Point pt, PointSymbolizer pointSymbolizer) {
+	public void render(GraphicsRenderingContext context, SimpleFeature feature, Point pt,
+			PointSymbolizer pointSymbolizer) {
 
 		var szo = pointSymbolizer.size().apply(feature, pt);
 		if (szo == null)
@@ -32,7 +33,7 @@ public class CircleMarkSymbolizer extends BaseMarkSymbolizer {
 
 		var x = pt.getX();
 		var y = pt.getY();
-		var sz = ((Number) szo).doubleValue();
+		var sz = szo.doubleValue();
 
 		var sizeX = sz * context.onePixelX();
 		var sizeY = sz * context.onePixelY();
