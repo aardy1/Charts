@@ -14,14 +14,11 @@ import org.knowtiphy.charts.chartview.markicons.ResourceLoader;
 import org.knowtiphy.shapemap.renderer.context.SVGCache;
 import org.knowtiphy.shapemap.viewmodel.MapDisplayOptions;
 import org.knowtiphy.shapemap.viewmodel.MapViewModel;
-import org.reactfx.EventSource;
 
 /**
  * @author graham
  */
 public class ENCChart extends MapViewModel {
-
-	public final EventSource<ENCChart> newChartEvents = new EventSource<>();
 
 	private final ChartDescription chartDescription;
 
@@ -32,8 +29,6 @@ public class ENCChart extends MapViewModel {
 		super(chartDescription.getName(), chartDescription.getBounds(crs), displayOptions,
 				new SVGCache(ResourceLoader.class));
 		this.chartDescription = chartDescription;
-		// TODO -- need to unsubscibe?
-		newChartEvents.feedFrom(chartLocker.chartLoadedEvents);
 	}
 
 	public ChartDescription getChartDescription() {

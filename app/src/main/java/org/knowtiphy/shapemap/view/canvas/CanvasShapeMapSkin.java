@@ -14,12 +14,13 @@ import javafx.scene.transform.NonInvertibleTransformException;
 import org.geotools.api.referencing.FactoryException;
 import org.geotools.api.referencing.operation.TransformException;
 import org.knowtiphy.charts.chartview.ChartView.EventModel;
-import org.knowtiphy.charts.enc.ENCChart;
 import org.knowtiphy.shapemap.renderer.ShapeMapRenderer;
 import org.knowtiphy.shapemap.renderer.context.RemoveHolesFromPolygon;
 import org.knowtiphy.shapemap.renderer.context.RendererContext;
 import org.knowtiphy.shapemap.view.ShapeMapBaseSkin;
 import org.knowtiphy.shapemap.view.ShapeMapView;
+import org.knowtiphy.shapemap.viewmodel.IMapViewModel;
+import org.reactfx.Change;
 import org.reactfx.Subscription;
 
 public class CanvasShapeMapSkin extends ShapeMapBaseSkin {
@@ -28,7 +29,7 @@ public class CanvasShapeMapSkin extends ShapeMapBaseSkin {
 
 	private static final double PREFERRED_HEIGHT = Region.USE_COMPUTED_SIZE;
 
-	private ENCChart chart;
+	private IMapViewModel chart;
 
 	private final Pane root;
 
@@ -36,7 +37,7 @@ public class CanvasShapeMapSkin extends ShapeMapBaseSkin {
 
 	private final List<Subscription> subscriptions = new ArrayList<>();
 
-	public CanvasShapeMapSkin(ShapeMapView surface, ENCChart chart, EventModel eventModel) {
+	public CanvasShapeMapSkin(ShapeMapView surface, IMapViewModel chart, EventModel eventModel) {
 		super(surface);
 
 		this.chart = chart;
@@ -57,10 +58,10 @@ public class CanvasShapeMapSkin extends ShapeMapBaseSkin {
 		// unsubscribe listeners on the old chart
 		subscriptions.forEach(s -> s.unsubscribe());
 		subscriptions.clear();
-		subscriptions.add(chart.viewPortBoundsEvent.subscribe(b -> root.requestLayout()));
-		subscriptions.add(chart.layerVisibilityEvent.subscribe(b -> root.requestLayout()));
-		subscriptions.add(chart.newChartEvents.subscribe(newChart -> {
-			this.chart = newChart;
+		subscriptions.add(chart.viewPortBoundsEvent().subscribe(b -> root.requestLayout()));
+		subscriptions.add(chart.layerVisibilityEvent().subscribe(b -> root.requestLayout()));
+		subscriptions.add(chart.newChartEvent().subscribe((Change<IMapViewModel> change) -> {
+			this.chart = change.getNewValue();
 			setupListeners();
 			root.requestLayout();
 		}));

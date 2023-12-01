@@ -73,8 +73,8 @@ public class QuiltingSurface extends StackPane {
 
 		widthProperty().addListener(cl -> makeQuilting());
 		heightProperty().addListener(cl -> makeQuilting());
-		chart.viewPortBoundsEvent.subscribe(extent -> makeQuilting());
-		chart.newChartEvents.subscribe(extent -> makeQuilting());
+		chart.viewPortBoundsEvent().subscribe(extent -> makeQuilting());
+		chart.newChartEvent().subscribe(extent -> makeQuilting());
 	}
 
 	private void makeQuilting() {

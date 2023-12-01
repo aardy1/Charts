@@ -19,14 +19,11 @@ import org.geotools.geometry.jts.JTS;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.knowtiphy.shapemap.style.parser.StyleSyntaxException;
 import org.knowtiphy.shapemap.viewmodel.MapDisplayOptions;
-import org.reactfx.EventSource;
 
 /**
  * @author graham
  */
 public class ChartLocker {
-
-	public final EventSource<ENCChart> chartLoadedEvents = new EventSource<>();
 
 	// eventually this will be a list of providers
 	private final LocalChartProvider chartProvider;
@@ -55,7 +52,8 @@ public class ChartLocker {
 		return chartProvider.loadChart(this, chartDescription, displayOptions);
 	}
 
-	public void loadChart(ChartDescription chartDescription, MapDisplayOptions displayOptions, Rectangle2D screenArea)
+	public ENCChart loadChart(ChartDescription chartDescription, MapDisplayOptions displayOptions,
+			Rectangle2D screenArea)
 			throws TransformException, FactoryException, NonInvertibleTransformException, StyleSyntaxException {
 
 		ENCChart newChart;
@@ -64,13 +62,12 @@ public class ChartLocker {
 		}
 		catch (IOException | XMLStreamException ex) {
 			Logger.getLogger(ChartLocker.class.getName()).log(Level.SEVERE, null, ex);
-			return;
+			return null;
 		}
 
 		newChart.setViewPortScreenArea(screenArea);
 		newChart.setViewPortBounds(newChart.bounds());
-
-		chartLoadedEvents.push(newChart);
+		return newChart;
 	}
 
 }

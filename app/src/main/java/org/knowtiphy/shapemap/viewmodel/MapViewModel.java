@@ -18,9 +18,12 @@ import org.reactfx.EventSource;
 
 public class MapViewModel implements IMapViewModel {
 
-	public final EventSource<Change<Boolean>> layerVisibilityEvent = new EventSource<>();
+	private final EventSource<Change<Boolean>> layerVisibilityEvent = new EventSource<>();
 
-	public final EventSource<Change<ReferencedEnvelope>> viewPortBoundsEvent = new EventSource<>();
+	private final EventSource<Change<ReferencedEnvelope>> viewPortBoundsEvent = new EventSource<>();
+
+	// TODO -- need to unsubscibe?
+	public final EventSource<Change<IMapViewModel>> newChartEvent = new EventSource<>();
 
 	private final ReferencedEnvelope bounds;
 
@@ -82,6 +85,22 @@ public class MapViewModel implements IMapViewModel {
 
 	public int totalRuleCount() {
 		return totalRuleCount;
+	}
+
+	public EventSource<Change<ReferencedEnvelope>> viewPortBoundsEvent() {
+		return viewPortBoundsEvent;
+	}
+
+	public EventSource<Change<Boolean>> layerVisibilityEvent() {
+		return layerVisibilityEvent;
+	}
+
+	public EventSource<Change<IMapViewModel>> newChartEvent() {
+		return newChartEvent;
+	}
+
+	public MapViewport getViewport() {
+		return viewport;
 	}
 
 	public void setViewport(MapViewport viewport) {

@@ -54,10 +54,10 @@ public class IconSurface extends Pane {
 	private void setupListeners() {
 		subscriptions.forEach(s -> s.unsubscribe());
 		subscriptions.clear();
-		subscriptions.add(chart.viewPortBoundsEvent.subscribe(b -> makeIconLayers()));
-		subscriptions.add(chart.layerVisibilityEvent.subscribe(b -> makeIconLayers()));
-		subscriptions.add(chart.newChartEvents.subscribe(newChart -> {
-			this.chart = newChart;
+		subscriptions.add(chart.viewPortBoundsEvent().subscribe(b -> makeIconLayers()));
+		subscriptions.add(chart.layerVisibilityEvent().subscribe(b -> makeIconLayers()));
+		subscriptions.add(chart.newChartEvent().subscribe(change -> {
+			chart = (ENCChart) change.getNewValue();
 			setupListeners();
 			makeIconLayers();
 		}));

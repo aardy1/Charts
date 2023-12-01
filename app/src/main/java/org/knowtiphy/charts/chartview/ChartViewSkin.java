@@ -40,6 +40,7 @@ import org.knowtiphy.shapemap.renderer.Transformation;
 import org.knowtiphy.shapemap.style.parser.StyleSyntaxException;
 import org.knowtiphy.shapemap.view.ShapeMapView;
 import org.knowtiphy.shapemap.viewmodel.MapDisplayOptions;
+import org.reactfx.Change;
 import org.reactfx.EventStreams;
 import org.reactfx.Subscription;
 
@@ -120,7 +121,7 @@ public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView
 		// windows on clicked, mac on pressed
 		eventModel.mouseClicked.filter(event -> event.isPopupTrigger())
 				.subscribe(event -> makeContextMenu(event).show(mapSurface, event.getScreenX(), event.getScreenY()));
-		eventModel.mousePressed.filter(event -> event.isSecondaryButtonDown())
+		eventModel.mousePressed.filter(event -> event.isPopupTrigger())
 				.subscribe(event -> makeContextMenu(event).show(mapSurface, event.getScreenX(), event.getScreenY()));
 
 		setupListeners();
@@ -196,8 +197,8 @@ public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView
 		// subscriptions.add(chart.newChartEvents.subscribe(change -> updateBoats()));
 		// subscriptions.add(dynamics.aisEvents.subscribe(this::updateAISInformation));
 
-		subscriptions.add(chart.newChartEvents.subscribe(newChart -> {
-			chart = newChart;
+		subscriptions.add(chart.newChartEvent.subscribe(change -> {
+			chart = (ENCChart) change.getNewValue();
 			setupListeners();
 		}));
 	}
@@ -261,7 +262,8 @@ public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView
 		if (mostDetailedChart != null) {
 			var screenArea = new Rectangle2D(0, 0, (int) root.getWidth(), (int) root.getHeight());
 			try {
-				chartLocker.loadChart(mostDetailedChart, displayOptions, screenArea);
+				var newChart = chartLocker.loadChart(mostDetailedChart, displayOptions, screenArea);
+				chart.newChartEvent().push(new Change<>(chart, newChart));
 			}
 			catch (TransformException | FactoryException | NonInvertibleTransformException | StyleSyntaxException ex) {
 				Logger.getLogger(ChartViewSkin.class.getName()).log(Level.SEVERE, null, ex);
