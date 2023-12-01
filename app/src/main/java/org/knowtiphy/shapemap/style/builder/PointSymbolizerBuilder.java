@@ -19,7 +19,7 @@ import static org.knowtiphy.shapemap.style.parser.StyleSyntaxException.expect;
 public class PointSymbolizerBuilder {
 
 	// TODO -- spec says the default is the "native symbol size" ...?
-	private IFeatureFunction DEFAULT_SIZE = (f, g) -> 8;
+	private static final IFeatureFunction DEFAULT_SIZE = (f, g) -> 8;
 
 	private IMarkSymbolizer markSymbolizer;
 

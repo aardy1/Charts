@@ -26,7 +26,7 @@ import static org.knowtiphy.shapemap.style.parser.Utils.normalizeKey;
  */
 public class ExpressionParser {
 
-	public static IFeatureFunction parse(XMLEventReader reader, String finishTag) throws XMLStreamException {
+	public static IFeatureFunction<?> parse(XMLEventReader reader, String finishTag) throws XMLStreamException {
 
 		var stack = new LinkedList<LinkedList<IFeatureFunction<?>>>();
 		startFrame(stack);
@@ -118,7 +118,7 @@ public class ExpressionParser {
 			return (f, g) -> value;
 		}
 		catch (NumberFormatException ex) {
-			return parse(reader, finishTag);
+			return (IFeatureFunction<T>) parse(reader, finishTag);
 		}
 	}
 

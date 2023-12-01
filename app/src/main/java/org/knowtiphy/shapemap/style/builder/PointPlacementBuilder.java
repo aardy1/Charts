@@ -5,10 +5,13 @@
 
 package org.knowtiphy.shapemap.style.builder;
 
-import org.knowtiphy.shapemap.renderer.symbolizer.basic.PointPlacement;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.AnchorPoint;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.Displacement;
-import org.knowtiphy.shapemap.style.*;
+import org.knowtiphy.shapemap.renderer.symbolizer.basic.PointPlacement;
+import org.knowtiphy.shapemap.style.parser.StyleSyntaxException;
+import org.knowtiphy.shapemap.style.parser.XML;
+
+import static org.knowtiphy.shapemap.style.parser.StyleSyntaxException.expectElement;
 
 /**
  * @author graham
@@ -29,7 +32,8 @@ public class PointPlacementBuilder {
 		return this;
 	}
 
-	public PointPlacement build() {
+	public PointPlacement build() throws StyleSyntaxException {
+		expectElement(anchorPoint, displacement, XML.ANCHOR_POINT, XML.DISPLACEMENT);
 		return new PointPlacement(anchorPoint, displacement);
 	}
 

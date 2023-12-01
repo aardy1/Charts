@@ -182,8 +182,7 @@ public class ShapeMapRenderer {
 	private boolean applyGraphicsRule(Rule rule, GraphicsRenderingContext context, SimpleFeature feature) {
 
 		if (rule.filter() != null) {
-			var filterResult = rule.filter().apply(feature, (Geometry) feature.getDefaultGeometry());
-			if (filterResult instanceof Boolean fr && fr) {
+			if (rule.filter().apply(feature, (Geometry) feature.getDefaultGeometry())) {
 				for (var symbolizer : rule.graphicSymbolizers()) {
 					symbolizer.render(context, feature);
 				}
@@ -197,8 +196,7 @@ public class ShapeMapRenderer {
 
 	private void applyTextRule(Rule rule, GraphicsRenderingContext context, SimpleFeature feature) {
 
-		var filterResult = rule.filter().apply(feature, (Geometry) feature.getDefaultGeometry());
-		if (filterResult instanceof Boolean fr && fr) {
+		if (rule.filter().apply(feature, (Geometry) feature.getDefaultGeometry())) {
 			for (var symbolizer : rule.textSymbolizers()) {
 				symbolizer.render(context, feature);
 

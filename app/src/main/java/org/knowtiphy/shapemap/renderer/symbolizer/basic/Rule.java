@@ -12,7 +12,7 @@ import org.knowtiphy.shapemap.renderer.symbolizer.TextSymbolizer;
 /**
  * @author graham
  */
-public record Rule(IFeatureFunction filter, List<ISymbolizer> graphicSymbolizers, List<TextSymbolizer> textSymbolizers,
-		boolean elseFilter) {
+public record Rule(IFeatureFunction<Boolean> filter, List<ISymbolizer> graphicSymbolizers,
+		List<TextSymbolizer> textSymbolizers, boolean elseFilter) {
 
 }

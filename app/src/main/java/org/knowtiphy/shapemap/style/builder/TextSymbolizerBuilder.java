@@ -18,7 +18,7 @@ import org.knowtiphy.shapemap.renderer.symbolizer.basic.StrokeInfo;
  */
 public class TextSymbolizerBuilder {
 
-	private IFeatureFunction label = (f, g) -> null;
+	private IFeatureFunction<String> label = (f, g) -> null;
 
 	private Font font = Font.getDefault();
 
@@ -34,7 +34,7 @@ public class TextSymbolizerBuilder {
 		return this;
 	}
 
-	public TextSymbolizerBuilder label(IFeatureFunction label) {
+	public TextSymbolizerBuilder label(IFeatureFunction<String> label) {
 		this.label = label;
 		return this;
 	}

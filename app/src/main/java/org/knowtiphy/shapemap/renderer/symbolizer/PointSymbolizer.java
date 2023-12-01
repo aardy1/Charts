@@ -23,7 +23,7 @@ public class PointSymbolizer implements ISymbolizer {
 
 	private final double opacity;
 
-	public PointSymbolizer(IMarkSymbolizer markSymbolizer, IFeatureFunction size, double opacity) {
+	public PointSymbolizer(IMarkSymbolizer markSymbolizer, IFeatureFunction<Number> size, double opacity) {
 		this.markSymbolizer = markSymbolizer;
 		this.size = size;
 		this.opacity = opacity;

@@ -30,7 +30,7 @@ import org.locationtech.jts.index.quadtree.Quadtree;
  */
 public class TextSymbolizer {
 
-	private final IFeatureFunction label;
+	private final IFeatureFunction<String> label;
 
 	private final Font font;
 
@@ -40,7 +40,7 @@ public class TextSymbolizer {
 
 	private final LabelPlacement labelPlacement;
 
-	public TextSymbolizer(IFeatureFunction label, Font font, FillInfo fillInfo, StrokeInfo strokeInfo,
+	public TextSymbolizer(IFeatureFunction<String> label, Font font, FillInfo fillInfo, StrokeInfo strokeInfo,
 			LabelPlacement labelPlacement) {
 
 		this.label = label;
@@ -85,40 +85,37 @@ public class TextSymbolizer {
 
 		if (point != null && label != null) {
 			var text = label.apply(feature, point);
-			if (text != null) {
-				var textString = text.toString();
-				if (!StringUtils.isBlank(textString)) {
+			if (text != null && !StringUtils.isBlank(text)) {
 
-					var graphicsContext = context.graphicsContext();
-					var tx = context.worldToScreen();
-					var blocked = context.blocked();
+				var graphicsContext = context.graphicsContext();
+				var tx = context.worldToScreen();
+				var blocked = context.blocked();
 
-					tx.apply(point.getX(), point.getY());
-					// TODO -- this is wrong since it supposed to be from the bounding box
-					// of the pt feature?
+				tx.apply(point.getX(), point.getY());
+				// TODO -- this is wrong since it supposed to be from the bounding box
+				// of the pt feature?
 
-					var x = tx.getX() + (labelPlacement == null || labelPlacement.pointPlacement() == null ? 0
-							: labelPlacement.pointPlacement().getDisplacementX());
-					var y = tx.getY() + (labelPlacement == null || labelPlacement.pointPlacement() == null ? 0
-							: labelPlacement.pointPlacement().getDisplacementY());
+				var x = tx.getX() + (labelPlacement == null || labelPlacement.pointPlacement() == null ? 0
+						: labelPlacement.pointPlacement().getDisplacementX());
+				var y = tx.getY() + (labelPlacement == null || labelPlacement.pointPlacement() == null ? 0
+						: labelPlacement.pointPlacement().getDisplacementY());
 
-					var textDimensions = Fonts.textSizeFast(font, textString);
-					var textBounds = new ReferencedEnvelope(x, x + textDimensions.getWidth(), y,
-							y + textDimensions.getHeight(), DefaultEngineeringCRS.CARTESIAN_2D);
+				var textDimensions = Fonts.textSizeFast(font, text);
+				var textBounds = new ReferencedEnvelope(x, x + textDimensions.getWidth(), y,
+						y + textDimensions.getHeight(), DefaultEngineeringCRS.CARTESIAN_2D);
 
-					if (!overlaps(textBounds, blocked)) {
+				if (!overlaps(textBounds, blocked)) {
 
-						if (fillInfo != null) {
-							graphicsContext.fillText(textString, tx.getX(), tx.getY());
-						}
-
-						if (strokeInfo != null) {
-							graphicsContext.strokeText(textString, tx.getX(), tx.getY());
-						}
-
-						// TODO -- set bounds from greater of fill or stroke
-						blocked.insert(textBounds, textBounds);
+					if (fillInfo != null) {
+						graphicsContext.fillText(text, tx.getX(), tx.getY());
 					}
+
+					if (strokeInfo != null) {
+						graphicsContext.strokeText(text, tx.getX(), tx.getY());
+					}
+
+					// TODO -- set bounds from greater of fill or stroke
+					blocked.insert(textBounds, textBounds);
 				}
 			}
 		}

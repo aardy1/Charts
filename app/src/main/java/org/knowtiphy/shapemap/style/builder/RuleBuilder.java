@@ -19,7 +19,7 @@ import org.locationtech.jts.geom.Geometry;
  */
 public class RuleBuilder {
 
-	private IFeatureFunction<?> filter = RuleBuilder::defaultRuleFilter;
+	private IFeatureFunction<Boolean> filter = RuleBuilder::defaultRuleFilter;
 
 	private final List<ISymbolizer> graphicSymbolizers = new ArrayList<>();
 
