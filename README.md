@@ -16,7 +16,7 @@ You need three things:
 2. a JVM
 3. some charts
 
-**Note**: on a Mac you must have a JVM built for ARM)
+**Note**: on a Mac you must have a JVM built for ARM.
 
 I use Gradle 8.3 and java 17.0.9-amzn, both installed via the wonderful [sdkman](https://sdkman.io/).
 
