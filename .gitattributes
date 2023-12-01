@@ -8,4 +8,4 @@
 *.bat           text eol=crlf
 
 #  sld files are style layer descriptions
-*.sld linguist-detectable=false
+*.sld linguist-language=XML
