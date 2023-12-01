@@ -53,4 +53,9 @@ public class Operators {
 			return first == null ? r.apply(feature, geom) : first;
 	}
 
+	public static String toString(IFeatureFunction<?> f, SimpleFeature feature, Geometry geom) {
+		var result = f.apply(feature, geom);
+		return result == null ? null : result.toString();
+	}
+
 }

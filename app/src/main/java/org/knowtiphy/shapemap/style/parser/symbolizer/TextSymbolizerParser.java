@@ -7,8 +7,8 @@ package org.knowtiphy.shapemap.style.parser.symbolizer;
 
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
+import org.knowtiphy.shapemap.renderer.Operators;
 import org.knowtiphy.shapemap.renderer.symbolizer.TextSymbolizer;
-import org.knowtiphy.shapemap.renderer.symbolizer.basic.IFeatureFunction;
 import org.knowtiphy.shapemap.style.builder.TextSymbolizerBuilder;
 import org.knowtiphy.shapemap.style.parser.StyleSyntaxException;
 import org.knowtiphy.shapemap.style.parser.Utils;
@@ -38,8 +38,10 @@ public class TextSymbolizerParser {
 			if (nextEvent.isStartElement()) {
 				var startElement = nextEvent.asStartElement();
 				switch (normalize(startElement)) {
-					case XML.LABEL ->
-						builder.label((IFeatureFunction<String>) ExpressionParser.parse(reader, XML.LABEL));
+					case XML.LABEL -> {
+						var labelValue = ExpressionParser.parse(reader, XML.LABEL);
+						builder.label((f, s) -> Operators.toString(labelValue, f, s));
+					}
 					case XML.FONT -> builder.font(FontParser.parse(reader));
 					case XML.STROKE -> builder.strokeInfo(StrokeParser.parse(reader));
 					case XML.FILL -> builder.fillInfo(FillParser.parse(reader));

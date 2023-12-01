@@ -9,6 +9,7 @@ import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.LabelPlacement;
 import org.knowtiphy.shapemap.style.builder.LabelPlacementBuilder;
+import org.knowtiphy.shapemap.style.parser.StyleSyntaxException;
 import org.knowtiphy.shapemap.style.parser.Utils;
 import org.knowtiphy.shapemap.style.parser.XML;
 
@@ -19,7 +20,7 @@ import static org.knowtiphy.shapemap.style.parser.Utils.normalize;
  */
 public class LabelPlacementParser {
 
-	public static LabelPlacement parse(XMLEventReader reader) throws XMLStreamException {
+	public static LabelPlacement parse(XMLEventReader reader) throws XMLStreamException, StyleSyntaxException {
 
 		var builder = new LabelPlacementBuilder();
 

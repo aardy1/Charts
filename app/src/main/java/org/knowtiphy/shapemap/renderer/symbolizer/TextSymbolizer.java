@@ -85,7 +85,7 @@ public class TextSymbolizer {
 
 		if (point != null && label != null) {
 			var text = label.apply(feature, point);
-			if (text != null && !StringUtils.isBlank(text)) {
+			if (!StringUtils.isBlank(text)) {
 
 				var graphicsContext = context.graphicsContext();
 				var tx = context.worldToScreen();
