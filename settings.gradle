@@ -22,6 +22,7 @@ dependencyResolutionManagement {
             version('stax', '1.0-2')
             version('reactfx', '1.4.1')
             version('controlsfx', '11.1.2')
+            version('fxsvgimage', '1.1')
 
             library('geotools-shapefile', 'org.geotools', 'gt-shapefile').versionRef('geotools')
             library('geotools-sld', 'org.geotools.xsd', 'gt-xsd-sld').versionRef('geotools')
@@ -42,6 +43,8 @@ dependencyResolutionManagement {
             library('stax-api', 'javax.xml.stream', 'stax-api').versionRef('stax')
             library('controlsfx', 'org.controlsfx', 'controlsfx').versionRef('controlsfx')
             library('reactfx', 'org.reactfx', 'reactfx').versionRef('reactfx')
+
+            library( 'fxsvgimage', 'com.github.hervegirod', 'fxsvgimage').versionRef('fxsvgimage')
     }
 }
 
