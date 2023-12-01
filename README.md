@@ -37,7 +37,7 @@ So this bit is usually a pain in the neck.
 
 It's different for every IDE. There are some instructions [here](https://openjfx.io/openjfx-docs/#introduction).
 
-I followed the instructions for [IntelliJ](https://openjfx.io/openjfx-docs/#IDE-Intellij) for "Non-modular from IDE" -- except Step 1 of course since you already have a project! 
+I followed the instructions for [IntelliJ](https://openjfx.io/openjfx-docs/#IDE-Intellij) for "Non-modular projects" -- except Step 1 of course since you already have a project! 
 
 After Step 3. I could run Knowtiphy Charts from the Gradle window in Intellij.
 
