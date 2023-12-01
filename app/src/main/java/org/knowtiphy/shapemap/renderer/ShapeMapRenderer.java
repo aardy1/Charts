@@ -44,10 +44,11 @@ public class ShapeMapRenderer {
 	public void paint(Rectangle2D paintArea, ReferencedEnvelope viewportBounds)
 			throws TransformException, IOException, NonInvertibleTransformException, FactoryException {
 
-		System.err.println("\nRepaint : " + paintArea + "\n");
-
 		// TODO -- get rid of this debugging code
 		count.set(count.get() + 1);
+
+		System.err.println("\nRepaint : " + count.get() + " : " + paintArea + "\n");
+
 		var start = System.currentTimeMillis();
 
 		var worldToScreen = RendererUtilities.worldToScreenTransform(viewportBounds, paintArea, map.crs());

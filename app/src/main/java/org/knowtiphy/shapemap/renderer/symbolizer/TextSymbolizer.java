@@ -87,7 +87,8 @@ public class TextSymbolizer {
 			var text = label.apply(feature, point);
 
 			// TODO -- get rid of debugging
-			var bill = feature.getFeatureType().getName().getLocalPart().contains("CURENT");
+			// var bill =
+			// feature.getFeatureType().getName().getLocalPart().contains("CURENT");
 
 			if (!StringUtils.isBlank(text)) {
 
@@ -121,8 +122,8 @@ public class TextSymbolizer {
 					// TODO -- set bounds from greater of fill or stroke
 					blocked.insert(textBounds, textBounds);
 				}
-				else if (bill)
-					System.err.println(text + " : " + " blocked");
+				// else if (bill)
+				// System.err.println(text + " : " + " blocked");
 			}
 		}
 	}
