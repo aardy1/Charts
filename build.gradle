@@ -4,6 +4,12 @@ plugins {
     id 'com.gluonhq.gluonfx-gradle-plugin' version '1.0.21'
 }
 
+javafx {
+    version = "21"
+    platform = "macos-aarch64"
+    modules = [ 'javafx.base', 'javafx.graphics', 'javafx.controls' ]
+}
+
 repositories {
     maven { url  'https://repo.osgeo.org/repository/release/' }
     maven { url  'https://repo.osgeo.org/repository/snapshot/' }
@@ -25,7 +31,9 @@ application {
     applicationDefaultJvmArgs = ['-Xms2G', '-Xmx2G']
 }
 
-
+//tasks.withType(JavaExec) {
+//    enableAssertions = true
+//}
 
 println("Build target = " + findProperty('target'))
 
@@ -52,12 +60,14 @@ gluonfx {
         providedKeyStorePassword = ""
         providedKeyAlias = ""
         providedKeyAliasPassword = ""
+
         // iOS
         bundleName = "Knowtiphy Charts"
         bundleVersion = "0.0.9"
         appIdentifier = "KnowtiphyCharts.Knowtiphy-Charts"
         providedSigningIdentity = "Apple Development: gym@orangedogsoftware.com (D42UBLKQAW)"
         skipSigning = false
+
         // iOS sim
         simulatorDevice = "iPhone 15"
     }
