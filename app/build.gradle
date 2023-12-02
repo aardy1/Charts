@@ -29,11 +29,12 @@ javafx {
     modules = [ 'javafx.base', 'javafx.graphics', 'javafx.controls' ]
 }
 
-println("Build target = " + findProperty('target'))
+def buildTarget = findProperty('target')  ?: 'host'
+println("Build target = " + buildTarget)
 
 gluonfx {
 
-    target = findProperty('target') ?: 'host'
+    target = buildTarget
 
     attachConfig {
         version = "$attach"
