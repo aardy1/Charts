@@ -7,7 +7,7 @@ The project has two goals:
 
 Part 1 enables part 2, because JavaFX runs on all platforns, including mobile.
 
-The project has basic stuff working -- some screen recordings of it running on my iPhone with the US_REGION08 ENC charts can be found [here](https://github.com/aardy1/Charts/wiki/Videos-of-Knowtiphy-Charts-running-on-an-iPhone).
+The project has basic stuff working -- some screen recordings of it running on my iPhone with the US_REGION08 ENC charts can be found [here](https://github.com/aardy1/Charts/wiki/Videos-of-Knowtiphy-Charts-running-on-an-iPhone) (sometimes Github says it can't show the videos -- it can, just reload the page, possibly more than once).
 
 ## Building and Running Knowtiphy Charts with a JVM on the Command Line for a Desktop
 
