@@ -20,6 +20,7 @@ dependencyResolutionManagement {
             version('fx', '21')
             version('attach', '4.0.19')
             version('connect', '2.0.1')
+    //        version('glisten', '6.2.3')
             version('stax', '1.0-2')
             version('reactfx', '1.4.1')
             version('controlsfx', '11.1.2')
@@ -33,6 +34,7 @@ dependencyResolutionManagement {
              library('fx-graphics', 'org.openjfx', 'javafx-graphics').versionRef('fx')
              library('fx-controls', 'org.openjfx', 'javafx-controls').versionRef('fx')
 
+      //      library('glisten', 'com.gluonhq', 'charm-glisten').versionRef('glisten')
             library('attach-display', 'com.gluonhq.attach', 'display').versionRef('attach')
             library('attach-lifecycle', 'com.gluonhq.attach', 'lifecycle').versionRef('attach')
             library('attach-statusbar', 'com.gluonhq.attach', 'statusbar').versionRef('attach')

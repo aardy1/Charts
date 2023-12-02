@@ -97,6 +97,3 @@ public class Platform {
 	// }
 
 }
-// var platform = System.getProperty("javafx.platform", "desktop");
-// [Tue Oct 24 21:01:26 NZDT 2023][INFO] [SUB] Root =
-// /Users/graham/Library/Developer/CoreSimulator/Devices/D6D575C0-9955-4B1D-8F1B-91FCBF0BB655/data/Containers/Data/Application/34041E1F-4952-41A1-AAF2-8E137A0843F2/Library/gluon

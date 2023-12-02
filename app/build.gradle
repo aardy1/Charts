@@ -58,8 +58,8 @@ gluonfx {
         // MacOS/iOS
         bundleName = "Knowtiphy Charts"
         bundleVersion = "0.0.9"
-        appIdentifier = "KnowtiphyCharts.Knowtiphy-Charts"
-        providedSigningIdentity = "Apple Development: gym@orangedogsoftware.com (D42UBLKQAW)"
+        appIdentifier = findProperty('appIdentifier')
+        providedSigningIdentity = findProperty('providedSigningIdentity')
         skipSigning = false
 
         // iOS sim
@@ -83,6 +83,8 @@ dependencies {
     implementation libs.fx.graphics
     implementation libs.fx.controls
 
+    implementation 'com.gluonhq:charm-glisten:6.2.3'
+//implementation libs.glisten.charm
     implementation libs.attach.display
     implementation libs.attach.lifecycle
     implementation libs.attach.statusbar
