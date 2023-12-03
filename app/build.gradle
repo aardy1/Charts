@@ -13,7 +13,7 @@ repositories {
 }
 
 application {
-    mainClassName = "org.knowtiphy.charts.KnowtiphyCharts"
+    mainClassName = "org.knowtiphy.charts.ios.KnowtiphyChartsMobile"
     applicationDefaultJvmArgs = ['-Xms2G', '-Xmx2G']
 }
 
@@ -38,7 +38,7 @@ gluonfx {
 
     attachConfig {
         version = "$attach"
-        services 'display', 'lifecycle', 'statusbar', 'storage'
+        services 'display', 'lifecycle', 'statusbar', 'storage', 'position'
     }
 
     //verbose = true
@@ -90,6 +90,7 @@ dependencies {
     implementation libs.attach.lifecycle
     implementation libs.attach.statusbar
     implementation libs.attach.storage
+    implementation libs.attach.position
     implementation libs.attach.util
 
     implementation libs.connect

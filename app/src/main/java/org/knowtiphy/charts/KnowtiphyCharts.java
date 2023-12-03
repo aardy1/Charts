@@ -145,6 +145,8 @@ public class KnowtiphyCharts extends Application {
 		System.err.println("Screen ppi = " + platform.ppi());
 		System.err.println("Screen ppcm = " + platform.ppcm());
 		System.err.println("Default font = " + Font.getDefault());
+		System.err.println("GPS Position = " + platform.positionProperty());
+		platform.info();
 		System.err.println();
 	}
 

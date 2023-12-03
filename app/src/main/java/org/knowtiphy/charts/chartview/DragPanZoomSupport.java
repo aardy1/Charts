@@ -35,7 +35,18 @@ public class DragPanZoomSupport {
 
 	public static Subscription addPanningSupport(EventModel eventModel, MapViewModel map) {
 
-		return eventModel.scrollEvents.subscribe(event -> {
+		// eventModel.scrollEvents.filter(event -> event.getTouchCount() ==
+		// 0).subscribe(event -> {
+		// System.err.println("Scrolling Wheel " + event.getTouchCount());
+		//
+		// // Coordinates.zoom(map, 1.0000005);
+		// });
+
+		return eventModel.scrollEvents.subscribe(event -> {// filter(event ->
+															// event.getTouchCount() !=
+															// 0).subscribe(event -> {
+
+			System.err.println("Scrolling " + event.getTouchCount());
 			// this seems kind of bogus
 			var newPos = new Point2D(event.getDeltaX(), event.getDeltaY());
 			var result = map.viewPortScreenToWorld().transform(newPos);

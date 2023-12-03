@@ -39,6 +39,7 @@ dependencyResolutionManagement {
             library('attach-lifecycle', 'com.gluonhq.attach', 'lifecycle').versionRef('attach')
             library('attach-statusbar', 'com.gluonhq.attach', 'statusbar').versionRef('attach')
             library('attach-storage', 'com.gluonhq.attach', 'storage').versionRef('attach')
+            library('attach-position', 'com.gluonhq.attach', 'position').versionRef('attach')
             library('attach-util', 'com.gluonhq.attach', 'util').versionRef('attach')
             library('connect', 'com.gluonhq', 'connect').versionRef('connect')
 

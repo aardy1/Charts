@@ -56,13 +56,11 @@ public class LocalChartProvider {
 			MapDisplayOptions displayOptions) throws IOException, XMLStreamException, TransformException,
 			FactoryException, NonInvertibleTransformException, StyleSyntaxException {
 
-		System.err.println("Desc = " + chartDescription);
 		var reader = new ChartBuilder(chartLocker, chartDescription.getDir(), chartDescription, styleReader,
 				displayOptions).read();
 		var map = reader.getMap();
 		map.setViewPortBounds(map.bounds());
 		return map;
-		// return new ENCChart(chartDescription, map.crs(), displayOptions);
 	}
 
 	public ENCChart loadChart(ChartLocker chartLocker, ChartDescription chartDescription, ReferencedEnvelope bounds,
@@ -74,7 +72,6 @@ public class LocalChartProvider {
 		var map = reader.getMap();
 		map.setViewPortBounds(bounds);
 		return map;
-		// return new ENCChart(chartDescription, map.crs(), displayOptions);
 	}
 
 }
