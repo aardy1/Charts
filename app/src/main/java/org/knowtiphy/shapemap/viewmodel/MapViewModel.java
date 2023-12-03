@@ -23,7 +23,7 @@ public class MapViewModel implements IMapViewModel {
 	private final EventSource<Change<ReferencedEnvelope>> viewPortBoundsEvent = new EventSource<>();
 
 	// TODO -- need to unsubscibe?
-	public final EventSource<Change<IMapViewModel>> newChartEvent = new EventSource<>();
+	public final EventSource<Change<IMapViewModel>> newMapEvent = new EventSource<>();
 
 	private final ReferencedEnvelope bounds;
 
@@ -83,20 +83,24 @@ public class MapViewModel implements IMapViewModel {
 		return displayOptions;
 	}
 
+	@Override
 	public int totalRuleCount() {
 		return totalRuleCount;
 	}
 
+	@Override
 	public EventSource<Change<ReferencedEnvelope>> viewPortBoundsEvent() {
 		return viewPortBoundsEvent;
 	}
 
+	@Override
 	public EventSource<Change<Boolean>> layerVisibilityEvent() {
 		return layerVisibilityEvent;
 	}
 
-	public EventSource<Change<IMapViewModel>> newChartEvent() {
-		return newChartEvent;
+	@Override
+	public EventSource<Change<IMapViewModel>> newMapEvent() {
+		return newMapEvent;
 	}
 
 	public MapViewport getViewport() {
@@ -151,10 +155,12 @@ public class MapViewModel implements IMapViewModel {
 		return title;
 	}
 
+	@Override
 	public RenderGeomCache renderGeomCache() {
 		return renderGeomCache;
 	}
 
+	@Override
 	public ISVGProvider svgCache() {
 		return svgCache;
 	}

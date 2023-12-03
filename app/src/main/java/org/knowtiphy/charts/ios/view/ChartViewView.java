@@ -28,19 +28,14 @@ package org.knowtiphy.charts.ios.view;
 
 import com.gluonhq.charm.glisten.control.AppBar;
 import com.gluonhq.charm.glisten.mvc.View;
-import javafx.geometry.Rectangle2D;
-import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.transform.NonInvertibleTransformException;
 import org.geotools.api.referencing.operation.TransformException;
 import org.knowtiphy.charts.UnitProfile;
-import org.knowtiphy.charts.chartview.ChartView;
 import org.knowtiphy.charts.dynamics.AISModel;
 import org.knowtiphy.charts.enc.ChartLocker;
 import org.knowtiphy.charts.enc.ENCChart;
 import org.knowtiphy.shapemap.viewmodel.MapDisplayOptions;
-
-import static org.knowtiphy.charts.utils.FXUtils.resizeable;
 
 public class ChartViewView extends View {
 
@@ -49,51 +44,53 @@ public class ChartViewView extends View {
 
 	private static final int height = 750;
 
-	private final UnitProfile unitProfile;
-
-	private final ChartLocker chartLocker;
-
-	private final MapDisplayOptions displayOptions;
-
-	private final AISModel dynamics;
-
-	private final ENCChart chart;
+	// private final UnitProfile unitProfile;
+	//
+	// private final ChartLocker chartLocker;
+	//
+	// private final MapDisplayOptions displayOptions;
+	//
+	// private final AISModel dynamics;
+	//
+	// private final ENCChart chart;
 
 	public ChartViewView(UnitProfile unitProfile, ChartLocker chartLocker, MapDisplayOptions displayOptions,
 			AISModel dynamics, ENCChart chart) throws NonInvertibleTransformException, TransformException {
 
-		this.unitProfile = unitProfile;
-		this.chartLocker = chartLocker;
-		this.displayOptions = displayOptions;
-		this.dynamics = dynamics;
-		this.chart = chart;
-
-		// this won't be right after the info bar is done, but that will be resized later
-		chart.setViewPortScreenArea(new Rectangle2D(0, 0, width, height));
-
-		var mapSurface = makeMap();
-
-		// var infoBar = new InfoBar(platform, toggle, chart, unitProfile,
-		// displayOptions);
+		// this.unitProfile = unitProfile;
+		// this.chartLocker = chartLocker;
+		// this.displayOptions = displayOptions;
+		// this.dynamics = dynamics;
+		// this.chart = chart;
+		//
+		// // this won't be right after the info bar is done, but that will be resized
+		// later
+		// chart.setViewPortScreenArea(new Rectangle2D(0, 0, width, height));
+		//
+		// var mapSurface = makeMap();
+		//
+		// // var infoBar = new InfoBar(platform, toggle, chart, unitProfile,
+		// // displayOptions);
 
 		var vbox = new VBox();
 		vbox.getStyleClass().add("charts");
-		VBox.setVgrow(mapSurface, Priority.ALWAYS);
+		// VBox.setVgrow(mapSurface, Priority.ALWAYS);
 		// VBox.setVgrow(infoBar, Priority.NEVER);
 		vbox.setFillWidth(true);
-		vbox.getChildren().addAll(mapSurface);
+		// vbox.getChildren().addAll(mapSurface);
 		// getStylesheets().add(Splash.class.getResource("splash.css").toExternalForm());
 		vbox.setPickOnBounds(false);
 		setCenter(vbox);
 	}
 
-	private ChartView makeMap() {
-		return resizeable(new ChartView(chartLocker, chart, dynamics, unitProfile, displayOptions));
-	}
+	// private ChartView makeMap() {
+	// return resizeable(new ChartView(chartLocker, chart, dynamics, unitProfile,
+	// displayOptions));
+	// }
 
 	@Override
 	protected void updateAppBar(AppBar appBar) {
-		AppBarManager.updateAppBar(Names.CHART_VIEW_VIEW);
+		// AppBarManager.updateAppBar(Names.CHART_VIEW_VIEW);
 		appBar.setTitleText(Names.VIEW_NAME.get(Names.CHART_VIEW_VIEW));
 	}
 

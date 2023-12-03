@@ -8,18 +8,15 @@ package org.knowtiphy.charts.ios;
 /**
  * @author graham
  */
-import com.gluonhq.attach.util.Platform;
 import com.gluonhq.charm.glisten.application.AppManager;
-import com.gluonhq.charm.glisten.visual.Swatch;
+import com.gluonhq.charm.glisten.mvc.View;
 import java.beans.IntrospectionException;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.application.Application;
-import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
+import javafx.scene.layout.VBox;
 import javafx.scene.transform.NonInvertibleTransformException;
-import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javax.xml.stream.XMLStreamException;
 import org.geotools.api.referencing.FactoryException;
@@ -31,10 +28,7 @@ import org.knowtiphy.charts.enc.CatalogReader;
 import org.knowtiphy.charts.enc.ChartLocker;
 import org.knowtiphy.charts.enc.ENCChart;
 import org.knowtiphy.charts.enc.LocalChartProvider;
-import org.knowtiphy.charts.ios.view.ChartLockerView;
 import org.knowtiphy.charts.ios.view.ChartViewView;
-import org.knowtiphy.charts.ios.view.MyBoatView;
-import org.knowtiphy.charts.ios.view.Names;
 import org.knowtiphy.charts.memstore.MapStats;
 import org.knowtiphy.charts.memstore.StyleReader;
 import org.knowtiphy.shapemap.style.parser.StyleSyntaxException;
@@ -79,29 +73,32 @@ public class KnowtiphyChartsMobile extends Application {
 		stats.print();
 
 		appManager.addViewFactory(HOME_VIEW, () -> {
-			try {
-				chartViewView = new ChartViewView(unitProfile, chartLocker, displayOptions, dynamics, chart);
-			}
-			catch (NonInvertibleTransformException | TransformException ex) {
-				Logger.getLogger(KnowtiphyChartsMobile.class.getName()).log(Level.SEVERE, null, ex);
-			}
-			return chartViewView;
+			return new View(new VBox(new Label("Dave")));
+			// try {
+			// chartViewView = new ChartViewView(unitProfile, chartLocker, displayOptions,
+			// dynamics, chart);
+			// }
+			// catch (NonInvertibleTransformException | TransformException ex) {
+			// Logger.getLogger(KnowtiphyChartsMobile.class.getName()).log(Level.SEVERE,
+			// null, ex);
+			// }
+			// return chartViewView;
 		});
 
-		appManager.addViewFactory(Names.MY_BOAT_VIEW, () -> new MyBoatView(platform));
-		appManager.addViewFactory(Names.CHART_LOCKER_VIEW, ChartLockerView::new);
+		// appManager.addViewFactory(Names.MY_BOAT_VIEW, () -> new MyBoatView(platform));
+		// appManager.addViewFactory(Names.CHART_LOCKER_VIEW, ChartLockerView::new);
 	}
 
 	public void postInit(Scene scene) {
-		Swatch.TEAL.assignTo(scene);
-
-		if (Platform.isDesktop()) {
-			// ((Stage) scene.getWindow()).getIcons().add(new
-			// Image(GluonRubik.class.getResourceAsStream("/icon.png")));
-			Rectangle2D visualBounds = Screen.getPrimary().getVisualBounds();
-			scene.getWindow().setWidth(visualBounds.getWidth());
-			scene.getWindow().setHeight(visualBounds.getHeight());
-		}
+		// Swatch.TEAL.assignTo(scene);
+		//
+		// if (Platform.isDesktop()) {
+		// // ((Stage) scene.getWindow()).getIcons().add(new
+		// // Image(GluonRubik.class.getResourceAsStream("/icon.png")));
+		// Rectangle2D visualBounds = Screen.getPrimary().getVisualBounds();
+		// scene.getWindow().setWidth(visualBounds.getWidth());
+		// scene.getWindow().setHeight(visualBounds.getHeight());
+		// }
 	}
 
 	@Override

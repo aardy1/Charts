@@ -34,6 +34,6 @@ public interface IMapViewModel {
 
 	EventSource<Change<Boolean>> layerVisibilityEvent();
 
-	EventSource<Change<IMapViewModel>> newChartEvent();
+	EventSource<Change<IMapViewModel>> newMapEvent();
 
 }

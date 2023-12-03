@@ -7,8 +7,8 @@ import javafx.css.StyleablePropertyFactory;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 import org.knowtiphy.charts.chartview.ChartView.EventModel;
-import org.knowtiphy.charts.enc.ENCChart;
 import org.knowtiphy.shapemap.view.canvas.CanvasShapeMapSkin;
+import org.knowtiphy.shapemap.viewmodel.IMapViewModel;
 
 /**
  * A map "surface" -- a control that shows a map.
@@ -29,17 +29,17 @@ public class ShapeMapView extends Control {
 
 	private SkinType skinType;
 
-	private final ENCChart chart;
+	private final IMapViewModel map;
 
 	private final EventModel eventModel;
 
-	public ShapeMapView(ENCChart map, EventModel eventModel) {
+	public ShapeMapView(IMapViewModel map, EventModel eventModel) {
 		this(map, eventModel, SkinType.CANVAS);
 	}
 
-	public ShapeMapView(ENCChart chart, EventModel eventModel, SkinType skinType) {
+	public ShapeMapView(IMapViewModel map, EventModel eventModel, SkinType skinType) {
 
-		this.chart = chart;
+		this.map = map;
 		this.eventModel = eventModel;
 		this.skinType = skinType;
 		getStyleClass().add("shapemap-view");
@@ -53,7 +53,7 @@ public class ShapeMapView extends Control {
 	@Override
 	protected Skin createDefaultSkin() {
 		return switch (skinType) {
-			default -> new CanvasShapeMapSkin(this, chart, eventModel);
+			default -> new CanvasShapeMapSkin(this, map, eventModel);
 		};
 	}
 

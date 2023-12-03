@@ -124,7 +124,7 @@ public class InfoBar extends StackPane {
 		subscriptions.forEach(s -> s.unsubscribe());
 		subscriptions.clear();
 		subscriptions.add(chart.viewPortBoundsEvent().subscribe(c -> showVariableChartInfo()));
-		subscriptions.add(chart.newChartEvent().subscribe(change -> {
+		subscriptions.add(chart.newMapEvent().subscribe(change -> {
 			chart = (ENCChart) change.getNewValue();
 			showFixedChartInfo();
 			showVariableChartInfo();

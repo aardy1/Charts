@@ -28,27 +28,26 @@ package org.knowtiphy.charts.ios.view;
 
 import com.gluonhq.charm.glisten.control.AppBar;
 import com.gluonhq.charm.glisten.mvc.View;
-import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 
 public class ChartLockerView extends View {
 
 	public ChartLockerView() {
 
-		Label access = new Label("Chart Locker View");
-		access.setTranslateY(200);
-		// access.setVisible(false);
+		// Label access = new Label("Chart Locker View");
+		// access.setTranslateY(200);
+		// // access.setVisible(false);
 
 		StackPane pane = new StackPane();
-		pane.getStyleClass().add("pane");
-		getChildren().addAll(pane, access);
+		// pane.getStyleClass().add("pane");
+		getChildren().addAll(pane);// , access);
 
 		// getStylesheets().add(Splash.class.getResource("splash.css").toExternalForm());
 	}
 
 	@Override
 	protected void updateAppBar(AppBar appBar) {
-		AppBarManager.updateAppBar(Names.CHART_LOCKER_VIEW);
+		// AppBarManager.updateAppBar(Names.CHART_LOCKER_VIEW);
 		appBar.setTitleText(Names.VIEW_NAME.get(Names.CHART_LOCKER_VIEW));
 	}
 

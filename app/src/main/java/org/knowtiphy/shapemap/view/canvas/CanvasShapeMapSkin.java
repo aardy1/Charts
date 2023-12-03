@@ -29,7 +29,7 @@ public class CanvasShapeMapSkin extends ShapeMapBaseSkin {
 
 	private static final double PREFERRED_HEIGHT = Region.USE_COMPUTED_SIZE;
 
-	private IMapViewModel chart;
+	private IMapViewModel map;
 
 	private final Pane root;
 
@@ -40,7 +40,7 @@ public class CanvasShapeMapSkin extends ShapeMapBaseSkin {
 	public CanvasShapeMapSkin(ShapeMapView surface, IMapViewModel chart, EventModel eventModel) {
 		super(surface);
 
-		this.chart = chart;
+		this.map = chart;
 		borderPane = new BorderPane();
 		root = new Pane(borderPane);
 		getChildren().addAll(root);
@@ -58,10 +58,10 @@ public class CanvasShapeMapSkin extends ShapeMapBaseSkin {
 		// unsubscribe listeners on the old chart
 		subscriptions.forEach(s -> s.unsubscribe());
 		subscriptions.clear();
-		subscriptions.add(chart.viewPortBoundsEvent().subscribe(b -> root.requestLayout()));
-		subscriptions.add(chart.layerVisibilityEvent().subscribe(b -> root.requestLayout()));
-		subscriptions.add(chart.newChartEvent().subscribe((Change<IMapViewModel> change) -> {
-			this.chart = change.getNewValue();
+		subscriptions.add(map.viewPortBoundsEvent().subscribe(b -> root.requestLayout()));
+		subscriptions.add(map.layerVisibilityEvent().subscribe(b -> root.requestLayout()));
+		subscriptions.add(map.newMapEvent().subscribe((Change<IMapViewModel> change) -> {
+			this.map = change.getNewValue();
 			setupListeners();
 			root.requestLayout();
 		}));
@@ -95,11 +95,11 @@ public class CanvasShapeMapSkin extends ShapeMapBaseSkin {
 		graphics.setFill(Color.LIGHTGREY);
 		graphics.fillRect(0, 0, width, height);
 
-		var renderablePolygonProvider = new RemoveHolesFromPolygon(chart.renderGeomCache());
-		var rendererContext = new RendererContext(renderablePolygonProvider, chart.svgCache());
-		var renderer = new ShapeMapRenderer(chart, rendererContext, graphics);
+		var renderablePolygonProvider = new RemoveHolesFromPolygon(map.renderGeomCache());
+		var rendererContext = new RendererContext(renderablePolygonProvider, map.svgCache());
+		var renderer = new ShapeMapRenderer(map, rendererContext, graphics);
 		try {
-			renderer.paint(new Rectangle2D(0, 0, width, height), chart.viewPortBounds());
+			renderer.paint(new Rectangle2D(0, 0, width, height), map.viewPortBounds());
 			borderPane.setCenter(canvas);
 		}
 		catch (IOException | NonInvertibleTransformException | FactoryException | TransformException ex) {

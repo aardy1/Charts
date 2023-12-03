@@ -13,7 +13,8 @@ repositories {
 }
 
 application {
-    mainClassName = "org.knowtiphy.charts.ios.KnowtiphyChartsMobile"
+//    mainClassName = "org.knowtiphy.charts.ios.KnowtiphyChartsMobile"
+    mainClassName = "org.knowtiphy.charts.KnowtiphyCharts"
     applicationDefaultJvmArgs = ['-Xms2G', '-Xmx2G']
 }
 

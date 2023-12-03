@@ -197,7 +197,7 @@ public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView
 		// subscriptions.add(chart.newChartEvents.subscribe(change -> updateBoats()));
 		// subscriptions.add(dynamics.aisEvents.subscribe(this::updateAISInformation));
 
-		subscriptions.add(chart.newChartEvent.subscribe(change -> {
+		subscriptions.add(chart.newMapEvent.subscribe(change -> {
 			chart = (ENCChart) change.getNewValue();
 			setupListeners();
 		}));
@@ -263,7 +263,7 @@ public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView
 			var screenArea = new Rectangle2D(0, 0, (int) root.getWidth(), (int) root.getHeight());
 			try {
 				var newChart = chartLocker.loadChart(mostDetailedChart, displayOptions, screenArea);
-				chart.newChartEvent().push(new Change<>(chart, newChart));
+				chart.newMapEvent().push(new Change<>(chart, newChart));
 			}
 			catch (TransformException | FactoryException | NonInvertibleTransformException | StyleSyntaxException ex) {
 				Logger.getLogger(ChartViewSkin.class.getName()).log(Level.SEVERE, null, ex);

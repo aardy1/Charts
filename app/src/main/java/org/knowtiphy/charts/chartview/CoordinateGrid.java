@@ -54,7 +54,7 @@ public class CoordinateGrid extends Pane {
 		subscriptions.forEach(s -> s.unsubscribe());
 		subscriptions.clear();
 		subscriptions.add(chart.viewPortBoundsEvent().subscribe(extent -> requestLayout()));
-		subscriptions.add(chart.newChartEvent().subscribe(change -> {
+		subscriptions.add(chart.newMapEvent().subscribe(change -> {
 			chart = (ENCChart) change.getNewValue();
 			setupListeners();
 			requestLayout();

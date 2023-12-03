@@ -30,13 +30,13 @@ public abstract class BasePlatform {
 	BasePlatform(Path root) {
 		this.root = root;
 		display = Services.get(DisplayService.class).get();
-		var posService = Services.get(PositionService.class);
-		if (posService.isPresent()) {
-			positionService = posService.get();
-			positionService.start();
-		}
-		else
-			positionService = new DummyPositionService();
+		// var posService = Services.get(PositionService.class);
+		// if (posService.isPresent()) {
+		// positionService = posService.get();
+		// positionService.start();
+		// }
+		// else
+		positionService = new DummyPositionService();
 		// keep the compiler happy
 	}
 

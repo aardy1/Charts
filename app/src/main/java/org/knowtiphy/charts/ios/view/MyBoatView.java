@@ -30,7 +30,6 @@ import com.gluonhq.charm.glisten.control.AppBar;
 import com.gluonhq.charm.glisten.mvc.View;
 import javafx.geometry.HPos;
 import javafx.scene.Node;
-import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import org.knowtiphy.charts.platform.IPlatform;
@@ -40,22 +39,30 @@ public class MyBoatView extends View {
 	public MyBoatView(IPlatform platform) {
 
 		var grid = new GridPane();
-
-		var gpsLabel = new Label("GPS");
-		initLabel(gpsLabel, 0, 0);
-
-		var gpsValue = new Label(platform.positionProperty().get().toString());
-		initLabel(gpsValue, 1, 0);
-
-		var heel = new Label("Heel");
-		initLabel(heel, 0, 1);
-
-		var heelValue = new Label("Who knows");
-		initLabel(heelValue, 1, 1);
-
-		grid.getChildren().addAll(gpsLabel, gpsValue, heel, heelValue);
-
-		// pane.getStyleClass().add("pane");
+		//
+		// var gps = new Label("GPS");
+		// initLabel(gps, 0, 0);
+		// var position = platform.positionProperty().get();
+		// var gpsValue = new Label(Coordinates.labelLattitude(position.getLatitude()) + "
+		// : "
+		// + Coordinates.labelLongitude(position.getLongitude()));
+		// initLabel(gpsValue, 1, 0);
+		//
+		// var heel = new Label("Heel");
+		// initLabel(heel, 0, 1);
+		// var heelValue = new Label("Who knows");
+		// initLabel(heelValue, 1, 1);
+		//
+		// var windSpeed = new Label("Wind Speed");
+		// initLabel(windSpeed, 0, 2);
+		// var windSpeedValue = new Label("Who knows");
+		// initLabel(windSpeedValue, 1, 2);
+		//
+		// grid.getChildren().addAll(gps, gpsValue, heel, heelValue, windSpeed,
+		// windSpeedValue);
+		//
+		// // pane.getStyleClass().add("pane");
+		// //
 		// getStylesheets().add(Splash.class.getResource("splash.css").toExternalForm());
 
 		setCenter(grid);
@@ -63,7 +70,7 @@ public class MyBoatView extends View {
 
 	@Override
 	protected void updateAppBar(AppBar appBar) {
-		AppBarManager.updateAppBar(Names.MY_BOAT_VIEW);
+		// AppBarManager.updateAppBar(Names.MY_BOAT_VIEW);
 		appBar.setTitleText(Names.VIEW_NAME.get(Names.MY_BOAT_VIEW));
 	}
 
