@@ -14,4 +14,6 @@ public interface IFeature {
 
 	Geometry getDefaultGeometry();
 
+	GeomType geomType();
+
 }

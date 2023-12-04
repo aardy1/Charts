@@ -5,12 +5,11 @@
 
 package org.knowtiphy.shapemap.renderer.symbolizer;
 
-import org.knowtiphy.charts.memstore.MemFeature;
 import org.knowtiphy.shapemap.renderer.GraphicsRenderingContext;
+import org.knowtiphy.shapemap.renderer.api.IFeature;
 import org.knowtiphy.shapemap.renderer.graphics.Fill;
 import org.knowtiphy.shapemap.renderer.graphics.Stroke;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.FillInfo;
-import org.knowtiphy.shapemap.renderer.api.IFeature;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.StrokeInfo;
 import org.locationtech.jts.geom.Geometry;
 
@@ -33,12 +32,12 @@ public class PolygonSymbolizer<F extends IFeature> implements ISymbolizer<F> {
 
 		if (fillInfo != null) {
 			Fill.setup(context, fillInfo);
-			Fill.fill(context, (Geometry) feature.getDefaultGeometry(), ((MemFeature) feature).geomType());
+			Fill.fill(context, (Geometry) feature.getDefaultGeometry(), feature.geomType());
 		}
 
 		if (strokeInfo != null) {
 			Stroke.setup(context, strokeInfo);
-			Stroke.stroke(context, (Geometry) feature.getDefaultGeometry(), ((MemFeature) feature).geomType());
+			Stroke.stroke(context, (Geometry) feature.getDefaultGeometry(), feature.geomType());
 		}
 	}
 

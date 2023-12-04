@@ -6,7 +6,7 @@
 package org.knowtiphy.shapemap.renderer.graphics;
 
 import org.geotools.geometry.jts.JTS;
-import org.knowtiphy.charts.memstore.GeomType;
+import org.knowtiphy.shapemap.renderer.api.GeomType;
 import org.knowtiphy.shapemap.renderer.GraphicsRenderingContext;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.FillInfo;
 import org.locationtech.jts.geom.Geometry;

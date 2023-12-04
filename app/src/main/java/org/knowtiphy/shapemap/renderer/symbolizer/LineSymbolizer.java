@@ -5,10 +5,9 @@
 
 package org.knowtiphy.shapemap.renderer.symbolizer;
 
-import org.knowtiphy.charts.memstore.MemFeature;
 import org.knowtiphy.shapemap.renderer.GraphicsRenderingContext;
-import org.knowtiphy.shapemap.renderer.graphics.Stroke;
 import org.knowtiphy.shapemap.renderer.api.IFeature;
+import org.knowtiphy.shapemap.renderer.graphics.Stroke;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.StrokeInfo;
 import org.locationtech.jts.geom.Geometry;
 
@@ -26,7 +25,7 @@ public class LineSymbolizer<F extends IFeature> implements ISymbolizer<F> {
 	@Override
 	public void render(GraphicsRenderingContext context, F feature) {
 		Stroke.setup(context, strokeInfo);
-		Stroke.stroke(context, (Geometry) feature.getDefaultGeometry(), ((MemFeature) feature).geomType());
+		Stroke.stroke(context, (Geometry) feature.getDefaultGeometry(), feature.geomType());
 	}
 
 }

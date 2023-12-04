@@ -5,6 +5,7 @@
 
 package org.knowtiphy.charts.memstore;
 
+import org.knowtiphy.shapemap.renderer.api.GeomType;
 import java.util.List;
 import org.geotools.api.feature.simple.SimpleFeatureType;
 import org.geotools.api.filter.identity.FeatureId;

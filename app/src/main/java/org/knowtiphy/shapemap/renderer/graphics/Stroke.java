@@ -5,7 +5,7 @@
 
 package org.knowtiphy.shapemap.renderer.graphics;
 
-import org.knowtiphy.charts.memstore.GeomType;
+import org.knowtiphy.shapemap.renderer.api.GeomType;
 import org.knowtiphy.shapemap.renderer.GraphicsRenderingContext;
 import org.knowtiphy.shapemap.renderer.Transformation;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.StrokeInfo;
@@ -14,13 +14,13 @@ import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.Polygon;
 
-import static org.knowtiphy.charts.memstore.GeomType.LINEAR_RING;
-import static org.knowtiphy.charts.memstore.GeomType.LINE_STRING;
-import static org.knowtiphy.charts.memstore.GeomType.MULTI_LINE_STRING;
-import static org.knowtiphy.charts.memstore.GeomType.MULTI_POINT;
-import static org.knowtiphy.charts.memstore.GeomType.MULTI_POLYGON;
-import static org.knowtiphy.charts.memstore.GeomType.POINT;
-import static org.knowtiphy.charts.memstore.GeomType.POLYGON;
+import static org.knowtiphy.shapemap.renderer.api.GeomType.LINEAR_RING;
+import static org.knowtiphy.shapemap.renderer.api.GeomType.LINE_STRING;
+import static org.knowtiphy.shapemap.renderer.api.GeomType.MULTI_LINE_STRING;
+import static org.knowtiphy.shapemap.renderer.api.GeomType.MULTI_POINT;
+import static org.knowtiphy.shapemap.renderer.api.GeomType.MULTI_POLYGON;
+import static org.knowtiphy.shapemap.renderer.api.GeomType.POINT;
+import static org.knowtiphy.shapemap.renderer.api.GeomType.POLYGON;
 
 public class Stroke {
 
