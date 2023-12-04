@@ -8,7 +8,7 @@ package org.knowtiphy.shapemap.viewmodel;
 import java.util.Collection;
 import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.knowtiphy.shapemap.renderer.context.ISVGProvider;
+import org.knowtiphy.shapemap.renderer.api.ISVGProvider;
 import org.knowtiphy.shapemap.renderer.context.RenderGeomCache;
 import org.knowtiphy.shapemap.renderer.api.IFeature;
 import org.reactfx.Change;

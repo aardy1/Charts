@@ -10,8 +10,8 @@ package org.knowtiphy.shapemap.renderer.api;
  */
 public interface IFeatureSourceIterator<T, F extends IFeature> extends AutoCloseable {
 
-	boolean hasNext();
+	boolean hasNext() throws Exception;
 
-	F next();
+	F next() throws Exception;
 
 }

@@ -5,7 +5,6 @@
 
 package org.knowtiphy.shapemap.renderer.api;
 
-import org.geotools.api.feature.simple.SimpleFeatureType;
 import org.locationtech.jts.geom.Geometry;
 
 /**
@@ -14,7 +13,5 @@ import org.locationtech.jts.geom.Geometry;
 public interface IFeature {
 
 	Geometry getDefaultGeometry();
-
-	SimpleFeatureType getType();
 
 }

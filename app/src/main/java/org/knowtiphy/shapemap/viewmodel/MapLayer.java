@@ -63,7 +63,7 @@ public class MapLayer<S, F extends IFeature> {
 	}
 
 	public IFeatureSourceIterator<S, F> getFeatures(ReferencedEnvelope bounds, boolean scaleLess) throws IOException {
-		return getFeatureSource().getFeatures(bounds, scaleLess);
+		return getFeatureSource().features(bounds, scaleLess);
 	}
 
 	@Override

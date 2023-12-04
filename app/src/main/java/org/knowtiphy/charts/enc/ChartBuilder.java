@@ -57,6 +57,16 @@ public class ChartBuilder {
 		this.chartDescription = chartDescription;
 		this.styleReader = styleReader;
 		this.displayOptions = displayOptions;
+
+		// displayOptions.showLightsEvents.subscribe(change -> setLayerVisible(change,
+		// S57.OC_LIGHTS));
+		// displayOptions.showPlatformEvents.subscribe(change -> setLayerVisible(change,
+		// S57.OC_OFSPLF));
+		// displayOptions.showSoundingsEvents.subscribe(change -> setLayerVisible(change,
+		// S57.OC_SOUNDG));
+		// displayOptions.showWreckEvents.subscribe(change -> setLayerVisible(change,
+		// S57.OC_WRECKS));
+
 	}
 
 	public ENCChart getMap() {

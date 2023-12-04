@@ -42,15 +42,15 @@ public class Queries {
 	}
 
 	public static <S, F extends IFeature> List<IFeatureSourceIterator<S, F>> featuresNearXYWorld(MapViewModel<S, F> map,
-			double x, double y, int radius) throws IOException {
+			double x, double y, int radius) throws Exception {
 
 		var envelope = tinyPolygon(map, x, y, radius);
 
 		var result = new ArrayList<IFeatureSourceIterator<S, F>>();
 		var foo = new ArrayList<F>();
 		for (var layer : map.layers()) {
-			result.add(layer.getFeatureSource().getFeatures(envelope, true));
-			var it = layer.getFeatureSource().getFeatures(envelope, true);
+			result.add(layer.getFeatureSource().features(envelope, true));
+			var it = layer.getFeatureSource().features(envelope, true);
 			while (it.hasNext()) {
 				foo.add(it.next());
 			}

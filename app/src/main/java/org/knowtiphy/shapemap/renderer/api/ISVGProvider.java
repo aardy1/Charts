@@ -3,7 +3,7 @@
  * All rights reserved.
  */
 
-package org.knowtiphy.shapemap.renderer.context;
+package org.knowtiphy.shapemap.renderer.api;
 
 import javafx.scene.image.Image;
 

@@ -3,7 +3,7 @@
  * All rights reserved.
  */
 
-package org.knowtiphy.shapemap.renderer.context;
+package org.knowtiphy.shapemap.renderer.api;
 
 import org.locationtech.jts.geom.Polygon;
 

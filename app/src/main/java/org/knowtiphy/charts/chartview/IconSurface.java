@@ -16,17 +16,14 @@ import javafx.scene.shape.Polyline;
 import javafx.scene.shape.Shape;
 import javafx.scene.shape.StrokeType;
 import org.controlsfx.glyphfont.Glyph;
-import org.knowtiphy.charts.Fonts;
+import org.geotools.api.feature.simple.SimpleFeatureType;
 import org.knowtiphy.charts.enc.ENCChart;
-import org.knowtiphy.charts.ontology.S57;
 import org.knowtiphy.shapemap.renderer.Transformation;
 import org.knowtiphy.shapemap.renderer.api.IFeature;
 import org.locationtech.jts.geom.Geometry;
 import org.reactfx.Change;
 import org.reactfx.EventStream;
 import org.reactfx.Subscription;
-
-import static org.knowtiphy.charts.ontology.S57.AT_INFORM;
 
 /**
  * @author graham
@@ -64,10 +61,13 @@ public class IconSurface extends Pane {
 		getChildren().clear();
 
 		try {
-			createIconLayer(S57.OC_CTNARE, Fonts::info, List.of(AT_INFORM), null, null);
-			createIconLayer(S57.OC_MIPARE, Fonts::jet, List.of(AT_INFORM), null, null);
-			createIconLayer(S57.OC_UNSARE, Fonts::info, List.of(AT_INFORM), null, null);
-			createIconLayer(S57.OC_DMPGRD, Fonts::info, List.of(AT_INFORM), null, null);
+			// createIconLayer(S57.OC_CTNARE, Fonts::info, List.of(AT_INFORM), null,
+			// null);
+			// createIconLayer(S57.OC_MIPARE, Fonts::jet, List.of(AT_INFORM), null, null);
+			// createIconLayer(S57.OC_UNSARE, Fonts::info, List.of(AT_INFORM), null,
+			// null);
+			// createIconLayer(S57.OC_DMPGRD, Fonts::info, List.of(AT_INFORM), null,
+			// null);
 			// createIconLayer(map, S57.OC_OFSPLF, Fonts::platform, List.of(AT_OBJNAM),
 			// "Offshore Platform", displayOptions.showPlatformEvents);
 			// // createIconLayer(pane, map, S57.OC_BUAARE);
@@ -77,8 +77,8 @@ public class IconSurface extends Pane {
 		}
 	}
 
-	private void createIconLayer(String type, Supplier<Glyph> glyph, List<String> attributes, String defaultValue,
-			EventStream<Change<Boolean>> visibilityEvents) throws Exception {
+	private void createIconLayer(SimpleFeatureType type, Supplier<Glyph> glyph, List<String> attributes,
+			String defaultValue, EventStream<Change<Boolean>> visibilityEvents) throws Exception {
 
 		var layer = chart.layer(type);
 		if (layer == null)

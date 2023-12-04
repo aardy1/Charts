@@ -105,7 +105,7 @@ public class Dump<S extends SimpleFeatureType, F extends IFeature> {
 			try (var features = layer.getFeatureSource().features()) {
 				while (features.hasNext()) {
 					var feature = features.next();
-					System.err.println("\tFeature Type = " + feature.getType());
+					// System.err.println("\tFeature Type = " + feature.getType());
 				}
 
 			}

@@ -24,8 +24,4 @@ public class RenderGeomCache {
 		return cache.get(key);
 	}
 
-	public int size() {
-		return cache.size();
-	}
-
 }

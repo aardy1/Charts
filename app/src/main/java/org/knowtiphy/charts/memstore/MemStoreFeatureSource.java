@@ -96,7 +96,7 @@ public class MemStoreFeatureSource // extends ContentFeatureSource
 		return featureType;
 	}
 
-	public IFeatureSourceIterator<SimpleFeatureType, MemFeature> getFeatures(ReferencedEnvelope bounds,
+	public IFeatureSourceIterator<SimpleFeatureType, MemFeature> features(ReferencedEnvelope bounds,
 			boolean scaleLess) {
 		Collection<MemFeature> featuresInScale;
 

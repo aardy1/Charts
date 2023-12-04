@@ -5,20 +5,17 @@
 
 package org.knowtiphy.shapemap.renderer.api;
 
-import org.geotools.api.feature.simple.SimpleFeatureType;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 
 /**
  * @author graham
  */
-public interface IFeatureSource<T, F extends IFeature> {
+public interface IFeatureSource<S, F extends IFeature> {
 
-	IFeatureSourceIterator<T, F> getFeatures(ReferencedEnvelope bounds, boolean scaleLess);
+	IFeatureSourceIterator<S, F> features();
 
-	IFeatureSourceIterator<T, F> features();
+	IFeatureSourceIterator<S, F> features(ReferencedEnvelope bounds, boolean scaleLess);
 
-	SimpleFeatureType getSchema();
-
-	// ReferencedEnvelope getBounds() throws IOException;
+	S getSchema();
 
 }

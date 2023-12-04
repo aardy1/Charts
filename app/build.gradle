@@ -85,14 +85,14 @@ dependencies {
     implementation libs.fx.graphics
     implementation libs.fx.controls
 
-    implementation 'com.gluonhq:charm-glisten:6.2.3'
+//implementation 'com.gluonhq:charm-glisten:6.2.3'
 //implementation libs.glisten.charm
-    implementation libs.attach.display
-    implementation libs.attach.lifecycle
-    implementation libs.attach.statusbar
-    implementation libs.attach.storage
-    implementation libs.attach.position
-    implementation libs.attach.util
+//implementation libs.attach.display
+//implementation libs.attach.lifecycle
+//implementation libs.attach.statusbar
+//implementation libs.attach.storage
+//implementation libs.attach.position
+//implementation libs.attach.util
 
     implementation libs.connect
 
