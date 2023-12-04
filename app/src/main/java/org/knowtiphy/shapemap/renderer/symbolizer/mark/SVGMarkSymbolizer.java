@@ -8,7 +8,7 @@ package org.knowtiphy.shapemap.renderer.symbolizer.mark;
 import org.knowtiphy.shapemap.renderer.GraphicsRenderingContext;
 import org.knowtiphy.shapemap.renderer.symbolizer.PointSymbolizer;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.FillInfo;
-import org.knowtiphy.shapemap.renderer.feature.IFeature;
+import org.knowtiphy.shapemap.renderer.api.IFeature;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.PathInfo;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.StrokeInfo;
 import org.locationtech.jts.geom.Point;

@@ -7,7 +7,7 @@ package org.knowtiphy.shapemap.renderer.symbolizer.mark;
 
 import org.knowtiphy.shapemap.renderer.GraphicsRenderingContext;
 import org.knowtiphy.shapemap.renderer.symbolizer.PointSymbolizer;
-import org.knowtiphy.shapemap.renderer.feature.IFeature;
+import org.knowtiphy.shapemap.renderer.api.IFeature;
 import org.locationtech.jts.geom.Point;
 
 /**

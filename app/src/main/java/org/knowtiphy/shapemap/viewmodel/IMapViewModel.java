@@ -10,7 +10,7 @@ import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.knowtiphy.shapemap.renderer.context.ISVGProvider;
 import org.knowtiphy.shapemap.renderer.context.RenderGeomCache;
-import org.knowtiphy.shapemap.renderer.feature.IFeature;
+import org.knowtiphy.shapemap.renderer.api.IFeature;
 import org.reactfx.Change;
 import org.reactfx.EventSource;
 

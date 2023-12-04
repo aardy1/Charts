@@ -5,8 +5,8 @@
 
 package org.knowtiphy.shapemap.style.parser;
 
-import org.knowtiphy.shapemap.renderer.feature.IFeature;
-import org.knowtiphy.shapemap.renderer.feature.IFeatureFunction;
+import org.knowtiphy.shapemap.renderer.api.IFeature;
+import org.knowtiphy.shapemap.renderer.api.IFeatureFunction;
 
 /**
  * @author graham

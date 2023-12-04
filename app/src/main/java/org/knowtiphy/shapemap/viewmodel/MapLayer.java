@@ -3,9 +3,9 @@ package org.knowtiphy.shapemap.viewmodel;
 import java.io.IOException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.knowtiphy.shapemap.renderer.FeatureTypeStyle;
-import org.knowtiphy.shapemap.renderer.feature.IFeature;
-import org.knowtiphy.shapemap.renderer.feature.IFeatureSource;
-import org.knowtiphy.shapemap.renderer.feature.IFeatureSourceIterator;
+import org.knowtiphy.shapemap.renderer.api.IFeature;
+import org.knowtiphy.shapemap.renderer.api.IFeatureSource;
+import org.knowtiphy.shapemap.renderer.api.IFeatureSourceIterator;
 
 public class MapLayer<S, F extends IFeature> {
 
@@ -37,14 +37,14 @@ public class MapLayer<S, F extends IFeature> {
 		return style;
 	}
 
-	public ReferencedEnvelope getBounds() {
-		try {
-			return featureSource.getBounds();
-		}
-		catch (IOException ex) {
-			return null;
-		}
-	}
+	// public ReferencedEnvelope getBounds() {
+	// try {
+	// return featureSource.getBounds();
+	// }
+	// catch (IOException ex) {
+	// return null;
+	// }
+	// }
 
 	public boolean isVisible() {
 		return visible;

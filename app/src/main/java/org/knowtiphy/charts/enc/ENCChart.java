@@ -13,7 +13,7 @@ import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.api.referencing.operation.TransformException;
 import org.knowtiphy.charts.chartview.markicons.ResourceLoader;
 import org.knowtiphy.shapemap.renderer.context.SVGCache;
-import org.knowtiphy.shapemap.renderer.feature.IFeature;
+import org.knowtiphy.shapemap.renderer.api.IFeature;
 import org.knowtiphy.shapemap.viewmodel.MapDisplayOptions;
 import org.knowtiphy.shapemap.viewmodel.MapViewModel;
 

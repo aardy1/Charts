@@ -3,9 +3,8 @@
  * All rights reserved.
  */
 
-package org.knowtiphy.shapemap.renderer.feature;
+package org.knowtiphy.shapemap.renderer.api;
 
-import java.io.IOException;
 import org.geotools.api.feature.simple.SimpleFeatureType;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 
@@ -20,6 +19,6 @@ public interface IFeatureSource<T, F extends IFeature> {
 
 	SimpleFeatureType getSchema();
 
-	ReferencedEnvelope getBounds() throws IOException;
+	// ReferencedEnvelope getBounds() throws IOException;
 
 }

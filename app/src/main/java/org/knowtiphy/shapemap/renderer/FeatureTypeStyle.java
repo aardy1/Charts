@@ -6,7 +6,7 @@
 package org.knowtiphy.shapemap.renderer;
 
 import java.util.List;
-import org.knowtiphy.shapemap.renderer.feature.IFeature;
+import org.knowtiphy.shapemap.renderer.api.IFeature;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.Rule;
 
 /**

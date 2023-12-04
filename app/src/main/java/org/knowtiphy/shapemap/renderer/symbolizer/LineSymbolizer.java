@@ -8,7 +8,7 @@ package org.knowtiphy.shapemap.renderer.symbolizer;
 import org.knowtiphy.charts.memstore.MemFeature;
 import org.knowtiphy.shapemap.renderer.GraphicsRenderingContext;
 import org.knowtiphy.shapemap.renderer.graphics.Stroke;
-import org.knowtiphy.shapemap.renderer.feature.IFeature;
+import org.knowtiphy.shapemap.renderer.api.IFeature;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.StrokeInfo;
 import org.locationtech.jts.geom.Geometry;
 

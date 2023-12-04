@@ -3,7 +3,7 @@
  * All rights reserved.
  */
 
-package org.knowtiphy.shapemap.renderer.feature;
+package org.knowtiphy.shapemap.renderer.api;
 
 /**
  * @author graham

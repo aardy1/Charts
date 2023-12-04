@@ -11,9 +11,9 @@ import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.api.referencing.operation.TransformException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.knowtiphy.charts.ontology.S57;
+import org.knowtiphy.shapemap.renderer.api.IFeature;
 import org.knowtiphy.shapemap.renderer.context.ISVGProvider;
 import org.knowtiphy.shapemap.renderer.context.RenderGeomCache;
-import org.knowtiphy.shapemap.renderer.feature.IFeature;
 import org.reactfx.Change;
 import org.reactfx.EventSource;
 
@@ -23,7 +23,6 @@ public class MapViewModel<S, F extends IFeature> implements IMapViewModel<S, F> 
 
 	private final EventSource<Change<ReferencedEnvelope>> viewPortBoundsEvent = new EventSource<>();
 
-	// TODO -- need to unsubscibe?
 	private final EventSource<Change<IMapViewModel<S, F>>> newMapEvent = new EventSource<>();
 
 	private final ReferencedEnvelope bounds;
@@ -63,9 +62,10 @@ public class MapViewModel<S, F extends IFeature> implements IMapViewModel<S, F> 
 
 	public void addLayer(MapLayer<S, F> layer)
 			throws TransformException, FactoryException, NonInvertibleTransformException {
+
 		layers.put(layer.getFeatureSource().getSchema().getTypeName(), layer);
 		totalRuleCount += layer.getStyle().rules().size();
-		checkViewportCRS();
+		// checkViewportCRS();
 	}
 
 	@Override
@@ -173,21 +173,22 @@ public class MapViewModel<S, F extends IFeature> implements IMapViewModel<S, F> 
 	 * nothing if the viewport already has a CRS set or if it has been set as
 	 * non-editable.
 	 */
-	private void checkViewportCRS() throws TransformException, FactoryException, NonInvertibleTransformException {
-
-		if (viewport != null && crs() == null) {
-			for (MapLayer layer : layers()) {
-				var bnds = layer.getBounds();
-				if (bnds != null) {
-					CoordinateReferenceSystem crs = bnds.getCoordinateReferenceSystem();
-					if (crs != null) {
-						viewport.setCoordinateReferenceSystem(crs);
-						return;
-					}
-				}
-			}
-		}
-	}
+	// private void checkViewportCRS() throws TransformException, FactoryException,
+	// NonInvertibleTransformException {
+	//
+	// if (viewport != null && crs() == null) {
+	// for (MapLayer layer : layers()) {
+	// var bnds = layer.getBounds();
+	// if (bnds != null) {
+	// CoordinateReferenceSystem crs = bnds.getCoordinateReferenceSystem();
+	// if (crs != null) {
+	// viewport.setCoordinateReferenceSystem(crs);
+	// return;
+	// }
+	// }
+	// }
+	// }
+	// }
 
 	private void setLayerVisible(Change<Boolean> change, String type) {
 		var layer = layer(type);

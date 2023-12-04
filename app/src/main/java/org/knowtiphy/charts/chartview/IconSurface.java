@@ -20,7 +20,7 @@ import org.knowtiphy.charts.Fonts;
 import org.knowtiphy.charts.enc.ENCChart;
 import org.knowtiphy.charts.ontology.S57;
 import org.knowtiphy.shapemap.renderer.Transformation;
-import org.knowtiphy.shapemap.renderer.feature.IFeature;
+import org.knowtiphy.shapemap.renderer.api.IFeature;
 import org.locationtech.jts.geom.Geometry;
 import org.reactfx.Change;
 import org.reactfx.EventStream;

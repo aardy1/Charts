@@ -15,8 +15,8 @@ import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import org.knowtiphy.shapemap.renderer.Functions;
 import org.knowtiphy.shapemap.renderer.Operators;
-import org.knowtiphy.shapemap.renderer.feature.IFeature;
-import org.knowtiphy.shapemap.renderer.feature.IFeatureFunction;
+import org.knowtiphy.shapemap.renderer.api.IFeature;
+import org.knowtiphy.shapemap.renderer.api.IFeatureFunction;
 import org.knowtiphy.shapemap.style.parser.IParsingContext;
 import org.knowtiphy.shapemap.style.parser.Utils;
 

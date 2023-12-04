@@ -29,6 +29,8 @@ import org.knowtiphy.shapemap.renderer.ShapeMapRenderer;
 import org.knowtiphy.shapemap.viewmodel.MapDisplayOptions;
 import org.reactfx.Subscription;
 
+import static org.knowtiphy.charts.geotools.Coordinates.distanceAcross;
+
 /**
  * @author graham
  */
@@ -39,8 +41,6 @@ public class InfoBar extends StackPane {
 	private final Label chartScale = new Label();
 
 	private final Label extentLabel = new Label();
-
-	private final Label crsLabel = new Label();
 
 	private final Label currentExtent = new Label();
 
@@ -95,7 +95,7 @@ public class InfoBar extends StackPane {
 		buttons.getColumnConstraints().addAll(FXUtils.gridAlwaysGrow(), FXUtils.gridNeverGrow(),
 				FXUtils.gridAlwaysGrow());
 
-		var fixedLabels = new HBox(chartScale, crsLabel, extentLabel);
+		var fixedLabels = new HBox(chartScale, extentLabel);
 		fixedLabels.getStyleClass().add("infobar");
 
 		var variableLabels = new HBox(currentExtent, currentMapSpan, currentScreenToWorld, currentZoomLevel);
@@ -135,24 +135,22 @@ public class InfoBar extends StackPane {
 		chartScale.setText(ShapeMapRenderer.count.get() + "");// chart.currentScale() +
 																// "");
 		// chartScale.setText(chart.currentScale() + "");
-		// crsLabel.setText(chart.crs().getCoordinateSystem().getName().getCode());
 		// extentLabel.setText(unitProfile.envelopeLabel(chart.bounds()));
 	}
 
 	private void showVariableChartInfo() {
 
-		// var envelope = chart.viewPortBounds();
-		// var mapWidth = distanceAcross(envelope) / 1000;
+		var envelope = chart.viewPortBounds();
+		var mapWidth = distanceAcross(envelope) / 1000;
 		// // currentExtent.setText(unitProfile.envelopeLabel(envelope));
-		// currentMapSpan
-		// .setText(Coordinates.twoDec(unitProfile.convertDistance(mapWidth)) + " " +
-		// unitProfile.distanceUnit);
+		currentMapSpan
+				.setText(Coordinates.twoDec(unitProfile.convertDistance(mapWidth)) + " " + unitProfile.distanceUnit);
 		// currentScreenToWorld.setText("1" + unitProfile.screenUnit + " : "
 		// + Coordinates.twoDec(unitProfile.convertFromScreenUnit(mapWidth /
 		// platform.windowWidthCM(this)))
 		// + unitProfile.distanceUnit);
 
-		// currentZoomLevel.setText(Coordinates.twoDec(chart.getZoomFactor()) + "");
+		currentZoomLevel.setText(Coordinates.twoDec(chart.getZoomFactor()) + "");
 	}
 
 }

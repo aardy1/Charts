@@ -17,7 +17,7 @@ import org.knowtiphy.charts.chartview.ChartView.EventModel;
 import org.knowtiphy.shapemap.renderer.ShapeMapRenderer;
 import org.knowtiphy.shapemap.renderer.context.RemoveHolesFromPolygon;
 import org.knowtiphy.shapemap.renderer.context.RendererContext;
-import org.knowtiphy.shapemap.renderer.feature.IFeature;
+import org.knowtiphy.shapemap.renderer.api.IFeature;
 import org.knowtiphy.shapemap.view.ShapeMapBaseSkin;
 import org.knowtiphy.shapemap.view.ShapeMapView;
 import org.knowtiphy.shapemap.viewmodel.IMapViewModel;

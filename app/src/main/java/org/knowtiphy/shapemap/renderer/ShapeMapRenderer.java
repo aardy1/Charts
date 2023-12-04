@@ -16,7 +16,7 @@ import org.geotools.api.referencing.FactoryException;
 import org.geotools.api.referencing.operation.TransformException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.knowtiphy.shapemap.renderer.context.RendererContext;
-import org.knowtiphy.shapemap.renderer.feature.IFeature;
+import org.knowtiphy.shapemap.renderer.api.IFeature;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.Rule;
 import org.knowtiphy.shapemap.viewmodel.IMapViewModel;
 import org.locationtech.jts.index.quadtree.Quadtree;

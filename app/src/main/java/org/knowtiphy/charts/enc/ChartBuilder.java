@@ -18,8 +18,8 @@ import org.knowtiphy.charts.memstore.MemFeature;
 import org.knowtiphy.charts.memstore.MemStore;
 import org.knowtiphy.charts.memstore.StyleReader;
 import org.knowtiphy.charts.ontology.S57;
-import org.knowtiphy.shapemap.renderer.feature.IFeature;
-import org.knowtiphy.shapemap.renderer.feature.IFeatureFunction;
+import org.knowtiphy.shapemap.renderer.api.IFeature;
+import org.knowtiphy.shapemap.renderer.api.IFeatureFunction;
 import org.knowtiphy.shapemap.style.parser.IParsingContext;
 import org.knowtiphy.shapemap.style.parser.StyleSyntaxException;
 import org.knowtiphy.shapemap.viewmodel.MapDisplayOptions;
@@ -185,7 +185,7 @@ public class ChartBuilder {
 		assert type != null;
 		var typeName = type.getName();
 		var scaleLess = SCALELESS.contains(type.getTypeName()) || !hasScale;
-		store.addSource(type, featureSource.getBounds(), index, scaleLess);
+		store.addSource(type, index);
 		final var fType = type;
 		var parsingContext = new IParsingContext<MemFeature>() {
 			@Override
@@ -196,7 +196,7 @@ public class ChartBuilder {
 		};
 
 		var style = styleReader.createStyle(typeName.getLocalPart(), parsingContext);
-		return new MapLayer<>(typeName.getLocalPart(), store.getFeatureSource(typeName), style, isVisible(typeName),
+		return new MapLayer<>(typeName.getLocalPart(), store.featureSource(type), style, isVisible(typeName),
 				scaleLess);
 	}
 

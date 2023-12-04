@@ -6,8 +6,8 @@
 package org.knowtiphy.shapemap.renderer;
 
 import org.apache.commons.lang3.StringUtils;
-import org.knowtiphy.shapemap.renderer.feature.IFeature;
-import org.knowtiphy.shapemap.renderer.feature.IFeatureFunction;
+import org.knowtiphy.shapemap.renderer.api.IFeature;
+import org.knowtiphy.shapemap.renderer.api.IFeatureFunction;
 import org.locationtech.jts.geom.Geometry;
 
 /**

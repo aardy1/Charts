@@ -5,8 +5,8 @@
 
 package org.knowtiphy.shapemap.renderer.symbolizer.basic;
 
-import org.knowtiphy.shapemap.renderer.feature.IFeatureFunction;
-import org.knowtiphy.shapemap.renderer.feature.IFeature;
+import org.knowtiphy.shapemap.renderer.api.IFeatureFunction;
+import org.knowtiphy.shapemap.renderer.api.IFeature;
 import java.util.List;
 import org.knowtiphy.shapemap.renderer.symbolizer.ISymbolizer;
 import org.knowtiphy.shapemap.renderer.symbolizer.TextSymbolizer;
