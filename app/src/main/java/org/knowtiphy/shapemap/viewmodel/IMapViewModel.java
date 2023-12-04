@@ -10,15 +10,16 @@ import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.knowtiphy.shapemap.renderer.context.ISVGProvider;
 import org.knowtiphy.shapemap.renderer.context.RenderGeomCache;
+import org.knowtiphy.shapemap.renderer.feature.IFeature;
 import org.reactfx.Change;
 import org.reactfx.EventSource;
 
 /**
  * @author graham
  */
-public interface IMapViewModel {
+public interface IMapViewModel<S, F extends IFeature> {
 
-	Collection<MapLayer> layers();
+	Collection<MapLayer<S, F>> layers();
 
 	ReferencedEnvelope viewPortBounds();
 
@@ -34,6 +35,6 @@ public interface IMapViewModel {
 
 	EventSource<Change<Boolean>> layerVisibilityEvent();
 
-	EventSource<Change<IMapViewModel>> newMapEvent();
+	EventSource<Change<IMapViewModel<S, F>>> newMapEvent();
 
 }

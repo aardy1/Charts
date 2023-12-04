@@ -5,19 +5,19 @@
 
 package org.knowtiphy.shapemap.renderer.symbolizer.mark;
 
-import org.geotools.api.feature.simple.SimpleFeature;
 import org.knowtiphy.shapemap.renderer.GraphicsRenderingContext;
 import org.knowtiphy.shapemap.renderer.graphics.Fill;
 import org.knowtiphy.shapemap.renderer.graphics.Stroke;
 import org.knowtiphy.shapemap.renderer.symbolizer.PointSymbolizer;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.FillInfo;
+import org.knowtiphy.shapemap.renderer.feature.IFeature;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.StrokeInfo;
 import org.locationtech.jts.geom.Point;
 
 /**
  * @author graham
  */
-public class TriangleMarkSymbolizer extends BaseMarkSymbolizer {
+public class TriangleMarkSymbolizer<F extends IFeature> extends BaseMarkSymbolizer<F> {
 
 	public TriangleMarkSymbolizer(FillInfo fillInfo, StrokeInfo strokeInfo) {
 		super(fillInfo, strokeInfo);
@@ -29,8 +29,7 @@ public class TriangleMarkSymbolizer extends BaseMarkSymbolizer {
 	private static final double[] ys = new double[4];
 
 	@Override
-	public void render(GraphicsRenderingContext context, SimpleFeature feature, Point pt,
-			PointSymbolizer pointSymbolizer) {
+	public void render(GraphicsRenderingContext context, F feature, Point pt, PointSymbolizer<F> pointSymbolizer) {
 
 		var szo = pointSymbolizer.size().apply(feature, pt);
 		if (szo == null)

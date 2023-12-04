@@ -7,7 +7,6 @@ package org.knowtiphy.shapemap.renderer.symbolizer;
 
 import javafx.scene.text.Font;
 import org.apache.commons.lang3.StringUtils;
-import org.geotools.api.feature.simple.SimpleFeature;
 import org.geotools.api.geometry.BoundingBox;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.crs.DefaultEngineeringCRS;
@@ -16,7 +15,8 @@ import org.knowtiphy.shapemap.renderer.GraphicsRenderingContext;
 import org.knowtiphy.shapemap.renderer.graphics.Fill;
 import org.knowtiphy.shapemap.renderer.graphics.Text;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.FillInfo;
-import org.knowtiphy.shapemap.renderer.symbolizer.basic.IFeatureFunction;
+import org.knowtiphy.shapemap.renderer.feature.IFeature;
+import org.knowtiphy.shapemap.renderer.feature.IFeatureFunction;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.LabelPlacement;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.StrokeInfo;
 import org.locationtech.jts.geom.Geometry;
@@ -28,9 +28,9 @@ import org.locationtech.jts.index.quadtree.Quadtree;
 /**
  * @author graham
  */
-public class TextSymbolizer {
+public class TextSymbolizer<F extends IFeature> {
 
-	private final IFeatureFunction<String> label;
+	private final IFeatureFunction<F, String> label;
 
 	private final Font font;
 
@@ -40,7 +40,7 @@ public class TextSymbolizer {
 
 	private final LabelPlacement labelPlacement;
 
-	public TextSymbolizer(IFeatureFunction<String> label, Font font, FillInfo fillInfo, StrokeInfo strokeInfo,
+	public TextSymbolizer(IFeatureFunction<F, String> label, Font font, FillInfo fillInfo, StrokeInfo strokeInfo,
 			LabelPlacement labelPlacement) {
 
 		this.label = label;
@@ -50,7 +50,7 @@ public class TextSymbolizer {
 		this.labelPlacement = labelPlacement;
 	}
 
-	public void render(GraphicsRenderingContext context, SimpleFeature feature) {
+	public void render(GraphicsRenderingContext context, F feature) {
 
 		if (fillInfo != null) {
 			Fill.setup(context, fillInfo);
@@ -67,7 +67,7 @@ public class TextSymbolizer {
 		text(context, feature, (Geometry) feature.getDefaultGeometry());
 	}
 
-	private void text(GraphicsRenderingContext context, SimpleFeature feature, Geometry geom) {
+	private void text(GraphicsRenderingContext context, F feature, Geometry geom) {
 
 		// TODO -- switch on strings is brain dead
 		switch (geom.getGeometryType()) {
@@ -81,7 +81,7 @@ public class TextSymbolizer {
 		}
 	}
 
-	private void textPoint(GraphicsRenderingContext context, SimpleFeature feature, Point point) {
+	private void textPoint(GraphicsRenderingContext context, F feature, Point point) {
 
 		if (point != null && label != null) {
 			var text = label.apply(feature, point);
@@ -131,7 +131,7 @@ public class TextSymbolizer {
 	// TODO -- text along line strings ...
 
 	// only necessary if a multi-X, can contain another multi-X, rather than just X's
-	private void recurse(GraphicsRenderingContext context, SimpleFeature feature, Geometry geom) {
+	private void recurse(GraphicsRenderingContext context, F feature, Geometry geom) {
 		for (int i = 0; i < geom.getNumGeometries(); i++) {
 			text(context, feature, geom.getGeometryN(i));
 		}

@@ -9,11 +9,13 @@ import java.util.List;
 import org.geotools.api.feature.simple.SimpleFeatureType;
 import org.geotools.api.filter.identity.FeatureId;
 import org.geotools.feature.simple.SimpleFeatureImpl;
+import org.knowtiphy.shapemap.renderer.feature.IFeature;
+import org.locationtech.jts.geom.Geometry;
 
 /**
  * @author graham
  */
-public class MemFeature extends SimpleFeatureImpl {
+public class MemFeature extends SimpleFeatureImpl implements IFeature {
 
 	private final GeomType geomType;
 
@@ -24,6 +26,11 @@ public class MemFeature extends SimpleFeatureImpl {
 
 	public GeomType geomType() {
 		return geomType;
+	}
+
+	@Override
+	public Geometry getDefaultGeometry() {
+		return (Geometry) super.getDefaultGeometry();
 	}
 
 }

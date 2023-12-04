@@ -23,7 +23,6 @@ import org.knowtiphy.charts.enc.CatalogReader;
 import org.knowtiphy.charts.enc.ChartLocker;
 import org.knowtiphy.charts.enc.ENCChart;
 import org.knowtiphy.charts.enc.LocalChartProvider;
-import org.knowtiphy.charts.memstore.MapStats;
 import org.knowtiphy.charts.memstore.StyleReader;
 import org.knowtiphy.charts.platform.IPlatform;
 import org.knowtiphy.charts.platform.Platform;
@@ -72,8 +71,8 @@ public class KnowtiphyCharts extends Application {
 
 		displayOptions = new MapDisplayOptions();
 		chart = chartLocker.getChart(chartDescription, displayOptions);
-		var stats = new MapStats(chart).stats();
-		stats.print();
+		// var stats = new MapStats(chart).stats();
+		// stats.print();
 
 		// new Dump(mapContent, reader.getStore()).dump(S57.OC_BUAARE);
 

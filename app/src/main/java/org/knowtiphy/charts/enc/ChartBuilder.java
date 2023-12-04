@@ -7,29 +7,24 @@ import java.util.HashSet;
 import java.util.Set;
 import javafx.scene.transform.NonInvertibleTransformException;
 import javax.xml.stream.XMLStreamException;
-import org.geotools.api.feature.simple.SimpleFeature;
 import org.geotools.api.feature.simple.SimpleFeatureType;
-import org.geotools.api.feature.type.GeometryDescriptor;
 import org.geotools.api.feature.type.Name;
 import org.geotools.api.referencing.FactoryException;
 import org.geotools.api.referencing.operation.TransformException;
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.data.store.ContentFeatureSource;
-import org.geotools.feature.NameImpl;
-import org.geotools.feature.type.GeometryDescriptorImpl;
-import org.geotools.feature.type.GeometryTypeImpl;
 import org.knowtiphy.charts.memstore.ExtraAttributes;
 import org.knowtiphy.charts.memstore.MemFeature;
 import org.knowtiphy.charts.memstore.MemStore;
 import org.knowtiphy.charts.memstore.StyleReader;
 import org.knowtiphy.charts.ontology.S57;
-import org.knowtiphy.shapemap.renderer.symbolizer.basic.IFeatureFunction;
+import org.knowtiphy.shapemap.renderer.feature.IFeature;
+import org.knowtiphy.shapemap.renderer.feature.IFeatureFunction;
 import org.knowtiphy.shapemap.style.parser.IParsingContext;
 import org.knowtiphy.shapemap.style.parser.StyleSyntaxException;
 import org.knowtiphy.shapemap.viewmodel.MapDisplayOptions;
 import org.knowtiphy.shapemap.viewmodel.MapLayer;
 import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.index.strtree.STRtree;
 
 import static org.knowtiphy.charts.geotools.FileUtils.readShapeFilesInDir;
@@ -155,11 +150,10 @@ public class ChartBuilder {
 			}
 		}
 
-		// scale.setMap(map);
 		return this;
 	}
 
-	private MapLayer readLayer(ContentFeatureSource featureSource, MemStore store)
+	private MapLayer<SimpleFeatureType, IFeature> readLayer(ContentFeatureSource featureSource, MemStore store)
 			throws IOException, XMLStreamException, TransformException, NonInvertibleTransformException,
 			FactoryException, StyleSyntaxException {
 
@@ -170,14 +164,69 @@ public class ChartBuilder {
 		try (var coll = featureSource.getFeatures().features()) {
 			while (coll.hasNext()) {
 				var geoFeature = coll.next();
-
-				// clearFeature(feature);
 				if (type == null)
 					type = geoFeature.getFeatureType();
 
 				var geom = (Geometry) geoFeature.getDefaultGeometry();
 
-				var geomType = geom.getGeometryType();
+				// TODO -- get rid of this line? replaced with enum types
+				ExtraAttributes.setGeomType(geoFeature);
+				var feature = new MemFeature(geoFeature.getAttributes(), geoFeature.getFeatureType(),
+						geoFeature.getIdentifier(), ExtraAttributes.setGeomType(geom));
+				index.insert(geom.getEnvelopeInternal(), feature);
+
+				var prop = feature.getProperty(S57.AT_SCAMIN);
+				if (prop != null && prop.getValue() != null) {
+					hasScale = true;
+				}
+			}
+		}
+
+		assert type != null;
+		var typeName = type.getName();
+		var scaleLess = SCALELESS.contains(type.getTypeName()) || !hasScale;
+		store.addSource(type, featureSource.getBounds(), index, scaleLess);
+		final var fType = type;
+		var parsingContext = new IParsingContext<MemFeature>() {
+			@Override
+			public IFeatureFunction<MemFeature, Object> compilePropertyAccess(String name) {
+				var index = fType.indexOf(name);
+				return (f, g) -> f.getAttribute(index);
+			}
+		};
+
+		var style = styleReader.createStyle(typeName.getLocalPart(), parsingContext);
+		return new MapLayer<>(typeName.getLocalPart(), store.getFeatureSource(typeName), style, isVisible(typeName),
+				scaleLess);
+	}
+
+	public boolean isVisible(Name typeName) {
+		return switch (typeName.getLocalPart()) {
+			case S57.OC_LIGHTS -> displayOptions.getShowLights();
+			case S57.OC_OFSPLF -> displayOptions.getShowPlatforms();
+			case S57.OC_SOUNDG -> displayOptions.getShowSoundings();
+			case S57.OC_WRECKS -> displayOptions.getShowWrecks();
+			default -> true;
+		};
+	}
+
+}
+// private GeometryDescriptor singlePointGeomDescriptor(SimpleFeature feature) {
+//
+// var fGeomDesc = feature.getDefaultGeometryProperty().getDescriptor();
+// var fGeomType = fGeomDesc.getType();
+//
+// var newGeomType = new GeometryTypeImpl(new NameImpl("Point"), Point.class,
+// fGeomType.getCoordinateReferenceSystem(), fGeomType.isAbstract(),
+// fGeomType.isIdentified(),
+// fGeomType.getRestrictions(), null, null);
+//
+// return new GeometryDescriptorImpl​(newGeomType, new NameImpl("the_geom"),
+// fGeomDesc.getMinOccurs(),
+// fGeomDesc.getMaxOccurs(), fGeomDesc.isNillable(), null);
+// }
+
+
 				// switch (geomType) {
 				// case "MultiPoint" -> {
 				// var newGeomDescriptor = singlePointGeomDescriptor(feature);
@@ -193,59 +242,3 @@ public class ChartBuilder {
 				// }
 				// }
 				// default -> {
-				ExtraAttributes.setGeomType(geoFeature);
-				var gt = ExtraAttributes.setGeomType(geom);
-				var feature = new MemFeature(geoFeature.getAttributes(), geoFeature.getFeatureType(),
-						geoFeature.getIdentifier(), gt);
-				index.insert(geom.getEnvelopeInternal(), feature);
-				// }
-				// }
-
-				var prop = feature.getProperty(S57.AT_SCAMIN);
-				if (prop != null && prop.getValue() != null) {
-					hasScale = true;
-				}
-			}
-		}
-
-		var typeName = type.getName();
-		var scaleLess = SCALELESS.contains(type.getTypeName()) || !hasScale;
-		store.addSource(type, featureSource.getBounds(), index, scaleLess);
-		final var fType = type;
-		var parsingContext = new IParsingContext() {
-			@Override
-			public IFeatureFunction<Object> compilePropertyAccess(String name) {
-				var index = fType.indexOf(name);
-				return (f, g) -> f.getAttribute(index);
-			}
-		};
-
-		var style = styleReader.createStyle(typeName.getLocalPart(), parsingContext);
-		return new MapLayer(typeName.getLocalPart(), store.getFeatureSource(typeName), style, isVisible(typeName),
-				scaleLess);
-	}
-
-	public boolean isVisible(Name typeName) {
-		return switch (typeName.getLocalPart()) {
-			case S57.OC_LIGHTS -> displayOptions.getShowLights();
-			case S57.OC_OFSPLF -> displayOptions.getShowPlatforms();
-			case S57.OC_SOUNDG -> displayOptions.getShowSoundings();
-			case S57.OC_WRECKS -> displayOptions.getShowWrecks();
-			default -> true;
-		};
-	}
-
-	private GeometryDescriptor singlePointGeomDescriptor(SimpleFeature feature) {
-
-		var fGeomDesc = feature.getDefaultGeometryProperty().getDescriptor();
-		var fGeomType = fGeomDesc.getType();
-
-		var newGeomType = new GeometryTypeImpl(new NameImpl("Point"), Point.class,
-				fGeomType.getCoordinateReferenceSystem(), fGeomType.isAbstract(), fGeomType.isIdentified(),
-				fGeomType.getRestrictions(), null, null);
-
-		return new GeometryDescriptorImpl​(newGeomType, new NameImpl("the_geom"), fGeomDesc.getMinOccurs(),
-				fGeomDesc.getMaxOccurs(), fGeomDesc.isNillable(), null);
-	}
-
-}

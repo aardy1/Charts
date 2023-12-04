@@ -9,6 +9,7 @@ import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
 import org.knowtiphy.shapemap.renderer.Operators;
 import org.knowtiphy.shapemap.renderer.symbolizer.TextSymbolizer;
+import org.knowtiphy.shapemap.renderer.feature.IFeature;
 import org.knowtiphy.shapemap.style.builder.TextSymbolizerBuilder;
 import org.knowtiphy.shapemap.style.parser.IParsingContext;
 import org.knowtiphy.shapemap.style.parser.StyleSyntaxException;
@@ -28,10 +29,10 @@ import static org.knowtiphy.shapemap.style.parser.Utils.normalize;
  */
 public class TextSymbolizerParser {
 
-	public static TextSymbolizer parse(IParsingContext parsingContext, XMLEventReader reader)
+	public static <F extends IFeature> TextSymbolizer parse(IParsingContext parsingContext, XMLEventReader reader)
 			throws XMLStreamException, StyleSyntaxException {
 
-		var builder = new TextSymbolizerBuilder();
+		var builder = new TextSymbolizerBuilder<F>();
 
 		var done = false;
 		while (!done && reader.hasNext()) {
@@ -41,8 +42,8 @@ public class TextSymbolizerParser {
 				var startElement = nextEvent.asStartElement();
 				switch (normalize(startElement)) {
 					case XML.LABEL -> {
-						var labelValue = ExpressionParser.parse(parsingContext, reader, XML.LABEL);
-						builder.label((f, s) -> Operators.toString(labelValue, f, s));
+						var labelValue = ExpressionParser.<F>parse(parsingContext, reader, XML.LABEL);
+						builder.label((f, g) -> Operators.toString(labelValue, f, g));
 					}
 					case XML.FONT -> builder.font(FontParser.parse(reader));
 					case XML.STROKE -> builder.strokeInfo(StrokeParser.parse(reader));

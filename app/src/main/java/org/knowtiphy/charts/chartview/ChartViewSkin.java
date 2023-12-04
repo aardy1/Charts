@@ -1,6 +1,5 @@
 package org.knowtiphy.charts.chartview;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -13,7 +12,6 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Skin;
 import javafx.scene.control.SkinBase;
-import javafx.scene.control.TextArea;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.input.ZoomEvent;
@@ -22,7 +20,6 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.transform.NonInvertibleTransformException;
 import org.apache.commons.lang3.tuple.Pair;
-import org.controlsfx.control.PopOver;
 import org.controlsfx.glyphfont.Glyph;
 import org.geotools.api.referencing.FactoryException;
 import org.geotools.api.referencing.operation.TransformException;
@@ -194,10 +191,10 @@ public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView
 
 		// subscriptions.add(chart.viewPortBoundsEvent.subscribe(change ->
 		// updateBoats()));
-		// subscriptions.add(chart.newChartEvents.subscribe(change -> updateBoats()));
+		subscriptions.add(chart.newMapEvent().subscribe(change -> updateBoats()));
 		// subscriptions.add(dynamics.aisEvents.subscribe(this::updateAISInformation));
 
-		subscriptions.add(chart.newMapEvent.subscribe(change -> {
+		subscriptions.add(chart.newMapEvent().subscribe(change -> {
 			chart = (ENCChart) change.getNewValue();
 			setupListeners();
 		}));
@@ -205,44 +202,44 @@ public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView
 
 	private void showInfo(MouseEvent event) {
 
-		try {
-			// TODO are these the right x and y?
-			var nearby = Queries.featuresNearXYWorld(chart, event.getX(), event.getY(), 1);
-
-			var tx = new Transformation(chart.viewPortScreenToWorld());
-			tx.apply(event.getX(), event.getY());
-
-			// this is a bit weird since surely you can do it one query?
-			var textToDisplay = new StringBuilder();
-			textToDisplay.append(tx.getX()).append(", ").append(tx.getY()).append("\n");
-
-			for (var features : nearby) {
-				try (var iterator = features.features()) {
-					while (iterator.hasNext()) {
-						var feature = iterator.next();
-						textToDisplay.append(feature.getIdentifier()).append("\n");
-						textToDisplay.append(feature.getDefaultGeometry()).append("\n");
-						for (var attr : feature.getFeatureType().getAttributeDescriptors()) {
-							if (!attr.getLocalName().equals("the_geom")) {
-								var attrVal = feature.getAttribute(attr.getLocalName());
-								if (attrVal != null && !(attrVal instanceof String x && x.isEmpty())) {
-									textToDisplay.append("\t").append(attr.getName()).append(" = ").append(attrVal)
-											.append("\n");
-								}
-							}
-						}
-					}
-				}
-			}
-
-			var text = new TextArea(textToDisplay.toString());
-
-			var popOver = new PopOver(text);
-			popOver.show(mapSurface, event.getScreenX(), event.getScreenY());
-		}
-		catch (IOException ex) {
-			Logger.getLogger(ChartViewSkin.class.getName()).log(Level.SEVERE, null, ex);
-		}
+		// try {
+		// // TODO are these the right x and y?
+		// List<IFeatureSourceIterator<SimpleFeatureType, IFeature>> nearby = Queries
+		// .<SimpleFeatureType, IFeature>featuresNearXYWorld(chart, event.getX(),
+		// event.getY(), 1);
+		//
+		// var tx = new Transformation(chart.viewPortScreenToWorld());
+		// tx.apply(event.getX(), event.getY());
+		//
+		// // this is a bit weird since surely you can do it one query?
+		// var textToDisplay = new StringBuilder();
+		// textToDisplay.append(tx.getX()).append(", ").append(tx.getY()).append("\n");
+		//
+		// for (var iterator : nearby) {
+		// while (iterator.hasNext()) {
+		// var feature = iterator.next();
+		// textToDisplay.append(feature.getIdentifier()).append("\n");
+		// textToDisplay.append(feature.getDefaultGeometry()).append("\n");
+		// for (var attr : feature.getFeatureType().getAttributeDescriptors()) {
+		// if (!attr.getLocalName().equals("the_geom")) {
+		// var attrVal = feature.getAttribute(attr.getLocalName());
+		// if (attrVal != null && !(attrVal instanceof String x && x.isEmpty())) {
+		// textToDisplay.append("\t").append(attr.getName()).append(" = ").append(attrVal)
+		// .append("\n");
+		// }
+		// }
+		// }
+		// }
+		// }
+		//
+		// var text = new TextArea(textToDisplay.toString());
+		//
+		// var popOver = new PopOver(text);
+		// popOver.show(mapSurface, event.getScreenX(), event.getScreenY());
+		// }
+		// catch (IOException ex) {
+		// Logger.getLogger(ChartViewSkin.class.getName()).log(Level.SEVERE, null, ex);
+		// }
 	}
 
 	private void showMaxDetail(MouseEvent event) {
@@ -263,7 +260,7 @@ public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView
 			var screenArea = new Rectangle2D(0, 0, (int) root.getWidth(), (int) root.getHeight());
 			try {
 				var newChart = chartLocker.loadChart(mostDetailedChart, displayOptions, screenArea);
-				chart.newMapEvent().push(new Change<>(chart, newChart));
+				newChart.newMapEvent().push(new Change<>(chart, newChart));
 			}
 			catch (TransformException | FactoryException | NonInvertibleTransformException | StyleSyntaxException ex) {
 				Logger.getLogger(ChartViewSkin.class.getName()).log(Level.SEVERE, null, ex);

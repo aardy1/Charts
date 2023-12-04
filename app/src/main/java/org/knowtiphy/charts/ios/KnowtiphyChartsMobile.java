@@ -29,7 +29,6 @@ import org.knowtiphy.charts.enc.ChartLocker;
 import org.knowtiphy.charts.enc.ENCChart;
 import org.knowtiphy.charts.enc.LocalChartProvider;
 import org.knowtiphy.charts.ios.view.ChartViewView;
-import org.knowtiphy.charts.memstore.MapStats;
 import org.knowtiphy.charts.memstore.StyleReader;
 import org.knowtiphy.shapemap.style.parser.StyleSyntaxException;
 import org.knowtiphy.shapemap.viewmodel.MapDisplayOptions;
@@ -69,8 +68,8 @@ public class KnowtiphyChartsMobile extends Application {
 
 		displayOptions = new MapDisplayOptions();
 		chart = chartLocker.getChart(chartDescription, displayOptions);
-		var stats = new MapStats(chart).stats();
-		stats.print();
+		// var stats = new MapStats(chart).stats();
+		// stats.print();
 
 		appManager.addViewFactory(HOME_VIEW, () -> {
 			return new View(new VBox(new Label("Dave")));

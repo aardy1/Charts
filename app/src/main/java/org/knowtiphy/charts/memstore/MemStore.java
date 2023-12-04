@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.geotools.api.data.SimpleFeatureSource;
 import org.geotools.api.feature.simple.SimpleFeatureType;
 import org.geotools.api.feature.type.Name;
 import org.geotools.data.store.ContentDataStore;
@@ -62,7 +61,7 @@ public class MemStore extends ContentDataStore {
 	}
 
 	@Override
-	public SimpleFeatureSource getFeatureSource(Name typeName) throws IOException {
+	public MemStoreFeatureSource getFeatureSource(Name typeName) throws IOException {
 		return createFeatureSource(new ContentEntry(this, typeName));
 	}
 

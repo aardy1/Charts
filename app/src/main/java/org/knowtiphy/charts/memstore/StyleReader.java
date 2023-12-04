@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import javax.xml.stream.XMLStreamException;
 import org.knowtiphy.shapemap.renderer.FeatureTypeStyle;
+import org.knowtiphy.shapemap.renderer.feature.IFeature;
 import org.knowtiphy.shapemap.style.parser.IParsingContext;
 import org.knowtiphy.shapemap.style.parser.StyleSyntaxException;
 import org.knowtiphy.shapemap.style.parser.StyledLayerDescriptorParser;
@@ -11,7 +12,7 @@ import org.knowtiphy.shapemap.style.parser.StyledLayerDescriptorParser;
 /**
  * @author graham
  */
-public class StyleReader {
+public class StyleReader<F extends IFeature> {
 
 	private static final String SLD = ".sld";
 
@@ -21,14 +22,14 @@ public class StyleReader {
 		this.dir = dir;
 	}
 
-	public FeatureTypeStyle createStyle(String fileName, IParsingContext parsingContext)
+	public FeatureTypeStyle<F> createStyle(String fileName, IParsingContext parsingContext)
 			throws IOException, XMLStreamException, StyleSyntaxException {
 		var styleSheet = toSLDFile(fileName);
 		assert styleSheet != null;
 		return createFromSLD(styleSheet, parsingContext);
 	}
 
-	private FeatureTypeStyle createFromSLD(InputStream stream, IParsingContext parsingContext)
+	private FeatureTypeStyle<F> createFromSLD(InputStream stream, IParsingContext parsingContext)
 			throws IOException, XMLStreamException, StyleSyntaxException {
 		return new StyledLayerDescriptorParser(stream, parsingContext).read();
 	}

@@ -8,11 +8,11 @@ package org.knowtiphy.charts.geotools;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import org.geotools.api.feature.simple.SimpleFeature;
 import org.geotools.data.simple.SimpleFeatureCollection;
 import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.knowtiphy.charts.memstore.MemStoreQuery;
 import org.knowtiphy.shapemap.renderer.Transformation;
+import org.knowtiphy.shapemap.renderer.feature.IFeature;
+import org.knowtiphy.shapemap.renderer.feature.IFeatureSourceIterator;
 import org.knowtiphy.shapemap.viewmodel.MapViewModel;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
@@ -25,8 +25,8 @@ public class Queries {
 
 	private static final double DELTA = 0.1;
 
-	public static List<SimpleFeatureCollection> featuresNearXYWorld(MapViewModel map, double x, double y)
-			throws IOException {
+	public static <S, F extends IFeature> List<SimpleFeatureCollection> featuresNearXYWorld(MapViewModel<S, F> map,
+			double x, double y) throws IOException {
 
 		var tx = new Transformation(map.viewPortScreenToWorld());
 		tx.apply(x, y);
@@ -35,24 +35,22 @@ public class Queries {
 
 		var result = new ArrayList<SimpleFeatureCollection>();
 		for (var layer : map.layers()) {
-			var query = new MemStoreQuery(envelope, true);
-			result.add((SimpleFeatureCollection) layer.getFeatureSource().getFeatures(query));
+			result.add((SimpleFeatureCollection) layer.getFeatures(envelope, true));
 		}
 
 		return result;
 	}
 
-	public static List<SimpleFeatureCollection> featuresNearXYWorld(MapViewModel map, double x, double y, int radius)
-			throws IOException {
+	public static <S, F extends IFeature> List<IFeatureSourceIterator<S, F>> featuresNearXYWorld(MapViewModel<S, F> map,
+			double x, double y, int radius) throws IOException {
 
 		var envelope = tinyPolygon(map, x, y, radius);
 
-		var result = new ArrayList<SimpleFeatureCollection>();
-		var foo = new ArrayList<SimpleFeature>();
+		var result = new ArrayList<IFeatureSourceIterator<S, F>>();
+		var foo = new ArrayList<F>();
 		for (var layer : map.layers()) {
-			var query = new MemStoreQuery(envelope, true);
-			result.add((SimpleFeatureCollection) layer.getFeatureSource().getFeatures(query));
-			var it = layer.getFeatureSource().getFeatures(query).features();
+			result.add(layer.getFeatureSource().getFeatures(envelope, true));
+			var it = layer.getFeatureSource().getFeatures(envelope, true);
 			while (it.hasNext()) {
 				foo.add(it.next());
 			}

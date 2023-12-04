@@ -17,13 +17,13 @@ import org.knowtiphy.charts.chartview.ChartView.EventModel;
 import org.knowtiphy.shapemap.renderer.ShapeMapRenderer;
 import org.knowtiphy.shapemap.renderer.context.RemoveHolesFromPolygon;
 import org.knowtiphy.shapemap.renderer.context.RendererContext;
+import org.knowtiphy.shapemap.renderer.feature.IFeature;
 import org.knowtiphy.shapemap.view.ShapeMapBaseSkin;
 import org.knowtiphy.shapemap.view.ShapeMapView;
 import org.knowtiphy.shapemap.viewmodel.IMapViewModel;
-import org.reactfx.Change;
 import org.reactfx.Subscription;
 
-public class CanvasShapeMapSkin extends ShapeMapBaseSkin {
+public class CanvasShapeMapSkin<S, F extends IFeature> extends ShapeMapBaseSkin {
 
 	private static final double PREFERRED_WIDTH = Region.USE_COMPUTED_SIZE;
 
@@ -60,11 +60,12 @@ public class CanvasShapeMapSkin extends ShapeMapBaseSkin {
 		subscriptions.clear();
 		subscriptions.add(map.viewPortBoundsEvent().subscribe(b -> root.requestLayout()));
 		subscriptions.add(map.layerVisibilityEvent().subscribe(b -> root.requestLayout()));
-		subscriptions.add(map.newMapEvent().subscribe((Change<IMapViewModel> change) -> {
-			this.map = change.getNewValue();
-			setupListeners();
-			root.requestLayout();
-		}));
+		// subscriptions.add(map.newMapEvent().subscribe((Change<IMapViewModel<?, ?>>
+		// change) -> {
+		// this.map = change.getNewValue();
+		// setupListeners();
+		// root.requestLayout();
+		// }));
 	}
 
 	private void initGraphics() {

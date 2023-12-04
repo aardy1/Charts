@@ -11,24 +11,26 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.geotools.api.feature.simple.SimpleFeatureType;
 import org.geotools.api.feature.type.Name;
 import org.geotools.api.feature.type.PropertyDescriptor;
 import org.geotools.api.filter.identity.FeatureId;
+import org.knowtiphy.shapemap.renderer.feature.IFeature;
 import org.knowtiphy.shapemap.viewmodel.MapLayer;
 import org.knowtiphy.shapemap.viewmodel.MapViewModel;
 
 /**
  * @author graham
  */
-public class Dump {
+public class Dump<S extends SimpleFeatureType, F extends IFeature> {
 
-	private final MapViewModel mapContent;
+	private final MapViewModel<S, F> mapContent;
 
 	private final Set<PropertyDescriptor> descriptors = new HashSet<>();
 
 	private final Map<FeatureId, Map<Name, List<Object>>> featureProperties = new HashMap<>();
 
-	public Dump(MapViewModel mapContent) {
+	public Dump(MapViewModel<S, F> mapContent) {
 		this.mapContent = mapContent;
 	}
 
@@ -49,7 +51,7 @@ public class Dump {
 		}
 	}
 
-	public void dumpSchema(MapLayer layer) throws IOException {
+	public void dumpSchema(MapLayer<S, F> layer) throws IOException {
 
 		var schema = layer.getFeatureSource().getSchema();
 		descriptors.addAll(schema.getDescriptors());
@@ -96,11 +98,11 @@ public class Dump {
 		descriptors.forEach(d -> System.err.println(d));
 	}
 
-	public void dumpFeatureTypes() throws IOException {
+	public void dumpFeatureTypes() throws Exception {
 		var j = 0;
 		for (var layer : mapContent.layers()) {
 			System.err.println("Layer = " + j);
-			try (var features = layer.getFeatureSource().getFeatures().features()) {
+			try (var features = layer.getFeatureSource().features()) {
 				while (features.hasNext()) {
 					var feature = features.next();
 					System.err.println("\tFeature Type = " + feature.getType());

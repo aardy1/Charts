@@ -5,13 +5,14 @@
 
 package org.knowtiphy.shapemap.style.parser;
 
-import org.knowtiphy.shapemap.renderer.symbolizer.basic.IFeatureFunction;
+import org.knowtiphy.shapemap.renderer.feature.IFeature;
+import org.knowtiphy.shapemap.renderer.feature.IFeatureFunction;
 
 /**
  * @author graham
  */
-public interface IParsingContext {
+public interface IParsingContext<F extends IFeature> {
 
-	IFeatureFunction<Object> compilePropertyAccess(String name);
+	IFeatureFunction<F, Object> compilePropertyAccess(String name);
 
 }

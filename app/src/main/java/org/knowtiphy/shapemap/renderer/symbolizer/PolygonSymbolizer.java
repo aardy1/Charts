@@ -5,19 +5,19 @@
 
 package org.knowtiphy.shapemap.renderer.symbolizer;
 
-import org.geotools.api.feature.simple.SimpleFeature;
 import org.knowtiphy.charts.memstore.MemFeature;
 import org.knowtiphy.shapemap.renderer.GraphicsRenderingContext;
 import org.knowtiphy.shapemap.renderer.graphics.Fill;
 import org.knowtiphy.shapemap.renderer.graphics.Stroke;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.FillInfo;
+import org.knowtiphy.shapemap.renderer.feature.IFeature;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.StrokeInfo;
 import org.locationtech.jts.geom.Geometry;
 
 /**
  * @author graham
  */
-public class PolygonSymbolizer implements ISymbolizer {
+public class PolygonSymbolizer<F extends IFeature> implements ISymbolizer<F> {
 
 	private final FillInfo fillInfo;
 
@@ -29,7 +29,7 @@ public class PolygonSymbolizer implements ISymbolizer {
 	}
 
 	@Override
-	public void render(GraphicsRenderingContext context, SimpleFeature feature) {
+	public void render(GraphicsRenderingContext context, F feature) {
 
 		if (fillInfo != null) {
 			Fill.setup(context, fillInfo);

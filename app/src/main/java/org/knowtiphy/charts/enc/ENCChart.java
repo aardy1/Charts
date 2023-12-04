@@ -7,18 +7,20 @@ package org.knowtiphy.charts.enc;
 
 import java.util.Collection;
 import javafx.scene.transform.NonInvertibleTransformException;
+import org.geotools.api.feature.simple.SimpleFeatureType;
 import org.geotools.api.referencing.FactoryException;
 import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.api.referencing.operation.TransformException;
 import org.knowtiphy.charts.chartview.markicons.ResourceLoader;
 import org.knowtiphy.shapemap.renderer.context.SVGCache;
+import org.knowtiphy.shapemap.renderer.feature.IFeature;
 import org.knowtiphy.shapemap.viewmodel.MapDisplayOptions;
 import org.knowtiphy.shapemap.viewmodel.MapViewModel;
 
 /**
  * @author graham
  */
-public class ENCChart extends MapViewModel {
+public class ENCChart extends MapViewModel<SimpleFeatureType, IFeature> {
 
 	private final ChartDescription chartDescription;
 

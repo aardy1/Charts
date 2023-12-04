@@ -6,12 +6,13 @@
 package org.knowtiphy.shapemap.renderer.symbolizer.mark;
 
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.FillInfo;
+import org.knowtiphy.shapemap.renderer.feature.IFeature;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.StrokeInfo;
 
 /**
  * @author graham
  */
-public abstract class BaseMarkSymbolizer implements IMarkSymbolizer {
+public abstract class BaseMarkSymbolizer<F extends IFeature> implements IMarkSymbolizer<F> {
 
 	protected final FillInfo fillInfo;
 

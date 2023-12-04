@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
@@ -17,21 +16,17 @@ import javafx.scene.shape.Polyline;
 import javafx.scene.shape.Shape;
 import javafx.scene.shape.StrokeType;
 import org.controlsfx.glyphfont.Glyph;
-import org.geotools.api.feature.Feature;
 import org.knowtiphy.charts.Fonts;
 import org.knowtiphy.charts.enc.ENCChart;
-import org.knowtiphy.charts.memstore.ExtraAttributes;
 import org.knowtiphy.charts.ontology.S57;
 import org.knowtiphy.shapemap.renderer.Transformation;
+import org.knowtiphy.shapemap.renderer.feature.IFeature;
 import org.locationtech.jts.geom.Geometry;
 import org.reactfx.Change;
 import org.reactfx.EventStream;
 import org.reactfx.Subscription;
 
-import static org.knowtiphy.charts.geotools.GetDescription.description;
 import static org.knowtiphy.charts.ontology.S57.AT_INFORM;
-import static org.knowtiphy.charts.utils.FXUtils.later;
-import static org.knowtiphy.charts.utils.FXUtils.tooltip;
 
 /**
  * @author graham
@@ -43,6 +38,7 @@ public class IconSurface extends Pane {
 	private final List<Subscription> subscriptions = new ArrayList<>();
 
 	public IconSurface(ENCChart chart) {
+
 		this.chart = chart;
 
 		widthProperty().addListener(x -> makeIconLayers());
@@ -67,23 +63,28 @@ public class IconSurface extends Pane {
 
 		getChildren().clear();
 
-		createIconLayer(S57.OC_CTNARE, Fonts::info, List.of(AT_INFORM), null, null);
-		createIconLayer(S57.OC_MIPARE, Fonts::jet, List.of(AT_INFORM), null, null);
-		createIconLayer(S57.OC_UNSARE, Fonts::info, List.of(AT_INFORM), null, null);
-		createIconLayer(S57.OC_DMPGRD, Fonts::info, List.of(AT_INFORM), null, null);
-		// createIconLayer(map, S57.OC_OFSPLF, Fonts::platform, List.of(AT_OBJNAM),
-		// "Offshore Platform", displayOptions.showPlatformEvents);
-		// // createIconLayer(pane, map, S57.OC_BUAARE);
+		try {
+			createIconLayer(S57.OC_CTNARE, Fonts::info, List.of(AT_INFORM), null, null);
+			createIconLayer(S57.OC_MIPARE, Fonts::jet, List.of(AT_INFORM), null, null);
+			createIconLayer(S57.OC_UNSARE, Fonts::info, List.of(AT_INFORM), null, null);
+			createIconLayer(S57.OC_DMPGRD, Fonts::info, List.of(AT_INFORM), null, null);
+			// createIconLayer(map, S57.OC_OFSPLF, Fonts::platform, List.of(AT_OBJNAM),
+			// "Offshore Platform", displayOptions.showPlatformEvents);
+			// // createIconLayer(pane, map, S57.OC_BUAARE);
+		}
+		catch (Exception ex) {
+			ex.printStackTrace();
+		}
 	}
 
 	private void createIconLayer(String type, Supplier<Glyph> glyph, List<String> attributes, String defaultValue,
-			EventStream<Change<Boolean>> visibilityEvents) {
+			EventStream<Change<Boolean>> visibilityEvents) throws Exception {
 
 		var layer = chart.layer(type);
 		if (layer == null)
 			return;
 
-		try (var features = layer.getFeatureSource().getFeatures().features()) {
+		try (var features = layer.getFeatureSource().features()) {
 			while (features.hasNext()) {
 				var g = glyph.get();
 				g.setFontSize(14);
@@ -95,47 +96,50 @@ public class IconSurface extends Pane {
 		}
 	}
 
-	private void createIcon(Feature feature, Glyph glyph, List<String> attributes, String defaultValue,
+	private void createIcon(IFeature feature, Glyph glyph, List<String> attributes, String defaultValue,
 			EventStream<Change<Boolean>> visibilityEvents) {
 
-		var description = description(feature, attributes, defaultValue);
-		if (description == null)
-			return;
+		// var description = description(feature, attributes, defaultValue);
+		// if (description == null)
+		// return;
+		//
+		// var geom = (Geometry) feature.getDefaultGeometry();
+		// var geomType = ExtraAttributes.geomType(feature);
+		// var pt = switch (geomType) {
+		// case POINT -> geom;
+		// case POLYGON, MULTI_POLYGON -> geom.getInteriorPoint();
+		// default -> null;
+		// };
 
-		var geom = (Geometry) feature.getDefaultGeometryProperty().getValue();
-		var geomType = ExtraAttributes.geomType(feature);
-		var pt = switch (geomType) {
-			case POINT -> geom;
-			case POLYGON, MULTI_POLYGON -> geom.getInteriorPoint();
-			default -> null;
-		};
-
-		if (pt == null) {
-			System.err.println("type " + geom.getGeometryType());
-			return;
-		}
-
-		var tooltip = tooltip(description, Fonts.DEFAULT_FONT_12, Fonts.DEFAULT_FONT_WIDTH_12, 400);
-		glyph.setTooltip(tooltip);
-		var transform = new Transformation(chart.viewPortWorldToScreen());
-
-		repositionPoint(transform, pt, glyph);
-		getChildren().add(glyph);
-
-		if (visibilityEvents != null)
-			visibilityEvents.subscribe(c -> glyph.setVisible(c.getNewValue()));
-
-		switch (geomType) {
-			case LINE_STRING, POLYGON, MULTI_POLYGON -> {
-				var polys = createHighlight(geom, transform, Color.RED);
-				final var fpolys = polys;
-				glyph.addEventHandler(MouseEvent.MOUSE_ENTERED, evt -> later(() -> getChildren().addAll(fpolys)));
-				glyph.addEventHandler(MouseEvent.MOUSE_EXITED, evt -> later(() -> getChildren().removeAll(fpolys)));
-			}
-			default -> {
-				// de nada
-			}
-		}
+		// if (pt == null) {
+		// System.err.println("type " + geom.getGeometryType());
+		// return;
+		// }
+		//
+		// var tooltip = tooltip(description, Fonts.DEFAULT_FONT_12,
+		// Fonts.DEFAULT_FONT_WIDTH_12, 400);
+		// glyph.setTooltip(tooltip);
+		// var transform = new Transformation(chart.viewPortWorldToScreen());
+		//
+		// repositionPoint(transform, pt, glyph);
+		// getChildren().add(glyph);
+		//
+		// if (visibilityEvents != null)
+		// visibilityEvents.subscribe(c -> glyph.setVisible(c.getNewValue()));
+		//
+		// switch (geomType) {
+		// case LINE_STRING, POLYGON, MULTI_POLYGON -> {
+		// var polys = createHighlight(geom, transform, Color.RED);
+		// final var fpolys = polys;
+		// glyph.addEventHandler(MouseEvent.MOUSE_ENTERED, evt -> later(() ->
+		// getChildren().addAll(fpolys)));
+		// glyph.addEventHandler(MouseEvent.MOUSE_EXITED, evt -> later(() ->
+		// getChildren().removeAll(fpolys)));
+		// }
+		// default -> {
+		// // de nada
+		// }
+		// }
 	}
 
 	private List<Shape> createHighlight(Geometry geom, Transformation transform, Color color) {

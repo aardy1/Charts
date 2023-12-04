@@ -7,7 +7,8 @@ package org.knowtiphy.shapemap.style.builder;
 
 import org.knowtiphy.shapemap.renderer.symbolizer.ISymbolizer;
 import org.knowtiphy.shapemap.renderer.symbolizer.PointSymbolizer;
-import org.knowtiphy.shapemap.renderer.symbolizer.basic.IFeatureFunction;
+import org.knowtiphy.shapemap.renderer.feature.IFeature;
+import org.knowtiphy.shapemap.renderer.feature.IFeatureFunction;
 import org.knowtiphy.shapemap.renderer.symbolizer.mark.IMarkSymbolizer;
 import org.knowtiphy.shapemap.style.parser.StyleSyntaxException;
 
@@ -16,35 +17,33 @@ import static org.knowtiphy.shapemap.style.parser.StyleSyntaxException.expect;
 /**
  * @author graham
  */
-public class PointSymbolizerBuilder {
+public class PointSymbolizerBuilder<F extends IFeature> {
+
+	private IMarkSymbolizer<F> markSymbolizer;
 
 	// TODO -- spec says the default is the "native symbol size" ...?
-	private static final IFeatureFunction DEFAULT_SIZE = (f, g) -> 8;
+	private IFeatureFunction<F, Number> size = (f, g) -> 8.0;
 
-	private IMarkSymbolizer markSymbolizer;
-
-	private IFeatureFunction<Number> size = DEFAULT_SIZE;
-
-	private IFeatureFunction<Number> rotation;
+	private IFeatureFunction<F, Number> rotation;
 
 	private double opacity = 1;
 
-	public PointSymbolizerBuilder markSymbolizer(IMarkSymbolizer markSymbolizer) {
+	public PointSymbolizerBuilder<F> markSymbolizer(IMarkSymbolizer<F> markSymbolizer) {
 		this.markSymbolizer = markSymbolizer;
 		return this;
 	}
 
-	public PointSymbolizerBuilder size(IFeatureFunction<Number> size) {
+	public PointSymbolizerBuilder<F> size(IFeatureFunction<F, Number> size) {
 		this.size = size;
 		return this;
 	}
 
-	public PointSymbolizerBuilder opacity(double opacity) {
+	public PointSymbolizerBuilder<F> opacity(double opacity) {
 		this.opacity = opacity;
 		return this;
 	}
 
-	public PointSymbolizerBuilder rotation(IFeatureFunction<Number> rotation) {
+	public PointSymbolizerBuilder<F> rotation(IFeatureFunction<F, Number> rotation) {
 		this.rotation = rotation;
 		return this;
 	}

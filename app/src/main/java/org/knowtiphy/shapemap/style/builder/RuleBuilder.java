@@ -7,10 +7,9 @@ package org.knowtiphy.shapemap.style.builder;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.geotools.api.feature.simple.SimpleFeature;
 import org.knowtiphy.shapemap.renderer.symbolizer.ISymbolizer;
 import org.knowtiphy.shapemap.renderer.symbolizer.TextSymbolizer;
-import org.knowtiphy.shapemap.renderer.symbolizer.basic.IFeatureFunction;
+import org.knowtiphy.shapemap.renderer.feature.IFeatureFunction;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.Rule;
 import org.locationtech.jts.geom.Geometry;
 
@@ -19,7 +18,7 @@ import org.locationtech.jts.geom.Geometry;
  */
 public class RuleBuilder {
 
-	private IFeatureFunction<Boolean> filter = RuleBuilder::defaultRuleFilter;
+	private IFeatureFunction<?, Boolean> filter = RuleBuilder::defaultRuleFilter;
 
 	private final List<ISymbolizer> graphicSymbolizers = new ArrayList<>();
 
@@ -43,7 +42,7 @@ public class RuleBuilder {
 		this.elseFilter = true;
 	}
 
-	private static boolean defaultRuleFilter(SimpleFeature feature, Geometry geom) {
+	private static <F> boolean defaultRuleFilter(F feature, Geometry geom) {
 		return true;
 	}
 

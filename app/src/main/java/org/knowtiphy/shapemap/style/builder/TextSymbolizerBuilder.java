@@ -9,16 +9,17 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import org.knowtiphy.shapemap.renderer.symbolizer.TextSymbolizer;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.FillInfo;
-import org.knowtiphy.shapemap.renderer.symbolizer.basic.IFeatureFunction;
+import org.knowtiphy.shapemap.renderer.feature.IFeature;
+import org.knowtiphy.shapemap.renderer.feature.IFeatureFunction;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.LabelPlacement;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.StrokeInfo;
 
 /**
  * @author graham
  */
-public class TextSymbolizerBuilder {
+public class TextSymbolizerBuilder<F extends IFeature> {
 
-	private IFeatureFunction<String> label = (f, g) -> null;
+	private IFeatureFunction<F, String> label = (f, g) -> null;
 
 	private Font font = Font.getDefault();
 
@@ -29,12 +30,12 @@ public class TextSymbolizerBuilder {
 
 	private LabelPlacement labelPlacement;
 
-	public TextSymbolizerBuilder font(Font font) {
+	public TextSymbolizerBuilder<F> font(Font font) {
 		this.font = font;
 		return this;
 	}
 
-	public TextSymbolizerBuilder label(IFeatureFunction<String> label) {
+	public TextSymbolizerBuilder<F> label(IFeatureFunction<F, String> label) {
 		this.label = label;
 		return this;
 	}

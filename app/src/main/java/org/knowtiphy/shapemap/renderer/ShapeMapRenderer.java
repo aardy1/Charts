@@ -12,22 +12,21 @@ import javafx.geometry.Rectangle2D;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.transform.Affine;
 import javafx.scene.transform.NonInvertibleTransformException;
-import org.geotools.api.feature.simple.SimpleFeature;
 import org.geotools.api.referencing.FactoryException;
 import org.geotools.api.referencing.operation.TransformException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.knowtiphy.shapemap.renderer.context.RendererContext;
+import org.knowtiphy.shapemap.renderer.feature.IFeature;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.Rule;
 import org.knowtiphy.shapemap.viewmodel.IMapViewModel;
-import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.index.quadtree.Quadtree;
 
 /**
  * @author graham
  */
-public class ShapeMapRenderer {
+public class ShapeMapRenderer<S, F extends IFeature> {
 
-	private final IMapViewModel map;
+	private final IMapViewModel<S, F> map;
 
 	private final RendererContext rendererContext;
 
@@ -93,7 +92,7 @@ public class ShapeMapRenderer {
 	}
 
 	private void renderGraphics(GraphicsRenderingContext context, boolean[] appliedRule, boolean[] layerNeedsTextLayout)
-			throws IOException {
+			throws Exception {
 
 		var layerPos = 0;
 		var rulePos = 0;
@@ -102,9 +101,9 @@ public class ShapeMapRenderer {
 			if (layer.isVisible()) {
 				var style = layer.getStyle();
 
-				try (var iterator = layer.getFeatures(map.viewPortBounds(), layer.isScaleLess()).features()) {
+				try (var iterator = layer.getFeatures(map.viewPortBounds(), layer.isScaleLess())) {
 					while (iterator.hasNext()) {
-						var feature = (SimpleFeature) iterator.next();
+						var feature = iterator.next();
 						layerNeedsTextLayout[layerPos] |= applyStyle(style, context, feature, appliedRule, rulePos);
 					}
 				}
@@ -118,7 +117,7 @@ public class ShapeMapRenderer {
 	}
 
 	private void renderText(GraphicsRenderingContext context, boolean[] appliedRule, boolean[] layerNeedsTextLayout)
-			throws IOException {
+			throws Exception {
 
 		var layerPos = 0;
 		var rulePos = 0;
@@ -127,9 +126,9 @@ public class ShapeMapRenderer {
 			// System.err.println("Layer " + layer.title() + " vis = " +
 			// layer.isVisible());
 			if (layerNeedsTextLayout[layerPos]) {
-				try (var iterator = layer.getFeatures(map.viewPortBounds(), true).features()) {
+				try (var iterator = layer.getFeatures(map.viewPortBounds(), true)) {
 					while (iterator.hasNext()) {
-						var feature = (SimpleFeature) iterator.next();
+						var feature = iterator.next();
 						var rp = rulePos;
 						for (var rule : layer.getStyle().rules()) {
 							if (appliedRule[rp]) {
@@ -148,11 +147,12 @@ public class ShapeMapRenderer {
 
 	}
 
-	private boolean applyStyle(FeatureTypeStyle style, GraphicsRenderingContext context, SimpleFeature feature,
+	private boolean applyStyle(FeatureTypeStyle<F> style, GraphicsRenderingContext context, F feature,
 			boolean[] appliedRule, int startPos) {
 
 		var appliedSomeRule = false;
-		if (style.applies(feature)) {
+		// if (style.applies(feature))
+		{
 
 			var rulePos = startPos;
 			var elsePos = -1;
@@ -180,10 +180,10 @@ public class ShapeMapRenderer {
 		return appliedSomeRule;
 	}
 
-	private boolean applyGraphicsRule(Rule rule, GraphicsRenderingContext context, SimpleFeature feature) {
+	private boolean applyGraphicsRule(Rule<F> rule, GraphicsRenderingContext context, F feature) {
 
 		if (rule.filter() != null) {
-			if (rule.filter().apply(feature, (Geometry) feature.getDefaultGeometry())) {
+			if (rule.filter().apply(feature, feature.getDefaultGeometry())) {
 				for (var symbolizer : rule.graphicSymbolizers()) {
 					symbolizer.render(context, feature);
 				}
@@ -195,9 +195,9 @@ public class ShapeMapRenderer {
 		return false;
 	}
 
-	private void applyTextRule(Rule rule, GraphicsRenderingContext context, SimpleFeature feature) {
+	private void applyTextRule(Rule<F> rule, GraphicsRenderingContext context, F feature) {
 
-		if (rule.filter().apply(feature, (Geometry) feature.getDefaultGeometry())) {
+		if (rule.filter().apply(feature, feature.getDefaultGeometry())) {
 			for (var symbolizer : rule.textSymbolizers()) {
 				symbolizer.render(context, feature);
 

@@ -18,12 +18,15 @@ import org.geotools.data.store.ContentFeatureSource;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.knowtiphy.charts.enc.ENCChart;
 import org.knowtiphy.charts.ontology.S57;
+import org.knowtiphy.shapemap.renderer.feature.IFeatureSource;
+import org.knowtiphy.shapemap.renderer.feature.IFeatureSourceIterator;
 import org.locationtech.jts.index.strtree.STRtree;
 
 /**
  * @author graham
  */
-public class MemStoreFeatureSource extends ContentFeatureSource {
+public class MemStoreFeatureSource extends ContentFeatureSource
+		implements IFeatureSource<SimpleFeatureType, MemFeature> {
 
 	private final ENCChart map;
 
@@ -86,6 +89,73 @@ public class MemStoreFeatureSource extends ContentFeatureSource {
 			// " + featuresInScale.size()
 			// + " : " + ebounds + " millis");
 		}
+
+		return null;
+		// return new MemStoreFeatureReader(getState(), featureType,
+		// featuresInScale.iterator());
+	}
+
+	public IFeatureSourceIterator<SimpleFeatureType, MemFeature> getFeatures(ReferencedEnvelope bounds,
+			boolean scaleLess) {
+
+		Collection<MemFeature> featuresInScale;
+
+		var ebounds = System.currentTimeMillis();
+		var featuresInBounds = (List<MemFeature>) featureIndex.query(bounds);
+		ebounds = System.currentTimeMillis() - ebounds;
+
+		var sbounds = System.currentTimeMillis();
+
+		var currentScale = map.currentScale();
+
+		featuresInScale = new ArrayList<>();
+		for (var feature : featuresInBounds) {
+			var featureMinScale = feature.getAttribute(S57.AT_SCAMIN);
+			if (scaleLess || featureMinScale == null || (int) featureMinScale >= currentScale) {
+				featuresInScale.add(feature);
+			}
+		}
+
+		sbounds = System.currentTimeMillis() - sbounds;
+
+		// System.err.println("Source " + featureType.getTypeName() + ", #In Bounds =
+		// " + featuresInBounds.size()
+		// + " : " + ebounds + " millis, #In Scale = " + featuresInScale.size() + " :
+		// " + sbounds
+		// + " millis, current scale = " + currentScale + ", scaleLess = " +
+		// scaleLess);
+
+		return new MemStoreFeatureReader(getState(), featureType, featuresInScale.iterator());
+	}
+
+	public IFeatureSourceIterator<SimpleFeatureType, MemFeature> features() {
+
+		Collection<MemFeature> featuresInScale;
+
+		var ebounds = System.currentTimeMillis();
+		var featuresInBounds = (List<MemFeature>) featureIndex.itemsTree();
+		ebounds = System.currentTimeMillis() - ebounds;
+
+		var sbounds = System.currentTimeMillis();
+
+		var currentScale = map.currentScale();
+
+		featuresInScale = new ArrayList<>();
+		for (var feature : featuresInBounds) {
+			var featureMinScale = feature.getAttribute(S57.AT_SCAMIN);
+			if (featureMinScale == null || (int) featureMinScale >= currentScale) {
+				featuresInScale.add(feature);
+			}
+		}
+
+		sbounds = System.currentTimeMillis() - sbounds;
+
+		// System.err.println("Source " + featureType.getTypeName() + ", #In Bounds =
+		// " + featuresInBounds.size()
+		// + " : " + ebounds + " millis, #In Scale = " + featuresInScale.size() + " :
+		// " + sbounds
+		// + " millis, current scale = " + currentScale + ", scaleLess = " +
+		// scaleLess);
 
 		return new MemStoreFeatureReader(getState(), featureType, featuresInScale.iterator());
 	}

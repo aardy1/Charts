@@ -91,7 +91,7 @@ public class Fill {
 				// TODO -- recurses wrong, fix
 				for (int i = 0; i < geom.getNumGeometries(); i++) {
 					fill(context, geom.getGeometryN(i));
-				} // recurse(context, geom);
+				}
 			}
 		}
 	}

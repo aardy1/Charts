@@ -5,44 +5,44 @@
 
 package org.knowtiphy.shapemap.renderer.symbolizer;
 
-import org.geotools.api.feature.simple.SimpleFeature;
 import org.knowtiphy.shapemap.renderer.GraphicsRenderingContext;
 import org.knowtiphy.shapemap.renderer.graphics.DrawPoint;
-import org.knowtiphy.shapemap.renderer.symbolizer.basic.IFeatureFunction;
+import org.knowtiphy.shapemap.renderer.feature.IFeature;
+import org.knowtiphy.shapemap.renderer.feature.IFeatureFunction;
 import org.knowtiphy.shapemap.renderer.symbolizer.mark.IMarkSymbolizer;
 import org.locationtech.jts.geom.Geometry;
 
 /**
  * @author graham
  */
-public class PointSymbolizer implements ISymbolizer {
+public class PointSymbolizer<F extends IFeature> implements ISymbolizer<F> {
 
-	private final IMarkSymbolizer markSymbolizer;
+	private final IMarkSymbolizer<F> markSymbolizer;
 
-	private final IFeatureFunction<Number> size;
+	private final IFeatureFunction<F, Number> size;
 
-	private final IFeatureFunction<Number> rotation;
+	private final IFeatureFunction<F, Number> rotation;
 
 	private final double opacity;
 
-	public PointSymbolizer(IMarkSymbolizer markSymbolizer, IFeatureFunction<Number> size, double opacity,
-			IFeatureFunction<Number> rotation) {
+	public PointSymbolizer(IMarkSymbolizer markSymbolizer, IFeatureFunction<F, Number> size, double opacity,
+			IFeatureFunction<F, Number> rotation) {
 		this.markSymbolizer = markSymbolizer;
 		this.size = size;
 		this.opacity = opacity;
 		this.rotation = rotation;
 	}
 
-	public IFeatureFunction<Number> size() {
+	public IFeatureFunction<F, Number> size() {
 		return size;
 	}
 
-	public IFeatureFunction<Number> rotation() {
+	public IFeatureFunction<F, Number> rotation() {
 		return rotation;
 	}
 
 	@Override
-	public void render(GraphicsRenderingContext context, SimpleFeature feature) {
+	public void render(GraphicsRenderingContext context, F feature) {
 
 		DrawPoint.setup(context, opacity);
 		var geom = (Geometry) feature.getDefaultGeometry();

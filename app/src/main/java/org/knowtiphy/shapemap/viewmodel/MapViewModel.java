@@ -13,23 +13,24 @@ import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.knowtiphy.charts.ontology.S57;
 import org.knowtiphy.shapemap.renderer.context.ISVGProvider;
 import org.knowtiphy.shapemap.renderer.context.RenderGeomCache;
+import org.knowtiphy.shapemap.renderer.feature.IFeature;
 import org.reactfx.Change;
 import org.reactfx.EventSource;
 
-public class MapViewModel implements IMapViewModel {
+public class MapViewModel<S, F extends IFeature> implements IMapViewModel<S, F> {
 
 	private final EventSource<Change<Boolean>> layerVisibilityEvent = new EventSource<>();
 
 	private final EventSource<Change<ReferencedEnvelope>> viewPortBoundsEvent = new EventSource<>();
 
 	// TODO -- need to unsubscibe?
-	public final EventSource<Change<IMapViewModel>> newMapEvent = new EventSource<>();
+	private final EventSource<Change<IMapViewModel<S, F>>> newMapEvent = new EventSource<>();
 
 	private final ReferencedEnvelope bounds;
 
 	private final MapDisplayOptions displayOptions;
 
-	private final Map<String, MapLayer> layers = new LinkedHashMap<>();
+	private final Map<String, MapLayer<S, F>> layers = new LinkedHashMap<>();
 
 	private final String title;
 
@@ -60,14 +61,15 @@ public class MapViewModel implements IMapViewModel {
 		displayOptions.showWreckEvents.subscribe(change -> setLayerVisible(change, S57.OC_WRECKS));
 	}
 
-	public void addLayer(MapLayer layer) throws TransformException, FactoryException, NonInvertibleTransformException {
+	public void addLayer(MapLayer<S, F> layer)
+			throws TransformException, FactoryException, NonInvertibleTransformException {
 		layers.put(layer.getFeatureSource().getSchema().getTypeName(), layer);
 		totalRuleCount += layer.getStyle().rules().size();
 		checkViewportCRS();
 	}
 
 	@Override
-	public Collection<MapLayer> layers() {
+	public Collection<MapLayer<S, F>> layers() {
 		return layers.values();
 	}
 
@@ -99,7 +101,7 @@ public class MapViewModel implements IMapViewModel {
 	}
 
 	@Override
-	public EventSource<Change<IMapViewModel>> newMapEvent() {
+	public EventSource<Change<IMapViewModel<S, F>>> newMapEvent() {
 		return newMapEvent;
 	}
 
@@ -111,7 +113,7 @@ public class MapViewModel implements IMapViewModel {
 		this.viewport = viewport;
 	}
 
-	public MapLayer layer(String type) {
+	public MapLayer<S, F> layer(String type) {
 		return layers.get(type);
 	}
 

@@ -5,11 +5,10 @@
 
 package org.knowtiphy.shapemap.style.builder;
 
-import org.knowtiphy.shapemap.renderer.FeatureTypeStyle;
-import org.knowtiphy.shapemap.renderer.symbolizer.basic.Rule;
 import java.util.ArrayList;
 import java.util.List;
-import org.knowtiphy.shapemap.style.*;
+import org.knowtiphy.shapemap.renderer.FeatureTypeStyle;
+import org.knowtiphy.shapemap.renderer.symbolizer.basic.Rule;
 
 /**
  * @author graham

@@ -29,8 +29,6 @@ import org.knowtiphy.shapemap.renderer.ShapeMapRenderer;
 import org.knowtiphy.shapemap.viewmodel.MapDisplayOptions;
 import org.reactfx.Subscription;
 
-import static org.knowtiphy.charts.geotools.Coordinates.distanceAcross;
-
 /**
  * @author graham
  */
@@ -143,14 +141,16 @@ public class InfoBar extends StackPane {
 
 	private void showVariableChartInfo() {
 
-		var envelope = chart.viewPortBounds();
-		var mapWidth = distanceAcross(envelope) / 1000;
-		// currentExtent.setText(unitProfile.envelopeLabel(envelope));
-		currentMapSpan
-				.setText(Coordinates.twoDec(unitProfile.convertDistance(mapWidth)) + " " + unitProfile.distanceUnit);
-		currentScreenToWorld.setText("1" + unitProfile.screenUnit + " : "
-				+ Coordinates.twoDec(unitProfile.convertFromScreenUnit(mapWidth / platform.windowWidthCM(this)))
-				+ unitProfile.distanceUnit);
+		// var envelope = chart.viewPortBounds();
+		// var mapWidth = distanceAcross(envelope) / 1000;
+		// // currentExtent.setText(unitProfile.envelopeLabel(envelope));
+		// currentMapSpan
+		// .setText(Coordinates.twoDec(unitProfile.convertDistance(mapWidth)) + " " +
+		// unitProfile.distanceUnit);
+		// currentScreenToWorld.setText("1" + unitProfile.screenUnit + " : "
+		// + Coordinates.twoDec(unitProfile.convertFromScreenUnit(mapWidth /
+		// platform.windowWidthCM(this)))
+		// + unitProfile.distanceUnit);
 
 		// currentZoomLevel.setText(Coordinates.twoDec(chart.getZoomFactor()) + "");
 	}

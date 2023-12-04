@@ -5,14 +5,13 @@
 
 package org.knowtiphy.shapemap.renderer.symbolizer;
 
-import org.geotools.api.feature.simple.SimpleFeature;
 import org.knowtiphy.shapemap.renderer.GraphicsRenderingContext;
 
 /**
  * @author graham
  */
-public interface ISymbolizer {
+public interface ISymbolizer<F> {
 
-	void render(GraphicsRenderingContext context, SimpleFeature feature);
+	void render(GraphicsRenderingContext context, F feature);
 
 }

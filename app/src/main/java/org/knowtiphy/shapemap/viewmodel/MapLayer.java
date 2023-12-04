@@ -1,15 +1,13 @@
 package org.knowtiphy.shapemap.viewmodel;
 
 import java.io.IOException;
-import org.geotools.api.data.FeatureSource;
-import org.geotools.api.feature.simple.SimpleFeature;
-import org.geotools.api.feature.simple.SimpleFeatureType;
-import org.geotools.feature.FeatureCollection;
 import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.knowtiphy.charts.memstore.MemStoreQuery;
 import org.knowtiphy.shapemap.renderer.FeatureTypeStyle;
+import org.knowtiphy.shapemap.renderer.feature.IFeature;
+import org.knowtiphy.shapemap.renderer.feature.IFeatureSource;
+import org.knowtiphy.shapemap.renderer.feature.IFeatureSourceIterator;
 
-public class MapLayer {
+public class MapLayer<S, F extends IFeature> {
 
 	private final String title;
 
@@ -17,12 +15,12 @@ public class MapLayer {
 
 	private final boolean scaleLess;
 
-	private final FeatureSource<SimpleFeatureType, SimpleFeature> featureSource;
+	private final IFeatureSource<S, F> featureSource;
 
-	private final FeatureTypeStyle style;
+	private final FeatureTypeStyle<F> style;
 
-	public MapLayer(String title, FeatureSource<SimpleFeatureType, SimpleFeature> featureSource, FeatureTypeStyle style,
-			boolean visible, boolean scaleLess) {
+	public MapLayer(String title, IFeatureSource<S, F> featureSource, FeatureTypeStyle<F> style, boolean visible,
+			boolean scaleLess) {
 
 		this.title = title;
 		this.featureSource = featureSource;
@@ -35,7 +33,7 @@ public class MapLayer {
 		return title;
 	}
 
-	public FeatureTypeStyle getStyle() {
+	public FeatureTypeStyle<F> getStyle() {
 		return style;
 	}
 
@@ -60,13 +58,12 @@ public class MapLayer {
 		return scaleLess;
 	}
 
-	public FeatureSource<SimpleFeatureType, SimpleFeature> getFeatureSource() {
+	public IFeatureSource<S, F> getFeatureSource() {
 		return featureSource;
 	}
 
-	public FeatureCollection<SimpleFeatureType, SimpleFeature> getFeatures(ReferencedEnvelope bounds, boolean scaleLess)
-			throws IOException {
-		return getFeatureSource().getFeatures(new MemStoreQuery(bounds, scaleLess));
+	public IFeatureSourceIterator<S, F> getFeatures(ReferencedEnvelope bounds, boolean scaleLess) throws IOException {
+		return getFeatureSource().getFeatures(bounds, scaleLess);
 	}
 
 	@Override
