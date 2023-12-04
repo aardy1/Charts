@@ -19,6 +19,7 @@ import org.geotools.feature.NameImpl;
 import org.geotools.feature.type.GeometryDescriptorImpl;
 import org.geotools.feature.type.GeometryTypeImpl;
 import org.knowtiphy.charts.memstore.ExtraAttributes;
+import org.knowtiphy.charts.memstore.MemFeature;
 import org.knowtiphy.charts.memstore.MemStore;
 import org.knowtiphy.charts.memstore.StyleReader;
 import org.knowtiphy.charts.ontology.S57;
@@ -168,12 +169,13 @@ public class ChartBuilder {
 
 		try (var coll = featureSource.getFeatures().features()) {
 			while (coll.hasNext()) {
-				var feature = coll.next();
+				var geoFeature = coll.next();
+
 				// clearFeature(feature);
 				if (type == null)
-					type = feature.getFeatureType();
+					type = geoFeature.getFeatureType();
 
-				var geom = (Geometry) feature.getDefaultGeometry();
+				var geom = (Geometry) geoFeature.getDefaultGeometry();
 
 				var geomType = geom.getGeometryType();
 				// switch (geomType) {
@@ -191,7 +193,10 @@ public class ChartBuilder {
 				// }
 				// }
 				// default -> {
-				ExtraAttributes.setGeomType(feature);
+				ExtraAttributes.setGeomType(geoFeature);
+				var gt = ExtraAttributes.setGeomType(geom);
+				var feature = new MemFeature(geoFeature.getAttributes(), geoFeature.getFeatureType(),
+						geoFeature.getIdentifier(), gt);
 				index.insert(geom.getEnvelopeInternal(), feature);
 				// }
 				// }

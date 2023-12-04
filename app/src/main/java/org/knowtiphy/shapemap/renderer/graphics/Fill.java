@@ -6,6 +6,7 @@
 package org.knowtiphy.shapemap.renderer.graphics;
 
 import org.geotools.geometry.jts.JTS;
+import org.knowtiphy.charts.memstore.GeomType;
 import org.knowtiphy.shapemap.renderer.GraphicsRenderingContext;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.FillInfo;
 import org.locationtech.jts.geom.Geometry;
@@ -58,6 +59,36 @@ public class Fill {
 				}
 			}
 			default -> {
+				for (int i = 0; i < geom.getNumGeometries(); i++) {
+					fill(context, geom.getGeometryN(i));
+				} // recurse(context, geom);
+			}
+		}
+	}
+
+	public static void fill(GraphicsRenderingContext context, Geometry geom, GeomType geomType) {
+
+		switch (geomType) {
+			case POINT -> fillPoint(context, (Point) geom);
+			case LINE_STRING, LINEAR_RING -> fillLineString(context, (LineString) geom);
+			case POLYGON -> fillPolygon(context, (Polygon) geom);
+			case MULTI_POINT -> {
+				for (int i = 0; i < geom.getNumGeometries(); i++) {
+					fillPoint(context, (Point) geom.getGeometryN(i));
+				}
+			}
+			case MULTI_LINE_STRING -> {
+				for (int i = 0; i < geom.getNumGeometries(); i++) {
+					fillLineString(context, (LineString) geom.getGeometryN(i));
+				}
+			}
+			case MULTI_POLYGON -> {
+				for (int i = 0; i < geom.getNumGeometries(); i++) {
+					fillPolygon(context, (Polygon) geom.getGeometryN(i));
+				}
+			}
+			default -> {
+				// TODO -- recurses wrong, fix
 				for (int i = 0; i < geom.getNumGeometries(); i++) {
 					fill(context, geom.getGeometryN(i));
 				} // recurse(context, geom);

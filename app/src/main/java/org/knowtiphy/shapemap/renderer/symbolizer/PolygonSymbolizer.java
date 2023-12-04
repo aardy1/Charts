@@ -6,6 +6,7 @@
 package org.knowtiphy.shapemap.renderer.symbolizer;
 
 import org.geotools.api.feature.simple.SimpleFeature;
+import org.knowtiphy.charts.memstore.MemFeature;
 import org.knowtiphy.shapemap.renderer.GraphicsRenderingContext;
 import org.knowtiphy.shapemap.renderer.graphics.Fill;
 import org.knowtiphy.shapemap.renderer.graphics.Stroke;
@@ -32,12 +33,12 @@ public class PolygonSymbolizer implements ISymbolizer {
 
 		if (fillInfo != null) {
 			Fill.setup(context, fillInfo);
-			Fill.fill(context, (Geometry) feature.getDefaultGeometry());
+			Fill.fill(context, (Geometry) feature.getDefaultGeometry(), ((MemFeature) feature).geomType());
 		}
 
 		if (strokeInfo != null) {
 			Stroke.setup(context, strokeInfo);
-			Stroke.stroke(context, (Geometry) feature.getDefaultGeometry());
+			Stroke.stroke(context, (Geometry) feature.getDefaultGeometry(), ((MemFeature) feature).geomType());
 		}
 	}
 

@@ -5,6 +5,7 @@
 
 package org.knowtiphy.shapemap.renderer.graphics;
 
+import org.knowtiphy.charts.memstore.GeomType;
 import org.knowtiphy.shapemap.renderer.GraphicsRenderingContext;
 import org.knowtiphy.shapemap.renderer.Transformation;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.StrokeInfo;
@@ -12,6 +13,14 @@ import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.Polygon;
+
+import static org.knowtiphy.charts.memstore.GeomType.LINEAR_RING;
+import static org.knowtiphy.charts.memstore.GeomType.LINE_STRING;
+import static org.knowtiphy.charts.memstore.GeomType.MULTI_LINE_STRING;
+import static org.knowtiphy.charts.memstore.GeomType.MULTI_POINT;
+import static org.knowtiphy.charts.memstore.GeomType.MULTI_POLYGON;
+import static org.knowtiphy.charts.memstore.GeomType.POINT;
+import static org.knowtiphy.charts.memstore.GeomType.POLYGON;
 
 public class Stroke {
 
@@ -61,6 +70,38 @@ public class Stroke {
 				}
 			}
 			default -> {
+				for (var i = 0; i < geom.getNumGeometries(); i++) {
+					stroke(context, geom.getGeometryN(i));
+				}
+			}
+		}
+	}
+
+	public static void stroke(GraphicsRenderingContext context, Geometry geom, GeomType geomType) {
+
+		// TODO -- switch on strings is brain dead
+		switch (geomType) {
+			case POINT -> strokePoint(context, (Point) geom);
+			case LINE_STRING -> strokeLineString(context, (LineString) geom);
+			case LINEAR_RING -> strokeLineString(context, (LineString) geom);
+			case POLYGON -> strokePolygon(context, (Polygon) geom);
+			case MULTI_POINT -> {
+				for (var i = 0; i < geom.getNumGeometries(); i++) {
+					strokePoint(context, (Point) geom.getGeometryN(i));
+				}
+			}
+			case MULTI_LINE_STRING -> {
+				for (var i = 0; i < geom.getNumGeometries(); i++) {
+					strokeLineString(context, (LineString) geom.getGeometryN(i));
+				}
+			}
+			case MULTI_POLYGON -> {
+				for (var i = 0; i < geom.getNumGeometries(); i++) {
+					strokePolygon(context, (Polygon) geom.getGeometryN(i));
+				}
+			}
+			default -> {
+				// TODO -- this is wrong, fix
 				for (var i = 0; i < geom.getNumGeometries(); i++) {
 					stroke(context, geom.getGeometryN(i));
 				}
