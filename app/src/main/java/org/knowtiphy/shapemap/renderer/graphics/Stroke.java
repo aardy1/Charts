@@ -42,13 +42,29 @@ public class Stroke {
 		// TODO -- switch on strings is brain dead
 		switch (geom.getGeometryType()) {
 			case Geometry.TYPENAME_POINT -> strokePoint(context, (Point) geom);
-			case Geometry.TYPENAME_LINESTRING -> strokeLineStringSVG(context, (LineString) geom);
-			case Geometry.TYPENAME_LINEARRING -> strokeLineStringSVG(context, (LineString) geom);
+			case Geometry.TYPENAME_LINESTRING -> strokeLineString(context, (LineString) geom);
+			case Geometry.TYPENAME_LINEARRING -> strokeLineString(context, (LineString) geom);
 			case Geometry.TYPENAME_POLYGON -> strokePolygon(context, (Polygon) geom);
-			case Geometry.TYPENAME_MULTIPOINT, Geometry.TYPENAME_MULTILINESTRING, Geometry.TYPENAME_MULTIPOLYGON,
-					Geometry.TYPENAME_GEOMETRYCOLLECTION ->
-				recurse(context, geom);
-			default -> throw new IllegalArgumentException(geom.getGeometryType());
+			case Geometry.TYPENAME_MULTIPOINT -> {
+				for (var i = 0; i < geom.getNumGeometries(); i++) {
+					strokePoint(context, (Point) geom.getGeometryN(i));
+				}
+			}
+			case Geometry.TYPENAME_MULTILINESTRING -> {
+				for (var i = 0; i < geom.getNumGeometries(); i++) {
+					strokeLineString(context, (LineString) geom.getGeometryN(i));
+				}
+			}
+			case Geometry.TYPENAME_MULTIPOLYGON -> {
+				for (var i = 0; i < geom.getNumGeometries(); i++) {
+					strokePolygon(context, (Polygon) geom.getGeometryN(i));
+				}
+			}
+			default -> {
+				for (var i = 0; i < geom.getNumGeometries(); i++) {
+					stroke(context, geom.getGeometryN(i));
+				}
+			}
 		}
 	}
 
@@ -56,6 +72,7 @@ public class Stroke {
 		context.graphicsContext().strokeOval(point.getX(), point.getY(), context.onePixelX(), context.onePixelY());
 	}
 
+	// line width calculated from pixels per world x-coordinate
 	private static void strokeLineString(GraphicsRenderingContext context, LineString lineString) {
 		var tx = context.worldToScreen();
 		tx.copyCoordinatesG(lineString);
@@ -78,6 +95,7 @@ public class Stroke {
 		}
 		var foo = gc.getTransform();
 		gc.setTransform(Transformation.IDENTITY);
+		// TODO -- fix this
 		gc.setLineWidth(1);
 		gc.stroke();
 		gc.setTransform(foo);
@@ -92,10 +110,10 @@ public class Stroke {
 
 	// this is only necessary because I am not sure if a multi-X, can contain another
 	// multi-X, or just X's
-	private static void recurse(GraphicsRenderingContext context, Geometry geom) {
-		for (var i = 0; i < geom.getNumGeometries(); i++) {
-			stroke(context, geom.getGeometryN(i));
-		}
-	}
+	// private static void recurse(GraphicsRenderingContext context, Geometry geom) {
+	// for (var i = 0; i < geom.getNumGeometries(); i++) {
+	// stroke(context, geom.getGeometryN(i));
+	// }
+	// }
 
 }

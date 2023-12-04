@@ -42,9 +42,26 @@ public class Fill {
 			case Geometry.TYPENAME_LINESTRING, Geometry.TYPENAME_LINEARRING ->
 				fillLineString(context, (LineString) geom);
 			case Geometry.TYPENAME_POLYGON -> fillPolygon(context, (Polygon) geom);
-			case Geometry.TYPENAME_MULTIPOINT, Geometry.TYPENAME_MULTILINESTRING, Geometry.TYPENAME_MULTIPOLYGON ->
-				recurse(context, geom);
-			default -> throw new IllegalArgumentException(geom.getGeometryType());
+			case Geometry.TYPENAME_MULTIPOINT -> {
+				for (int i = 0; i < geom.getNumGeometries(); i++) {
+					fillPoint(context, (Point) geom.getGeometryN(i));
+				}
+			}
+			case Geometry.TYPENAME_MULTILINESTRING -> {
+				for (int i = 0; i < geom.getNumGeometries(); i++) {
+					fillLineString(context, (LineString) geom.getGeometryN(i));
+				}
+			}
+			case Geometry.TYPENAME_MULTIPOLYGON -> {
+				for (int i = 0; i < geom.getNumGeometries(); i++) {
+					fillPolygon(context, (Polygon) geom.getGeometryN(i));
+				}
+			}
+			default -> {
+				for (int i = 0; i < geom.getNumGeometries(); i++) {
+					fill(context, geom.getGeometryN(i));
+				} // recurse(context, geom);
+			}
 		}
 	}
 
@@ -74,10 +91,10 @@ public class Fill {
 	}
 
 	// only necessary if a multi-X, can contain another multi-X, rather than just X's
-	private static void recurse(GraphicsRenderingContext context, Geometry geom) {
-		for (int i = 0; i < geom.getNumGeometries(); i++) {
-			fill(context, geom.getGeometryN(i));
-		}
-	}
+	// private static void recurse(GraphicsRenderingContext context, Geometry geom) {
+	// for (int i = 0; i < geom.getNumGeometries(); i++) {
+	// fill(context, geom.getGeometryN(i));
+	// }
+	// }
 
 }

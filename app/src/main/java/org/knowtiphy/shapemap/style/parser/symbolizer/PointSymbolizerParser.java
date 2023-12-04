@@ -9,6 +9,7 @@ import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
 import org.knowtiphy.shapemap.renderer.symbolizer.ISymbolizer;
 import org.knowtiphy.shapemap.style.builder.PointSymbolizerBuilder;
+import org.knowtiphy.shapemap.style.parser.IParsingContext;
 import org.knowtiphy.shapemap.style.parser.StyleSyntaxException;
 import org.knowtiphy.shapemap.style.parser.Utils;
 import org.knowtiphy.shapemap.style.parser.VendorOptionParser;
@@ -22,7 +23,8 @@ import static org.knowtiphy.shapemap.style.parser.Utils.normalize;
  */
 public class PointSymbolizerParser {
 
-	public static ISymbolizer parse(XMLEventReader reader) throws XMLStreamException, StyleSyntaxException {
+	public static ISymbolizer parse(IParsingContext parsingContext, XMLEventReader reader)
+			throws XMLStreamException, StyleSyntaxException {
 
 		var builder = new PointSymbolizerBuilder();
 
@@ -39,11 +41,11 @@ public class PointSymbolizerParser {
 						// ignore
 					}
 					case XML.MARK -> builder.markSymbolizer(MarkSymbolizerParser.parse(reader));
-					case XML.SIZE ->
-						builder.size(ExpressionParser.parseOrLiteral(reader, XML.SIZE, Utils::parseDouble));
+					case XML.SIZE -> builder.size(
+							ExpressionParser.parseOrLiteral(parsingContext, reader, XML.SIZE, Utils::parseDouble));
 					case XML.OPACITY -> builder.opacity(Utils.parseDouble(reader.nextEvent()));
-					case XML.ROTATION ->
-						builder.rotation(ExpressionParser.parseOrLiteral(reader, XML.ROTATION, Utils::parseDouble));
+					case XML.ROTATION -> builder.rotation(
+							ExpressionParser.parseOrLiteral(parsingContext, reader, XML.ROTATION, Utils::parseDouble));
 					case XML.VENDOR_OPTION -> VendorOptionParser.parse(reader);
 					default -> throw new IllegalArgumentException(startElement.toString());
 				}

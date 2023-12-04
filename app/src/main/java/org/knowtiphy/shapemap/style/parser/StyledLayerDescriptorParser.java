@@ -21,8 +21,11 @@ public class StyledLayerDescriptorParser {
 
 	private final InputStream input;
 
-	public StyledLayerDescriptorParser(InputStream input) {
+	private final IParsingContext parsingContext;
+
+	public StyledLayerDescriptorParser(InputStream input, IParsingContext parsingContext) {
 		this.input = input;
+		this.parsingContext = parsingContext;
 	}
 
 	public FeatureTypeStyle read() throws FileNotFoundException, XMLStreamException, StyleSyntaxException {
@@ -44,7 +47,7 @@ public class StyledLayerDescriptorParser {
 					}
 					case XML.VENDOR_OPTION -> VendorOptionParser.parse(reader);
 					case XML.FEATURE_TYPE_NAME -> builder.featureType(Utils.parseString(reader.nextEvent()));
-					case XML.RULE -> builder.rule(RuleParser.parse(reader));
+					case XML.RULE -> builder.rule(RuleParser.parse(parsingContext, reader));
 					default -> throw new IllegalArgumentException(startElement.toString());
 				}
 			}

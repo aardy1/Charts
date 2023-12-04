@@ -23,7 +23,7 @@ import static org.knowtiphy.shapemap.style.parser.Utils.normalize;
  */
 public class RuleParser {
 
-	public static Rule parse(XMLEventReader reader)
+	public static Rule parse(IParsingContext parsingContext, XMLEventReader reader)
 			throws FileNotFoundException, XMLStreamException, StyleSyntaxException {
 
 		var builder = new RuleBuilder();
@@ -35,11 +35,13 @@ public class RuleParser {
 			if (nextEvent.isStartElement()) {
 				var startElement = nextEvent.asStartElement();
 				switch (normalize(startElement)) {
-					case XML.FILTER -> builder.filter(ExpressionParser.parse(reader, XML.FILTER));
-					case XML.POINT_SYMBOLIZER -> builder.graphicSymbolizer(PointSymbolizerParser.parse(reader));
+					case XML.FILTER -> builder.filter(ExpressionParser.parse(parsingContext, reader, XML.FILTER));
+					case XML.POINT_SYMBOLIZER ->
+						builder.graphicSymbolizer(PointSymbolizerParser.parse(parsingContext, reader));
 					case XML.LINE_SYMBOLIZER -> builder.graphicSymbolizer(LineSymbolizerParser.parse(reader));
 					case XML.POLYGON_SYMBOLIZER -> builder.graphicSymbolizer(PolygonSymbolizerParser.parse(reader));
-					case XML.TEXT_SYMBOLIZER -> builder.textSymbolizer(TextSymbolizerParser.parse(reader));
+					case XML.TEXT_SYMBOLIZER ->
+						builder.textSymbolizer(TextSymbolizerParser.parse(parsingContext, reader));
 					case XML.ELSE_FILTER -> builder.elseFilter();
 					default -> throw new IllegalArgumentException(startElement.toString());
 				}

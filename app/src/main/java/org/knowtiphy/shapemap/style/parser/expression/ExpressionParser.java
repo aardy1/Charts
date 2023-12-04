@@ -16,6 +16,7 @@ import javax.xml.stream.events.XMLEvent;
 import org.knowtiphy.shapemap.renderer.Functions;
 import org.knowtiphy.shapemap.renderer.Operators;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.IFeatureFunction;
+import org.knowtiphy.shapemap.style.parser.IParsingContext;
 import org.knowtiphy.shapemap.style.parser.Utils;
 
 import static org.knowtiphy.shapemap.style.parser.Utils.normalize;
@@ -26,7 +27,8 @@ import static org.knowtiphy.shapemap.style.parser.Utils.normalizeKey;
  */
 public class ExpressionParser {
 
-	public static IFeatureFunction<?> parse(XMLEventReader reader, String finishTag) throws XMLStreamException {
+	public static IFeatureFunction<?> parse(IParsingContext parsingContext, XMLEventReader reader, String finishTag)
+			throws XMLStreamException {
 
 		var stack = new LinkedList<LinkedList<IFeatureFunction<?>>>();
 		startFrame(stack);
@@ -48,8 +50,10 @@ public class ExpressionParser {
 						var name = Utils.parseString(reader.nextEvent());
 						if (name.equals("the_geom"))
 							push(stack, (feature, geom) -> geom);
-						else
-							push(stack, (feature, geom) -> feature.getProperty(name).getValue());
+						else {
+							var propertyAccess = parsingContext.compilePropertyAccess(name);
+							push(stack, propertyAccess);
+						}
 					}
 					case org.knowtiphy.shapemap.style.parser.XML.FUNCTION -> {
 						startFrame(stack);
@@ -108,8 +112,8 @@ public class ExpressionParser {
 		return endFrame(stack).pop();
 	}
 
-	public static <T> IFeatureFunction<T> parseOrLiteral(XMLEventReader reader, String finishTag,
-			Function<XMLEvent, T> literalParser) throws XMLStreamException {
+	public static <T> IFeatureFunction<T> parseOrLiteral(IParsingContext parsingContext, XMLEventReader reader,
+			String finishTag, Function<XMLEvent, T> literalParser) throws XMLStreamException {
 
 		// this is a bit hacky
 		try {
@@ -118,7 +122,7 @@ public class ExpressionParser {
 			return (f, g) -> value;
 		}
 		catch (NumberFormatException ex) {
-			return (IFeatureFunction<T>) parse(reader, finishTag);
+			return (IFeatureFunction<T>) parse(parsingContext, reader, finishTag);
 		}
 	}
 
