@@ -12,8 +12,8 @@ import org.geotools.api.feature.simple.SimpleFeatureType;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.knowtiphy.charts.enc.ENCChart;
 import org.knowtiphy.charts.ontology.S57;
-import shapemap.renderer.api.IFeatureSource;
-import shapemap.renderer.api.IFeatureSourceIterator;
+import org.knowtiphy.shapemap.renderer.api.IFeatureSource;
+import org.knowtiphy.shapemap.renderer.api.IFeatureSourceIterator;
 import org.locationtech.jts.index.strtree.STRtree;
 
 /**

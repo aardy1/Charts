@@ -14,9 +14,9 @@ import org.geotools.api.referencing.crs.GeographicCRS;
 import org.geotools.api.referencing.operation.TransformException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
-import shapemap.renderer.RendererUtilities;
-import shapemap.renderer.Transformation;
-import shapemap.model.MapViewModel;
+import org.knowtiphy.shapemap.model.MapViewModel;
+import org.knowtiphy.shapemap.renderer.RendererUtilities;
+import org.knowtiphy.shapemap.renderer.Transformation;
 import si.uom.SI;
 
 /**

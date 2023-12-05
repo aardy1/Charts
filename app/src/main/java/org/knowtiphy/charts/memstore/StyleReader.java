@@ -3,11 +3,11 @@ package org.knowtiphy.charts.memstore;
 import java.io.IOException;
 import java.io.InputStream;
 import javax.xml.stream.XMLStreamException;
-import shapemap.renderer.FeatureTypeStyle;
-import shapemap.renderer.api.IFeature;
-import shapemap.style.parser.IParsingContext;
-import shapemap.style.parser.StyleSyntaxException;
-import shapemap.style.parser.StyledLayerDescriptorParser;
+import org.knowtiphy.shapemap.renderer.FeatureTypeStyle;
+import org.knowtiphy.shapemap.renderer.api.IFeature;
+import org.knowtiphy.shapemap.style.parser.IParsingContext;
+import org.knowtiphy.shapemap.style.parser.StyleSyntaxException;
+import org.knowtiphy.shapemap.style.parser.StyledLayerDescriptorParser;
 
 /**
  * @author graham

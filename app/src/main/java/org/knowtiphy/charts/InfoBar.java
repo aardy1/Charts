@@ -20,13 +20,13 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.transform.NonInvertibleTransformException;
 import org.geotools.api.referencing.operation.TransformException;
+import org.knowtiphy.charts.chartview.MapDisplayOptions;
 import org.knowtiphy.charts.enc.ENCChart;
 import org.knowtiphy.charts.geotools.Coordinates;
 import org.knowtiphy.charts.platform.IPlatform;
 import org.knowtiphy.charts.utils.FXUtils;
 import org.knowtiphy.charts.utils.ToggleModel;
-import shapemap.renderer.ShapeMapRenderer;
-import org.knowtiphy.charts.chartview.MapDisplayOptions;
+import org.knowtiphy.shapemap.renderer.ShapeMapRenderer;
 import org.reactfx.Subscription;
 
 import static org.knowtiphy.charts.geotools.Coordinates.distanceAcross;

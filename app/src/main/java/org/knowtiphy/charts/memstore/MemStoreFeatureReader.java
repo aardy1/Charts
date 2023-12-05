@@ -7,7 +7,7 @@ package org.knowtiphy.charts.memstore;
 
 import java.util.Iterator;
 import org.geotools.api.feature.simple.SimpleFeatureType;
-import shapemap.renderer.api.IFeatureSourceIterator;
+import org.knowtiphy.shapemap.renderer.api.IFeatureSourceIterator;
 
 /**
  * @author graham

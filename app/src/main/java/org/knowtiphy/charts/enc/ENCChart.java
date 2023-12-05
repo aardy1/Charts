@@ -11,11 +11,11 @@ import org.geotools.api.feature.simple.SimpleFeatureType;
 import org.geotools.api.referencing.FactoryException;
 import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.api.referencing.operation.TransformException;
-import org.knowtiphy.charts.chartview.markicons.ResourceLoader;
 import org.knowtiphy.charts.chartview.MapDisplayOptions;
-import shapemap.model.MapViewModel;
-import shapemap.renderer.api.IFeature;
-import shapemap.renderer.context.SVGCache;
+import org.knowtiphy.charts.chartview.markicons.ResourceLoader;
+import org.knowtiphy.shapemap.model.MapViewModel;
+import org.knowtiphy.shapemap.renderer.api.IFeature;
+import org.knowtiphy.shapemap.renderer.context.SVGCache;
 
 /**
  * @author graham
