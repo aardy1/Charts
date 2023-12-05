@@ -5,9 +5,7 @@
 
 package org.knowtiphy.charts.platform;
 
-import com.gluonhq.attach.position.Position;
 import java.nio.file.Path;
-import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.layout.Region;
 import javafx.stage.Stage;
@@ -33,7 +31,7 @@ public interface IPlatform {
 
 	double ppcm();
 
-	ReadOnlyObjectProperty<Position> positionProperty();
+	// ReadOnlyObjectProperty<Position> positionProperty();
 
 	void info();
 

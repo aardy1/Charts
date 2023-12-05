@@ -35,12 +35,13 @@ public class Platform {
 
 	public static IPlatform getPlatform() {
 
-		if (com.gluonhq.attach.util.Platform.isIOS())
-			return new IOS();
-		else if (com.gluonhq.attach.util.Platform.isAndroid())
-			// TODO
-			return null;
-		else if (SystemUtils.IS_OS_MAC_OSX)
+		// if (com.gluonhq.attach.util.Platform.isIOS())
+		// return new IOS();
+		// else if (com.gluonhq.attach.util.Platform.isAndroid())
+		// // TODO
+		// return null;
+		// else
+		if (SystemUtils.IS_OS_MAC_OSX)
 			return new MacOSX();
 		else if (SystemUtils.IS_OS_WINDOWS)
 			// TODO

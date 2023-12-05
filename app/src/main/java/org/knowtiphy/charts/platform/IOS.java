@@ -5,8 +5,7 @@
 
 package org.knowtiphy.charts.platform;
 
-import com.gluonhq.attach.storage.StorageService;
-import com.gluonhq.attach.util.Services;
+import java.nio.file.Paths;
 import javafx.stage.Stage;
 
 /**
@@ -15,7 +14,9 @@ import javafx.stage.Stage;
 public class IOS extends BasePlatform implements IPlatform {
 
 	public IOS() {
-		super(Services.get(StorageService.class).flatMap(StorageService::getPrivateStorage).get().toPath());
+		super(Paths.get(System.getProperty("user.home")));// , "Documents", "Knowtiphy
+															// Charts"));
+		// super(Services.get(StorageService.class).flatMap(StorageService::getPrivateStorage).get().toPath());
 	}
 
 	// public Path chartsDir() {

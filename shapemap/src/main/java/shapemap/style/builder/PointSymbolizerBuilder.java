@@ -1,0 +1,57 @@
+/*
+ * Copyright Knowtiphy
+ * All rights reserved.
+ */
+
+package shapemap.style.builder;
+
+import shapemap.renderer.symbolizer.ISymbolizer;
+import shapemap.renderer.symbolizer.PointSymbolizer;
+import shapemap.renderer.api.IFeature;
+import shapemap.renderer.api.IFeatureFunction;
+import shapemap.renderer.symbolizer.mark.IMarkSymbolizer;
+import shapemap.style.parser.StyleSyntaxException;
+
+import static shapemap.style.parser.StyleSyntaxException.expect;
+
+/**
+ * @author graham
+ */
+public class PointSymbolizerBuilder<F extends IFeature> {
+
+	private IMarkSymbolizer<F> markSymbolizer;
+
+	// TODO -- spec says the default is the "native symbol size" ...?
+	private IFeatureFunction<F, Number> size = (f, g) -> 8.0;
+
+	private IFeatureFunction<F, Number> rotation;
+
+	private double opacity = 1;
+
+	public PointSymbolizerBuilder<F> markSymbolizer(IMarkSymbolizer<F> markSymbolizer) {
+		this.markSymbolizer = markSymbolizer;
+		return this;
+	}
+
+	public PointSymbolizerBuilder<F> size(IFeatureFunction<F, Number> size) {
+		this.size = size;
+		return this;
+	}
+
+	public PointSymbolizerBuilder<F> opacity(double opacity) {
+		this.opacity = opacity;
+		return this;
+	}
+
+	public PointSymbolizerBuilder<F> rotation(IFeatureFunction<F, Number> rotation) {
+		this.rotation = rotation;
+		return this;
+	}
+
+	public ISymbolizer build() throws StyleSyntaxException {
+
+		expect(markSymbolizer, "Expected a mark symbolizer");
+		return new PointSymbolizer(markSymbolizer, size, opacity, rotation);
+	}
+
+}

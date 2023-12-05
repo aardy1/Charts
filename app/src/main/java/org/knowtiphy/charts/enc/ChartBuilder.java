@@ -18,12 +18,12 @@ import org.knowtiphy.charts.memstore.MemFeature;
 import org.knowtiphy.charts.memstore.MemStore;
 import org.knowtiphy.charts.memstore.StyleReader;
 import org.knowtiphy.charts.ontology.S57;
-import org.knowtiphy.shapemap.renderer.api.IFeature;
-import org.knowtiphy.shapemap.renderer.api.IFeatureFunction;
-import org.knowtiphy.shapemap.style.parser.IParsingContext;
-import org.knowtiphy.shapemap.style.parser.StyleSyntaxException;
-import org.knowtiphy.shapemap.viewmodel.MapDisplayOptions;
-import org.knowtiphy.shapemap.viewmodel.MapLayer;
+import shapemap.renderer.api.IFeature;
+import shapemap.renderer.api.IFeatureFunction;
+import shapemap.style.parser.IParsingContext;
+import shapemap.style.parser.StyleSyntaxException;
+import org.knowtiphy.charts.chartview.MapDisplayOptions;
+import shapemap.model.MapLayer;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.index.strtree.STRtree;
 

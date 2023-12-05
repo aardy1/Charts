@@ -37,11 +37,6 @@ gluonfx {
 
     target = buildTarget
 
-    attachConfig {
-        version = "$attach"
-        services 'display', 'lifecycle', 'statusbar', 'storage', 'position'
-    }
-
     //verbose = true
     enableSwRendering = false
 
@@ -85,15 +80,6 @@ dependencies {
     implementation libs.fx.graphics
     implementation libs.fx.controls
 
-//implementation 'com.gluonhq:charm-glisten:6.2.3'
-//implementation libs.glisten.charm
-//implementation libs.attach.display
-//implementation libs.attach.lifecycle
-//implementation libs.attach.statusbar
-//implementation libs.attach.storage
-//implementation libs.attach.position
-//implementation libs.attach.util
-
     implementation libs.connect
 
     implementation libs.commons.lang3
@@ -103,6 +89,19 @@ dependencies {
     implementation libs.controlsfx
     implementation libs.fxsvgimage
 }
+
+   // attachConfig {
+   //     version = "$attach"
+     //   services 'display', 'lifecycle', 'statusbar', 'storage', 'position'
+   // }
+//implementation 'com.gluonhq:charm-glisten:6.2.3'
+//implementation libs.glisten.charm
+//implementation libs.attach.display
+//implementation libs.attach.lifecycle
+//implementation libs.attach.statusbar
+//implementation libs.attach.storage
+//implementation libs.attach.position
+//implementation libs.attach.util
 
     //javaStaticSdkVersion = "17"
     //javafxStaticSdkVersion = "21" // "22.1.0.1-Final"

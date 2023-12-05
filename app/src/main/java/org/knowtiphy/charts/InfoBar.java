@@ -25,8 +25,8 @@ import org.knowtiphy.charts.geotools.Coordinates;
 import org.knowtiphy.charts.platform.IPlatform;
 import org.knowtiphy.charts.utils.FXUtils;
 import org.knowtiphy.charts.utils.ToggleModel;
-import org.knowtiphy.shapemap.renderer.ShapeMapRenderer;
-import org.knowtiphy.shapemap.viewmodel.MapDisplayOptions;
+import shapemap.renderer.ShapeMapRenderer;
+import org.knowtiphy.charts.chartview.MapDisplayOptions;
 import org.reactfx.Subscription;
 
 import static org.knowtiphy.charts.geotools.Coordinates.distanceAcross;

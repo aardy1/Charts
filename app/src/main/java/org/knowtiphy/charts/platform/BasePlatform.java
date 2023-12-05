@@ -5,13 +5,8 @@
 
 package org.knowtiphy.charts.platform;
 
-import com.gluonhq.attach.display.DisplayService;
-import com.gluonhq.attach.position.Position;
-import com.gluonhq.attach.position.PositionService;
-import com.gluonhq.attach.util.Services;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.layout.Region;
 import javafx.stage.Screen;
@@ -23,20 +18,20 @@ public abstract class BasePlatform {
 
 	private final Path root;
 
-	private final DisplayService display;
-
-	private final PositionService positionService;
+	// private final DisplayService display;
+	//
+	// private final PositionService positionService;
 
 	BasePlatform(Path root) {
 		this.root = root;
-		display = Services.get(DisplayService.class).get();
+		// display = Services.get(DisplayService.class).get();
 		// var posService = Services.get(PositionService.class);
 		// if (posService.isPresent()) {
 		// positionService = posService.get();
 		// positionService.start();
 		// }
 		// else
-		positionService = new DummyPositionService();
+		// positionService = new DummyPositionService();
 		// keep the compiler happy
 	}
 
@@ -69,24 +64,24 @@ public abstract class BasePlatform {
 		return screenWidthCM() * (region.getWidth() / screenDimensions().getWidth());
 	}
 
-	public ReadOnlyObjectProperty<Position> positionProperty() {
-		return positionService.positionProperty();
-	}
+	// public ReadOnlyObjectProperty<Position> positionProperty() {
+	// return positionService.positionProperty();
+	// }
 
 	public void info() {
 		System.err.println("Screen VB " + Screen.getPrimary().getVisualBounds());
 		System.err.println("Screen Bounds " + Screen.getPrimary().getBounds());
 		System.err.println("Screen Scale X " + Screen.getPrimary().getOutputScaleX());
 		System.err.println("Screen Scale Y " + Screen.getPrimary().getOutputScaleY());
-		System.err.println("Display DD " + display.getDefaultDimensions());
-		System.err.println("Display SR " + display.getScreenResolution());
-		System.err.println("Display Scale " + display.getScreenScale());
-		System.err.println("Display Has Notch " + display.hasNotch());
-		System.err.println("Display Notch Property " + display.notchProperty());
-		System.err.println("Display Is Round " + display.isScreenRound());
-		System.err.println("Display is Phone " + display.isPhone());
-		System.err.println("Display is Tablet " + display.isTablet());
-		System.err.println("Display is Desktop " + display.isDesktop());
+		// System.err.println("Display DD " + display.getDefaultDimensions());
+		// System.err.println("Display SR " + display.getScreenResolution());
+		// System.err.println("Display Scale " + display.getScreenScale());
+		// System.err.println("Display Has Notch " + display.hasNotch());
+		// System.err.println("Display Notch Property " + display.notchProperty());
+		// System.err.println("Display Is Round " + display.isScreenRound());
+		// System.err.println("Display is Phone " + display.isPhone());
+		// System.err.println("Display is Tablet " + display.isTablet());
+		// System.err.println("Display is Desktop " + display.isDesktop());
 	}
 
 }

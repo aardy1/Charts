@@ -33,10 +33,9 @@ import org.knowtiphy.charts.enc.ChartDescription;
 import org.knowtiphy.charts.enc.ChartLocker;
 import org.knowtiphy.charts.enc.ENCChart;
 import org.knowtiphy.charts.geotools.Queries;
-import org.knowtiphy.shapemap.renderer.Transformation;
-import org.knowtiphy.shapemap.style.parser.StyleSyntaxException;
-import org.knowtiphy.shapemap.view.ShapeMapView;
-import org.knowtiphy.shapemap.viewmodel.MapDisplayOptions;
+import shapemap.renderer.Transformation;
+import shapemap.style.parser.StyleSyntaxException;
+import shapemap.view.ShapeMapView;
 import org.reactfx.Change;
 import org.reactfx.EventStreams;
 import org.reactfx.Subscription;
@@ -169,7 +168,7 @@ public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView
 	}
 
 	private ShapeMapView makeMapSurface() {
-		var theSurface = new ShapeMapView(chart, eventModel);
+		var theSurface = new ShapeMapView(chart);
 		theSurface.setMouseTransparent(true);
 		return theSurface;
 	}

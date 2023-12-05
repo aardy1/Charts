@@ -1,0 +1,55 @@
+/*
+ * Copyright Knowtiphy
+ * All rights reserved.
+ */
+
+package shapemap.renderer.symbolizer.mark;
+
+import shapemap.renderer.GraphicsRenderingContext;
+import shapemap.renderer.graphics.Fill;
+import shapemap.renderer.graphics.Stroke;
+import shapemap.renderer.symbolizer.PointSymbolizer;
+import shapemap.renderer.symbolizer.basic.FillInfo;
+import shapemap.renderer.api.IFeature;
+import shapemap.renderer.symbolizer.basic.StrokeInfo;
+import org.locationtech.jts.geom.Point;
+
+/**
+ * @author graham
+ */
+public class CircleMarkSymbolizer<F extends IFeature> extends BaseMarkSymbolizer<F> {
+
+	public CircleMarkSymbolizer(FillInfo fillInfo, StrokeInfo strokeInfo) {
+		super(fillInfo, strokeInfo);
+	}
+
+	@Override
+	public void render(GraphicsRenderingContext context, F feature, Point pt, PointSymbolizer<F> pointSymbolizer) {
+
+		var szo = pointSymbolizer.size().apply(feature, pt);
+		if (szo == null)
+			return;
+
+		var x = pt.getX();
+		var y = pt.getY();
+		var sz = szo.doubleValue();
+
+		var sizeX = sz * context.onePixelX();
+		var sizeY = sz * context.onePixelY();
+		var halfSizeX = sizeX / 2;
+		var halfSizeY = sizeY / 2;
+
+		var gc = context.graphicsContext();
+
+		if (fillInfo != null) {
+			Fill.setup(context, fillInfo);
+			gc.fillOval(x - halfSizeX, y - halfSizeY, sizeX, sizeY);
+		}
+
+		if (strokeInfo != null) {
+			Stroke.setup(context, strokeInfo);
+			gc.strokeOval(x - halfSizeX, y - halfSizeY, sizeX, sizeY);
+		}
+	}
+
+}

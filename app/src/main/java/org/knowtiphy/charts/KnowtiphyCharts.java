@@ -28,7 +28,7 @@ import org.knowtiphy.charts.platform.IPlatform;
 import org.knowtiphy.charts.platform.Platform;
 import org.knowtiphy.charts.utils.FXUtils;
 import org.knowtiphy.charts.utils.ToggleModel;
-import org.knowtiphy.shapemap.viewmodel.MapDisplayOptions;
+import org.knowtiphy.charts.chartview.MapDisplayOptions;
 
 import static org.knowtiphy.charts.utils.FXUtils.later;
 import static org.knowtiphy.charts.utils.FXUtils.resizeable;
@@ -144,7 +144,7 @@ public class KnowtiphyCharts extends Application {
 		System.err.println("Screen ppi = " + platform.ppi());
 		System.err.println("Screen ppcm = " + platform.ppcm());
 		System.err.println("Default font = " + Font.getDefault());
-		System.err.println("GPS Position = " + platform.positionProperty());
+		// System.err.println("GPS Position = " + platform.positionProperty());
 		platform.info();
 		System.err.println();
 	}

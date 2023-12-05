@@ -20,7 +20,7 @@ import org.geotools.geometry.jts.JTS;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.knowtiphy.charts.UnitProfile;
 import org.knowtiphy.charts.enc.ENCChart;
-import org.knowtiphy.shapemap.renderer.Transformation;
+import shapemap.renderer.Transformation;
 import org.locationtech.jts.geom.Coordinate;
 import org.reactfx.Subscription;
 

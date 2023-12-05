@@ -17,7 +17,6 @@ import org.knowtiphy.charts.dynamics.AISEvent;
 import org.knowtiphy.charts.dynamics.AISModel;
 import org.knowtiphy.charts.enc.ChartLocker;
 import org.knowtiphy.charts.enc.ENCChart;
-import org.knowtiphy.shapemap.viewmodel.MapDisplayOptions;
 import org.reactfx.EventSource;
 import org.reactfx.EventStream;
 

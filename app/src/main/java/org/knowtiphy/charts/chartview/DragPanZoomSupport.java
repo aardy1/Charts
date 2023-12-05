@@ -9,7 +9,7 @@ import org.geotools.api.referencing.operation.TransformException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.knowtiphy.charts.chartview.ChartView.EventModel;
 import org.knowtiphy.charts.geotools.Coordinates;
-import org.knowtiphy.shapemap.viewmodel.MapViewModel;
+import shapemap.model.MapViewModel;
 import org.reactfx.Subscription;
 
 import static org.knowtiphy.charts.geotools.Coordinates.clip;

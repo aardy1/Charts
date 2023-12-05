@@ -28,8 +28,7 @@ import org.knowtiphy.charts.Fonts;
 import org.knowtiphy.charts.enc.ChartDescription;
 import org.knowtiphy.charts.enc.ChartLocker;
 import org.knowtiphy.charts.enc.ENCChart;
-import org.knowtiphy.shapemap.style.parser.StyleSyntaxException;
-import org.knowtiphy.shapemap.viewmodel.MapDisplayOptions;
+import shapemap.style.parser.StyleSyntaxException;
 
 /**
  * @author graham

@@ -5,7 +5,7 @@
 
 package org.knowtiphy.charts.memstore;
 
-import org.knowtiphy.shapemap.renderer.api.GeomType;
+import shapemap.renderer.api.GeomType;
 import org.geotools.api.feature.Feature;
 import org.geotools.api.feature.simple.SimpleFeature;
 import org.locationtech.jts.geom.Geometry;

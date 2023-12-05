@@ -15,8 +15,8 @@ import org.geotools.api.referencing.FactoryException;
 import org.geotools.api.referencing.operation.TransformException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.knowtiphy.charts.memstore.StyleReader;
-import org.knowtiphy.shapemap.style.parser.StyleSyntaxException;
-import org.knowtiphy.shapemap.viewmodel.MapDisplayOptions;
+import shapemap.style.parser.StyleSyntaxException;
+import org.knowtiphy.charts.chartview.MapDisplayOptions;
 
 /**
  * @author graham

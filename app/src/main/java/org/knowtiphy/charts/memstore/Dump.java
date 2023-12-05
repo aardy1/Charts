@@ -15,9 +15,9 @@ import org.geotools.api.feature.simple.SimpleFeatureType;
 import org.geotools.api.feature.type.Name;
 import org.geotools.api.feature.type.PropertyDescriptor;
 import org.geotools.api.filter.identity.FeatureId;
-import org.knowtiphy.shapemap.renderer.api.IFeature;
-import org.knowtiphy.shapemap.viewmodel.MapLayer;
-import org.knowtiphy.shapemap.viewmodel.MapViewModel;
+import shapemap.renderer.api.IFeature;
+import shapemap.model.MapLayer;
+import shapemap.model.MapViewModel;
 
 /**
  * @author graham

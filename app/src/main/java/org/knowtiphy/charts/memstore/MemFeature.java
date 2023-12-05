@@ -5,12 +5,12 @@
 
 package org.knowtiphy.charts.memstore;
 
-import org.knowtiphy.shapemap.renderer.api.GeomType;
+import shapemap.renderer.api.GeomType;
 import java.util.List;
 import org.geotools.api.feature.simple.SimpleFeatureType;
 import org.geotools.api.filter.identity.FeatureId;
 import org.geotools.feature.simple.SimpleFeatureImpl;
-import org.knowtiphy.shapemap.renderer.api.IFeature;
+import shapemap.renderer.api.IFeature;
 import org.locationtech.jts.geom.Geometry;
 
 /**
