@@ -12,7 +12,6 @@ import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.api.referencing.operation.TransformException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.knowtiphy.shapemap.model.MapLayer;
-import org.knowtiphy.shapemap.renderer.context.RenderGeomCache;
 import org.reactfx.Change;
 import org.reactfx.EventStream;
 
@@ -31,9 +30,9 @@ public interface IMapViewModel<S, F extends IFeature> {
 
 	int totalRuleCount();
 
-	RenderGeomCache renderGeomCache();
+	IRenderablePolygonProvider renderablePolygonProvider();
 
-	ISVGProvider svgCache();
+	ISVGProvider svgProvider();
 
 	// used externally to change view model state
 

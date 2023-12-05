@@ -12,10 +12,8 @@ import org.geotools.api.referencing.operation.TransformException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.knowtiphy.shapemap.api.IFeature;
 import org.knowtiphy.shapemap.api.IMapViewModel;
+import org.knowtiphy.shapemap.api.IRenderablePolygonProvider;
 import org.knowtiphy.shapemap.api.ISVGProvider;
-import org.knowtiphy.shapemap.model.MapLayer;
-import org.knowtiphy.shapemap.model.MapViewport;
-import org.knowtiphy.shapemap.renderer.context.RenderGeomCache;
 import org.reactfx.Change;
 import org.reactfx.EventSource;
 
@@ -33,22 +31,23 @@ public class MapViewModel<S, F extends IFeature> implements IMapViewModel<S, F> 
 
 	private final MapViewport viewport;
 
-	private final RenderGeomCache renderGeomCache = new RenderGeomCache();
+	private final IRenderablePolygonProvider renderablePolygonProvider;
 
-	private final ISVGProvider svgCache;
+	private final ISVGProvider svgProvider;
 
 	// possibly shouldnt be here -- but it makes for faster rendering
 	private int totalRuleCount;
 
-	public MapViewModel(ReferencedEnvelope envelope, ISVGProvider svgCache)
-			throws TransformException, NonInvertibleTransformException, FactoryException {
+	public MapViewModel(ReferencedEnvelope bounds, IRenderablePolygonProvider renderablePolygonProvider,
+			ISVGProvider svgProvider) throws TransformException, NonInvertibleTransformException, FactoryException {
 
-		this.bounds = envelope;
-		this.svgCache = svgCache;
+		this.bounds = bounds;
+		this.renderablePolygonProvider = renderablePolygonProvider;
+		this.svgProvider = svgProvider;
 
 		viewport = new MapViewport();
-		viewport.setBounds(envelope);
-		viewport.setCoordinateReferenceSystem(envelope.getCoordinateReferenceSystem());
+		viewport.setBounds(bounds);
+		viewport.setCoordinateReferenceSystem(bounds.getCoordinateReferenceSystem());
 	}
 
 	@Override
@@ -56,6 +55,7 @@ public class MapViewModel<S, F extends IFeature> implements IMapViewModel<S, F> 
 		return layers.values();
 	}
 
+	// probably should only be used in the internal model
 	@Override
 	public int totalRuleCount() {
 		return totalRuleCount;
@@ -72,13 +72,13 @@ public class MapViewModel<S, F extends IFeature> implements IMapViewModel<S, F> 
 	}
 
 	@Override
-	public RenderGeomCache renderGeomCache() {
-		return renderGeomCache;
+	public IRenderablePolygonProvider renderablePolygonProvider() {
+		return renderablePolygonProvider;
 	}
 
 	@Override
-	public ISVGProvider svgCache() {
-		return svgCache;
+	public ISVGProvider svgProvider() {
+		return svgProvider;
 	}
 
 	@Override
@@ -102,27 +102,14 @@ public class MapViewModel<S, F extends IFeature> implements IMapViewModel<S, F> 
 		return newMapEvent;
 	}
 
+	// below here is the helper part of the class
+
 	public MapLayer<S, F> layer(S type) {
 		return layers.get(type);
 	}
 
-	public void addLayer(MapLayer<S, F> layer) {
-
-		layers.put(layer.getFeatureSource().getSchema(), layer);
-		totalRuleCount += layer.getStyle().rules().size();
-	}
-
 	public ReferencedEnvelope bounds() {
 		return bounds;
-	}
-
-	public void setViewPortBounds(ReferencedEnvelope bounds)
-			throws TransformException, NonInvertibleTransformException {
-
-		var oldBounds = viewport.getBounds();
-		viewport.setBounds(bounds);
-		System.err.println("\n\nVP change " + bounds + "\n\n");
-		viewPortBoundsEvent.push(new Change<>(oldBounds, bounds()));
 	}
 
 	public Rectangle2D viewPortScreenArea() {
@@ -137,32 +124,25 @@ public class MapViewModel<S, F extends IFeature> implements IMapViewModel<S, F> 
 		return viewport.getWorldToScreen();
 	}
 
+	public void addLayer(MapLayer<S, F> layer) {
+		layers.put(layer.getFeatureSource().getSchema(), layer);
+		totalRuleCount += layer.getStyle().rules().size();
+	}
+
+	public void setViewPortBounds(ReferencedEnvelope bounds)
+			throws TransformException, NonInvertibleTransformException {
+
+		var oldBounds = viewport.getBounds();
+		viewport.setBounds(bounds);
+		System.err.println("\n\nVP change " + bounds + "\n\n");
+		viewPortBoundsEvent.push(new Change<>(oldBounds, bounds()));
+	}
+
 	public void setLayerVisible(S type, boolean visible) {
 		var layer = layer(type);
 		var oldVisible = layer.isVisible();
 		layer.setVisible(visible);
 		layerVisibilityEvent.push(new Change<>(oldVisible, visible));
 	}
-
-	// public void setViewPortScreenArea(Rectangle2D screenArea)
-	// throws TransformException, NonInvertibleTransformException {
-	// viewport.setScreenArea(screenArea);
-	// }
-
-	// public ReferencedEnvelope bounds() {
-	// return bounds;
-	// }
-
-	// public Rectangle2D viewPortScreenArea() {
-	// return viewport.getScreenArea();
-	// }
-
-	// public Affine viewPortScreenToWorld() {
-	// return viewport.getScreenToWorld();
-	// }
-
-	// public Affine viewPortWorldToScreen() {
-	// return viewport.getWorldToScreen();
-	// }
 
 }

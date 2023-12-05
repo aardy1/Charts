@@ -13,8 +13,10 @@ import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.api.referencing.operation.TransformException;
 import org.knowtiphy.charts.chartview.MapDisplayOptions;
 import org.knowtiphy.charts.chartview.markicons.ResourceLoader;
-import org.knowtiphy.shapemap.model.MapViewModel;
 import org.knowtiphy.shapemap.api.IFeature;
+import org.knowtiphy.shapemap.model.MapViewModel;
+import org.knowtiphy.shapemap.renderer.context.RemoveHolesFromPolygon;
+import org.knowtiphy.shapemap.renderer.context.RenderGeomCache;
 import org.knowtiphy.shapemap.renderer.context.SVGCache;
 
 /**
@@ -28,7 +30,8 @@ public class ENCChart extends MapViewModel<SimpleFeatureType, IFeature> {
 			MapDisplayOptions displayOptions)
 			throws TransformException, FactoryException, NonInvertibleTransformException {
 
-		super(chartDescription.getBounds(crs), new SVGCache(ResourceLoader.class));
+		super(chartDescription.getBounds(crs), new RemoveHolesFromPolygon(new RenderGeomCache()),
+				new SVGCache(ResourceLoader.class));
 		this.chartDescription = chartDescription;
 	}
 

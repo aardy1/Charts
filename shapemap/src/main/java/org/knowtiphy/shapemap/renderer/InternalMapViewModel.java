@@ -2,11 +2,11 @@ package org.knowtiphy.shapemap.renderer;
 
 import java.util.Collection;
 import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.knowtiphy.shapemap.model.MapLayer;
 import org.knowtiphy.shapemap.api.IFeature;
 import org.knowtiphy.shapemap.api.IMapViewModel;
+import org.knowtiphy.shapemap.api.IRenderablePolygonProvider;
 import org.knowtiphy.shapemap.api.ISVGProvider;
-import org.knowtiphy.shapemap.renderer.context.RenderGeomCache;
+import org.knowtiphy.shapemap.model.MapLayer;
 import org.reactfx.EventSource;
 import org.reactfx.EventStream;
 
@@ -36,12 +36,12 @@ public class InternalMapViewModel<S, F extends IFeature> {
 		return mapViewModel.viewPortBounds();
 	}
 
-	public RenderGeomCache renderGeomCache() {
-		return mapViewModel.renderGeomCache();
+	public IRenderablePolygonProvider renderablePolygonProvider() {
+		return mapViewModel.renderablePolygonProvider();
 	}
 
-	public ISVGProvider svgCache() {
-		return mapViewModel.svgCache();
+	public ISVGProvider svgProvider() {
+		return mapViewModel.svgProvider();
 	}
 
 	public EventStream<Boolean> layoutNeededEvent() {

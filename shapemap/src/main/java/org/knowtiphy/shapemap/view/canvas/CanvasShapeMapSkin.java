@@ -10,13 +10,12 @@ import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.scene.transform.NonInvertibleTransformException;
 import org.geotools.api.referencing.operation.TransformException;
+import org.knowtiphy.shapemap.api.IFeature;
+import org.knowtiphy.shapemap.api.ShapeMapView;
 import org.knowtiphy.shapemap.renderer.InternalMapViewModel;
 import org.knowtiphy.shapemap.renderer.ShapeMapRenderer;
-import org.knowtiphy.shapemap.api.IFeature;
-import org.knowtiphy.shapemap.renderer.context.RemoveHolesFromPolygon;
 import org.knowtiphy.shapemap.renderer.context.RendererContext;
 import org.knowtiphy.shapemap.view.ShapeMapBaseSkin;
-import org.knowtiphy.shapemap.api.ShapeMapView;
 import org.reactfx.Subscription;
 
 public class CanvasShapeMapSkin<S, F extends IFeature> extends ShapeMapBaseSkin {
@@ -91,9 +90,15 @@ public class CanvasShapeMapSkin<S, F extends IFeature> extends ShapeMapBaseSkin 
 		graphics.setFill(Color.LIGHTGREY);
 		graphics.fillRect(0, 0, width, height);
 
-		var renderablePolygonProvider = new RemoveHolesFromPolygon(map.renderGeomCache());
-		var rendererContext = new RendererContext(map.layers(), map.totalRuleCount(), map.viewPortBounds(),
-				new Rectangle2D(0, 0, width, height), renderablePolygonProvider, map.svgCache());
+		var rendererContext = new RendererContext(
+		//@formatter:off
+				map.layers(),
+				map.totalRuleCount(),
+				map.viewPortBounds(),
+				new Rectangle2D(0, 0, width, height),
+				map.renderablePolygonProvider(),
+				map.svgProvider());
+		//@formatter:on
 		var renderer = new ShapeMapRenderer(rendererContext, graphics);
 		try {
 			renderer.paint();
