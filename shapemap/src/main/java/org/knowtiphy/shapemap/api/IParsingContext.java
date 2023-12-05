@@ -3,10 +3,10 @@
  * All rights reserved.
  */
 
-package org.knowtiphy.shapemap.style.parser;
+package org.knowtiphy.shapemap.api;
 
-import org.knowtiphy.shapemap.renderer.api.IFeature;
-import org.knowtiphy.shapemap.renderer.api.IFeatureFunction;
+import org.knowtiphy.shapemap.api.IFeature;
+import org.knowtiphy.shapemap.api.IFeatureFunction;
 
 /**
  * @author graham

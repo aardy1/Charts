@@ -7,8 +7,8 @@ package org.knowtiphy.shapemap.style.builder;
 
 import org.knowtiphy.shapemap.renderer.symbolizer.ISymbolizer;
 import org.knowtiphy.shapemap.renderer.symbolizer.PointSymbolizer;
-import org.knowtiphy.shapemap.renderer.api.IFeature;
-import org.knowtiphy.shapemap.renderer.api.IFeatureFunction;
+import org.knowtiphy.shapemap.api.IFeature;
+import org.knowtiphy.shapemap.api.IFeatureFunction;
 import org.knowtiphy.shapemap.renderer.symbolizer.mark.IMarkSymbolizer;
 import org.knowtiphy.shapemap.style.parser.StyleSyntaxException;
 

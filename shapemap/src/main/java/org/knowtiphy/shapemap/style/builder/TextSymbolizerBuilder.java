@@ -9,8 +9,8 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import org.knowtiphy.shapemap.renderer.symbolizer.TextSymbolizer;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.FillInfo;
-import org.knowtiphy.shapemap.renderer.api.IFeature;
-import org.knowtiphy.shapemap.renderer.api.IFeatureFunction;
+import org.knowtiphy.shapemap.api.IFeature;
+import org.knowtiphy.shapemap.api.IFeatureFunction;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.LabelPlacement;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.StrokeInfo;
 

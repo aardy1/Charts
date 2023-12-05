@@ -15,7 +15,6 @@ import org.geotools.api.referencing.operation.TransformException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
 import org.knowtiphy.shapemap.model.MapViewModel;
-import org.knowtiphy.shapemap.renderer.RendererUtilities;
 import org.knowtiphy.shapemap.renderer.Transformation;
 import si.uom.SI;
 
@@ -171,7 +170,7 @@ public class Coordinates {
 
 	static final double OGC_DEGREE_TO_METERS = 6378137.0 * 2.0 * Math.PI / 360;
 
-	private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(RendererUtilities.class);
+	private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(Coordinates.class);
 
 	/**
 	 * Enable unit correction in {@link #toMeters(double, CoordinateReferenceSystem)}

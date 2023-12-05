@@ -5,6 +5,7 @@
 
 package org.knowtiphy.shapemap.style.parser;
 
+import org.knowtiphy.shapemap.api.IParsingContext;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import javax.xml.stream.XMLInputFactory;

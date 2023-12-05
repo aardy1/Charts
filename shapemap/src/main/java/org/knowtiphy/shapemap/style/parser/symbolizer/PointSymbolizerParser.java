@@ -9,7 +9,7 @@ import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
 import org.knowtiphy.shapemap.renderer.symbolizer.ISymbolizer;
 import org.knowtiphy.shapemap.style.builder.PointSymbolizerBuilder;
-import org.knowtiphy.shapemap.style.parser.IParsingContext;
+import org.knowtiphy.shapemap.api.IParsingContext;
 import org.knowtiphy.shapemap.style.parser.StyleSyntaxException;
 import org.knowtiphy.shapemap.style.parser.Utils;
 import org.knowtiphy.shapemap.style.parser.VendorOptionParser;

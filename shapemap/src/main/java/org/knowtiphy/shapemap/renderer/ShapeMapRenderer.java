@@ -5,20 +5,15 @@
 
 package org.knowtiphy.shapemap.renderer;
 
-import java.io.IOException;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
-import javafx.geometry.Rectangle2D;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.transform.Affine;
 import javafx.scene.transform.NonInvertibleTransformException;
-import org.geotools.api.referencing.FactoryException;
 import org.geotools.api.referencing.operation.TransformException;
-import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.knowtiphy.shapemap.api.IFeature;
 import org.knowtiphy.shapemap.renderer.context.RendererContext;
-import org.knowtiphy.shapemap.renderer.api.IFeature;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.Rule;
-import org.knowtiphy.shapemap.model.IMapViewModel;
 import org.locationtech.jts.index.quadtree.Quadtree;
 
 /**
@@ -26,31 +21,31 @@ import org.locationtech.jts.index.quadtree.Quadtree;
  */
 public class ShapeMapRenderer<S, F extends IFeature> {
 
-	private final IMapViewModel<S, F> map;
-
-	private final RendererContext rendererContext;
+	private final RendererContext<S, F> rendererContext;
 
 	private final GraphicsContext graphics;
 
 	public static IntegerProperty count = new SimpleIntegerProperty(0);
 
-	public ShapeMapRenderer(IMapViewModel map, RendererContext rendererContext, GraphicsContext graphics) {
-		this.map = map;
+	public ShapeMapRenderer(RendererContext<S, F> rendererContext, GraphicsContext graphics) {
 		this.rendererContext = rendererContext;
 		this.graphics = graphics;
 	}
 
-	public void paint(Rectangle2D paintArea, ReferencedEnvelope viewportBounds)
-			throws TransformException, IOException, NonInvertibleTransformException, FactoryException {
+	public void paint() throws TransformException, NonInvertibleTransformException {
+
+		var layers = rendererContext.layers();
+		var viewPortBounds = rendererContext.viewPortBounds();
 
 		// TODO -- get rid of this debugging code
 		count.set(count.get() + 1);
 
-		System.err.println("\nRepaint : " + count.get() + " : " + paintArea + "\n");
+		System.err.println("\nRepaint : " + count.get() + " : " + rendererContext.paintArea() + "\n");
 
 		var start = System.currentTimeMillis();
 
-		var worldToScreen = RendererUtilities.worldToScreenTransform(viewportBounds, paintArea, map.crs());
+		var worldToScreen = RendererUtilities.worldToScreenTransform(viewPortBounds, rendererContext.paintArea(),
+				viewPortBounds.getCoordinateReferenceSystem());
 		var screenToWorld = worldToScreen.createInverse();
 
 		var onePixelX = onePixelX(screenToWorld);
@@ -58,7 +53,7 @@ public class ShapeMapRenderer<S, F extends IFeature> {
 
 		var index = new Quadtree();
 		var graphicsRenderingContext = new GraphicsRenderingContext(rendererContext, graphics,
-				new Transformation(worldToScreen), onePixelX, onePixelY, index, viewportBounds);
+				new Transformation(worldToScreen), onePixelX, onePixelY, index, viewPortBounds);
 
 		try {
 			// pass 1 -- do graphics -- point, line and polygon symbolizers
@@ -67,8 +62,8 @@ public class ShapeMapRenderer<S, F extends IFeature> {
 			// b) which layers need text layout (had rules that were applied and have text
 			// symbolizers
 
-			var appliedRule = new boolean[map.totalRuleCount()];
-			var layerNeedsTextLayout = new boolean[map.layers().size()];
+			var appliedRule = new boolean[rendererContext.totalRuleCount()];
+			var layerNeedsTextLayout = new boolean[layers.size()];
 
 			var gStart = System.currentTimeMillis();
 			graphics.setTransform(worldToScreen);
@@ -94,14 +89,17 @@ public class ShapeMapRenderer<S, F extends IFeature> {
 	private void renderGraphics(GraphicsRenderingContext context, boolean[] appliedRule, boolean[] layerNeedsTextLayout)
 			throws Exception {
 
+		var layers = rendererContext.layers();
+		var viewPortBounds = rendererContext.viewPortBounds();
+
 		var layerPos = 0;
 		var rulePos = 0;
 
-		for (var layer : map.layers()) {
+		for (var layer : layers) {
 			if (layer.isVisible()) {
 				var style = layer.getStyle();
 
-				try (var iterator = layer.getFeatures(map.viewPortBounds(), layer.isScaleLess())) {
+				try (var iterator = layer.getFeatures(viewPortBounds, layer.isScaleLess())) {
 					while (iterator.hasNext()) {
 						var feature = iterator.next();
 						layerNeedsTextLayout[layerPos] |= applyStyle(style, context, feature, appliedRule, rulePos);
@@ -119,14 +117,17 @@ public class ShapeMapRenderer<S, F extends IFeature> {
 	private void renderText(GraphicsRenderingContext context, boolean[] appliedRule, boolean[] layerNeedsTextLayout)
 			throws Exception {
 
+		var layers = rendererContext.layers();
+		var viewPortBounds = rendererContext.viewPortBounds();
+
 		var layerPos = 0;
 		var rulePos = 0;
 
-		for (var layer : map.layers()) {
+		for (var layer : layers) {
 			// System.err.println("Layer " + layer.title() + " vis = " +
 			// layer.isVisible());
 			if (layerNeedsTextLayout[layerPos]) {
-				try (var iterator = layer.getFeatures(map.viewPortBounds(), true)) {
+				try (var iterator = layer.getFeatures(viewPortBounds, true)) {
 					while (iterator.hasNext()) {
 						var feature = iterator.next();
 						var rp = rulePos;

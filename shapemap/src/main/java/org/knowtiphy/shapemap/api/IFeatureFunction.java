@@ -3,7 +3,7 @@
  * All rights reserved.
  */
 
-package org.knowtiphy.shapemap.renderer.api;
+package org.knowtiphy.shapemap.api;
 
 import java.util.function.BiFunction;
 import org.locationtech.jts.geom.Geometry;

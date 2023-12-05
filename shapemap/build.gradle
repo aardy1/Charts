@@ -13,7 +13,6 @@ repositories {
 
 dependencies {
 
-    implementation libs.geotools.shapefile
     implementation libs.geotools.sld
     implementation libs.geotools.metadata
 
@@ -25,7 +24,6 @@ dependencies {
     implementation libs.stax.api
 
     implementation libs.reactfx
-    implementation libs.controlsfx
 
     implementation 'com.github.hervegirod:fxsvgimage:1.1'
 }

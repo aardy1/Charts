@@ -5,7 +5,7 @@
 
 package org.knowtiphy.shapemap.renderer.context;
 
-import org.knowtiphy.shapemap.renderer.api.ISVGProvider;
+import org.knowtiphy.shapemap.api.ISVGProvider;
 import java.util.HashMap;
 import java.util.Map;
 import javafx.scene.SnapshotParameters;

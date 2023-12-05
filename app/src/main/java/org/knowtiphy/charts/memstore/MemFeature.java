@@ -9,8 +9,8 @@ import java.util.List;
 import org.geotools.api.feature.simple.SimpleFeatureType;
 import org.geotools.api.filter.identity.FeatureId;
 import org.geotools.feature.simple.SimpleFeatureImpl;
-import org.knowtiphy.shapemap.renderer.api.GeomType;
-import org.knowtiphy.shapemap.renderer.api.IFeature;
+import org.knowtiphy.shapemap.api.GeomType;
+import org.knowtiphy.shapemap.api.IFeature;
 import org.locationtech.jts.geom.Geometry;
 
 /**

@@ -4,8 +4,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import javax.xml.stream.XMLStreamException;
 import org.knowtiphy.shapemap.renderer.FeatureTypeStyle;
-import org.knowtiphy.shapemap.renderer.api.IFeature;
-import org.knowtiphy.shapemap.style.parser.IParsingContext;
+import org.knowtiphy.shapemap.api.IFeature;
+import org.knowtiphy.shapemap.api.IParsingContext;
 import org.knowtiphy.shapemap.style.parser.StyleSyntaxException;
 import org.knowtiphy.shapemap.style.parser.StyledLayerDescriptorParser;
 

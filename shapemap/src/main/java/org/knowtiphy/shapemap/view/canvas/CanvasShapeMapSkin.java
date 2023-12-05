@@ -1,6 +1,5 @@
 package org.knowtiphy.shapemap.view.canvas;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import javafx.geometry.Rectangle2D;
@@ -10,15 +9,14 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.scene.transform.NonInvertibleTransformException;
-import org.geotools.api.referencing.FactoryException;
 import org.geotools.api.referencing.operation.TransformException;
-import org.knowtiphy.shapemap.model.IMapViewModel;
+import org.knowtiphy.shapemap.renderer.InternalMapViewModel;
 import org.knowtiphy.shapemap.renderer.ShapeMapRenderer;
-import org.knowtiphy.shapemap.renderer.api.IFeature;
+import org.knowtiphy.shapemap.api.IFeature;
 import org.knowtiphy.shapemap.renderer.context.RemoveHolesFromPolygon;
 import org.knowtiphy.shapemap.renderer.context.RendererContext;
 import org.knowtiphy.shapemap.view.ShapeMapBaseSkin;
-import org.knowtiphy.shapemap.view.ShapeMapView;
+import org.knowtiphy.shapemap.api.ShapeMapView;
 import org.reactfx.Subscription;
 
 public class CanvasShapeMapSkin<S, F extends IFeature> extends ShapeMapBaseSkin {
@@ -27,7 +25,7 @@ public class CanvasShapeMapSkin<S, F extends IFeature> extends ShapeMapBaseSkin 
 
 	private static final double PREFERRED_HEIGHT = Region.USE_COMPUTED_SIZE;
 
-	private IMapViewModel map;
+	private final InternalMapViewModel<S, F> map;
 
 	private final Pane root;
 
@@ -35,10 +33,10 @@ public class CanvasShapeMapSkin<S, F extends IFeature> extends ShapeMapBaseSkin 
 
 	private final List<Subscription> subscriptions = new ArrayList<>();
 
-	public CanvasShapeMapSkin(ShapeMapView surface, IMapViewModel chart) {
+	public CanvasShapeMapSkin(ShapeMapView surface, InternalMapViewModel<S, F> map) {
 		super(surface);
 
-		this.map = chart;
+		this.map = map;
 		borderPane = new BorderPane();
 		root = new Pane(borderPane);
 		getChildren().addAll(root);
@@ -53,11 +51,10 @@ public class CanvasShapeMapSkin<S, F extends IFeature> extends ShapeMapBaseSkin 
 	}
 
 	private void setupListeners() {
-		// unsubscribe listeners on the old chart
+		// unsubscribe listeners on the old map
 		subscriptions.forEach(s -> s.unsubscribe());
 		subscriptions.clear();
-		subscriptions.add(map.viewPortBoundsEvent().subscribe(b -> root.requestLayout()));
-		subscriptions.add(map.layerVisibilityEvent().subscribe(b -> root.requestLayout()));
+		subscriptions.add(map.layoutNeededEvent().subscribe(b -> root.requestLayout()));
 		// subscriptions.add(map.newMapEvent().subscribe((Change<IMapViewModel<?, ?>>
 		// change) -> {
 		// this.map = change.getNewValue();
@@ -95,13 +92,14 @@ public class CanvasShapeMapSkin<S, F extends IFeature> extends ShapeMapBaseSkin 
 		graphics.fillRect(0, 0, width, height);
 
 		var renderablePolygonProvider = new RemoveHolesFromPolygon(map.renderGeomCache());
-		var rendererContext = new RendererContext(renderablePolygonProvider, map.svgCache());
-		var renderer = new ShapeMapRenderer(map, rendererContext, graphics);
+		var rendererContext = new RendererContext(map.layers(), map.totalRuleCount(), map.viewPortBounds(),
+				new Rectangle2D(0, 0, width, height), renderablePolygonProvider, map.svgCache());
+		var renderer = new ShapeMapRenderer(rendererContext, graphics);
 		try {
-			renderer.paint(new Rectangle2D(0, 0, width, height), map.viewPortBounds());
+			renderer.paint();
 			borderPane.setCenter(canvas);
 		}
-		catch (IOException | NonInvertibleTransformException | FactoryException | TransformException ex) {
+		catch (NonInvertibleTransformException | TransformException ex) {
 			ex.printStackTrace(System.err);
 		}
 	}

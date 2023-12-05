@@ -5,7 +5,7 @@
 
 package org.knowtiphy.charts.memstore;
 
-import org.knowtiphy.shapemap.renderer.api.IFeature;
+import org.knowtiphy.shapemap.api.IFeature;
 
 /**
  * @author graham

@@ -7,8 +7,8 @@ package org.knowtiphy.shapemap.renderer.symbolizer;
 
 import org.knowtiphy.shapemap.renderer.GraphicsRenderingContext;
 import org.knowtiphy.shapemap.renderer.graphics.DrawPoint;
-import org.knowtiphy.shapemap.renderer.api.IFeature;
-import org.knowtiphy.shapemap.renderer.api.IFeatureFunction;
+import org.knowtiphy.shapemap.api.IFeature;
+import org.knowtiphy.shapemap.api.IFeatureFunction;
 import org.knowtiphy.shapemap.renderer.symbolizer.mark.IMarkSymbolizer;
 import org.locationtech.jts.geom.Geometry;
 

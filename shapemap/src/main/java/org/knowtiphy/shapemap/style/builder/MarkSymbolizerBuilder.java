@@ -7,7 +7,7 @@ package org.knowtiphy.shapemap.style.builder;
 
 import java.util.function.BiFunction;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.FillInfo;
-import org.knowtiphy.shapemap.renderer.api.IFeature;
+import org.knowtiphy.shapemap.api.IFeature;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.StrokeInfo;
 import org.knowtiphy.shapemap.renderer.symbolizer.mark.IMarkSymbolizer;
 import org.knowtiphy.shapemap.renderer.symbolizer.mark.SquareMarkSymbolizer;

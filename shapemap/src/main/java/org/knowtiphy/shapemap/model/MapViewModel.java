@@ -10,8 +10,11 @@ import org.geotools.api.referencing.FactoryException;
 import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.api.referencing.operation.TransformException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.knowtiphy.shapemap.renderer.api.IFeature;
-import org.knowtiphy.shapemap.renderer.api.ISVGProvider;
+import org.knowtiphy.shapemap.api.IFeature;
+import org.knowtiphy.shapemap.api.IMapViewModel;
+import org.knowtiphy.shapemap.api.ISVGProvider;
+import org.knowtiphy.shapemap.model.MapLayer;
+import org.knowtiphy.shapemap.model.MapViewport;
 import org.knowtiphy.shapemap.renderer.context.RenderGeomCache;
 import org.reactfx.Change;
 import org.reactfx.EventSource;
@@ -59,21 +62,6 @@ public class MapViewModel<S, F extends IFeature> implements IMapViewModel<S, F> 
 	}
 
 	@Override
-	public EventSource<Change<ReferencedEnvelope>> viewPortBoundsEvent() {
-		return viewPortBoundsEvent;
-	}
-
-	@Override
-	public EventSource<Change<Boolean>> layerVisibilityEvent() {
-		return layerVisibilityEvent;
-	}
-
-	@Override
-	public EventSource<Change<IMapViewModel<S, F>>> newMapEvent() {
-		return newMapEvent;
-	}
-
-	@Override
 	public ReferencedEnvelope viewPortBounds() {
 		return viewport.getBounds();
 	}
@@ -99,6 +87,21 @@ public class MapViewModel<S, F extends IFeature> implements IMapViewModel<S, F> 
 		viewport.setScreenArea(screenArea);
 	}
 
+	@Override
+	public EventSource<Change<Boolean>> layerVisibilityEvent() {
+		return layerVisibilityEvent;
+	}
+
+	@Override
+	public EventSource<Change<ReferencedEnvelope>> viewPortBoundsEvent() {
+		return viewPortBoundsEvent;
+	}
+
+	@Override
+	public EventSource<Change<IMapViewModel<S, F>>> newMapViewModel() {
+		return newMapEvent;
+	}
+
 	public MapLayer<S, F> layer(S type) {
 		return layers.get(type);
 	}
@@ -119,7 +122,7 @@ public class MapViewModel<S, F extends IFeature> implements IMapViewModel<S, F> 
 		var oldBounds = viewport.getBounds();
 		viewport.setBounds(bounds);
 		System.err.println("\n\nVP change " + bounds + "\n\n");
-		viewPortBoundsEvent.push(new Change<>(oldBounds, bounds));
+		viewPortBoundsEvent.push(new Change<>(oldBounds, bounds()));
 	}
 
 	public Rectangle2D viewPortScreenArea() {
@@ -134,12 +137,32 @@ public class MapViewModel<S, F extends IFeature> implements IMapViewModel<S, F> 
 		return viewport.getWorldToScreen();
 	}
 
-	private void setLayerVisible(Change<Boolean> change, S type) {
+	public void setLayerVisible(S type, boolean visible) {
 		var layer = layer(type);
-		if (layer != null) {
-			layer.setVisible(change.getNewValue());
-			layerVisibilityEvent.push(change);
-		}
+		var oldVisible = layer.isVisible();
+		layer.setVisible(visible);
+		layerVisibilityEvent.push(new Change<>(oldVisible, visible));
 	}
+
+	// public void setViewPortScreenArea(Rectangle2D screenArea)
+	// throws TransformException, NonInvertibleTransformException {
+	// viewport.setScreenArea(screenArea);
+	// }
+
+	// public ReferencedEnvelope bounds() {
+	// return bounds;
+	// }
+
+	// public Rectangle2D viewPortScreenArea() {
+	// return viewport.getScreenArea();
+	// }
+
+	// public Affine viewPortScreenToWorld() {
+	// return viewport.getScreenToWorld();
+	// }
+
+	// public Affine viewPortWorldToScreen() {
+	// return viewport.getWorldToScreen();
+	// }
 
 }

@@ -1,5 +1,6 @@
 package org.knowtiphy.shapemap.view;
 
+import org.knowtiphy.shapemap.api.ShapeMapView;
 import javafx.scene.control.Skin;
 import javafx.scene.control.SkinBase;
 

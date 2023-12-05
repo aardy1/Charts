@@ -10,7 +10,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import org.apache.commons.lang3.tuple.Pair;
-import org.knowtiphy.shapemap.renderer.api.IRenderablePolygonProvider;
+import org.knowtiphy.shapemap.api.IRenderablePolygonProvider;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LinearRing;

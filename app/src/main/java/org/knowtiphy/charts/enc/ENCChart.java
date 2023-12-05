@@ -14,7 +14,7 @@ import org.geotools.api.referencing.operation.TransformException;
 import org.knowtiphy.charts.chartview.MapDisplayOptions;
 import org.knowtiphy.charts.chartview.markicons.ResourceLoader;
 import org.knowtiphy.shapemap.model.MapViewModel;
-import org.knowtiphy.shapemap.renderer.api.IFeature;
+import org.knowtiphy.shapemap.api.IFeature;
 import org.knowtiphy.shapemap.renderer.context.SVGCache;
 
 /**

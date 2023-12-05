@@ -10,7 +10,7 @@ import org.knowtiphy.shapemap.renderer.graphics.Fill;
 import org.knowtiphy.shapemap.renderer.graphics.Stroke;
 import org.knowtiphy.shapemap.renderer.symbolizer.PointSymbolizer;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.FillInfo;
-import org.knowtiphy.shapemap.renderer.api.IFeature;
+import org.knowtiphy.shapemap.api.IFeature;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.StrokeInfo;
 import org.locationtech.jts.geom.Point;
 

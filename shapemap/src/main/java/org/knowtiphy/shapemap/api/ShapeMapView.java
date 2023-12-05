@@ -1,4 +1,4 @@
-package org.knowtiphy.shapemap.view;
+package org.knowtiphy.shapemap.api;
 
 import java.util.List;
 import javafx.css.CssMetaData;
@@ -6,13 +6,13 @@ import javafx.css.Styleable;
 import javafx.css.StyleablePropertyFactory;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
-import org.knowtiphy.shapemap.model.IMapViewModel;
+import org.knowtiphy.shapemap.renderer.InternalMapViewModel;
 import org.knowtiphy.shapemap.view.canvas.CanvasShapeMapSkin;
 
 /**
  * A map "surface" -- a control that shows a map.
  */
-public class ShapeMapView extends Control {
+public class ShapeMapView<S, F extends IFeature> extends Control {
 
 	public enum SkinType {
 
@@ -21,20 +21,20 @@ public class ShapeMapView extends Control {
 	}
 
 	// CSS styling
-	private static final StyleablePropertyFactory<ShapeMapView> FACTORY = new StyleablePropertyFactory<>(
+	private static final StyleablePropertyFactory<ShapeMapView<?, ?>> FACTORY = new StyleablePropertyFactory<>(
 			Control.getClassCssMetaData());
 
 	private static String DEFAULT_STYLE_SHEET;
 
 	private SkinType skinType;
 
-	private final IMapViewModel map;
+	private final InternalMapViewModel<S, F> map;
 
-	public ShapeMapView(IMapViewModel map) {
+	public ShapeMapView(InternalMapViewModel<S, F> map) {
 		this(map, SkinType.CANVAS);
 	}
 
-	public ShapeMapView(IMapViewModel map, SkinType skinType) {
+	public ShapeMapView(InternalMapViewModel<S, F> map, SkinType skinType) {
 
 		this.map = map;
 		this.skinType = skinType;

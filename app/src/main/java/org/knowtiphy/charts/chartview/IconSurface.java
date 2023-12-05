@@ -19,7 +19,7 @@ import org.controlsfx.glyphfont.Glyph;
 import org.geotools.api.feature.simple.SimpleFeatureType;
 import org.knowtiphy.charts.enc.ENCChart;
 import org.knowtiphy.shapemap.renderer.Transformation;
-import org.knowtiphy.shapemap.renderer.api.IFeature;
+import org.knowtiphy.shapemap.api.IFeature;
 import org.locationtech.jts.geom.Geometry;
 import org.reactfx.Change;
 import org.reactfx.EventStream;
@@ -49,7 +49,7 @@ public class IconSurface extends Pane {
 		subscriptions.clear();
 		subscriptions.add(chart.viewPortBoundsEvent().subscribe(b -> makeIconLayers()));
 		subscriptions.add(chart.layerVisibilityEvent().subscribe(b -> makeIconLayers()));
-		subscriptions.add(chart.newMapEvent().subscribe(change -> {
+		subscriptions.add(chart.newMapViewModel().subscribe(change -> {
 			chart = (ENCChart) change.getNewValue();
 			setupListeners();
 			makeIconLayers();
