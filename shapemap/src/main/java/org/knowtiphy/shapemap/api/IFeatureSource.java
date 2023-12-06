@@ -8,13 +8,16 @@ package org.knowtiphy.shapemap.api;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 
 /**
- * @author graham
+ * A source of features of a given schema type.
+ *
+ * @param <S> the type of the schema
+ * @param <F> the type of the features
  */
-public interface IFeatureSource<S, F extends IFeature> {
+public interface IFeatureSource<S, F> {
 
-	IFeatureSourceIterator<S, F> features();
+	IFeatureSourceIterator<F> features();
 
-	IFeatureSourceIterator<S, F> features(ReferencedEnvelope bounds, boolean scaleLess);
+	IFeatureSourceIterator<F> features(ReferencedEnvelope bounds, boolean scaleLess);
 
 	S getSchema();
 

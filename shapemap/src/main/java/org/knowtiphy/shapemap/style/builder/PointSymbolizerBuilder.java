@@ -5,7 +5,6 @@
 
 package org.knowtiphy.shapemap.style.builder;
 
-import org.knowtiphy.shapemap.api.IFeature;
 import org.knowtiphy.shapemap.api.IFeatureFunction;
 import org.knowtiphy.shapemap.renderer.symbolizer.ISymbolizer;
 import org.knowtiphy.shapemap.renderer.symbolizer.PointSymbolizer;
@@ -17,7 +16,7 @@ import static org.knowtiphy.shapemap.style.parser.StyleSyntaxException.expect;
 /**
  * @author graham
  */
-public class PointSymbolizerBuilder<S, F extends IFeature> {
+public class PointSymbolizerBuilder<S, F> {
 
 	private IMarkSymbolizer<S, F> markSymbolizer;
 

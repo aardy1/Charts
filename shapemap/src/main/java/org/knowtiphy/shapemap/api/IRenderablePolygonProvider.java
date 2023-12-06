@@ -5,13 +5,13 @@
 
 package org.knowtiphy.shapemap.api;
 
+import java.util.function.Function;
 import org.locationtech.jts.geom.Polygon;
 
 /**
- * @author graham
+ * A provider of polygons that can be rendered (have no holes).
  */
-public interface IRenderablePolygonProvider {
 
-	Polygon get(Polygon polygon);
+public interface IRenderablePolygonProvider extends Function<Polygon, Polygon> {
 
 }

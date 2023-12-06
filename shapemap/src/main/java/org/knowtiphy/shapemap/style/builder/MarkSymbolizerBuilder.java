@@ -6,7 +6,6 @@
 package org.knowtiphy.shapemap.style.builder;
 
 import java.util.function.BiFunction;
-import org.knowtiphy.shapemap.api.IFeature;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.FillInfo;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.StrokeInfo;
 import org.knowtiphy.shapemap.renderer.symbolizer.mark.IMarkSymbolizer;
@@ -16,7 +15,7 @@ import org.knowtiphy.shapemap.style.parser.StyleSyntaxException;
 /**
  * @author graham
  */
-public class MarkSymbolizerBuilder<S, F extends IFeature> {
+public class MarkSymbolizerBuilder<S, F> {
 
 	private BiFunction<FillInfo, StrokeInfo, IMarkSymbolizer<S, F>> symbolizerBuilder = SquareMarkSymbolizer<S, F>::new;
 

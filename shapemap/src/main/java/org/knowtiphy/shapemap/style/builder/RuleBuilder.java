@@ -7,7 +7,6 @@ package org.knowtiphy.shapemap.style.builder;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.knowtiphy.shapemap.api.IFeature;
 import org.knowtiphy.shapemap.api.IFeatureFunction;
 import org.knowtiphy.shapemap.renderer.symbolizer.ISymbolizer;
 import org.knowtiphy.shapemap.renderer.symbolizer.TextSymbolizer;
@@ -17,7 +16,7 @@ import org.locationtech.jts.geom.Geometry;
 /**
  * @author graham
  */
-public class RuleBuilder<S, F extends IFeature> {
+public class RuleBuilder<S, F> {
 
 	private IFeatureFunction<F, Boolean> filter = RuleBuilder::defaultRuleFilter;
 

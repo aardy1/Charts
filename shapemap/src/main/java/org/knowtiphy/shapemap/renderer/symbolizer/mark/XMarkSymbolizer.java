@@ -5,7 +5,6 @@
 
 package org.knowtiphy.shapemap.renderer.symbolizer.mark;
 
-import org.knowtiphy.shapemap.api.IFeature;
 import org.knowtiphy.shapemap.renderer.GraphicsRenderingContext;
 import org.knowtiphy.shapemap.renderer.graphics.Stroke;
 import org.knowtiphy.shapemap.renderer.symbolizer.PointSymbolizer;
@@ -16,7 +15,7 @@ import org.locationtech.jts.geom.Point;
 /**
  * @author graham
  */
-public class XMarkSymbolizer<S, F extends IFeature> extends BaseMarkSymbolizer<S, F> {
+public class XMarkSymbolizer<S, F> extends BaseMarkSymbolizer<S, F> {
 
 	public XMarkSymbolizer(FillInfo fillInfo, StrokeInfo strokeInfo) {
 		super(fillInfo, strokeInfo);

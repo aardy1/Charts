@@ -2,12 +2,11 @@ package org.knowtiphy.shapemap.api.model;
 
 import java.io.IOException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.knowtiphy.shapemap.api.IFeature;
 import org.knowtiphy.shapemap.api.IFeatureSource;
 import org.knowtiphy.shapemap.api.IFeatureSourceIterator;
 import org.knowtiphy.shapemap.renderer.FeatureTypeStyle;
 
-public class MapLayer<S, F extends IFeature> {
+public class MapLayer<S, F> {
 
 	private final String title;
 
@@ -37,15 +36,6 @@ public class MapLayer<S, F extends IFeature> {
 		return style;
 	}
 
-	// public ReferencedEnvelope getBounds() {
-	// try {
-	// return featureSource.getBounds();
-	// }
-	// catch (IOException ex) {
-	// return null;
-	// }
-	// }
-
 	public boolean isVisible() {
 		return visible;
 	}
@@ -62,20 +52,8 @@ public class MapLayer<S, F extends IFeature> {
 		return featureSource;
 	}
 
-	public IFeatureSourceIterator<S, F> getFeatures(ReferencedEnvelope bounds, boolean scaleLess) throws IOException {
+	public IFeatureSourceIterator<F> getFeatures(ReferencedEnvelope bounds, boolean scaleLess) throws IOException {
 		return getFeatureSource().features(bounds, scaleLess);
-	}
-
-	@Override
-	public String toString() {
-		StringBuilder buf = new StringBuilder();
-		buf.append(getClass().getName());
-		buf.append("[");
-		if (title != null && title.length() != 0) {
-			buf.append(title());
-		}
-		buf.append("]");
-		return buf.toString();
 	}
 
 }

@@ -5,7 +5,6 @@
 
 package org.knowtiphy.shapemap.renderer.symbolizer;
 
-import org.knowtiphy.shapemap.api.IFeature;
 import org.knowtiphy.shapemap.renderer.GraphicsRenderingContext;
 import org.knowtiphy.shapemap.renderer.graphics.Stroke;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.StrokeInfo;
@@ -13,7 +12,7 @@ import org.knowtiphy.shapemap.renderer.symbolizer.basic.StrokeInfo;
 /**
  * @author graham
  */
-public class LineSymbolizer<S, F extends IFeature> implements ISymbolizer<S, F> {
+public class LineSymbolizer<S, F> implements ISymbolizer<S, F> {
 
 	private final StrokeInfo strokeInfo;
 
@@ -24,7 +23,8 @@ public class LineSymbolizer<S, F extends IFeature> implements ISymbolizer<S, F> 
 	@Override
 	public void render(GraphicsRenderingContext<S, F> context, F feature) {
 		Stroke.setup(context, strokeInfo);
-		Stroke.stroke(context, feature.getDefaultGeometry(), feature.geomType());
+		Stroke.stroke(context, context.rendererContext().featureAdapter().defaultGeometry(feature),
+				context.rendererContext().featureAdapter().geomType(feature));
 	}
 
 }

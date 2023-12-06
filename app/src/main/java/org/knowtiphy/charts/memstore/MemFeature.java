@@ -10,13 +10,12 @@ import org.geotools.api.feature.simple.SimpleFeatureType;
 import org.geotools.api.filter.identity.FeatureId;
 import org.geotools.feature.simple.SimpleFeatureImpl;
 import org.knowtiphy.shapemap.api.GeomType;
-import org.knowtiphy.shapemap.api.IFeature;
 import org.locationtech.jts.geom.Geometry;
 
 /**
  * @author graham
  */
-public class MemFeature extends SimpleFeatureImpl implements IFeature {
+public class MemFeature extends SimpleFeatureImpl {
 
 	private final GeomType geomType;
 
@@ -29,8 +28,7 @@ public class MemFeature extends SimpleFeatureImpl implements IFeature {
 		return geomType;
 	}
 
-	@Override
-	public Geometry getDefaultGeometry() {
+	public Geometry defaultGeometry() {
 		return (Geometry) super.getDefaultGeometry();
 	}
 

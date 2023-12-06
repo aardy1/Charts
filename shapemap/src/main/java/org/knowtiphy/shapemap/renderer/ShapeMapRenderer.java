@@ -11,7 +11,6 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.transform.Affine;
 import javafx.scene.transform.NonInvertibleTransformException;
 import org.geotools.api.referencing.operation.TransformException;
-import org.knowtiphy.shapemap.api.IFeature;
 import org.knowtiphy.shapemap.renderer.context.RendererContext;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.Rule;
 import org.locationtech.jts.index.quadtree.Quadtree;
@@ -19,7 +18,7 @@ import org.locationtech.jts.index.quadtree.Quadtree;
 /**
  * @author graham
  */
-public class ShapeMapRenderer<S, F extends IFeature> {
+public class ShapeMapRenderer<S, F> {
 
 	private final RendererContext<S, F> rendererContext;
 
@@ -183,8 +182,9 @@ public class ShapeMapRenderer<S, F extends IFeature> {
 
 	private boolean applyGraphicsRule(Rule<S, F> rule, GraphicsRenderingContext<S, F> context, F feature) {
 
+		var featureAdapter = context.rendererContext().featureAdapter();
 		if (rule.filter() != null) {
-			if (rule.filter().apply(feature, feature.getDefaultGeometry())) {
+			if (rule.filter().apply(feature, featureAdapter.defaultGeometry(feature))) {
 				for (var symbolizer : rule.graphicSymbolizers()) {
 					symbolizer.render(context, feature);
 				}
@@ -198,7 +198,8 @@ public class ShapeMapRenderer<S, F extends IFeature> {
 
 	private void applyTextRule(Rule<S, F> rule, GraphicsRenderingContext<S, F> context, F feature) {
 
-		if (rule.filter().apply(feature, feature.getDefaultGeometry())) {
+		var featureAdapter = context.rendererContext().featureAdapter();
+		if (rule.filter().apply(feature, featureAdapter.defaultGeometry(feature))) {
 			for (var symbolizer : rule.textSymbolizers()) {
 				symbolizer.render(context, feature);
 

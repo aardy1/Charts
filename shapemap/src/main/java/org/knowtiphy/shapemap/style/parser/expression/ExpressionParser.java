@@ -13,7 +13,6 @@ import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
-import org.knowtiphy.shapemap.api.IFeature;
 import org.knowtiphy.shapemap.api.IFeatureFunction;
 import org.knowtiphy.shapemap.api.IParsingContext;
 import org.knowtiphy.shapemap.renderer.Functions;
@@ -28,8 +27,8 @@ import static org.knowtiphy.shapemap.style.parser.Utils.normalizeKey;
  */
 public class ExpressionParser {
 
-	public static <F extends IFeature> IFeatureFunction<F, ?> parse(IParsingContext<F> parsingContext,
-			XMLEventReader reader, String finishTag) throws XMLStreamException {
+	public static <F> IFeatureFunction<F, ?> parse(IParsingContext<F> parsingContext, XMLEventReader reader,
+			String finishTag) throws XMLStreamException {
 
 		var stack = new LinkedList<LinkedList<IFeatureFunction<F, ?>>>();
 		startFrame(stack);
@@ -113,8 +112,8 @@ public class ExpressionParser {
 		return endFrame(stack).pop();
 	}
 
-	public static <F extends IFeature, T> IFeatureFunction<F, T> parseOrLiteral(IParsingContext<F> parsingContext,
-			XMLEventReader reader, String finishTag, Function<XMLEvent, T> literalParser) throws XMLStreamException {
+	public static <F, T> IFeatureFunction<F, T> parseOrLiteral(IParsingContext<F> parsingContext, XMLEventReader reader,
+			String finishTag, Function<XMLEvent, T> literalParser) throws XMLStreamException {
 
 		// this is a bit hacky
 		try {
@@ -127,16 +126,16 @@ public class ExpressionParser {
 		}
 	}
 
-	private static <F extends IFeature> void startFrame(LinkedList<LinkedList<IFeatureFunction<F, ?>>> stack) {
+	private static <F> void startFrame(LinkedList<LinkedList<IFeatureFunction<F, ?>>> stack) {
 		stack.push(new LinkedList<>());
 	}
 
-	private static <F extends IFeature> LinkedList<IFeatureFunction<F, ?>> endFrame(
+	private static <F> LinkedList<IFeatureFunction<F, ?>> endFrame(
 			LinkedList<LinkedList<IFeatureFunction<F, ?>>> stack) {
 		return stack.pop();
 	}
 
-	private static <F extends IFeature> void push(LinkedList<LinkedList<IFeatureFunction<F, ?>>> stack,
+	private static <F> void push(LinkedList<LinkedList<IFeatureFunction<F, ?>>> stack,
 			IFeatureFunction<F, ?> function) {
 		stack.peek().push(function);
 	}
@@ -159,8 +158,8 @@ public class ExpressionParser {
 		return name;
 	}
 
-	private static <F extends IFeature> IFeatureFunction<F, Object> makeFunctionCall(
-			LinkedList<IFeatureFunction<F, ?>> frame) throws XMLStreamException {
+	private static <F> IFeatureFunction<F, Object> makeFunctionCall(LinkedList<IFeatureFunction<F, ?>> frame)
+			throws XMLStreamException {
 
 		int size = frame.size();
 		var funArgs = new ArrayList<IFeatureFunction<F, ?>>();
@@ -189,7 +188,7 @@ public class ExpressionParser {
 		};
 	}
 
-	private static <F extends IFeature> IFeatureFunction<F, ?> mkBop(LinkedList<IFeatureFunction<F, ?>> frame,
+	private static <F> IFeatureFunction<F, ?> mkBop(LinkedList<IFeatureFunction<F, ?>> frame,
 			BiFunction<IFeatureFunction<F, ?>, IFeatureFunction<F, ?>, IFeatureFunction<F, ?>> operator)
 			throws XMLStreamException {
 

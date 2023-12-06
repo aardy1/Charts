@@ -8,12 +8,12 @@ package org.knowtiphy.shapemap.api;
 import org.locationtech.jts.geom.Geometry;
 
 /**
- * @author graham
+ * A feature in an ESRI shape map.
  */
-public interface IFeature {
+public interface IFeatureAdapter<F> {
 
-	Geometry getDefaultGeometry();
+	Geometry defaultGeometry(F feature);
 
-	GeomType geomType();
+	GeomType geomType(F feature);
 
 }

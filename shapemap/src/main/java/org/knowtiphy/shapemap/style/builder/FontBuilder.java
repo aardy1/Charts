@@ -10,7 +10,9 @@ import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 
 /**
- * @author graham
+ * A builder of fonts used in styling.
+ *
+ * The default font is given by the underlying JavaFX framework.
  */
 public class FontBuilder {
 

@@ -7,7 +7,6 @@ package org.knowtiphy.shapemap.style.parser.symbolizer;
 
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
-import org.knowtiphy.shapemap.api.IFeature;
 import org.knowtiphy.shapemap.api.IParsingContext;
 import org.knowtiphy.shapemap.renderer.symbolizer.ISymbolizer;
 import org.knowtiphy.shapemap.style.builder.PointSymbolizerBuilder;
@@ -24,8 +23,8 @@ import static org.knowtiphy.shapemap.style.parser.Utils.normalize;
  */
 public class PointSymbolizerParser {
 
-	public static <S, F extends IFeature> ISymbolizer<S, F> parse(IParsingContext<F> parsingContext,
-			XMLEventReader reader) throws XMLStreamException, StyleSyntaxException {
+	public static <S, F> ISymbolizer<S, F> parse(IParsingContext<F> parsingContext, XMLEventReader reader)
+			throws XMLStreamException, StyleSyntaxException {
 
 		var builder = new PointSymbolizerBuilder<S, F>();
 

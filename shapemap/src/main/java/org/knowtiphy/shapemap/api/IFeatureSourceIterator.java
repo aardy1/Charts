@@ -6,9 +6,11 @@
 package org.knowtiphy.shapemap.api;
 
 /**
- * @author graham
+ * An iterator over some collection of features (of a given schema type).
+ *
+ * @param <F> the type of the features
  */
-public interface IFeatureSourceIterator<T, F extends IFeature> extends AutoCloseable {
+public interface IFeatureSourceIterator<F> extends AutoCloseable {
 
 	boolean hasNext() throws Exception;
 

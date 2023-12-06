@@ -10,7 +10,6 @@ import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.scene.transform.NonInvertibleTransformException;
 import org.geotools.api.referencing.operation.TransformException;
-import org.knowtiphy.shapemap.api.IFeature;
 import org.knowtiphy.shapemap.api.model.MapViewModel;
 import org.knowtiphy.shapemap.renderer.ShapeMapRenderer;
 import org.knowtiphy.shapemap.renderer.context.RendererContext;
@@ -18,7 +17,15 @@ import org.knowtiphy.shapemap.view.ShapeMapBaseSkin;
 import org.knowtiphy.shapemap.view.ShapeMapView;
 import org.reactfx.Subscription;
 
-public class CanvasShapeMapSkin<S, F extends IFeature> extends ShapeMapBaseSkin<S, F> {
+/**
+ * A skin for a shape map view that uses a JavaFX canvas to show an ESRI shape of layers
+ * of features of some schema type.
+ *
+ * @param <S> the type of the schema
+ * @param <F> the type of the features
+ */
+
+public class CanvasShapeMapSkin<S, F> extends ShapeMapBaseSkin<S, F> {
 
 	private static final double PREFERRED_WIDTH = Region.USE_COMPUTED_SIZE;
 
@@ -97,6 +104,7 @@ public class CanvasShapeMapSkin<S, F extends IFeature> extends ShapeMapBaseSkin<
 				map.totalRuleCount(),
 				map.viewPortBounds(),
 				new Rectangle2D(0, 0, width, height),
+				map.featureAdapter(),
 				map.renderablePolygonProvider(),
 				map.svgProvider());
 		//@formatter:on

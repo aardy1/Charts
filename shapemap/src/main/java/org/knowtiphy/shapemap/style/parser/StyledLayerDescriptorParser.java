@@ -9,7 +9,6 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
-import org.knowtiphy.shapemap.api.IFeature;
 import org.knowtiphy.shapemap.api.IParsingContext;
 import org.knowtiphy.shapemap.renderer.FeatureTypeStyle;
 import org.knowtiphy.shapemap.style.builder.FeatureTypeStyleBuilder;
@@ -19,7 +18,7 @@ import static org.knowtiphy.shapemap.style.parser.Utils.normalize;
 /**
  * @author graham
  */
-public class StyledLayerDescriptorParser<S, F extends IFeature> {
+public class StyledLayerDescriptorParser<S, F> {
 
 	private final InputStream input;
 

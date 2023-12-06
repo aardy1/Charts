@@ -7,7 +7,6 @@ package org.knowtiphy.shapemap.style.builder;
 
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
-import org.knowtiphy.shapemap.api.IFeature;
 import org.knowtiphy.shapemap.api.IFeatureFunction;
 import org.knowtiphy.shapemap.renderer.symbolizer.TextSymbolizer;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.FillInfo;
@@ -17,7 +16,7 @@ import org.knowtiphy.shapemap.renderer.symbolizer.basic.StrokeInfo;
 /**
  * @author graham
  */
-public class TextSymbolizerBuilder<S, F extends IFeature> {
+public class TextSymbolizerBuilder<S, F> {
 
 	private IFeatureFunction<F, String> label = (f, g) -> null;
 

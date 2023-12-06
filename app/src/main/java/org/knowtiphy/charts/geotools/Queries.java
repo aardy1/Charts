@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 import org.geotools.data.simple.SimpleFeatureCollection;
 import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.knowtiphy.shapemap.api.IFeature;
 import org.knowtiphy.shapemap.api.IFeatureSourceIterator;
 import org.knowtiphy.shapemap.api.model.MapViewModel;
 import org.knowtiphy.shapemap.renderer.Transformation;
@@ -24,8 +23,8 @@ public class Queries {
 
 	private static final double DELTA = 0.1;
 
-	public static <S, F extends IFeature> List<SimpleFeatureCollection> featuresNearXYWorld(MapViewModel<S, F> map,
-			double x, double y) throws IOException {
+	public static <S, F> List<SimpleFeatureCollection> featuresNearXYWorld(MapViewModel<S, F> map, double x, double y)
+			throws IOException {
 
 		var tx = new Transformation(map.viewPortScreenToWorld());
 		tx.apply(x, y);
@@ -40,12 +39,12 @@ public class Queries {
 		return result;
 	}
 
-	public static <S, F extends IFeature> List<IFeatureSourceIterator<S, F>> featuresNearXYWorld(MapViewModel<S, F> map,
-			double x, double y, int radius) throws Exception {
+	public static <S, F> List<IFeatureSourceIterator<F>> featuresNearXYWorld(MapViewModel<S, F> map, double x, double y,
+			int radius) throws Exception {
 
 		var envelope = tinyPolygon(map, x, y, radius);
 
-		var result = new ArrayList<IFeatureSourceIterator<S, F>>();
+		var result = new ArrayList<IFeatureSourceIterator<F>>();
 		var foo = new ArrayList<F>();
 		for (var layer : map.layers()) {
 			result.add(layer.getFeatureSource().features(envelope, true));
@@ -59,8 +58,9 @@ public class Queries {
 		tx.apply(x, y);
 
 		var pt = new GeometryFactory().createPoint(new Coordinate(tx.getX(), tx.getY()));
+		var featureAdapter = map.featureAdapter();
 		for (var f : foo) {
-			var geom = f.getDefaultGeometry();
+			var geom = featureAdapter.defaultGeometry(f);
 			for (var i = 0; i < geom.getNumGeometries(); i++) {
 				var g = geom.getGeometryN(i);
 				if (g.contains(pt)) {
@@ -72,8 +72,7 @@ public class Queries {
 		return result;
 	}
 
-	public static <S, F extends IFeature> ReferencedEnvelope tinyPolygon(MapViewModel<S, F> map, double x, double y,
-			int radius) {
+	public static <S, F> ReferencedEnvelope tinyPolygon(MapViewModel<S, F> map, double x, double y, int radius) {
 		int screenMinX = (int) x - radius;
 		int screenMinY = (int) y - radius;
 		int screenMaxX = (int) x + radius;
@@ -96,7 +95,7 @@ public class Queries {
 		return new ReferencedEnvelope(minX, minX + width, minY, minY + height, map.crs());
 	}
 
-	public static <S, F extends IFeature> ReferencedEnvelope tinyPolygon(MapViewModel<S, F> map, double x, double y) {
+	public static <S, F> ReferencedEnvelope tinyPolygon(MapViewModel<S, F> map, double x, double y) {
 		return tinyPolygon(map, x, y, 1);
 	}
 

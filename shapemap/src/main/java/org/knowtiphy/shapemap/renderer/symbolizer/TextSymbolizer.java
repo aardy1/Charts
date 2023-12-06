@@ -10,7 +10,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.geotools.api.geometry.BoundingBox;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.crs.DefaultEngineeringCRS;
-import org.knowtiphy.shapemap.api.IFeature;
 import org.knowtiphy.shapemap.api.IFeatureFunction;
 import org.knowtiphy.shapemap.renderer.GraphicsRenderingContext;
 import org.knowtiphy.shapemap.renderer.graphics.Fill;
@@ -27,7 +26,7 @@ import org.locationtech.jts.index.quadtree.Quadtree;
 /**
  * @author graham
  */
-public class TextSymbolizer<S, F extends IFeature> {
+public class TextSymbolizer<S, F> {
 
 	private final IFeatureFunction<F, String> label;
 
@@ -63,7 +62,7 @@ public class TextSymbolizer<S, F extends IFeature> {
 			context.graphicsContext().setFont(font);
 		}
 
-		text(context, feature, feature.getDefaultGeometry());
+		text(context, feature, context.rendererContext().featureAdapter().defaultGeometry(feature));
 	}
 
 	private void text(GraphicsRenderingContext<S, F> context, F feature, Geometry geom) {

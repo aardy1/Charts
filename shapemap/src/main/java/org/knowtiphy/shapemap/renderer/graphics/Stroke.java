@@ -6,7 +6,6 @@
 package org.knowtiphy.shapemap.renderer.graphics;
 
 import org.knowtiphy.shapemap.api.GeomType;
-import org.knowtiphy.shapemap.api.IFeature;
 import org.knowtiphy.shapemap.renderer.GraphicsRenderingContext;
 import org.knowtiphy.shapemap.renderer.Transformation;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.StrokeInfo;
@@ -31,7 +30,7 @@ public class Stroke {
 	 * @param strokeInfo the stroke information
 	 */
 
-	public static <S, F extends IFeature> void setup(GraphicsRenderingContext<S, F> context, StrokeInfo strokeInfo) {
+	public static <S, F> void setup(GraphicsRenderingContext<S, F> context, StrokeInfo strokeInfo) {
 		var gc = context.graphicsContext();
 		gc.setStroke(strokeInfo.stroke());
 		// TODO -- hmm?
@@ -47,7 +46,7 @@ public class Stroke {
 	 * @param geom the geometry to render
 	 */
 
-	public static <S, F extends IFeature> void stroke(GraphicsRenderingContext<S, F> context, Geometry geom) {
+	public static <S, F> void stroke(GraphicsRenderingContext<S, F> context, Geometry geom) {
 
 		// TODO -- switch on strings is brain dead
 		switch (geom.getGeometryType()) {
@@ -78,8 +77,7 @@ public class Stroke {
 		}
 	}
 
-	public static <S, F extends IFeature> void stroke(GraphicsRenderingContext<S, F> context, Geometry geom,
-			GeomType geomType) {
+	public static <S, F> void stroke(GraphicsRenderingContext<S, F> context, Geometry geom, GeomType geomType) {
 
 		// TODO -- switch on strings is brain dead
 		switch (geomType) {
@@ -111,13 +109,12 @@ public class Stroke {
 		}
 	}
 
-	private static <S, F extends IFeature> void strokePoint(GraphicsRenderingContext<S, F> context, Point point) {
+	private static <S, F> void strokePoint(GraphicsRenderingContext<S, F> context, Point point) {
 		context.graphicsContext().strokeOval(point.getX(), point.getY(), context.onePixelX(), context.onePixelY());
 	}
 
 	// line width calculated from pixels per world x-coordinate
-	private static <S, F extends IFeature> void strokeLineString(GraphicsRenderingContext<S, F> context,
-			LineString lineString) {
+	private static <S, F> void strokeLineString(GraphicsRenderingContext<S, F> context, LineString lineString) {
 		var tx = context.worldToScreen();
 		tx.copyCoordinatesG(lineString);
 		context.graphicsContext().strokePolyline(tx.getXs(), tx.getYs(), tx.getXs().length);
@@ -125,8 +122,7 @@ public class Stroke {
 
 	// if we are scaling in world coordinates it is faster to use the lineString() code --
 	// need to know that in our styles
-	private static <S, F extends IFeature> void strokeLineStringSVG(GraphicsRenderingContext<S, F> context,
-			LineString lineString) {
+	private static <S, F> void strokeLineStringSVG(GraphicsRenderingContext<S, F> context, LineString lineString) {
 		var gc = context.graphicsContext();
 
 		gc.beginPath();
@@ -146,7 +142,7 @@ public class Stroke {
 		gc.setTransform(foo);
 	}
 
-	public static <S, F extends IFeature> void strokePolygon(GraphicsRenderingContext<S, F> context, Polygon polygon) {
+	public static <S, F> void strokePolygon(GraphicsRenderingContext<S, F> context, Polygon polygon) {
 		stroke(context, polygon.getBoundary());
 		for (var i = 0; i < polygon.getNumInteriorRing(); i++) {
 			stroke(context, polygon.getInteriorRingN(i));

@@ -5,7 +5,6 @@
 
 package org.knowtiphy.shapemap.renderer.symbolizer;
 
-import org.knowtiphy.shapemap.api.IFeature;
 import org.knowtiphy.shapemap.api.IFeatureFunction;
 import org.knowtiphy.shapemap.renderer.GraphicsRenderingContext;
 import org.knowtiphy.shapemap.renderer.graphics.DrawPoint;
@@ -14,7 +13,7 @@ import org.knowtiphy.shapemap.renderer.symbolizer.mark.IMarkSymbolizer;
 /**
  * @author graham
  */
-public class PointSymbolizer<S, F extends IFeature> implements ISymbolizer<S, F> {
+public class PointSymbolizer<S, F> implements ISymbolizer<S, F> {
 
 	private final IMarkSymbolizer<S, F> markSymbolizer;
 
@@ -44,7 +43,7 @@ public class PointSymbolizer<S, F extends IFeature> implements ISymbolizer<S, F>
 	public void render(GraphicsRenderingContext<S, F> context, F feature) {
 
 		DrawPoint.setup(context, opacity);
-		var geom = feature.getDefaultGeometry();
+		var geom = context.rendererContext().featureAdapter().defaultGeometry(feature);
 		for (var i = 0; i < geom.getNumGeometries(); i++) {
 			markSymbolizer.render(context, feature, DrawPoint.choosePoint(geom.getGeometryN(i)), this);
 		}

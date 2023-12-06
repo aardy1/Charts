@@ -5,7 +5,6 @@
 
 package org.knowtiphy.shapemap.style.builder;
 
-import org.knowtiphy.shapemap.api.IFeature;
 import org.knowtiphy.shapemap.renderer.symbolizer.ISymbolizer;
 import org.knowtiphy.shapemap.renderer.symbolizer.LineSymbolizer;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.StrokeInfo;
@@ -17,7 +16,7 @@ import static org.knowtiphy.shapemap.style.parser.StyleSyntaxException.expectEle
 /**
  * @author graham
  */
-public class LineSymbolizerBuilder<S, F extends IFeature> {
+public class LineSymbolizerBuilder<S, F> {
 
 	private StrokeInfo strokeInfo;
 

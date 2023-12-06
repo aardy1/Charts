@@ -33,6 +33,7 @@ public class AISModel {
 	// for generating fake AIS events
 	private static final Random random = new Random();
 
+	@SuppressWarnings("unchecked")
 	private static final Pair<Long, Position2D>[] BOAT_TEST_DATA = new Pair[] { Pair.of(1L, new Position2D(-90, 30)),
 			Pair.of(2L, new Position2D(-85, 25)), Pair.of(3L, new Position2D(-80, 20)) };
 

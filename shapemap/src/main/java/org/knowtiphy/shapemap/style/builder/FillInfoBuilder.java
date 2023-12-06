@@ -9,11 +9,13 @@ import javafx.scene.paint.Color;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.FillInfo;
 
 /**
- * @author graham
+ * A builder of fill information used in styling.
+ *
+ * The default fill color is white, and fill opacity is 1.
  */
 public class FillInfoBuilder {
 
-	private Color fill = Color.web("#808080");
+	private Color fill = Color.WHITE;
 
 	private double opacity = 1;
 

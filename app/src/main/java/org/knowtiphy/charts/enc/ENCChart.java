@@ -30,7 +30,7 @@ public class ENCChart extends MapViewModel<SimpleFeatureType, MemFeature> {
 			MapDisplayOptions displayOptions)
 			throws TransformException, FactoryException, NonInvertibleTransformException {
 
-		super(chartDescription.getBounds(crs), new RemoveHolesFromPolygon(new RenderGeomCache()),
+		super(chartDescription.getBounds(crs), new FeatureAdapter(), new RemoveHolesFromPolygon(new RenderGeomCache()),
 				new SVGCache(ResourceLoader.class));
 		this.chartDescription = chartDescription;
 	}

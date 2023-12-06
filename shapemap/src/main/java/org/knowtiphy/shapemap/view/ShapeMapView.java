@@ -6,14 +6,18 @@ import javafx.css.Styleable;
 import javafx.css.StyleablePropertyFactory;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
-import org.knowtiphy.shapemap.api.IFeature;
 import org.knowtiphy.shapemap.api.model.MapViewModel;
 import org.knowtiphy.shapemap.view.canvas.CanvasShapeMapSkin;
 
 /**
- * A map "surface" -- a control that shows a map.
+ * A shape map view -- a control that shows an ESRI shape map of layers of features of
+ * some schema type.
+ *
+ * @param <S> the type of the schema
+ * @param <F> the type of the features
  */
-public class ShapeMapView<S, F extends IFeature> extends Control {
+
+public class ShapeMapView<S, F> extends Control {
 
 	public enum SkinType {
 
@@ -48,7 +52,7 @@ public class ShapeMapView<S, F extends IFeature> extends Control {
 	}
 
 	@Override
-	protected Skin createDefaultSkin() {
+	protected Skin<ShapeMapView<S, F>> createDefaultSkin() {
 		return switch (skinType) {
 			default -> new CanvasShapeMapSkin<>(this, map);
 		};

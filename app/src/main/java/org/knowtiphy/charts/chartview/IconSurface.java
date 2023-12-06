@@ -18,8 +18,8 @@ import javafx.scene.shape.StrokeType;
 import org.controlsfx.glyphfont.Glyph;
 import org.geotools.api.feature.simple.SimpleFeatureType;
 import org.knowtiphy.charts.enc.ENCChart;
+import org.knowtiphy.charts.memstore.MemFeature;
 import org.knowtiphy.shapemap.renderer.Transformation;
-import org.knowtiphy.shapemap.api.IFeature;
 import org.locationtech.jts.geom.Geometry;
 import org.reactfx.Change;
 import org.reactfx.EventStream;
@@ -96,7 +96,7 @@ public class IconSurface extends Pane {
 		}
 	}
 
-	private void createIcon(IFeature feature, Glyph glyph, List<String> attributes, String defaultValue,
+	private void createIcon(MemFeature feature, Glyph glyph, List<String> attributes, String defaultValue,
 			EventStream<Change<Boolean>> visibilityEvents) {
 
 		// var description = description(feature, attributes, defaultValue);

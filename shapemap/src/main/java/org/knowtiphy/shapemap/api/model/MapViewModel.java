@@ -10,15 +10,14 @@ import org.geotools.api.referencing.FactoryException;
 import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.api.referencing.operation.TransformException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.knowtiphy.shapemap.api.IFeature;
+import org.knowtiphy.shapemap.api.IFeatureAdapter;
 import org.knowtiphy.shapemap.api.IRenderablePolygonProvider;
 import org.knowtiphy.shapemap.api.ISVGProvider;
-import org.knowtiphy.shapemap.model.MapViewport;
 import org.reactfx.Change;
 import org.reactfx.EventSource;
 import org.reactfx.EventStream;
 
-public abstract class MapViewModel<S, F extends IFeature> {
+public abstract class MapViewModel<S, F> {
 
 	private final EventSource<Change<Boolean>> layerVisibilityEvent = new EventSource<>();
 
@@ -34,6 +33,8 @@ public abstract class MapViewModel<S, F extends IFeature> {
 
 	private final MapViewport viewPort;
 
+	private final IFeatureAdapter<F> featureAdapter;
+
 	private final IRenderablePolygonProvider renderablePolygonProvider;
 
 	private final ISVGProvider svgProvider;
@@ -41,23 +42,21 @@ public abstract class MapViewModel<S, F extends IFeature> {
 	// possibly shouldnt be here -- but it makes for faster rendering
 	private int totalRuleCount;
 
-	protected MapViewModel(ReferencedEnvelope bounds, IRenderablePolygonProvider renderablePolygonProvider,
-			ISVGProvider svgProvider) throws TransformException, NonInvertibleTransformException, FactoryException {
+	protected MapViewModel(ReferencedEnvelope bounds, IFeatureAdapter<F> featureAdapter,
+			IRenderablePolygonProvider renderablePolygonProvider, ISVGProvider svgProvider)
+			throws TransformException, NonInvertibleTransformException, FactoryException {
 
 		this.bounds = bounds;
+		this.featureAdapter = featureAdapter;
 		this.renderablePolygonProvider = renderablePolygonProvider;
 		this.svgProvider = svgProvider;
 		this.totalRuleCount = 0;
 
 		viewPort = new MapViewport(bounds);
-		// this.mapViewModel = mapViewModel;
-		// mapViewModel.viewPortBoundsEvent().subscribe(x -> layoutNeeded());
-		// mapViewModel.layerVisibilityEvent().subscribe(x -> layoutNeeded());
-		// mapViewModel.newMapViewModel().subscribe(change -> {
-		// System.err.println("NEW MODEL XXX ");
-		// newMapViewModel.push(new Change<>(this, new
-		// BaseMapViewModel<>(change.getNewValue())));
-		// });
+	}
+
+	public IFeatureAdapter<F> featureAdapter() {
+		return featureAdapter;
 	}
 
 	protected MapViewport viewPort() {

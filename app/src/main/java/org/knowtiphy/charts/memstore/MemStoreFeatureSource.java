@@ -38,59 +38,6 @@ public class MemStoreFeatureSource // extends ContentFeatureSource
 		this.featureIndex = featureIndex;
 	}
 
-	// @Override
-	// public FeatureReader<SimpleFeatureType, SimpleFeature> getReaderInternal(Query
-	// query) throws IOException {
-	//
-	// assert false;
-	// // System.err.println("Query = " + (query instanceof MemStoreQuery));
-	// // System.err.println("Query = " + query);
-	//
-	// Collection<SimpleFeature> featuresInScale;
-	// if (query instanceof MemStoreQuery mq) {
-	//
-	// var ebounds = System.currentTimeMillis();
-	// var featuresInBounds = (List<SimpleFeature>) featureIndex.query(mq.bounds());
-	// ebounds = System.currentTimeMillis() - ebounds;
-	//
-	// var sbounds = System.currentTimeMillis();
-	//
-	// var currentScale = map.currentScale();
-	// var scaleLess = mq.scaleLess();
-	//
-	// featuresInScale = new ArrayList<>();
-	// for (var feature : featuresInBounds) {
-	// var featureMinScale = feature.getAttribute(S57.AT_SCAMIN);
-	// if (scaleLess || featureMinScale == null || (int) featureMinScale >= currentScale)
-	// {
-	// featuresInScale.add(feature);
-	// }
-	// }
-	//
-	// sbounds = System.currentTimeMillis() - sbounds;
-	//
-	// // System.err.println("Source " + featureType.getTypeName() + ", #In Bounds =
-	// // " + featuresInBounds.size()
-	// // + " : " + ebounds + " millis, #In Scale = " + featuresInScale.size() + " :
-	// // " + sbounds
-	// // + " millis, current scale = " + currentScale + ", scaleLess = " +
-	// // scaleLess);
-	// }
-	// else {
-	// var ebounds = System.currentTimeMillis();
-	// featuresInScale = featureIndex.query(map.viewPortBounds());
-	// ebounds = System.currentTimeMillis() - ebounds;
-	//
-	// // System.err.println("Source " + featureType.getTypeName() + ", #In Bounds =
-	// // " + featuresInScale.size()
-	// // + " : " + ebounds + " millis");
-	// }
-	//
-	// return null;
-	// // return new MemStoreFeatureReader(getState(), featureType,
-	// // featuresInScale.iterator());
-	// }
-
 	@Override
 	public SimpleFeatureType getSchema() {
 
@@ -98,11 +45,11 @@ public class MemStoreFeatureSource // extends ContentFeatureSource
 	}
 
 	@Override
-	public IFeatureSourceIterator<SimpleFeatureType, MemFeature> features(ReferencedEnvelope bounds,
-			boolean scaleLess) {
+	public IFeatureSourceIterator<MemFeature> features(ReferencedEnvelope bounds, boolean scaleLess) {
 		Collection<MemFeature> featuresInScale;
 
 		var ebounds = System.currentTimeMillis();
+		@SuppressWarnings("unchecked")
 		var featuresInBounds = (List<MemFeature>) featureIndex.query(bounds);
 		ebounds = System.currentTimeMillis() - ebounds;
 
@@ -120,22 +67,20 @@ public class MemStoreFeatureSource // extends ContentFeatureSource
 
 		sbounds = System.currentTimeMillis() - sbounds;
 
-		// System.err.println("Source " + featureType.getTypeName() + ", #In Bounds =
-		// " + featuresInBounds.size()
-		// + " : " + ebounds + " millis, #In Scale = " + featuresInScale.size() + " :
-		// " + sbounds
-		// + " millis, current scale = " + currentScale + ", scaleLess = " +
-		// scaleLess);
+		System.err.println("Source " + featureType.getTypeName() + ", #In Bounds = " + featuresInBounds.size() + " : "
+				+ ebounds + " millis, #In Scale = " + featuresInScale.size() + " : " + sbounds
+				+ " millis, current scale = " + currentScale + ", scaleLess = " + scaleLess);
 
-		return new MemStoreFeatureReader(featureType, featuresInScale.iterator());
+		return new MemStoreFeatureIterator(featuresInScale.iterator());
 	}
 
 	@Override
-	public IFeatureSourceIterator<SimpleFeatureType, MemFeature> features() {
+	public IFeatureSourceIterator<MemFeature> features() {
 
 		Collection<MemFeature> featuresInScale;
 
 		var ebounds = System.currentTimeMillis();
+		@SuppressWarnings("unchecked")
 		var featuresInBounds = (List<MemFeature>) featureIndex.itemsTree();
 		ebounds = System.currentTimeMillis() - ebounds;
 
@@ -160,29 +105,60 @@ public class MemStoreFeatureSource // extends ContentFeatureSource
 		// + " millis, current scale = " + currentScale + ", scaleLess = " +
 		// scaleLess);
 
-		return new MemStoreFeatureReader(featureType, featuresInScale.iterator());
+		return new MemStoreFeatureIterator(featuresInScale.iterator());
 	}
 
-	// @Override
-	// protected int getCountInternal(Query query) {
-	// // can do better here
-	// return featureIndex.size();
-	// }
-	//
-	// @Override
-	// protected ReferencedEnvelope getBoundsInternal(Query query) throws IOException {
-	// return !(query instanceof MemStoreQuery) ? map.viewPortBounds() : ((MemStoreQuery)
-	// query).bounds();
-	// }
-	//
-	// @Override
-	// protected synchronized SimpleFeatureType buildFeatureType() throws IOException {
-	// return featureType;
-	// }
-	//
-	// @Override
-	// protected boolean canFilter() {
-	// return true;
-	// }
-
 }
+
+// @Override
+// public FeatureReader<SimpleFeatureType, SimpleFeature> getReaderInternal(Query
+// query) throws IOException {
+//
+// assert false;
+// // System.err.println("Query = " + (query instanceof MemStoreQuery));
+// // System.err.println("Query = " + query);
+//
+// Collection<SimpleFeature> featuresInScale;
+// if (query instanceof MemStoreQuery mq) {
+//
+// var ebounds = System.currentTimeMillis();
+// var featuresInBounds = (List<SimpleFeature>) featureIndex.query(mq.bounds());
+// ebounds = System.currentTimeMillis() - ebounds;
+//
+// var sbounds = System.currentTimeMillis();
+//
+// var currentScale = map.currentScale();
+// var scaleLess = mq.scaleLess();
+//
+// featuresInScale = new ArrayList<>();
+// for (var feature : featuresInBounds) {
+// var featureMinScale = feature.getAttribute(S57.AT_SCAMIN);
+// if (scaleLess || featureMinScale == null || (int) featureMinScale >= currentScale)
+// {
+// featuresInScale.add(feature);
+// }
+// }
+//
+// sbounds = System.currentTimeMillis() - sbounds;
+//
+// // System.err.println("Source " + featureType.getTypeName() + ", #In Bounds =
+// // " + featuresInBounds.size()
+// // + " : " + ebounds + " millis, #In Scale = " + featuresInScale.size() + " :
+// // " + sbounds
+// // + " millis, current scale = " + currentScale + ", scaleLess = " +
+// // scaleLess);
+// }
+// else {
+// var ebounds = System.currentTimeMillis();
+// featuresInScale = featureIndex.query(map.viewPortBounds());
+// ebounds = System.currentTimeMillis() - ebounds;
+//
+// // System.err.println("Source " + featureType.getTypeName() + ", #In Bounds =
+// // " + featuresInScale.size()
+// // + " : " + ebounds + " millis");
+// }
+//
+// return null;
+// // return new MemStoreFeatureReader(getState(), featureType,
+// // featuresInScale.iterator());
+// }

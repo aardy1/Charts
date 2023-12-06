@@ -27,7 +27,7 @@ public class RemoveHolesFromPolygon implements IRenderablePolygonProvider {
 	}
 
 	@Override
-	public Polygon get(Polygon polygon) {
+	public Polygon apply(Polygon polygon) {
 
 		var renderGeom = renderGeomCache.fetch(polygon);
 		if (renderGeom == null) {

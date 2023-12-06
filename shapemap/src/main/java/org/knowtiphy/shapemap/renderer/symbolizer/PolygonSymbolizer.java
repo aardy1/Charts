@@ -5,7 +5,6 @@
 
 package org.knowtiphy.shapemap.renderer.symbolizer;
 
-import org.knowtiphy.shapemap.api.IFeature;
 import org.knowtiphy.shapemap.renderer.GraphicsRenderingContext;
 import org.knowtiphy.shapemap.renderer.graphics.Fill;
 import org.knowtiphy.shapemap.renderer.graphics.Stroke;
@@ -15,7 +14,7 @@ import org.knowtiphy.shapemap.renderer.symbolizer.basic.StrokeInfo;
 /**
  * @author graham
  */
-public class PolygonSymbolizer<S, F extends IFeature> implements ISymbolizer<S, F> {
+public class PolygonSymbolizer<S, F> implements ISymbolizer<S, F> {
 
 	private final FillInfo fillInfo;
 
@@ -29,14 +28,17 @@ public class PolygonSymbolizer<S, F extends IFeature> implements ISymbolizer<S, 
 	@Override
 	public void render(GraphicsRenderingContext<S, F> context, F feature) {
 
+		var featureAdapter = context.rendererContext().featureAdapter();
 		if (fillInfo != null) {
 			Fill.setup(context, fillInfo);
-			Fill.fill(context, feature.getDefaultGeometry(), feature.geomType());
+			Fill.fill(context, featureAdapter.defaultGeometry(feature),
+					context.rendererContext().featureAdapter().geomType(feature));
 		}
 
 		if (strokeInfo != null) {
 			Stroke.setup(context, strokeInfo);
-			Stroke.stroke(context, feature.getDefaultGeometry(), feature.geomType());
+			Stroke.stroke(context, featureAdapter.defaultGeometry(feature),
+					context.rendererContext().featureAdapter().geomType(feature));
 		}
 	}
 

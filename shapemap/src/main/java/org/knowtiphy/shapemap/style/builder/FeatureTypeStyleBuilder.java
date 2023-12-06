@@ -7,14 +7,13 @@ package org.knowtiphy.shapemap.style.builder;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.knowtiphy.shapemap.api.IFeature;
 import org.knowtiphy.shapemap.renderer.FeatureTypeStyle;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.Rule;
 
 /**
  * @author graham
  */
-public class FeatureTypeStyleBuilder<S, F extends IFeature> {
+public class FeatureTypeStyleBuilder<S, F> {
 
 	private String featureType;
 

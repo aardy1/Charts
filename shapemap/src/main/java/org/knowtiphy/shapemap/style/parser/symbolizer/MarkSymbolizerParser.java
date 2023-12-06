@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.function.BiFunction;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
-import org.knowtiphy.shapemap.api.IFeature;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.FillInfo;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.PathInfo;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.StrokeInfo;
@@ -32,7 +31,9 @@ import static org.knowtiphy.shapemap.style.parser.Utils.normalize;
 /**
  * @author graham
  */
-public class MarkSymbolizerParser<S, F extends IFeature> {
+
+// TODO -- this class is a mess
+public class MarkSymbolizerParser<S, F> {
 
 	private final Map<String, BiFunction<FillInfo, StrokeInfo, IMarkSymbolizer<S, F>>> WKN = Map.of(
 	//@formatter:off

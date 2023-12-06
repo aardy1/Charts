@@ -9,7 +9,9 @@ import javafx.scene.paint.Color;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.StrokeInfo;
 
 /**
- * @author graham
+ * A builder of stroke information used in styling.
+ *
+ * The default stroke color is white, stroke width is 1, and stroke opacity is 1.
  */
 public class StrokeInfoBuilder {
 

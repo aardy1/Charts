@@ -5,12 +5,10 @@
 
 package org.knowtiphy.charts.memstore;
 
-import org.knowtiphy.shapemap.api.IFeature;
-
 /**
  * @author graham
  */
-public class MapStats<S, F extends IFeature> {
+public class MapStats<S, F> {
 
 	// private final MapViewModel<S, F> map;
 	//

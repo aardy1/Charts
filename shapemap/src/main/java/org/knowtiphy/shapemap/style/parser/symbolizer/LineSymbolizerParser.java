@@ -7,7 +7,6 @@ package org.knowtiphy.shapemap.style.parser.symbolizer;
 
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
-import org.knowtiphy.shapemap.api.IFeature;
 import org.knowtiphy.shapemap.renderer.symbolizer.ISymbolizer;
 import org.knowtiphy.shapemap.style.builder.LineSymbolizerBuilder;
 import org.knowtiphy.shapemap.style.parser.StyleSyntaxException;
@@ -23,7 +22,7 @@ import static org.knowtiphy.shapemap.style.parser.Utils.normalize;
  */
 public class LineSymbolizerParser {
 
-	public static <S, F extends IFeature> ISymbolizer<S, F> parse(XMLEventReader reader)
+	public static <S, F> ISymbolizer<S, F> parse(XMLEventReader reader)
 			throws XMLStreamException, StyleSyntaxException {
 
 		var builder = new LineSymbolizerBuilder<S, F>();

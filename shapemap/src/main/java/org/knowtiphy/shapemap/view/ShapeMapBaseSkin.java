@@ -2,10 +2,8 @@ package org.knowtiphy.shapemap.view;
 
 import javafx.scene.control.Skin;
 import javafx.scene.control.SkinBase;
-import org.knowtiphy.shapemap.api.IFeature;
 
-public abstract class ShapeMapBaseSkin<S, F extends IFeature> extends SkinBase<ShapeMapView<S, F>>
-		implements Skin<ShapeMapView<S, F>> {
+public abstract class ShapeMapBaseSkin<S, F> extends SkinBase<ShapeMapView<S, F>> implements Skin<ShapeMapView<S, F>> {
 
 	private static final double MINIMUM_WIDTH = 8;
 

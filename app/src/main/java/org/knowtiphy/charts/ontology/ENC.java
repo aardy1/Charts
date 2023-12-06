@@ -8,7 +8,6 @@ package org.knowtiphy.charts.ontology;
 import org.geotools.api.referencing.FactoryException;
 import org.geotools.api.referencing.operation.TransformException;
 import org.knowtiphy.charts.geotools.Coordinates;
-import org.knowtiphy.shapemap.api.IFeature;
 import org.knowtiphy.shapemap.api.model.MapViewModel;
 
 import static org.knowtiphy.charts.geotools.Coordinates.twoDec;
@@ -37,14 +36,12 @@ public class ENC {
 	}
 
 	// I don't think this conversion is correct
-	public static <S, F extends IFeature> double encScale(MapViewModel<S, F> map)
-			throws TransformException, FactoryException {
+	public static <S, F> double encScale(MapViewModel<S, F> map) throws TransformException, FactoryException {
 		var meters = Coordinates.distanceAcross(map);
 		return encScaleKM(meters / 1000);
 	}
 
-	public static <S, F extends IFeature> String encScaleText(MapViewModel<S, F> map)
-			throws TransformException, FactoryException {
+	public static <S, F> String encScaleText(MapViewModel<S, F> map) throws TransformException, FactoryException {
 		var scale = encScale(map);
 		return scale > 1_000_000 ? twoDec(scale / 1_000_000) + "MM" : (twoDec(scale) + "");
 	}

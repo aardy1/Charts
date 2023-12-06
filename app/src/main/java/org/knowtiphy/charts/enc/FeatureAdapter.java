@@ -1,0 +1,28 @@
+/*
+ * Copyright Knowtiphy
+ * All rights reserved.
+ */
+
+package org.knowtiphy.charts.enc;
+
+import org.knowtiphy.charts.memstore.MemFeature;
+import org.knowtiphy.shapemap.api.GeomType;
+import org.knowtiphy.shapemap.api.IFeatureAdapter;
+import org.locationtech.jts.geom.Geometry;
+
+/**
+ * @author graham
+ */
+public class FeatureAdapter implements IFeatureAdapter<MemFeature> {
+
+	@Override
+	public Geometry defaultGeometry(MemFeature feature) {
+		return feature.defaultGeometry();
+	}
+
+	@Override
+	public GeomType geomType(MemFeature feature) {
+		return feature.geomType();
+	}
+
+}

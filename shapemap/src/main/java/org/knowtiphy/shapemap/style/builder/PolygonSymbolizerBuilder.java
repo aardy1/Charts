@@ -5,7 +5,6 @@
 
 package org.knowtiphy.shapemap.style.builder;
 
-import org.knowtiphy.shapemap.api.IFeature;
 import org.knowtiphy.shapemap.renderer.symbolizer.ISymbolizer;
 import org.knowtiphy.shapemap.renderer.symbolizer.PolygonSymbolizer;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.FillInfo;
@@ -18,7 +17,7 @@ import static org.knowtiphy.shapemap.style.parser.StyleSyntaxException.expectEle
 /**
  * @author graham
  */
-public class PolygonSymbolizerBuilder<S, F extends IFeature> {
+public class PolygonSymbolizerBuilder<S, F> {
 
 	private FillInfo fillInfo;
 

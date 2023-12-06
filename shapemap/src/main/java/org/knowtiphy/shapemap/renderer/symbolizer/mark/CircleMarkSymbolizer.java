@@ -5,7 +5,6 @@
 
 package org.knowtiphy.shapemap.renderer.symbolizer.mark;
 
-import org.knowtiphy.shapemap.api.IFeature;
 import org.knowtiphy.shapemap.renderer.GraphicsRenderingContext;
 import org.knowtiphy.shapemap.renderer.graphics.Fill;
 import org.knowtiphy.shapemap.renderer.graphics.Stroke;
@@ -17,7 +16,7 @@ import org.locationtech.jts.geom.Point;
 /**
  * @author graham
  */
-public class CircleMarkSymbolizer<S, F extends IFeature> extends BaseMarkSymbolizer<S, F> {
+public class CircleMarkSymbolizer<S, F> extends BaseMarkSymbolizer<S, F> {
 
 	public CircleMarkSymbolizer(FillInfo fillInfo, StrokeInfo strokeInfo) {
 		super(fillInfo, strokeInfo);
