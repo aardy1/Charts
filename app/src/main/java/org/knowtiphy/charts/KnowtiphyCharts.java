@@ -8,7 +8,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Application;
 import javafx.geometry.Pos;
-import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Priority;
@@ -18,6 +17,7 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import org.controlsfx.control.PropertySheet;
 import org.knowtiphy.charts.chartview.ChartView;
+import org.knowtiphy.charts.chartview.MapDisplayOptions;
 import org.knowtiphy.charts.dynamics.AISModel;
 import org.knowtiphy.charts.enc.CatalogReader;
 import org.knowtiphy.charts.enc.ChartLocker;
@@ -28,7 +28,6 @@ import org.knowtiphy.charts.platform.IPlatform;
 import org.knowtiphy.charts.platform.Platform;
 import org.knowtiphy.charts.utils.FXUtils;
 import org.knowtiphy.charts.utils.ToggleModel;
-import org.knowtiphy.charts.chartview.MapDisplayOptions;
 
 import static org.knowtiphy.charts.utils.FXUtils.later;
 import static org.knowtiphy.charts.utils.FXUtils.resizeable;
@@ -77,7 +76,7 @@ public class KnowtiphyCharts extends Application {
 		// new Dump(mapContent, reader.getStore()).dump(S57.OC_BUAARE);
 
 		// this won't be right after the info bar is done, but that will be resized later
-		chart.setViewPortScreenArea(new Rectangle2D(0, 0, width, height));
+		// chart.setViewPortScreenArea(new Rectangle2D(0, 0, width, height));
 
 		var mapSurface = makeMap();
 

@@ -65,7 +65,7 @@ public class ChartLocker {
 			return null;
 		}
 
-		newChart.setViewPortScreenArea(screenArea);
+		// newChart.setViewPortScreenArea(screenArea);
 		newChart.setViewPortBounds(newChart.bounds());
 		return newChart;
 	}

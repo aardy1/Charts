@@ -21,6 +21,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.transform.NonInvertibleTransformException;
 import org.apache.commons.lang3.tuple.Pair;
 import org.controlsfx.glyphfont.Glyph;
+import org.geotools.api.feature.simple.SimpleFeatureType;
 import org.geotools.api.referencing.FactoryException;
 import org.geotools.api.referencing.operation.TransformException;
 import org.knowtiphy.charts.Fonts;
@@ -33,11 +34,10 @@ import org.knowtiphy.charts.enc.ChartDescription;
 import org.knowtiphy.charts.enc.ChartLocker;
 import org.knowtiphy.charts.enc.ENCChart;
 import org.knowtiphy.charts.geotools.Queries;
+import org.knowtiphy.shapemap.api.IFeature;
+import org.knowtiphy.shapemap.view.ShapeMapView;
 import org.knowtiphy.shapemap.renderer.Transformation;
-import org.knowtiphy.shapemap.api.ShapeMapViewFactory;
 import org.knowtiphy.shapemap.style.parser.StyleSyntaxException;
-import org.knowtiphy.shapemap.api.ShapeMapView;
-import org.reactfx.Change;
 import org.reactfx.EventStreams;
 import org.reactfx.Subscription;
 
@@ -49,7 +49,7 @@ public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView
 
 	private final StackPane root;
 
-	private final ShapeMapView mapSurface;
+	private final ShapeMapView<SimpleFeatureType, IFeature> mapSurface;
 
 	private final ChartLocker chartLocker;
 
@@ -130,7 +130,7 @@ public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView
 			@Override
 			public void layoutChildren() {
 				try {
-					// set the screen area for all the children before laying them out
+					// set the screen area of the viewport before laying out the children
 					chart.setViewPortScreenArea(new Rectangle2D(0, 0, (int) getWidth(), (int) getHeight()));
 				}
 				catch (TransformException | NonInvertibleTransformException ex) {
@@ -168,8 +168,8 @@ public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView
 		return pane;
 	}
 
-	private ShapeMapView makeMapSurface() {
-		var theSurface = ShapeMapViewFactory.create(chart);
+	private ShapeMapView<SimpleFeatureType, IFeature> makeMapSurface() {
+		var theSurface = new ShapeMapView<>(chart);
 		theSurface.setMouseTransparent(true);
 		return theSurface;
 	}
@@ -260,7 +260,7 @@ public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView
 			var screenArea = new Rectangle2D(0, 0, (int) root.getWidth(), (int) root.getHeight());
 			try {
 				var newChart = chartLocker.loadChart(mostDetailedChart, displayOptions, screenArea);
-				newChart.newMapViewModel().push(new Change<>(chart, newChart));
+				chart.setNewMapViewModel(newChart);
 			}
 			catch (TransformException | FactoryException | NonInvertibleTransformException | StyleSyntaxException ex) {
 				Logger.getLogger(ChartViewSkin.class.getName()).log(Level.SEVERE, null, ex);

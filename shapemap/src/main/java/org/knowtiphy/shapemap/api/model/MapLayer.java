@@ -1,11 +1,11 @@
-package org.knowtiphy.shapemap.model;
+package org.knowtiphy.shapemap.api.model;
 
 import java.io.IOException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.knowtiphy.shapemap.renderer.FeatureTypeStyle;
 import org.knowtiphy.shapemap.api.IFeature;
 import org.knowtiphy.shapemap.api.IFeatureSource;
 import org.knowtiphy.shapemap.api.IFeatureSourceIterator;
+import org.knowtiphy.shapemap.renderer.FeatureTypeStyle;
 
 public class MapLayer<S, F extends IFeature> {
 

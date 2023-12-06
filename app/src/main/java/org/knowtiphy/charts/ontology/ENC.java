@@ -8,7 +8,7 @@ package org.knowtiphy.charts.ontology;
 import org.geotools.api.referencing.FactoryException;
 import org.geotools.api.referencing.operation.TransformException;
 import org.knowtiphy.charts.geotools.Coordinates;
-import org.knowtiphy.shapemap.model.MapViewModel;
+import org.knowtiphy.shapemap.api.model.MapViewModel;
 
 import static org.knowtiphy.charts.geotools.Coordinates.twoDec;
 

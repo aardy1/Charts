@@ -32,19 +32,22 @@ public class MapViewport {
 	private boolean fixedBoundsOnResize = false;
 
 	public MapViewport(ReferencedEnvelope bounds, boolean matchAspectRatio)
-			throws TransformException, NonInvertibleTransformException {
+			throws TransformException, NonInvertibleTransformException, FactoryException {
 		this.screenArea = Rectangle2D.EMPTY;
 		this.hasCenteringTransforms = false;
 		this.matchingAspectRatio = matchAspectRatio;
+		this.bounds = bounds;
+		setCoordinateReferenceSystem(bounds.getCoordinateReferenceSystem());
 		copyBounds(bounds);
 		setTransforms(true);
 	}
 
-	public MapViewport(ReferencedEnvelope bounds) throws TransformException, NonInvertibleTransformException {
+	public MapViewport(ReferencedEnvelope bounds)
+			throws TransformException, NonInvertibleTransformException, FactoryException {
 		this(bounds, false);
 	}
 
-	public MapViewport() throws TransformException, NonInvertibleTransformException {
+	public MapViewport() throws TransformException, NonInvertibleTransformException, FactoryException {
 		this(null, false);
 	}
 
@@ -55,7 +58,7 @@ public class MapViewport {
 	 */
 	public void setMatchingAspectRatio(boolean enabled) throws TransformException, NonInvertibleTransformException {
 		matchingAspectRatio = enabled;
-		setTransforms(true);
+		// setTransforms(true);
 	}
 
 	public boolean isMatchingAspectRatio() {

@@ -11,8 +11,8 @@ import javafx.scene.paint.Color;
 import javafx.scene.transform.NonInvertibleTransformException;
 import org.geotools.api.referencing.operation.TransformException;
 import org.knowtiphy.shapemap.api.IFeature;
-import org.knowtiphy.shapemap.api.ShapeMapView;
-import org.knowtiphy.shapemap.renderer.InternalMapViewModel;
+import org.knowtiphy.shapemap.view.ShapeMapView;
+import org.knowtiphy.shapemap.api.model.MapViewModel;
 import org.knowtiphy.shapemap.renderer.ShapeMapRenderer;
 import org.knowtiphy.shapemap.renderer.context.RendererContext;
 import org.knowtiphy.shapemap.view.ShapeMapBaseSkin;
@@ -24,7 +24,7 @@ public class CanvasShapeMapSkin<S, F extends IFeature> extends ShapeMapBaseSkin 
 
 	private static final double PREFERRED_HEIGHT = Region.USE_COMPUTED_SIZE;
 
-	private final InternalMapViewModel<S, F> map;
+	private MapViewModel<S, F> map;
 
 	private final Pane root;
 
@@ -32,7 +32,7 @@ public class CanvasShapeMapSkin<S, F extends IFeature> extends ShapeMapBaseSkin 
 
 	private final List<Subscription> subscriptions = new ArrayList<>();
 
-	public CanvasShapeMapSkin(ShapeMapView surface, InternalMapViewModel<S, F> map) {
+	public CanvasShapeMapSkin(ShapeMapView surface, MapViewModel<S, F> map) {
 		super(surface);
 
 		this.map = map;
@@ -53,13 +53,14 @@ public class CanvasShapeMapSkin<S, F extends IFeature> extends ShapeMapBaseSkin 
 		// unsubscribe listeners on the old map
 		subscriptions.forEach(s -> s.unsubscribe());
 		subscriptions.clear();
-		subscriptions.add(map.layoutNeededEvent().subscribe(b -> root.requestLayout()));
-		// subscriptions.add(map.newMapEvent().subscribe((Change<IMapViewModel<?, ?>>
-		// change) -> {
-		// this.map = change.getNewValue();
-		// setupListeners();
-		// root.requestLayout();
-		// }));
+		subscriptions.add(map.layerVisibilityEvent().subscribe(b -> root.requestLayout()));
+		subscriptions.add(map.viewPortBoundsEvent().subscribe(b -> root.requestLayout()));
+		subscriptions.add(map.newMapViewModel().subscribe(change -> {
+			this.map = change.getNewValue();
+			setupListeners();
+			System.err.println("NEW MAP");
+			root.requestLayout();
+		}));
 	}
 
 	private void initGraphics() {
@@ -99,6 +100,7 @@ public class CanvasShapeMapSkin<S, F extends IFeature> extends ShapeMapBaseSkin 
 				map.renderablePolygonProvider(),
 				map.svgProvider());
 		//@formatter:on
+
 		var renderer = new ShapeMapRenderer(rendererContext, graphics);
 		try {
 			renderer.paint();
