@@ -5,10 +5,8 @@
 
 package org.knowtiphy.charts.chartview;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Supplier;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
@@ -16,7 +14,6 @@ import javafx.scene.shape.Polyline;
 import javafx.scene.shape.Shape;
 import javafx.scene.shape.StrokeType;
 import org.controlsfx.glyphfont.Glyph;
-import org.geotools.api.feature.simple.SimpleFeatureType;
 import org.knowtiphy.charts.enc.ENCChart;
 import org.knowtiphy.charts.memstore.MemFeature;
 import org.knowtiphy.shapemap.renderer.Transformation;
@@ -77,24 +74,26 @@ public class IconSurface extends Pane {
 		}
 	}
 
-	private void createIconLayer(SimpleFeatureType type, Supplier<Glyph> glyph, List<String> attributes,
-			String defaultValue, EventStream<Change<Boolean>> visibilityEvents) throws Exception {
-
-		var layer = chart.layer(type);
-		if (layer == null)
-			return;
-
-		try (var features = layer.getFeatureSource().features()) {
-			while (features.hasNext()) {
-				var g = glyph.get();
-				g.setFontSize(14);
-				createIcon(features.next(), g, attributes, defaultValue, visibilityEvents);
-			}
-		}
-		catch (IOException ex) {
-			//
-		}
-	}
+	// private void createIconLayer(SimpleFeatureType type, Supplier<Glyph> glyph,
+	// List<String> attributes,
+	// String defaultValue, EventStream<Change<Boolean>> visibilityEvents) throws
+	// Exception {
+	//
+	// var layer = chart.layer(chart.sc);
+	// if (layer == null)
+	// return;
+	//
+	// try (var features = layer.getFeatureSource().features()) {
+	// while (features.hasNext()) {
+	// var g = glyph.get();
+	// g.setFontSize(14);
+	// createIcon(features.next(), g, attributes, defaultValue, visibilityEvents);
+	// }
+	// }
+	// catch (IOException ex) {
+	// //
+	// }
+	// }
 
 	private void createIcon(MemFeature feature, Glyph glyph, List<String> attributes, String defaultValue,
 			EventStream<Change<Boolean>> visibilityEvents) {

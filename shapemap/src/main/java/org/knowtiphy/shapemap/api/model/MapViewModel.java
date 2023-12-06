@@ -13,6 +13,7 @@ import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.knowtiphy.shapemap.api.IFeatureAdapter;
 import org.knowtiphy.shapemap.api.IRenderablePolygonProvider;
 import org.knowtiphy.shapemap.api.ISVGProvider;
+import org.knowtiphy.shapemap.api.ISchemaAdapter;
 import org.reactfx.Change;
 import org.reactfx.EventSource;
 import org.reactfx.EventStream;
@@ -29,11 +30,13 @@ public abstract class MapViewModel<S, F> {
 
 	private final ReferencedEnvelope bounds;
 
-	private final Map<S, MapLayer<S, F>> layers = new LinkedHashMap<>();
+	private final Map<String, MapLayer<S, F>> layers = new LinkedHashMap<>();
 
 	private final MapViewport viewPort;
 
 	private final IFeatureAdapter<F> featureAdapter;
+
+	private final ISchemaAdapter<S> schemaAdapter;
 
 	private final IRenderablePolygonProvider renderablePolygonProvider;
 
@@ -42,11 +45,12 @@ public abstract class MapViewModel<S, F> {
 	// possibly shouldnt be here -- but it makes for faster rendering
 	private int totalRuleCount;
 
-	protected MapViewModel(ReferencedEnvelope bounds, IFeatureAdapter<F> featureAdapter,
-			IRenderablePolygonProvider renderablePolygonProvider, ISVGProvider svgProvider)
-			throws TransformException, NonInvertibleTransformException, FactoryException {
+	protected MapViewModel(ReferencedEnvelope bounds, ISchemaAdapter<S> schemaAdapter,
+			IFeatureAdapter<F> featureAdapter, IRenderablePolygonProvider renderablePolygonProvider,
+			ISVGProvider svgProvider) throws TransformException, NonInvertibleTransformException, FactoryException {
 
 		this.bounds = bounds;
+		this.schemaAdapter = schemaAdapter;
 		this.featureAdapter = featureAdapter;
 		this.renderablePolygonProvider = renderablePolygonProvider;
 		this.svgProvider = svgProvider;
@@ -68,11 +72,11 @@ public abstract class MapViewModel<S, F> {
 	}
 
 	public void addLayer(MapLayer<S, F> layer) {
-		layers.put(layer.getFeatureSource().getSchema(), layer);
+		layers.put(schemaAdapter.name(layer.getFeatureSource().getSchema()), layer);
 		totalRuleCount += layer.getStyle().rules().size();
 	}
 
-	public MapLayer<S, F> layer(S type) {
+	public MapLayer<S, F> layer(String type) {
 		return layers.get(type);
 	}
 
@@ -80,7 +84,7 @@ public abstract class MapViewModel<S, F> {
 		return totalRuleCount;
 	}
 
-	public void setLayerVisible(S type, boolean visible) {
+	public void setLayerVisible(String type, boolean visible) {
 		var layer = layer(type);
 		var oldVisible = layer.isVisible();
 		layer.setVisible(visible);

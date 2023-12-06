@@ -37,6 +37,7 @@ import org.knowtiphy.charts.enc.ChartLocker;
 import org.knowtiphy.charts.enc.ENCChart;
 import org.knowtiphy.charts.geotools.Queries;
 import org.knowtiphy.charts.memstore.MemFeature;
+import org.knowtiphy.charts.ontology.S57;
 import org.knowtiphy.shapemap.renderer.Transformation;
 import org.knowtiphy.shapemap.style.parser.StyleSyntaxException;
 import org.knowtiphy.shapemap.view.ShapeMapView;
@@ -191,9 +192,15 @@ public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView
 		// subscriptions.add(displayOptions.showGridEvents.subscribe(c ->
 		// gridPane.setVisible(c.getNewValue())));
 
-		// var sft = new SimpleFeatureType
-		// subscriptions.add(displayOptions.showLightsEvents.subscribe(c ->
-		// chart.setLayerVisible(null, true)));
+		subscriptions.add(displayOptions.showLightsEvents
+				.subscribe(change -> chart.setLayerVisible(S57.OC_LIGHTS, change.getNewValue())));
+		subscriptions.add(displayOptions.showPlatformEvents
+				.subscribe(change -> chart.setLayerVisible(S57.OC_OFSPLF, change.getNewValue())));
+		subscriptions.add(displayOptions.showWreckEvents
+				.subscribe(change -> chart.setLayerVisible(S57.OC_WRECKS, change.getNewValue())));
+		subscriptions.add(displayOptions.showSoundingsEvents
+				.subscribe(change -> chart.setLayerVisible(S57.OC_SOUNDG, change.getNewValue())));
+
 		// gridPane.setVisible(c.getNewValue())));
 
 		// subscriptions.add(chart.viewPortBoundsEvent.subscribe(change ->
@@ -305,6 +312,7 @@ public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView
 	}
 
 	private void setBoatPosition(Glyph boat, AISInformation aisInfo) {
+		// need to clip the position?
 		var tx = new Transformation(chart.viewPortWorldToScreen());
 		tx.apply(aisInfo.getPosition().x, aisInfo.getPosition().y);
 		boat.setTranslateX(tx.getX());
