@@ -24,12 +24,12 @@ import org.knowtiphy.charts.enc.CatalogReader;
 import org.knowtiphy.charts.enc.ChartLocker;
 import org.knowtiphy.charts.enc.ENCChart;
 import org.knowtiphy.charts.enc.LocalChartProvider;
+import org.knowtiphy.charts.memstore.MemFeature;
 import org.knowtiphy.charts.memstore.StyleReader;
 import org.knowtiphy.charts.platform.IPlatform;
 import org.knowtiphy.charts.platform.Platform;
 import org.knowtiphy.charts.utils.FXUtils;
 import org.knowtiphy.charts.utils.ToggleModel;
-import org.knowtiphy.shapemap.api.IFeature;
 
 import static org.knowtiphy.charts.utils.FXUtils.later;
 import static org.knowtiphy.charts.utils.FXUtils.resizeable;
@@ -65,7 +65,7 @@ public class KnowtiphyCharts extends Application {
 		var catalog = new CatalogReader(catalogFile).read();
 
 		// var styleReader = new StyleReader(styleDir);
-		var styleReader = new StyleReader<SimpleFeatureType, IFeature>(getClass());
+		var styleReader = new StyleReader<SimpleFeatureType, MemFeature>(getClass());
 		var chartProvider = new LocalChartProvider(catalog, platform.chartsDir(), styleReader);
 		chartLocker = new ChartLocker(chartProvider);
 		var chartDescription = chartProvider.getChartDescription("Gulf of Mexico", 2_160_000);

@@ -19,7 +19,6 @@ import org.knowtiphy.charts.memstore.MemFeature;
 import org.knowtiphy.charts.memstore.MemStore;
 import org.knowtiphy.charts.memstore.StyleReader;
 import org.knowtiphy.charts.ontology.S57;
-import org.knowtiphy.shapemap.api.IFeature;
 import org.knowtiphy.shapemap.api.IFeatureFunction;
 import org.knowtiphy.shapemap.api.IParsingContext;
 import org.knowtiphy.shapemap.api.model.MapLayer;
@@ -40,7 +39,7 @@ public class ChartBuilder {
 
 	private final ChartDescription chartDescription;
 
-	private final StyleReader<SimpleFeatureType, IFeature> styleReader;
+	private final StyleReader<SimpleFeatureType, MemFeature> styleReader;
 
 	private final MapDisplayOptions displayOptions;
 
@@ -49,7 +48,7 @@ public class ChartBuilder {
 	private MemStore store;
 
 	public ChartBuilder(ChartLocker chartLocker, Path shapeDir, ChartDescription chartDescription,
-			StyleReader<SimpleFeatureType, IFeature> styleReader, MapDisplayOptions displayOptions)
+			StyleReader<SimpleFeatureType, MemFeature> styleReader, MapDisplayOptions displayOptions)
 			throws TransformException, NonInvertibleTransformException {
 
 		this.chartLocker = chartLocker;
@@ -163,7 +162,7 @@ public class ChartBuilder {
 		return this;
 	}
 
-	private MapLayer<SimpleFeatureType, IFeature> readLayer(ContentFeatureSource featureSource, MemStore store)
+	private MapLayer<SimpleFeatureType, MemFeature> readLayer(ContentFeatureSource featureSource, MemStore store)
 			throws IOException, XMLStreamException, TransformException, NonInvertibleTransformException,
 			FactoryException, StyleSyntaxException {
 

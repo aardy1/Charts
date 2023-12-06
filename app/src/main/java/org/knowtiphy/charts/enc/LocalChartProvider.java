@@ -16,8 +16,8 @@ import org.geotools.api.referencing.FactoryException;
 import org.geotools.api.referencing.operation.TransformException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.knowtiphy.charts.chartview.MapDisplayOptions;
+import org.knowtiphy.charts.memstore.MemFeature;
 import org.knowtiphy.charts.memstore.StyleReader;
-import org.knowtiphy.shapemap.api.IFeature;
 import org.knowtiphy.shapemap.style.parser.StyleSyntaxException;
 
 /**
@@ -25,12 +25,12 @@ import org.knowtiphy.shapemap.style.parser.StyleSyntaxException;
  */
 public class LocalChartProvider {
 
-	private final StyleReader<SimpleFeatureType, IFeature> styleReader;
+	private final StyleReader<SimpleFeatureType, MemFeature> styleReader;
 
 	private final List<ChartDescription> chartDescriptions = new ArrayList<>();
 
 	public LocalChartProvider(Catalog catalog, Path shapeBaseDir,
-			StyleReader<SimpleFeatureType, IFeature> styleReader) {
+			StyleReader<SimpleFeatureType, MemFeature> styleReader) {
 
 		this.styleReader = styleReader;
 

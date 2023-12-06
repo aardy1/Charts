@@ -13,7 +13,7 @@ import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.api.referencing.operation.TransformException;
 import org.knowtiphy.charts.chartview.MapDisplayOptions;
 import org.knowtiphy.charts.chartview.markicons.ResourceLoader;
-import org.knowtiphy.shapemap.api.IFeature;
+import org.knowtiphy.charts.memstore.MemFeature;
 import org.knowtiphy.shapemap.api.model.MapViewModel;
 import org.knowtiphy.shapemap.renderer.context.RemoveHolesFromPolygon;
 import org.knowtiphy.shapemap.renderer.context.RenderGeomCache;
@@ -22,7 +22,7 @@ import org.knowtiphy.shapemap.renderer.context.SVGCache;
 /**
  * @author graham
  */
-public class ENCChart extends MapViewModel<SimpleFeatureType, IFeature> {
+public class ENCChart extends MapViewModel<SimpleFeatureType, MemFeature> {
 
 	private final ChartDescription chartDescription;
 

@@ -34,7 +34,7 @@ import org.knowtiphy.charts.enc.ChartDescription;
 import org.knowtiphy.charts.enc.ChartLocker;
 import org.knowtiphy.charts.enc.ENCChart;
 import org.knowtiphy.charts.geotools.Queries;
-import org.knowtiphy.shapemap.api.IFeature;
+import org.knowtiphy.charts.memstore.MemFeature;
 import org.knowtiphy.shapemap.renderer.Transformation;
 import org.knowtiphy.shapemap.style.parser.StyleSyntaxException;
 import org.knowtiphy.shapemap.view.ShapeMapView;
@@ -49,7 +49,7 @@ public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView
 
 	private final StackPane root;
 
-	private final ShapeMapView<SimpleFeatureType, IFeature> mapSurface;
+	private final ShapeMapView<SimpleFeatureType, MemFeature> mapSurface;
 
 	private final ChartLocker chartLocker;
 
@@ -168,7 +168,7 @@ public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView
 		return pane;
 	}
 
-	private ShapeMapView<SimpleFeatureType, IFeature> makeMapSurface() {
+	private ShapeMapView<SimpleFeatureType, MemFeature> makeMapSurface() {
 		var theSurface = new ShapeMapView<>(chart);
 		theSurface.setMouseTransparent(true);
 		return theSurface;
