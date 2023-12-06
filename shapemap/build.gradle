@@ -6,30 +6,19 @@ plugins {
 repositories {
     maven { url  'https://repo.osgeo.org/repository/release/' }
     maven { url  'https://repo.osgeo.org/repository/snapshot/' }
-    maven { url 'https://nexus.gluonhq.com/nexus/content/repositories/releases/' }
     maven { url 'https://jitpack.io' }
     mavenCentral()
 }
 
 dependencies {
-
     implementation libs.geotools.sld
-    implementation libs.geotools.metadata
-
+    implementation libs.commons.lang3
+    implementation libs.stax.api
     implementation libs.fx.base
     implementation libs.fx.graphics
     implementation libs.fx.controls
-
-    implementation libs.commons.lang3
-    implementation libs.stax.api
-
     implementation libs.reactfx
-
-    implementation 'com.github.hervegirod:fxsvgimage:1.1'
-}
-
-tasks.withType(JavaExec) {
-    enableAssertions = true
+    implementation libs.fxsvgimage
 }
 
 java {
@@ -38,8 +27,17 @@ java {
     }
 }
 
+compileJava {
+    options.compilerArgs.addAll(['-Xlint'])
+}
+
 javafx {
     version = "21"
     platform = "macos-aarch64"
     modules = [ 'javafx.base', 'javafx.graphics', 'javafx.controls' ]
 }
+
+//tasks.withType(JavaExec) {
+//    enableAssertions = true
+//}
+//   maven { url 'https://nexus.gluonhq.com/nexus/content/repositories/releases/' }

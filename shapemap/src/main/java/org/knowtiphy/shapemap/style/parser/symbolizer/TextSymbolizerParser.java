@@ -7,11 +7,11 @@ package org.knowtiphy.shapemap.style.parser.symbolizer;
 
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
+import org.knowtiphy.shapemap.api.IFeature;
+import org.knowtiphy.shapemap.api.IParsingContext;
 import org.knowtiphy.shapemap.renderer.Operators;
 import org.knowtiphy.shapemap.renderer.symbolizer.TextSymbolizer;
-import org.knowtiphy.shapemap.api.IFeature;
 import org.knowtiphy.shapemap.style.builder.TextSymbolizerBuilder;
-import org.knowtiphy.shapemap.api.IParsingContext;
 import org.knowtiphy.shapemap.style.parser.StyleSyntaxException;
 import org.knowtiphy.shapemap.style.parser.Utils;
 import org.knowtiphy.shapemap.style.parser.VendorOptionParser;
@@ -29,10 +29,10 @@ import static org.knowtiphy.shapemap.style.parser.Utils.normalize;
  */
 public class TextSymbolizerParser {
 
-	public static <F extends IFeature> TextSymbolizer parse(IParsingContext parsingContext, XMLEventReader reader)
-			throws XMLStreamException, StyleSyntaxException {
+	public static <S, F extends IFeature> TextSymbolizer<S, F> parse(IParsingContext<F> parsingContext,
+			XMLEventReader reader) throws XMLStreamException, StyleSyntaxException {
 
-		var builder = new TextSymbolizerBuilder<F>();
+		var builder = new TextSymbolizerBuilder<S, F>();
 
 		var done = false;
 		while (!done && reader.hasNext()) {

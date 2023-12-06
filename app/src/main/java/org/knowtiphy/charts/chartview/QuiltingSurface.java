@@ -10,7 +10,6 @@ import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.geometry.Insets;
-import javafx.geometry.Rectangle2D;
 import javafx.scene.control.Button;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
@@ -96,8 +95,7 @@ public class QuiltingSurface extends StackPane {
 				label.setFont(Fonts.DEFAULT_FONT_10);
 				label.setOnAction(eh -> {
 					try {
-						chartLocker.loadChart(chartDescription, displayOptions, // chart.bounds(),
-								new Rectangle2D(0, 0, (int) widthProperty().get(), (int) heightProperty().get()));
+						chartLocker.loadChart(chartDescription, displayOptions);
 					}
 					catch (TransformException | FactoryException | NonInvertibleTransformException
 							| StyleSyntaxException ex) {

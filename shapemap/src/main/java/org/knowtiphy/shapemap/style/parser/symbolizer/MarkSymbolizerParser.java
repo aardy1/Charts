@@ -5,11 +5,11 @@
 
 package org.knowtiphy.shapemap.style.parser.symbolizer;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiFunction;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
+import org.knowtiphy.shapemap.api.IFeature;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.FillInfo;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.PathInfo;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.StrokeInfo;
@@ -32,9 +32,9 @@ import static org.knowtiphy.shapemap.style.parser.Utils.normalize;
 /**
  * @author graham
  */
-public class MarkSymbolizerParser {
+public class MarkSymbolizerParser<S, F extends IFeature> {
 
-	private static final Map<String, BiFunction<FillInfo, StrokeInfo, IMarkSymbolizer>> WKN = Map.of(
+	private final Map<String, BiFunction<FillInfo, StrokeInfo, IMarkSymbolizer<S, F>>> WKN = Map.of(
 	//@formatter:off
 			"circle", CircleMarkSymbolizer::new,
 			"square", SquareMarkSymbolizer::new,
@@ -45,17 +45,15 @@ public class MarkSymbolizerParser {
 	);
 	//@formatter:on
 
-	public static final Map<String, BiFunction<FillInfo, StrokeInfo, IMarkSymbolizer>> S52 = new HashMap<>();
-	static {
-		S52.put("Hazard-Lighthouse", (f, s) -> new SVGMarkSymbolizer(new PathInfo("Hazard-Lighthouse.svg"), f, s));
-		S52.put("Hazard-Oil-Platform", (f, s) -> new SVGMarkSymbolizer(new PathInfo("Hazard-Oil-Platform.svg"), f, s));
-		S52.put("Hazard-Wreck", (f, s) -> new SVGMarkSymbolizer(new PathInfo("Hazard-Wreck2.svg"), f, s));
-		S52.put("Arrow", (f, s) -> new SVGMarkSymbolizer(new PathInfo("Arrow.svg"), f, s));
-	}
+	public final Map<String, BiFunction<FillInfo, StrokeInfo, IMarkSymbolizer<S, F>>> S52 = Map.of("Hazard-Lighthouse",
+			(f, s) -> new SVGMarkSymbolizer<>(new PathInfo("Hazard-Lighthouse.svg"), f, s), "Hazard-Oil-Platform",
+			(f, s) -> new SVGMarkSymbolizer<>(new PathInfo("Hazard-Oil-Platform.svg"), f, s), "Hazard-Wreck",
+			(f, s) -> new SVGMarkSymbolizer<>(new PathInfo("Hazard-Wreck2.svg"), f, s), "Arrow",
+			(f, s) -> new SVGMarkSymbolizer<>(new PathInfo("Arrow.svg"), f, s));
 
-	public static IMarkSymbolizer parse(XMLEventReader reader) throws XMLStreamException, StyleSyntaxException {
+	public IMarkSymbolizer<S, F> parse(XMLEventReader reader) throws XMLStreamException, StyleSyntaxException {
 
-		var builder = new MarkSymbolizerBuilder();
+		var builder = new MarkSymbolizerBuilder<S, F>();
 
 		var done = false;
 		while (!done && reader.hasNext()) {
@@ -79,7 +77,7 @@ public class MarkSymbolizerParser {
 		return builder.build();
 	}
 
-	private static BiFunction<FillInfo, StrokeInfo, IMarkSymbolizer> getMarkSymbolizer(String name)
+	private BiFunction<FillInfo, StrokeInfo, IMarkSymbolizer<S, F>> getMarkSymbolizer(String name)
 			throws StyleSyntaxException {
 
 		var parts = name.split(":");

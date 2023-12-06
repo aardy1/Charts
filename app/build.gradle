@@ -24,6 +24,10 @@ java {
     }
 }
 
+compileJava {
+    options.compilerArgs.addAll(['-Xlint'])
+}
+
 javafx {
     version = "21"
     platform = "macos-aarch64"

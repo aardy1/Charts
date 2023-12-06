@@ -7,6 +7,7 @@ package org.knowtiphy.shapemap.style.parser.symbolizer;
 
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
+import org.knowtiphy.shapemap.api.IFeature;
 import org.knowtiphy.shapemap.renderer.symbolizer.ISymbolizer;
 import org.knowtiphy.shapemap.style.builder.PolygonSymbolizerBuilder;
 import org.knowtiphy.shapemap.style.parser.StyleSyntaxException;
@@ -23,9 +24,10 @@ import static org.knowtiphy.shapemap.style.parser.Utils.normalize;
  */
 public class PolygonSymbolizerParser {
 
-	public static ISymbolizer parse(XMLEventReader reader) throws XMLStreamException, StyleSyntaxException {
+	public static <S, F extends IFeature> ISymbolizer<S, F> parse(XMLEventReader reader)
+			throws XMLStreamException, StyleSyntaxException {
 
-		var builder = new PolygonSymbolizerBuilder();
+		var builder = new PolygonSymbolizerBuilder<S, F>();
 
 		var done = false;
 		while (!done && reader.hasNext()) {

@@ -14,6 +14,7 @@ import org.geotools.api.referencing.crs.GeographicCRS;
 import org.geotools.api.referencing.operation.TransformException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
+import org.knowtiphy.shapemap.api.IFeature;
 import org.knowtiphy.shapemap.api.model.MapViewModel;
 import org.knowtiphy.shapemap.renderer.Transformation;
 import si.uom.SI;
@@ -28,7 +29,8 @@ public class Coordinates {
 		return toMeters(degreeDiff, referencedEnvelope.getCoordinateReferenceSystem());
 	}
 
-	public static double distanceAcross(MapViewModel map) throws TransformException, FactoryException {
+	public static <S, F extends IFeature> double distanceAcross(MapViewModel<S, F> map)
+			throws TransformException, FactoryException {
 		return distanceAcross(map.bounds());
 	}
 
@@ -43,7 +45,7 @@ public class Coordinates {
 		return clip(maxExtent, copy, crs);
 	}
 
-	public static void zoom(MapViewModel map, double zoomFactor) {
+	public static <S, F extends IFeature> void zoom(MapViewModel<S, F> map, double zoomFactor) {
 
 		try {
 			var vpBounds = map.viewPortBounds();
@@ -62,7 +64,7 @@ public class Coordinates {
 	private static final double DEFAULT_HEIGHT = 3;
 
 	// need to make this adaptive -- like 1/2 the maxX
-	public static void positionAt(MapViewModel map, double x, double y)
+	public static <S, F extends IFeature> void positionAt(MapViewModel<S, F> map, double x, double y)
 			throws TransformException, NonInvertibleTransformException, TransformException {
 
 		var world = map.viewPortBounds();
@@ -80,7 +82,7 @@ public class Coordinates {
 		map.setViewPortBounds(newExtent);
 	}
 
-	public static ReferencedEnvelope clip(MapViewModel map, ReferencedEnvelope envelope) {
+	public static <S, F extends IFeature> ReferencedEnvelope clip(MapViewModel<S, F> map, ReferencedEnvelope envelope) {
 		return clip(map.viewPortBounds(), envelope, map.crs());
 	}
 
@@ -145,7 +147,7 @@ public class Coordinates {
 				+ labelLattitude(bounds.getMinY()) + " to " + labelLattitude(bounds.getMaxY());
 	}
 
-	public static double getMapScale(MapViewModel map, int screenWidth, double dpi) {
+	public static <S, F extends IFeature> double getMapScale(MapViewModel<S, F> map, int screenWidth, double dpi) {
 		// if it's geodetic, we're dealing with lat/lon unit measures
 		var crs = map.viewPortBounds().getCoordinateReferenceSystem();
 		double width = map.viewPortBounds().getWidth();
@@ -159,7 +161,7 @@ public class Coordinates {
 	 * @return DPI as doubles, to avoid issues with integer trunking in scale computation
 	 * expression
 	 */
-	public static double getDpi(Map hints) {
+	public static double getDpi(Map<String, Object> hints) {
 		if (hints != null && hints.containsKey("dpi")) {
 			return ((Number) hints.get("dpi")).doubleValue();
 		}

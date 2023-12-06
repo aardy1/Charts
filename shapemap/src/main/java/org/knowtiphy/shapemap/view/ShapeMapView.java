@@ -50,7 +50,7 @@ public class ShapeMapView<S, F extends IFeature> extends Control {
 	@Override
 	protected Skin createDefaultSkin() {
 		return switch (skinType) {
-			default -> new CanvasShapeMapSkin(this, map);
+			default -> new CanvasShapeMapSkin<>(this, map);
 		};
 	}
 

@@ -35,9 +35,9 @@ import org.knowtiphy.charts.enc.ChartLocker;
 import org.knowtiphy.charts.enc.ENCChart;
 import org.knowtiphy.charts.geotools.Queries;
 import org.knowtiphy.shapemap.api.IFeature;
-import org.knowtiphy.shapemap.view.ShapeMapView;
 import org.knowtiphy.shapemap.renderer.Transformation;
 import org.knowtiphy.shapemap.style.parser.StyleSyntaxException;
+import org.knowtiphy.shapemap.view.ShapeMapView;
 import org.reactfx.EventStreams;
 import org.reactfx.Subscription;
 
@@ -257,9 +257,8 @@ public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView
 		}
 
 		if (mostDetailedChart != null) {
-			var screenArea = new Rectangle2D(0, 0, (int) root.getWidth(), (int) root.getHeight());
 			try {
-				var newChart = chartLocker.loadChart(mostDetailedChart, displayOptions, screenArea);
+				var newChart = chartLocker.loadChart(mostDetailedChart, displayOptions);
 				chart.setNewMapViewModel(newChart);
 			}
 			catch (TransformException | FactoryException | NonInvertibleTransformException | StyleSyntaxException ex) {

@@ -17,9 +17,9 @@ public class MapLayer<S, F extends IFeature> {
 
 	private final IFeatureSource<S, F> featureSource;
 
-	private final FeatureTypeStyle<F> style;
+	private final FeatureTypeStyle<S, F> style;
 
-	public MapLayer(String title, IFeatureSource<S, F> featureSource, FeatureTypeStyle<F> style, boolean visible,
+	public MapLayer(String title, IFeatureSource<S, F> featureSource, FeatureTypeStyle<S, F> style, boolean visible,
 			boolean scaleLess) {
 
 		this.title = title;
@@ -33,7 +33,7 @@ public class MapLayer<S, F extends IFeature> {
 		return title;
 	}
 
-	public FeatureTypeStyle<F> getStyle() {
+	public FeatureTypeStyle<S, F> getStyle() {
 		return style;
 	}
 

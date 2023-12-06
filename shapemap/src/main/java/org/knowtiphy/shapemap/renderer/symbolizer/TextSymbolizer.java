@@ -10,9 +10,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.geotools.api.geometry.BoundingBox;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.crs.DefaultEngineeringCRS;
-import org.knowtiphy.shapemap.renderer.GraphicsRenderingContext;
 import org.knowtiphy.shapemap.api.IFeature;
 import org.knowtiphy.shapemap.api.IFeatureFunction;
+import org.knowtiphy.shapemap.renderer.GraphicsRenderingContext;
 import org.knowtiphy.shapemap.renderer.graphics.Fill;
 import org.knowtiphy.shapemap.renderer.graphics.Text;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.FillInfo;
@@ -27,7 +27,7 @@ import org.locationtech.jts.index.quadtree.Quadtree;
 /**
  * @author graham
  */
-public class TextSymbolizer<F extends IFeature> {
+public class TextSymbolizer<S, F extends IFeature> {
 
 	private final IFeatureFunction<F, String> label;
 
@@ -49,7 +49,7 @@ public class TextSymbolizer<F extends IFeature> {
 		this.labelPlacement = labelPlacement;
 	}
 
-	public void render(GraphicsRenderingContext context, F feature) {
+	public void render(GraphicsRenderingContext<S, F> context, F feature) {
 
 		if (fillInfo != null) {
 			Fill.setup(context, fillInfo);
@@ -63,10 +63,10 @@ public class TextSymbolizer<F extends IFeature> {
 			context.graphicsContext().setFont(font);
 		}
 
-		text(context, feature, (Geometry) feature.getDefaultGeometry());
+		text(context, feature, feature.getDefaultGeometry());
 	}
 
-	private void text(GraphicsRenderingContext context, F feature, Geometry geom) {
+	private void text(GraphicsRenderingContext<S, F> context, F feature, Geometry geom) {
 
 		// TODO -- switch on strings is brain dead
 		switch (geom.getGeometryType()) {
@@ -80,7 +80,7 @@ public class TextSymbolizer<F extends IFeature> {
 		}
 	}
 
-	private void textPoint(GraphicsRenderingContext context, F feature, Point point) {
+	private void textPoint(GraphicsRenderingContext<S, F> context, F feature, Point point) {
 
 		if (point != null && label != null) {
 			var text = label.apply(feature, point);
@@ -130,7 +130,7 @@ public class TextSymbolizer<F extends IFeature> {
 	// TODO -- text along line strings ...
 
 	// only necessary if a multi-X, can contain another multi-X, rather than just X's
-	private void recurse(GraphicsRenderingContext context, F feature, Geometry geom) {
+	private void recurse(GraphicsRenderingContext<S, F> context, F feature, Geometry geom) {
 		for (int i = 0; i < geom.getNumGeometries(); i++) {
 			text(context, feature, geom.getGeometryN(i));
 		}

@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javafx.geometry.Rectangle2D;
 import javafx.scene.transform.NonInvertibleTransformException;
 import javax.xml.stream.XMLStreamException;
 import org.geotools.api.referencing.FactoryException;
@@ -52,8 +51,7 @@ public class ChartLocker {
 		return chartProvider.loadChart(this, chartDescription, displayOptions);
 	}
 
-	public ENCChart loadChart(ChartDescription chartDescription, MapDisplayOptions displayOptions,
-			Rectangle2D screenArea)
+	public ENCChart loadChart(ChartDescription chartDescription, MapDisplayOptions displayOptions)
 			throws TransformException, FactoryException, NonInvertibleTransformException, StyleSyntaxException {
 
 		ENCChart newChart;

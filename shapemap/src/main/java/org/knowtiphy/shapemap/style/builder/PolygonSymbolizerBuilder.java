@@ -5,6 +5,7 @@
 
 package org.knowtiphy.shapemap.style.builder;
 
+import org.knowtiphy.shapemap.api.IFeature;
 import org.knowtiphy.shapemap.renderer.symbolizer.ISymbolizer;
 import org.knowtiphy.shapemap.renderer.symbolizer.PolygonSymbolizer;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.FillInfo;
@@ -17,25 +18,25 @@ import static org.knowtiphy.shapemap.style.parser.StyleSyntaxException.expectEle
 /**
  * @author graham
  */
-public class PolygonSymbolizerBuilder {
+public class PolygonSymbolizerBuilder<S, F extends IFeature> {
 
 	private FillInfo fillInfo;
 
 	private StrokeInfo strokeInfo;
 
-	public PolygonSymbolizerBuilder fillInfo(FillInfo fillInfo) {
+	public PolygonSymbolizerBuilder<S, F> fillInfo(FillInfo fillInfo) {
 		this.fillInfo = fillInfo;
 		return this;
 	}
 
-	public PolygonSymbolizerBuilder strokeInfo(StrokeInfo strokeInfo) {
+	public PolygonSymbolizerBuilder<S, F> strokeInfo(StrokeInfo strokeInfo) {
 		this.strokeInfo = strokeInfo;
 		return this;
 	}
 
-	public ISymbolizer build() throws StyleSyntaxException {
+	public ISymbolizer<S, F> build() throws StyleSyntaxException {
 		expectElement(fillInfo, strokeInfo, XML.FILL, XML.STROKE);
-		return new PolygonSymbolizer(fillInfo, strokeInfo);
+		return new PolygonSymbolizer<>(fillInfo, strokeInfo);
 	}
 
 }

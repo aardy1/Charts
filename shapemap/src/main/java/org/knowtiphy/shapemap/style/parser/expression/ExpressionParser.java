@@ -13,11 +13,11 @@ import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
-import org.knowtiphy.shapemap.renderer.Functions;
-import org.knowtiphy.shapemap.renderer.Operators;
 import org.knowtiphy.shapemap.api.IFeature;
 import org.knowtiphy.shapemap.api.IFeatureFunction;
 import org.knowtiphy.shapemap.api.IParsingContext;
+import org.knowtiphy.shapemap.renderer.Functions;
+import org.knowtiphy.shapemap.renderer.Operators;
 import org.knowtiphy.shapemap.style.parser.Utils;
 
 import static org.knowtiphy.shapemap.style.parser.Utils.normalize;
@@ -28,7 +28,7 @@ import static org.knowtiphy.shapemap.style.parser.Utils.normalizeKey;
  */
 public class ExpressionParser {
 
-	public static <F extends IFeature> IFeatureFunction<F, ?> parse(IParsingContext parsingContext,
+	public static <F extends IFeature> IFeatureFunction<F, ?> parse(IParsingContext<F> parsingContext,
 			XMLEventReader reader, String finishTag) throws XMLStreamException {
 
 		var stack = new LinkedList<LinkedList<IFeatureFunction<F, ?>>>();
@@ -61,7 +61,10 @@ public class ExpressionParser {
 						var fName = functionName(startElement);
 						push(stack, (feature, geom) -> fName);
 					}
-					case org.knowtiphy.shapemap.style.parser.XML.EQ, org.knowtiphy.shapemap.style.parser.XML.NE, org.knowtiphy.shapemap.style.parser.XML.LT, org.knowtiphy.shapemap.style.parser.XML.GT, org.knowtiphy.shapemap.style.parser.XML.IS_LIKE, org.knowtiphy.shapemap.style.parser.XML.COALESCE ->
+					case org.knowtiphy.shapemap.style.parser.XML.EQ, org.knowtiphy.shapemap.style.parser.XML.NE,
+							org.knowtiphy.shapemap.style.parser.XML.LT, org.knowtiphy.shapemap.style.parser.XML.GT,
+							org.knowtiphy.shapemap.style.parser.XML.IS_LIKE,
+							org.knowtiphy.shapemap.style.parser.XML.COALESCE ->
 						startFrame(stack);
 					default -> {
 						throw new IllegalArgumentException(normalize(startElement));
@@ -74,7 +77,7 @@ public class ExpressionParser {
 				var tag = normalize(endElement);
 				switch (tag) {
 
-					case org.knowtiphy.shapemap.style.parser.XML.LITERAL, 
+					case org.knowtiphy.shapemap.style.parser.XML.LITERAL,
 							org.knowtiphy.shapemap.style.parser.XML.PROPERTY_NAME -> {
 						// do nothing
 					}
@@ -110,7 +113,7 @@ public class ExpressionParser {
 		return endFrame(stack).pop();
 	}
 
-	public static <F extends IFeature, T> IFeatureFunction<F, T> parseOrLiteral(IParsingContext parsingContext,
+	public static <F extends IFeature, T> IFeatureFunction<F, T> parseOrLiteral(IParsingContext<F> parsingContext,
 			XMLEventReader reader, String finishTag, Function<XMLEvent, T> literalParser) throws XMLStreamException {
 
 		// this is a bit hacky
@@ -160,7 +163,7 @@ public class ExpressionParser {
 			LinkedList<IFeatureFunction<F, ?>> frame) throws XMLStreamException {
 
 		int size = frame.size();
-		var funArgs = new ArrayList<IFeatureFunction>();
+		var funArgs = new ArrayList<IFeatureFunction<F, ?>>();
 		for (int i = 0; i < size - 1; i++) {
 			funArgs.add(frame.pop());
 		}

@@ -5,26 +5,27 @@
 
 package org.knowtiphy.shapemap.renderer.symbolizer.mark;
 
+import org.knowtiphy.shapemap.api.IFeature;
 import org.knowtiphy.shapemap.renderer.GraphicsRenderingContext;
 import org.knowtiphy.shapemap.renderer.graphics.Fill;
 import org.knowtiphy.shapemap.renderer.graphics.Stroke;
 import org.knowtiphy.shapemap.renderer.symbolizer.PointSymbolizer;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.FillInfo;
-import org.knowtiphy.shapemap.api.IFeature;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.StrokeInfo;
 import org.locationtech.jts.geom.Point;
 
 /**
  * @author graham
  */
-public class CircleMarkSymbolizer<F extends IFeature> extends BaseMarkSymbolizer<F> {
+public class CircleMarkSymbolizer<S, F extends IFeature> extends BaseMarkSymbolizer<S, F> {
 
 	public CircleMarkSymbolizer(FillInfo fillInfo, StrokeInfo strokeInfo) {
 		super(fillInfo, strokeInfo);
 	}
 
 	@Override
-	public void render(GraphicsRenderingContext context, F feature, Point pt, PointSymbolizer<F> pointSymbolizer) {
+	public void render(GraphicsRenderingContext<S, F> context, F feature, Point pt,
+			PointSymbolizer<S, F> pointSymbolizer) {
 
 		var szo = pointSymbolizer.size().apply(feature, pt);
 		if (szo == null)

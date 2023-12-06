@@ -57,7 +57,7 @@ public class Dump<S extends SimpleFeatureType, F extends IFeature> {
 		descriptors.addAll(schema.getDescriptors());
 	}
 
-	public void dumpAttributeValues(MapLayer layer) throws IOException {
+	public void dumpAttributeValues(MapLayer<S, F> layer) throws IOException {
 
 		// var featureName =
 		// layer.getFeatureSource().getSchema().getName().getLocalPart();

@@ -7,6 +7,7 @@ package org.knowtiphy.shapemap.renderer.graphics;
 
 import javafx.geometry.Bounds;
 import javafx.scene.text.Font;
+import org.knowtiphy.shapemap.api.IFeature;
 import org.knowtiphy.shapemap.renderer.GraphicsRenderingContext;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.StrokeInfo;
 
@@ -20,7 +21,7 @@ public class Text {
 	 * @param strokeInfo the stroke information
 	 */
 
-	public static void setup(GraphicsRenderingContext context, StrokeInfo strokeInfo) {
+	public static <S, F extends IFeature> void setup(GraphicsRenderingContext<S, F> context, StrokeInfo strokeInfo) {
 		var gc = context.graphicsContext();
 		gc.setStroke(strokeInfo.stroke());
 		gc.setLineWidth(strokeInfo.strokeWidth());

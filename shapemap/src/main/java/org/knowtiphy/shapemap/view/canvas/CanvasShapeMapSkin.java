@@ -11,14 +11,14 @@ import javafx.scene.paint.Color;
 import javafx.scene.transform.NonInvertibleTransformException;
 import org.geotools.api.referencing.operation.TransformException;
 import org.knowtiphy.shapemap.api.IFeature;
-import org.knowtiphy.shapemap.view.ShapeMapView;
 import org.knowtiphy.shapemap.api.model.MapViewModel;
 import org.knowtiphy.shapemap.renderer.ShapeMapRenderer;
 import org.knowtiphy.shapemap.renderer.context.RendererContext;
 import org.knowtiphy.shapemap.view.ShapeMapBaseSkin;
+import org.knowtiphy.shapemap.view.ShapeMapView;
 import org.reactfx.Subscription;
 
-public class CanvasShapeMapSkin<S, F extends IFeature> extends ShapeMapBaseSkin {
+public class CanvasShapeMapSkin<S, F extends IFeature> extends ShapeMapBaseSkin<S, F> {
 
 	private static final double PREFERRED_WIDTH = Region.USE_COMPUTED_SIZE;
 
@@ -32,7 +32,7 @@ public class CanvasShapeMapSkin<S, F extends IFeature> extends ShapeMapBaseSkin 
 
 	private final List<Subscription> subscriptions = new ArrayList<>();
 
-	public CanvasShapeMapSkin(ShapeMapView surface, MapViewModel<S, F> map) {
+	public CanvasShapeMapSkin(ShapeMapView<S, F> surface, MapViewModel<S, F> map) {
 		super(surface);
 
 		this.map = map;
@@ -91,7 +91,7 @@ public class CanvasShapeMapSkin<S, F extends IFeature> extends ShapeMapBaseSkin 
 		graphics.setFill(Color.LIGHTGREY);
 		graphics.fillRect(0, 0, width, height);
 
-		var rendererContext = new RendererContext(
+		var rendererContext = new RendererContext<>(
 		//@formatter:off
 				map.layers(),
 				map.totalRuleCount(),
@@ -101,7 +101,7 @@ public class CanvasShapeMapSkin<S, F extends IFeature> extends ShapeMapBaseSkin 
 				map.svgProvider());
 		//@formatter:on
 
-		var renderer = new ShapeMapRenderer(rendererContext, graphics);
+		var renderer = new ShapeMapRenderer<>(rendererContext, graphics);
 		try {
 			renderer.paint();
 			borderPane.setCenter(canvas);

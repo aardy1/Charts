@@ -9,6 +9,7 @@ import org.geotools.api.referencing.operation.TransformException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.knowtiphy.charts.chartview.ChartView.EventModel;
 import org.knowtiphy.charts.geotools.Coordinates;
+import org.knowtiphy.shapemap.api.IFeature;
 import org.knowtiphy.shapemap.api.model.MapViewModel;
 import org.reactfx.Subscription;
 
@@ -20,7 +21,7 @@ import static org.knowtiphy.charts.geotools.Coordinates.clip;
  */
 public class DragPanZoomSupport {
 
-	public static Subscription addDragSupport(EventModel eventModel, MapViewModel map) {
+	public static <S, F extends IFeature> Subscription addDragSupport(EventModel eventModel, MapViewModel<S, F> map) {
 
 		var dragState = new DragPanZoomSupport.DragState();
 
@@ -33,7 +34,8 @@ public class DragPanZoomSupport {
 		return eventModel.mouseDragged.subscribe(event -> doDrag(map, event, dragState));
 	}
 
-	public static Subscription addPanningSupport(EventModel eventModel, MapViewModel map) {
+	public static <S, F extends IFeature> Subscription addPanningSupport(EventModel eventModel,
+			MapViewModel<S, F> map) {
 
 		// eventModel.scrollEvents.filter(event -> event.getTouchCount() ==
 		// 0).subscribe(event -> {
@@ -66,7 +68,7 @@ public class DragPanZoomSupport {
 		});
 	}
 
-	public static Subscription addZoomSupport(EventModel surface, MapViewModel map) {
+	public static <S, F extends IFeature> Subscription addZoomSupport(EventModel surface, MapViewModel<S, F> map) {
 		return surface.zoomEvents.subscribe(event -> {
 			// not sure what NaN means, but it can happen
 			if (Double.isNaN(event.getZoomFactor())) {
@@ -78,7 +80,8 @@ public class DragPanZoomSupport {
 	}
 
 	// need to check for no modifiers at all
-	public static Subscription addPositionAtSupport(EventModel surface, MapViewModel map) {
+	public static <S, F extends IFeature> Subscription addPositionAtSupport(EventModel surface,
+			MapViewModel<S, F> map) {
 		return surface.mouseDoubleClicked.subscribe(event -> {
 			try {
 				Coordinates.positionAt(map, event.getX(), event.getY());
@@ -97,7 +100,7 @@ public class DragPanZoomSupport {
 
 	}
 
-	private static void doDrag(MapViewModel map, MouseEvent event, DragState dragState) {
+	private static <S, F extends IFeature> void doDrag(MapViewModel<S, F> map, MouseEvent event, DragState dragState) {
 
 		var difX = event.getX() - dragState.startX;
 		var difY = event.getY() - dragState.startY;

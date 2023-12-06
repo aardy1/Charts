@@ -5,6 +5,7 @@
 
 package org.knowtiphy.shapemap.renderer.graphics;
 
+import org.knowtiphy.shapemap.api.IFeature;
 import org.knowtiphy.shapemap.renderer.GraphicsRenderingContext;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
@@ -19,7 +20,7 @@ public class DrawPoint {
 	 * @param opacity the opacity for the points
 	 */
 
-	public static void setup(GraphicsRenderingContext context, double opacity) {
+	public static <S, F extends IFeature> void setup(GraphicsRenderingContext<S, F> context, double opacity) {
 		context.graphicsContext().setGlobalAlpha(opacity);
 	}
 

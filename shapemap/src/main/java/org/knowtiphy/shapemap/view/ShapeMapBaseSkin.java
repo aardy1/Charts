@@ -2,8 +2,10 @@ package org.knowtiphy.shapemap.view;
 
 import javafx.scene.control.Skin;
 import javafx.scene.control.SkinBase;
+import org.knowtiphy.shapemap.api.IFeature;
 
-public abstract class ShapeMapBaseSkin extends SkinBase<ShapeMapView> implements Skin<ShapeMapView> {
+public abstract class ShapeMapBaseSkin<S, F extends IFeature> extends SkinBase<ShapeMapView<S, F>>
+		implements Skin<ShapeMapView<S, F>> {
 
 	private static final double MINIMUM_WIDTH = 8;
 
@@ -13,7 +15,7 @@ public abstract class ShapeMapBaseSkin extends SkinBase<ShapeMapView> implements
 
 	private static final double MAXIMUM_HEIGHT = Double.MAX_VALUE;
 
-	protected ShapeMapBaseSkin(ShapeMapView surface) {
+	protected ShapeMapBaseSkin(ShapeMapView<S, F> surface) {
 		super(surface);
 	}
 
@@ -41,7 +43,7 @@ public abstract class ShapeMapBaseSkin extends SkinBase<ShapeMapView> implements
 		return MAXIMUM_HEIGHT;
 	}
 
-	protected ShapeMapView S() {
+	protected ShapeMapView<S, F> S() {
 		return getSkinnable();
 	}
 

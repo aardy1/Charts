@@ -7,17 +7,17 @@ package org.knowtiphy.shapemap.style.builder;
 
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
-import org.knowtiphy.shapemap.renderer.symbolizer.TextSymbolizer;
-import org.knowtiphy.shapemap.renderer.symbolizer.basic.FillInfo;
 import org.knowtiphy.shapemap.api.IFeature;
 import org.knowtiphy.shapemap.api.IFeatureFunction;
+import org.knowtiphy.shapemap.renderer.symbolizer.TextSymbolizer;
+import org.knowtiphy.shapemap.renderer.symbolizer.basic.FillInfo;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.LabelPlacement;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.StrokeInfo;
 
 /**
  * @author graham
  */
-public class TextSymbolizerBuilder<F extends IFeature> {
+public class TextSymbolizerBuilder<S, F extends IFeature> {
 
 	private IFeatureFunction<F, String> label = (f, g) -> null;
 
@@ -30,37 +30,37 @@ public class TextSymbolizerBuilder<F extends IFeature> {
 
 	private LabelPlacement labelPlacement;
 
-	public TextSymbolizerBuilder<F> font(Font font) {
+	public TextSymbolizerBuilder<S, F> font(Font font) {
 		this.font = font;
 		return this;
 	}
 
-	public TextSymbolizerBuilder<F> label(IFeatureFunction<F, String> label) {
+	public TextSymbolizerBuilder<S, F> label(IFeatureFunction<F, String> label) {
 		this.label = label;
 		return this;
 	}
 
-	public TextSymbolizerBuilder labelPlacement(LabelPlacement labelPlacement) {
+	public TextSymbolizerBuilder<S, F> labelPlacement(LabelPlacement labelPlacement) {
 		this.labelPlacement = labelPlacement;
 		return this;
 	}
 
-	public TextSymbolizerBuilder fillInfo(FillInfo fillInfo) {
+	public TextSymbolizerBuilder<S, F> fillInfo(FillInfo fillInfo) {
 		this.fillInfo = fillInfo;
 		return this;
 	}
 
-	public TextSymbolizerBuilder strokeInfo(StrokeInfo strokeInfo) {
+	public TextSymbolizerBuilder<S, F> strokeInfo(StrokeInfo strokeInfo) {
 		this.strokeInfo = strokeInfo;
 		return this;
 	}
 
-	public TextSymbolizer build() {
+	public TextSymbolizer<S, F> build() {
 		if (strokeInfo == null && fillInfo == null) {
 			fillInfo = new FillInfoBuilder().fill(Color.BLACK).opacity(1).build();
 		}
 
-		return new TextSymbolizer(label, font, fillInfo, strokeInfo, labelPlacement);
+		return new TextSymbolizer<>(label, font, fillInfo, strokeInfo, labelPlacement);
 	}
 
 }

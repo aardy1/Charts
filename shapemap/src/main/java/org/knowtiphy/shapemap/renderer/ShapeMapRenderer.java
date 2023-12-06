@@ -52,7 +52,7 @@ public class ShapeMapRenderer<S, F extends IFeature> {
 		var onePixelY = onePixelY(screenToWorld);
 
 		var index = new Quadtree();
-		var graphicsRenderingContext = new GraphicsRenderingContext(rendererContext, graphics,
+		var graphicsRenderingContext = new GraphicsRenderingContext<>(rendererContext, graphics,
 				new Transformation(worldToScreen), onePixelX, onePixelY, index, viewPortBounds);
 
 		try {
@@ -86,8 +86,8 @@ public class ShapeMapRenderer<S, F extends IFeature> {
 		}
 	}
 
-	private void renderGraphics(GraphicsRenderingContext context, boolean[] appliedRule, boolean[] layerNeedsTextLayout)
-			throws Exception {
+	private void renderGraphics(GraphicsRenderingContext<S, F> context, boolean[] appliedRule,
+			boolean[] layerNeedsTextLayout) throws Exception {
 
 		var layers = rendererContext.layers();
 		var viewPortBounds = rendererContext.viewPortBounds();
@@ -114,8 +114,8 @@ public class ShapeMapRenderer<S, F extends IFeature> {
 		}
 	}
 
-	private void renderText(GraphicsRenderingContext context, boolean[] appliedRule, boolean[] layerNeedsTextLayout)
-			throws Exception {
+	private void renderText(GraphicsRenderingContext<S, F> context, boolean[] appliedRule,
+			boolean[] layerNeedsTextLayout) throws Exception {
 
 		var layers = rendererContext.layers();
 		var viewPortBounds = rendererContext.viewPortBounds();
@@ -148,7 +148,7 @@ public class ShapeMapRenderer<S, F extends IFeature> {
 
 	}
 
-	private boolean applyStyle(FeatureTypeStyle<F> style, GraphicsRenderingContext context, F feature,
+	private boolean applyStyle(FeatureTypeStyle<S, F> style, GraphicsRenderingContext<S, F> context, F feature,
 			boolean[] appliedRule, int startPos) {
 
 		var appliedSomeRule = false;
@@ -181,7 +181,7 @@ public class ShapeMapRenderer<S, F extends IFeature> {
 		return appliedSomeRule;
 	}
 
-	private boolean applyGraphicsRule(Rule<F> rule, GraphicsRenderingContext context, F feature) {
+	private boolean applyGraphicsRule(Rule<S, F> rule, GraphicsRenderingContext<S, F> context, F feature) {
 
 		if (rule.filter() != null) {
 			if (rule.filter().apply(feature, feature.getDefaultGeometry())) {
@@ -196,7 +196,7 @@ public class ShapeMapRenderer<S, F extends IFeature> {
 		return false;
 	}
 
-	private void applyTextRule(Rule<F> rule, GraphicsRenderingContext context, F feature) {
+	private void applyTextRule(Rule<S, F> rule, GraphicsRenderingContext<S, F> context, F feature) {
 
 		if (rule.filter().apply(feature, feature.getDefaultGeometry())) {
 			for (var symbolizer : rule.textSymbolizers()) {

@@ -40,7 +40,7 @@ public class ChartBuilder {
 
 	private final ChartDescription chartDescription;
 
-	private final StyleReader styleReader;
+	private final StyleReader<SimpleFeatureType, IFeature> styleReader;
 
 	private final MapDisplayOptions displayOptions;
 
@@ -49,7 +49,7 @@ public class ChartBuilder {
 	private MemStore store;
 
 	public ChartBuilder(ChartLocker chartLocker, Path shapeDir, ChartDescription chartDescription,
-			StyleReader styleReader, MapDisplayOptions displayOptions)
+			StyleReader<SimpleFeatureType, IFeature> styleReader, MapDisplayOptions displayOptions)
 			throws TransformException, NonInvertibleTransformException {
 
 		this.chartLocker = chartLocker;
@@ -206,8 +206,8 @@ public class ChartBuilder {
 		};
 
 		var style = styleReader.createStyle(typeName.getLocalPart(), parsingContext);
-		return new MapLayer<>(typeName.getLocalPart(), store.featureSource(type), style, isVisible(typeName),
-				scaleLess);
+		var memSource = store.featureSource(type);
+		return new MapLayer<>(typeName.getLocalPart(), memSource, style, isVisible(typeName), scaleLess);
 	}
 
 	public boolean isVisible(Name typeName) {

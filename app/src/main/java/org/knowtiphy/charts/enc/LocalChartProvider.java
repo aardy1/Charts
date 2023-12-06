@@ -11,23 +11,26 @@ import java.util.ArrayList;
 import java.util.List;
 import javafx.scene.transform.NonInvertibleTransformException;
 import javax.xml.stream.XMLStreamException;
+import org.geotools.api.feature.simple.SimpleFeatureType;
 import org.geotools.api.referencing.FactoryException;
 import org.geotools.api.referencing.operation.TransformException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.knowtiphy.charts.memstore.StyleReader;
-import org.knowtiphy.shapemap.style.parser.StyleSyntaxException;
 import org.knowtiphy.charts.chartview.MapDisplayOptions;
+import org.knowtiphy.charts.memstore.StyleReader;
+import org.knowtiphy.shapemap.api.IFeature;
+import org.knowtiphy.shapemap.style.parser.StyleSyntaxException;
 
 /**
  * @author graham
  */
 public class LocalChartProvider {
 
-	private final StyleReader styleReader;
+	private final StyleReader<SimpleFeatureType, IFeature> styleReader;
 
 	private final List<ChartDescription> chartDescriptions = new ArrayList<>();
 
-	public LocalChartProvider(Catalog catalog, Path shapeBaseDir, StyleReader styleReader) {
+	public LocalChartProvider(Catalog catalog, Path shapeBaseDir,
+			StyleReader<SimpleFeatureType, IFeature> styleReader) {
 
 		this.styleReader = styleReader;
 

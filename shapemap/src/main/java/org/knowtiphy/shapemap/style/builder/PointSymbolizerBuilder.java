@@ -5,10 +5,10 @@
 
 package org.knowtiphy.shapemap.style.builder;
 
-import org.knowtiphy.shapemap.renderer.symbolizer.ISymbolizer;
-import org.knowtiphy.shapemap.renderer.symbolizer.PointSymbolizer;
 import org.knowtiphy.shapemap.api.IFeature;
 import org.knowtiphy.shapemap.api.IFeatureFunction;
+import org.knowtiphy.shapemap.renderer.symbolizer.ISymbolizer;
+import org.knowtiphy.shapemap.renderer.symbolizer.PointSymbolizer;
 import org.knowtiphy.shapemap.renderer.symbolizer.mark.IMarkSymbolizer;
 import org.knowtiphy.shapemap.style.parser.StyleSyntaxException;
 
@@ -17,9 +17,9 @@ import static org.knowtiphy.shapemap.style.parser.StyleSyntaxException.expect;
 /**
  * @author graham
  */
-public class PointSymbolizerBuilder<F extends IFeature> {
+public class PointSymbolizerBuilder<S, F extends IFeature> {
 
-	private IMarkSymbolizer<F> markSymbolizer;
+	private IMarkSymbolizer<S, F> markSymbolizer;
 
 	// TODO -- spec says the default is the "native symbol size" ...?
 	private IFeatureFunction<F, Number> size = (f, g) -> 8.0;
@@ -28,30 +28,30 @@ public class PointSymbolizerBuilder<F extends IFeature> {
 
 	private double opacity = 1;
 
-	public PointSymbolizerBuilder<F> markSymbolizer(IMarkSymbolizer<F> markSymbolizer) {
+	public PointSymbolizerBuilder<S, F> markSymbolizer(IMarkSymbolizer<S, F> markSymbolizer) {
 		this.markSymbolizer = markSymbolizer;
 		return this;
 	}
 
-	public PointSymbolizerBuilder<F> size(IFeatureFunction<F, Number> size) {
+	public PointSymbolizerBuilder<S, F> size(IFeatureFunction<F, Number> size) {
 		this.size = size;
 		return this;
 	}
 
-	public PointSymbolizerBuilder<F> opacity(double opacity) {
+	public PointSymbolizerBuilder<S, F> opacity(double opacity) {
 		this.opacity = opacity;
 		return this;
 	}
 
-	public PointSymbolizerBuilder<F> rotation(IFeatureFunction<F, Number> rotation) {
+	public PointSymbolizerBuilder<S, F> rotation(IFeatureFunction<F, Number> rotation) {
 		this.rotation = rotation;
 		return this;
 	}
 
-	public ISymbolizer build() throws StyleSyntaxException {
+	public ISymbolizer<S, F> build() throws StyleSyntaxException {
 
 		expect(markSymbolizer, "Expected a mark symbolizer");
-		return new PointSymbolizer(markSymbolizer, size, opacity, rotation);
+		return new PointSymbolizer<>(markSymbolizer, size, opacity, rotation);
 	}
 
 }

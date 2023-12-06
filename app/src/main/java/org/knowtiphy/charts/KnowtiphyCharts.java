@@ -16,6 +16,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import org.controlsfx.control.PropertySheet;
+import org.geotools.api.feature.simple.SimpleFeatureType;
 import org.knowtiphy.charts.chartview.ChartView;
 import org.knowtiphy.charts.chartview.MapDisplayOptions;
 import org.knowtiphy.charts.dynamics.AISModel;
@@ -28,6 +29,7 @@ import org.knowtiphy.charts.platform.IPlatform;
 import org.knowtiphy.charts.platform.Platform;
 import org.knowtiphy.charts.utils.FXUtils;
 import org.knowtiphy.charts.utils.ToggleModel;
+import org.knowtiphy.shapemap.api.IFeature;
 
 import static org.knowtiphy.charts.utils.FXUtils.later;
 import static org.knowtiphy.charts.utils.FXUtils.resizeable;
@@ -63,7 +65,7 @@ public class KnowtiphyCharts extends Application {
 		var catalog = new CatalogReader(catalogFile).read();
 
 		// var styleReader = new StyleReader(styleDir);
-		var styleReader = new StyleReader(getClass());
+		var styleReader = new StyleReader<SimpleFeatureType, IFeature>(getClass());
 		var chartProvider = new LocalChartProvider(catalog, platform.chartsDir(), styleReader);
 		chartLocker = new ChartLocker(chartProvider);
 		var chartDescription = chartProvider.getChartDescription("Gulf of Mexico", 2_160_000);

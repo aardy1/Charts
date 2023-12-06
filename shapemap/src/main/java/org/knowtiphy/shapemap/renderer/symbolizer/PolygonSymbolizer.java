@@ -5,18 +5,17 @@
 
 package org.knowtiphy.shapemap.renderer.symbolizer;
 
-import org.knowtiphy.shapemap.renderer.GraphicsRenderingContext;
 import org.knowtiphy.shapemap.api.IFeature;
+import org.knowtiphy.shapemap.renderer.GraphicsRenderingContext;
 import org.knowtiphy.shapemap.renderer.graphics.Fill;
 import org.knowtiphy.shapemap.renderer.graphics.Stroke;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.FillInfo;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.StrokeInfo;
-import org.locationtech.jts.geom.Geometry;
 
 /**
  * @author graham
  */
-public class PolygonSymbolizer<F extends IFeature> implements ISymbolizer<F> {
+public class PolygonSymbolizer<S, F extends IFeature> implements ISymbolizer<S, F> {
 
 	private final FillInfo fillInfo;
 
@@ -28,16 +27,16 @@ public class PolygonSymbolizer<F extends IFeature> implements ISymbolizer<F> {
 	}
 
 	@Override
-	public void render(GraphicsRenderingContext context, F feature) {
+	public void render(GraphicsRenderingContext<S, F> context, F feature) {
 
 		if (fillInfo != null) {
 			Fill.setup(context, fillInfo);
-			Fill.fill(context, (Geometry) feature.getDefaultGeometry(), feature.geomType());
+			Fill.fill(context, feature.getDefaultGeometry(), feature.geomType());
 		}
 
 		if (strokeInfo != null) {
 			Stroke.setup(context, strokeInfo);
-			Stroke.stroke(context, (Geometry) feature.getDefaultGeometry(), feature.geomType());
+			Stroke.stroke(context, feature.getDefaultGeometry(), feature.geomType());
 		}
 	}
 

@@ -15,7 +15,6 @@ import org.knowtiphy.shapemap.api.IFeatureSourceIterator;
 import org.knowtiphy.shapemap.api.model.MapViewModel;
 import org.knowtiphy.shapemap.renderer.Transformation;
 import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
 
 /**
@@ -61,7 +60,7 @@ public class Queries {
 
 		var pt = new GeometryFactory().createPoint(new Coordinate(tx.getX(), tx.getY()));
 		for (var f : foo) {
-			var geom = (Geometry) f.getDefaultGeometry();
+			var geom = f.getDefaultGeometry();
 			for (var i = 0; i < geom.getNumGeometries(); i++) {
 				var g = geom.getGeometryN(i);
 				if (g.contains(pt)) {
@@ -73,7 +72,8 @@ public class Queries {
 		return result;
 	}
 
-	public static ReferencedEnvelope tinyPolygon(MapViewModel map, double x, double y, int radius) {
+	public static <S, F extends IFeature> ReferencedEnvelope tinyPolygon(MapViewModel<S, F> map, double x, double y,
+			int radius) {
 		int screenMinX = (int) x - radius;
 		int screenMinY = (int) y - radius;
 		int screenMaxX = (int) x + radius;
@@ -96,7 +96,7 @@ public class Queries {
 		return new ReferencedEnvelope(minX, minX + width, minY, minY + height, map.crs());
 	}
 
-	public static ReferencedEnvelope tinyPolygon(MapViewModel map, double x, double y) {
+	public static <S, F extends IFeature> ReferencedEnvelope tinyPolygon(MapViewModel<S, F> map, double x, double y) {
 		return tinyPolygon(map, x, y, 1);
 	}
 

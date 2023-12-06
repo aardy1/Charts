@@ -91,11 +91,13 @@ public class MemStoreFeatureSource // extends ContentFeatureSource
 	// // featuresInScale.iterator());
 	// }
 
+	@Override
 	public SimpleFeatureType getSchema() {
 
 		return featureType;
 	}
 
+	@Override
 	public IFeatureSourceIterator<SimpleFeatureType, MemFeature> features(ReferencedEnvelope bounds,
 			boolean scaleLess) {
 		Collection<MemFeature> featuresInScale;
@@ -128,6 +130,7 @@ public class MemStoreFeatureSource // extends ContentFeatureSource
 		return new MemStoreFeatureReader(featureType, featuresInScale.iterator());
 	}
 
+	@Override
 	public IFeatureSourceIterator<SimpleFeatureType, MemFeature> features() {
 
 		Collection<MemFeature> featuresInScale;
