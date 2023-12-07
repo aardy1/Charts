@@ -30,7 +30,6 @@ compileJava {
 
 javafx {
     version = "21"
-    platform = "macos-aarch64"
     modules = [ 'javafx.base', 'javafx.graphics', 'javafx.controls' ]
 }
 
