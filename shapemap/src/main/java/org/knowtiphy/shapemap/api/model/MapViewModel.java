@@ -36,7 +36,7 @@ public abstract class MapViewModel<S, F> {
 
 	private final IFeatureAdapter<F> featureAdapter;
 
-	private final ISchemaAdapter<S> schemaAdapter;
+	private final ISchemaAdapter<S, F> schemaAdapter;
 
 	private final IRenderablePolygonProvider renderablePolygonProvider;
 
@@ -45,7 +45,7 @@ public abstract class MapViewModel<S, F> {
 	// possibly shouldnt be here -- but it makes for faster rendering
 	private int totalRuleCount;
 
-	protected MapViewModel(ReferencedEnvelope bounds, ISchemaAdapter<S> schemaAdapter,
+	protected MapViewModel(ReferencedEnvelope bounds, ISchemaAdapter<S, F> schemaAdapter,
 			IFeatureAdapter<F> featureAdapter, IRenderablePolygonProvider renderablePolygonProvider,
 			ISVGProvider svgProvider) throws TransformException, NonInvertibleTransformException, FactoryException {
 

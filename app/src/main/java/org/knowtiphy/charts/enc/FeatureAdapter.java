@@ -15,6 +15,11 @@ import org.locationtech.jts.geom.Geometry;
  */
 public class FeatureAdapter implements IFeatureAdapter<MemFeature> {
 
+	public static final FeatureAdapter ADAPTER = new FeatureAdapter();
+
+	private FeatureAdapter() {
+	}
+
 	@Override
 	public Geometry defaultGeometry(MemFeature feature) {
 		return feature.defaultGeometry();

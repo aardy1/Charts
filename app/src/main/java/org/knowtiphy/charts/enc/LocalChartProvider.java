@@ -15,6 +15,7 @@ import org.geotools.api.feature.simple.SimpleFeatureType;
 import org.geotools.api.referencing.FactoryException;
 import org.geotools.api.referencing.operation.TransformException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.knowtiphy.charts.UnitProfile;
 import org.knowtiphy.charts.chartview.MapDisplayOptions;
 import org.knowtiphy.charts.memstore.MemFeature;
 import org.knowtiphy.charts.memstore.StyleReader;
@@ -29,10 +30,13 @@ public class LocalChartProvider {
 
 	private final List<ChartDescription> chartDescriptions = new ArrayList<>();
 
-	public LocalChartProvider(Catalog catalog, Path shapeBaseDir,
+	private final UnitProfile unitProfile;
+
+	public LocalChartProvider(Catalog catalog, Path shapeBaseDir, UnitProfile unitProfile,
 			StyleReader<SimpleFeatureType, MemFeature> styleReader) {
 
 		this.styleReader = styleReader;
+		this.unitProfile = unitProfile;
 
 		for (var cell : catalog.getCells()) {
 			var dir = shapeBaseDir
@@ -59,8 +63,8 @@ public class LocalChartProvider {
 			MapDisplayOptions displayOptions) throws IOException, XMLStreamException, TransformException,
 			FactoryException, NonInvertibleTransformException, StyleSyntaxException {
 
-		var reader = new ChartBuilder(chartLocker, chartDescription.getDir(), chartDescription, styleReader,
-				displayOptions).read();
+		var reader = new ChartBuilder(chartLocker, chartDescription.getDir(), chartDescription, unitProfile,
+				styleReader, displayOptions).read();
 		var map = reader.getMap();
 		map.setViewPortBounds(map.bounds());
 		return map;
@@ -70,8 +74,8 @@ public class LocalChartProvider {
 			MapDisplayOptions displayOptions) throws IOException, XMLStreamException, TransformException,
 			FactoryException, NonInvertibleTransformException, StyleSyntaxException {
 
-		var reader = new ChartBuilder(chartLocker, chartDescription.getDir(), chartDescription, styleReader,
-				displayOptions).read();
+		var reader = new ChartBuilder(chartLocker, chartDescription.getDir(), chartDescription, unitProfile,
+				styleReader, displayOptions).read();
 		var map = reader.getMap();
 		map.setViewPortBounds(bounds);
 		return map;

@@ -88,7 +88,8 @@ dependencies {
 
     implementation libs.commons.lang3
     implementation libs.stax.api
-
+ //   implementation libs.indriya
+//implementation 'javax.measure:unit-api:2.0'
     implementation libs.reactfx
     implementation libs.controlsfx
     implementation libs.fxsvgimage

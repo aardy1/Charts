@@ -76,6 +76,8 @@ public class XML {
 
 	public static final String ANCHOR_POINTY = "anchorpointy";
 
+	public static final String UOM = "uom";
+
 	// CSS attributes
 
 	public static final String CSS_FILL = "fill";

@@ -30,7 +30,7 @@ public class ExpressionParser {
 	public static <F> IFeatureFunction<F, ?> parse(IParsingContext<F> parsingContext, XMLEventReader reader,
 			String finishTag) throws XMLStreamException {
 
-		var stack = new LinkedList<LinkedList<IFeatureFunction<F, ?>>>();
+		var stack = new LinkedList<LinkedList<IFeatureFunction<F, Object>>>();
 		startFrame(stack);
 
 		var done = false;
@@ -82,7 +82,7 @@ public class ExpressionParser {
 					}
 
 					case org.knowtiphy.shapemap.style.parser.XML.FUNCTION ->
-						push(stack, makeFunctionCall(endFrame(stack)));
+						push(stack, makeFunctionCall(parsingContext, endFrame(stack)));
 
 					case org.knowtiphy.shapemap.style.parser.XML.EQ -> push(stack,
 							mkBop(endFrame(stack), (l, r) -> (feature, geom) -> Operators.eq(l, r, feature, geom)));
@@ -126,17 +126,17 @@ public class ExpressionParser {
 		}
 	}
 
-	private static <F> void startFrame(LinkedList<LinkedList<IFeatureFunction<F, ?>>> stack) {
+	private static <F> void startFrame(LinkedList<LinkedList<IFeatureFunction<F, Object>>> stack) {
 		stack.push(new LinkedList<>());
 	}
 
-	private static <F> LinkedList<IFeatureFunction<F, ?>> endFrame(
-			LinkedList<LinkedList<IFeatureFunction<F, ?>>> stack) {
+	private static <F> LinkedList<IFeatureFunction<F, Object>> endFrame(
+			LinkedList<LinkedList<IFeatureFunction<F, Object>>> stack) {
 		return stack.pop();
 	}
 
-	private static <F> void push(LinkedList<LinkedList<IFeatureFunction<F, ?>>> stack,
-			IFeatureFunction<F, ?> function) {
+	private static <F> void push(LinkedList<LinkedList<IFeatureFunction<F, Object>>> stack,
+			IFeatureFunction<F, Object> function) {
 		stack.peek().push(function);
 	}
 
@@ -158,38 +158,47 @@ public class ExpressionParser {
 		return name;
 	}
 
-	private static <F> IFeatureFunction<F, Object> makeFunctionCall(LinkedList<IFeatureFunction<F, ?>> frame)
-			throws XMLStreamException {
+	private static <F> IFeatureFunction<F, Object> makeFunctionCall(IParsingContext<F> parsingContext,
+			LinkedList<IFeatureFunction<F, Object>> frame) throws XMLStreamException {
 
 		int size = frame.size();
-		var funArgs = new ArrayList<IFeatureFunction<F, ?>>();
+		var funArgs = new ArrayList<IFeatureFunction<F, Object>>();
 		for (int i = 0; i < size - 1; i++) {
 			funArgs.add(frame.pop());
 		}
 
+		var name = (String) frame.pop().apply(null, null);
+
 		try {
 			// TODO -- optimize the likes code
-			var function = Functions.builtinUnary((String) frame.pop().apply(null, null));
+			var function = Functions.builtinUnary(name);
 			return (feature, geom) -> function.apply(funArgs.get(0).apply(feature, geom));
 		}
 		catch (IllegalArgumentException e) {
 			// it's not a unary function
 		}
 
-		var function = Functions.builtin((String) frame.pop().apply(null, null));
+		try {
+			var function = Functions.builtin(name);
 
-		return (feature, geom) -> {
-			var args = new ArrayList<>();
-			for (var arg : funArgs) {
-				args.add(arg.apply(feature, geom));
-			}
+			return (feature, geom) -> {
+				var args = new ArrayList<>();
+				for (var arg : funArgs) {
+					args.add(arg.apply(feature, geom));
+				}
 
-			return function.apply(args);
-		};
+				return function.apply(args);
+			};
+		}
+		catch (IllegalArgumentException e) {
+			// it's not a unary function
+		}
+
+		return parsingContext.compileFunctionCall(name, funArgs);
 	}
 
-	private static <F> IFeatureFunction<F, ?> mkBop(LinkedList<IFeatureFunction<F, ?>> frame,
-			BiFunction<IFeatureFunction<F, ?>, IFeatureFunction<F, ?>, IFeatureFunction<F, ?>> operator)
+	private static <F> IFeatureFunction<F, Object> mkBop(LinkedList<IFeatureFunction<F, Object>> frame,
+			BiFunction<IFeatureFunction<F, Object>, IFeatureFunction<F, Object>, IFeatureFunction<F, Object>> operator)
 			throws XMLStreamException {
 
 		var right = frame.pop();

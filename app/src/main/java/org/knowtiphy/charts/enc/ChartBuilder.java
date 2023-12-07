@@ -13,13 +13,13 @@ import org.geotools.api.referencing.FactoryException;
 import org.geotools.api.referencing.operation.TransformException;
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.data.store.ContentFeatureSource;
+import org.knowtiphy.charts.UnitProfile;
 import org.knowtiphy.charts.chartview.MapDisplayOptions;
 import org.knowtiphy.charts.memstore.ExtraAttributes;
 import org.knowtiphy.charts.memstore.MemFeature;
 import org.knowtiphy.charts.memstore.MemStore;
 import org.knowtiphy.charts.memstore.StyleReader;
 import org.knowtiphy.charts.ontology.S57;
-import org.knowtiphy.shapemap.api.IParsingContext;
 import org.knowtiphy.shapemap.api.model.MapLayer;
 import org.knowtiphy.shapemap.style.parser.StyleSyntaxException;
 import org.locationtech.jts.geom.Geometry;
@@ -38,6 +38,8 @@ public class ChartBuilder {
 
 	private final ChartDescription chartDescription;
 
+	private final UnitProfile unitProfile;
+
 	private final StyleReader<SimpleFeatureType, MemFeature> styleReader;
 
 	private final MapDisplayOptions displayOptions;
@@ -47,11 +49,12 @@ public class ChartBuilder {
 	private MemStore store;
 
 	public ChartBuilder(ChartLocker chartLocker, Path shapeDir, ChartDescription chartDescription,
-			StyleReader<SimpleFeatureType, MemFeature> styleReader, MapDisplayOptions displayOptions)
-			throws TransformException, NonInvertibleTransformException {
+			UnitProfile unitProfile, StyleReader<SimpleFeatureType, MemFeature> styleReader,
+			MapDisplayOptions displayOptions) throws TransformException, NonInvertibleTransformException {
 
 		this.chartLocker = chartLocker;
 		this.shapeDir = shapeDir;
+		this.unitProfile = unitProfile;
 		this.chartDescription = chartDescription;
 		this.styleReader = styleReader;
 		this.displayOptions = displayOptions;
@@ -194,14 +197,10 @@ public class ChartBuilder {
 		var typeName = type.getName();
 		var scaleLess = SCALELESS.contains(type.getTypeName()) || !hasScale;
 		store.addSource(type, index);
-		final var fType = type;
-		var parsingContext = (IParsingContext<MemFeature>) (String name) -> {
-			int index1 = fType.indexOf(name);
-			return (f, g) -> f.getAttribute(index1);
-		};
-
+		var parsingContext = new ParsingContext(type, unitProfile);
 		var style = styleReader.createStyle(typeName.getLocalPart(), parsingContext);
 		var memSource = store.featureSource(type);
+
 		return new MapLayer<>(typeName.getLocalPart(), memSource, style, isVisible(typeName), scaleLess);
 	}
 

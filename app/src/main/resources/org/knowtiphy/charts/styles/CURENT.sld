@@ -29,7 +29,9 @@
                     </PointSymbolizer>
                     <TextSymbolizer>
                         <Label>
-                            <ogc:PropertyName>CURVEL</ogc:PropertyName>
+                            <ogc:Function name="knotsToMapUnit">
+                                <ogc:PropertyName>CURVEL</ogc:PropertyName>
+                            </ogc:Function>
                         </Label>
                         <VendorOption name="group">yes</VendorOption>
                         <VendorOption name="goodnessOfFit">0.1</VendorOption>

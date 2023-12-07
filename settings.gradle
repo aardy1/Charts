@@ -22,6 +22,7 @@ dependencyResolutionManagement {
             version('connect', '2.0.1')
     //        version('glisten', '6.2.3')
             version('stax', '1.0-2')
+            version('indriya', '2.2')
             version('reactfx', '1.4.1')
             version('controlsfx', '11.1.2')
             version('fxsvgimage', '1.1')
@@ -45,6 +46,8 @@ dependencyResolutionManagement {
 
             library('commons-lang3', 'org.apache.commons', 'commons-lang3').versionRef('commons-lang')
             library('stax-api', 'javax.xml.stream', 'stax-api').versionRef('stax')
+            library('indriya', 'tech.units', 'indriya').versionRef('indriya')
+
             library('controlsfx', 'org.controlsfx', 'controlsfx').versionRef('controlsfx')
             library('reactfx', 'org.reactfx', 'reactfx').versionRef('reactfx')
 

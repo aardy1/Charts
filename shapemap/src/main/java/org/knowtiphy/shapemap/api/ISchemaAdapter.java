@@ -6,9 +6,12 @@
 package org.knowtiphy.shapemap.api;
 
 /**
- * A feature in an ESRI shape map.
+ * An adapter for a feature schema.
+ *
+ * @param <S> the type of the schema
  */
-public interface ISchemaAdapter<S> {
+
+public interface ISchemaAdapter<S, F> {
 
 	String name(S schema);
 

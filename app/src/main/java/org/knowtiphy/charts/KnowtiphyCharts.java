@@ -66,7 +66,7 @@ public class KnowtiphyCharts extends Application {
 
 		// var styleReader = new StyleReader(styleDir);
 		var styleReader = new StyleReader<SimpleFeatureType, MemFeature>(getClass());
-		var chartProvider = new LocalChartProvider(catalog, platform.chartsDir(), styleReader);
+		var chartProvider = new LocalChartProvider(catalog, platform.chartsDir(), unitProfile, styleReader);
 		chartLocker = new ChartLocker(chartProvider);
 		var chartDescription = chartProvider.getChartDescription("Gulf of Mexico", 2_160_000);
 
