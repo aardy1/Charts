@@ -10,7 +10,9 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.scene.control.Button;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.ToolBar;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.BorderPane;
@@ -20,6 +22,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.transform.NonInvertibleTransformException;
 import org.geotools.api.referencing.operation.TransformException;
+import org.knowtiphy.charts.chartview.ChartHistory;
 import org.knowtiphy.charts.chartview.MapDisplayOptions;
 import org.knowtiphy.charts.enc.ENCChart;
 import org.knowtiphy.charts.geotools.Coordinates;
@@ -56,14 +59,19 @@ public class InfoBar extends StackPane {
 
 	private ENCChart chart;
 
+	private final ChartHistory chartHistory;
+
+	private final List<MenuItem> chartHistoryItems = new ArrayList<>();
+
 	private final List<Subscription> subscriptions = new ArrayList<>();
 
 	public InfoBar(IPlatform platform, ToggleModel toggleModel, ENCChart chrt, UnitProfile unitProfile,
-			MapDisplayOptions displayOptions) {
+			ChartHistory chartHistory, MapDisplayOptions displayOptions) {
 
 		this.platform = platform;
 		this.chart = chrt;
 		this.unitProfile = unitProfile;
+		this.chartHistory = chartHistory;
 
 		var zoomIn = new Button("", Fonts.plus());
 		zoomIn.setTooltip(new Tooltip("Zoom In"));
@@ -87,7 +95,13 @@ public class InfoBar extends StackPane {
 			}
 		});
 
-		var toolbar = FXUtils.nonResizeable(new ToolBar(zoomIn, zoomOut, resetViewPort, mapDisplaySettings));
+		// var history = new MenuButton("", Fonts.history(), chartHistoryItems);
+		// history.setTooltip(new Tooltip("Chart History"));
+		// history.setOnAction(x -> showHistory());
+
+		var toolbar = FXUtils.nonResizeable(new ToolBar(zoomIn, zoomOut, resetViewPort,
+				// history,
+				mapDisplaySettings));
 		toolbar.getStyleClass().add("controlbar");
 
 		var buttons = new GridPane();
@@ -151,6 +165,17 @@ public class InfoBar extends StackPane {
 		// + unitProfile.distanceUnit);
 
 		currentZoomLevel.setText(Coordinates.twoDec(chart.getZoomFactor()) + "");
+	}
+
+	private ContextMenu showHistory() {
+
+		var contextMenu = new ContextMenu();
+		for (var chartDescription : chartHistory.history()) {
+			var item = new MenuItem(chartDescription.getName());
+			contextMenu.getItems().add(item);
+		}
+
+		return contextMenu;
 	}
 
 }

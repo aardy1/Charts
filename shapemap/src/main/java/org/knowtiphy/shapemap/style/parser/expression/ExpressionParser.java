@@ -14,7 +14,6 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import org.knowtiphy.shapemap.api.IFeatureFunction;
-import org.knowtiphy.shapemap.api.IParsingContext;
 import org.knowtiphy.shapemap.renderer.Functions;
 import org.knowtiphy.shapemap.renderer.Operators;
 import org.knowtiphy.shapemap.style.parser.Utils;
@@ -22,12 +21,14 @@ import org.knowtiphy.shapemap.style.parser.Utils;
 import static org.knowtiphy.shapemap.style.parser.Utils.normalize;
 import static org.knowtiphy.shapemap.style.parser.Utils.normalizeKey;
 
+import org.knowtiphy.shapemap.api.IStyleParserAdapter;
+
 /**
  * @author graham
  */
 public class ExpressionParser {
 
-	public static <F> IFeatureFunction<F, ?> parse(IParsingContext<F> parsingContext, XMLEventReader reader,
+	public static <F> IFeatureFunction<F, ?> parse(IStyleParserAdapter<F> parsingContext, XMLEventReader reader,
 			String finishTag) throws XMLStreamException {
 
 		var stack = new LinkedList<LinkedList<IFeatureFunction<F, Object>>>();
@@ -112,7 +113,7 @@ public class ExpressionParser {
 		return endFrame(stack).pop();
 	}
 
-	public static <F, T> IFeatureFunction<F, T> parseOrLiteral(IParsingContext<F> parsingContext, XMLEventReader reader,
+	public static <F, T> IFeatureFunction<F, T> parseOrLiteral(IStyleParserAdapter<F> parsingContext, XMLEventReader reader,
 			String finishTag, Function<XMLEvent, T> literalParser) throws XMLStreamException {
 
 		// this is a bit hacky
@@ -158,7 +159,7 @@ public class ExpressionParser {
 		return name;
 	}
 
-	private static <F> IFeatureFunction<F, Object> makeFunctionCall(IParsingContext<F> parsingContext,
+	private static <F> IFeatureFunction<F, Object> makeFunctionCall(IStyleParserAdapter<F> parsingContext,
 			LinkedList<IFeatureFunction<F, Object>> frame) throws XMLStreamException {
 
 		int size = frame.size();

@@ -20,7 +20,7 @@ import org.knowtiphy.charts.memstore.MemFeature;
 import org.knowtiphy.charts.memstore.MemStore;
 import org.knowtiphy.charts.memstore.StyleReader;
 import org.knowtiphy.charts.ontology.S57;
-import org.knowtiphy.shapemap.api.model.MapLayer;
+import org.knowtiphy.shapemap.model.MapLayer;
 import org.knowtiphy.shapemap.style.parser.StyleSyntaxException;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.index.strtree.STRtree;

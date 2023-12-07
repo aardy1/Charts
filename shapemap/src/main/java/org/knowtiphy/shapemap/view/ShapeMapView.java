@@ -6,7 +6,7 @@ import javafx.css.Styleable;
 import javafx.css.StyleablePropertyFactory;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
-import org.knowtiphy.shapemap.api.model.MapViewModel;
+import org.knowtiphy.shapemap.model.MapViewModel;
 import org.knowtiphy.shapemap.view.canvas.CanvasShapeMapSkin;
 
 /**

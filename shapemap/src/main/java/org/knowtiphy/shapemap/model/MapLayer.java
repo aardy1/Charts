@@ -1,4 +1,4 @@
-package org.knowtiphy.shapemap.api.model;
+package org.knowtiphy.shapemap.model;
 
 import java.io.IOException;
 import org.geotools.geometry.jts.ReferencedEnvelope;

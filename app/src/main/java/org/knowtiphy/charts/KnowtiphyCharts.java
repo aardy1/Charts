@@ -1,158 +1,167 @@
 package org.knowtiphy.charts;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javafx.application.Application;
-import javafx.geometry.Pos;
-import javafx.scene.Scene;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
-import javafx.scene.text.Font;
-import javafx.stage.Stage;
-import org.controlsfx.control.PropertySheet;
-import org.geotools.api.feature.simple.SimpleFeatureType;
-import org.knowtiphy.charts.chartview.ChartView;
-import org.knowtiphy.charts.chartview.MapDisplayOptions;
-import org.knowtiphy.charts.dynamics.AISModel;
-import org.knowtiphy.charts.enc.CatalogReader;
-import org.knowtiphy.charts.enc.ChartLocker;
-import org.knowtiphy.charts.enc.ENCChart;
-import org.knowtiphy.charts.enc.LocalChartProvider;
-import org.knowtiphy.charts.memstore.MemFeature;
-import org.knowtiphy.charts.memstore.StyleReader;
-import org.knowtiphy.charts.platform.IPlatform;
+import javafx.application.*;
+import javafx.geometry.*;
+import javafx.scene.*;
+import javafx.scene.layout.*;
+import javafx.scene.text.*;
+import javafx.stage.*;
+import org.controlsfx.control.*;
+import org.geotools.api.feature.simple.*;
+import org.knowtiphy.charts.chartview.*;
+import org.knowtiphy.charts.dynamics.*;
+import org.knowtiphy.charts.enc.*;
+import org.knowtiphy.charts.memstore.*;
 import org.knowtiphy.charts.platform.Platform;
-import org.knowtiphy.charts.utils.FXUtils;
-import org.knowtiphy.charts.utils.ToggleModel;
+import org.knowtiphy.charts.platform.*;
+import org.knowtiphy.charts.utils.*;
 
-import static org.knowtiphy.charts.utils.FXUtils.later;
-import static org.knowtiphy.charts.utils.FXUtils.resizeable;
+import java.io.*;
+import java.nio.file.*;
+import java.util.logging.*;
 
-public class KnowtiphyCharts extends Application {
+import static org.knowtiphy.charts.utils.FXUtils.*;
 
-	// need to work these out from screen dimensions
-	private final int width = 1300;
+public class KnowtiphyCharts extends Application
+{
 
-	private final int height = 750;
+    // need to work these out from screen dimensions
+    private static final int WIDTH = 1300;
 
-	private final UnitProfile unitProfile = new UnitProfile();
+    private static final int HEIGHT = 750;
 
-	private ChartLocker chartLocker;
+    private final UnitProfile unitProfile = new UnitProfile();
 
-	private MapDisplayOptions displayOptions;
+    private ChartLocker chartLocker;
 
-	private final AISModel dynamics = new AISModel();
+    private MapDisplayOptions displayOptions;
 
-	private ENCChart chart;
+    private final AISModel dynamics = new AISModel();
 
-	private final BorderPane overlay = new BorderPane();
+    private ENCChart chart;
 
-	@Override
-	public void start(Stage primaryStage) throws Exception {
+    private final BorderPane overlay = new BorderPane();
 
-		var platform = Platform.getPlatform();
+    @Override
+    public void start(Stage primaryStage) throws Exception
+    {
 
-		// var styleDir = Platform.getStylesPath();
-		showInitialSetup(platform);
+        var platform = Platform.getPlatform();
 
-		var catalogFile = platform.chartsDir().resolve("08Region_ENCProdCat.xml");// 08Region_ENCProdCat.xml");
-		var catalog = new CatalogReader(catalogFile).read();
+        // var styleDir = Platform.getStylesPath();
+        showInitialSetup(platform);
 
-		// var styleReader = new StyleReader(styleDir);
-		var styleReader = new StyleReader<SimpleFeatureType, MemFeature>(getClass());
-		var chartProvider = new LocalChartProvider(catalog, platform.chartsDir(), unitProfile, styleReader);
-		chartLocker = new ChartLocker(chartProvider);
-		var chartDescription = chartProvider.getChartDescription("Gulf of Mexico", 2_160_000);
+        var catalogFile = platform.chartsDir()
+                                  .resolve("08Region_ENCProdCat.xml");// 08Region_ENCProdCat.xml");
+        var catalog = new CatalogReader(catalogFile).read();
 
-		displayOptions = new MapDisplayOptions();
-		chart = chartLocker.getChart(chartDescription, displayOptions);
-		// var stats = new MapStats(chart).stats();
-		// stats.print();
+        // var styleReader = new StyleReader(styleDir);
+        var styleReader = new StyleReader<SimpleFeatureType, MemFeature>(getClass());
+        var chartProvider = new LocalChartProvider(catalog, platform.chartsDir(), unitProfile,
+                styleReader);
+        chartLocker = new ChartLocker(chartProvider);
+        var chartDescription = chartProvider.getChartDescription("Gulf of Mexico", 2_160_000);
 
-		// new Dump(mapContent, reader.getStore()).dump(S57.OC_BUAARE);
+        displayOptions = new MapDisplayOptions();
+        chart = chartLocker.getChart(chartDescription, displayOptions);
 
-		// this won't be right after the info bar is done, but that will be resized later
-		// chart.setViewPortScreenArea(new Rectangle2D(0, 0, width, height));
+        chart.newMapViewModel().subscribe(c -> {
+            System.err.println("new chart " + c);
+        });
 
-		var mapSurface = makeMap();
+        // var stats = new MapStats(chart).stats();
+        // stats.print();
 
-		var toggle = new ToggleModel();
-		setupPreferences(toggle);
+        // new Dump(mapContent, reader.getStore()).dump(S57.OC_BUAARE);
 
-		var infoBar = new InfoBar(platform, toggle, chart, unitProfile, displayOptions);
+        // this won't be right after the info bar is done, but that will be resized later
+        // chart.setViewPortScreenArea(new Rectangle2D(0, 0, width, height));
 
-		var vbox = new VBox();
-		vbox.getStyleClass().add("charts");
-		VBox.setVgrow(mapSurface, Priority.ALWAYS);
-		VBox.setVgrow(infoBar, Priority.NEVER);
-		vbox.setFillWidth(true);
-		vbox.getChildren().addAll(mapSurface, infoBar);
+        var mapSurface = makeMap();
 
-		vbox.setPickOnBounds(false);
-		overlay.setPickOnBounds(false);
+        var toggle = new ToggleModel();
+        setupPreferences(toggle);
 
-		var scene = new Scene(new StackPane(vbox, overlay), width, height);
-		scene.getStylesheets().add(getClass().getResource("charts.css").toExternalForm());
+        var chartHistory = new ChartHistory();
+        var infoBar = new InfoBar(platform, toggle, chart, unitProfile, chartHistory,
+                displayOptions);
 
-		primaryStage.setScene(scene);
-		platform.setTitle(primaryStage, "Knowtiphy Charts");
-		primaryStage.sizeToScene();
-		platform.setWindowIcons(primaryStage, getClass());
-		// if (platform.isDesktop()) {
-		// primaryStage.getIcons().addAll(new
-		// Image(getClass().getResourceAsStream("knowtiphy_charts_icon_32.png")),
-		// new Image(getClass().getResourceAsStream("knowtiphy_charts_icon_64.png")));
-		// }
-		primaryStage.show();
-	}
+        var vbox = new VBox();
+        vbox.getStyleClass().add("charts");
+        VBox.setVgrow(mapSurface, Priority.ALWAYS);
+        VBox.setVgrow(infoBar, Priority.NEVER);
+        vbox.setFillWidth(true);
+        vbox.getChildren().addAll(mapSurface, infoBar);
 
-	private ChartView makeMap() {
-		return resizeable(new ChartView(chartLocker, chart, dynamics, unitProfile, displayOptions));
-	}
+        vbox.setPickOnBounds(false);
+        overlay.setPickOnBounds(false);
 
-	private void setupPreferences(ToggleModel toggle) {
-		var displayProperties = FXUtils.nonResizeable(new PropertySheet(displayOptions.getProperties()));
-		BorderPane.setAlignment(displayProperties, Pos.CENTER);
-		displayProperties.setOnMouseExited(evt -> toggle.toggle());
-		toggle.getStateProperty()
-				.addListener(cl -> later(() -> overlay.setRight(toggle.isOn() ? displayProperties : null)));
-	}
+        var scene = new Scene(new StackPane(vbox, overlay), WIDTH, HEIGHT);
+        scene.getStylesheets().add(getClass().getResource("charts.css").toExternalForm());
 
-	private void showInitialSetup(IPlatform platform) {
+        primaryStage.setScene(scene);
+        platform.setTitle(primaryStage, "Knowtiphy Charts");
+        primaryStage.sizeToScene();
+        platform.setWindowIcons(primaryStage, getClass());
+        // if (platform.isDesktop()) {
+        // primaryStage.getIcons().addAll(new
+        // Image(getClass().getResourceAsStream("knowtiphy_charts_icon_32.png")),
+        // new Image(getClass().getResourceAsStream("knowtiphy_charts_icon_64.png")));
+        // }
+        primaryStage.show();
+    }
 
-		System.err.println("Platform = " + platform.getClass().getCanonicalName());
-		System.err.println("File System root = " + platform.rootDir());
-		System.err.println("File System root = " + platform.rootDir().toFile().exists());
-		System.err.println("File System root ENC = " + Paths.get(platform.rootDir().toString(), "ENC"));
-		System.err
-				.println("File System root ENC = " + Paths.get(platform.rootDir().toString(), "ENC").toFile().exists());
-		System.err.println("Charts  dir = " + platform.chartsDir());
-		System.err.println("Charts  dir = " + platform.chartsDir().toFile().exists());
-		try (var dave = Files.list(Paths.get(platform.rootDir().toString(), "ENC"))) {
-			var files = dave.map(Path::getFileName).map(Path::toString).toList();
-			System.err.println("Files = " + files);
-		}
-		catch (IOException ex) {
-			Logger.getLogger(KnowtiphyCharts.class.getName()).log(Level.SEVERE, null, ex);
-		}
-		System.err.println("Screen dimensions = " + platform.screenDimensions());
-		System.err.println("Screen ppi = " + platform.ppi());
-		System.err.println("Screen ppcm = " + platform.ppcm());
-		System.err.println("Default font = " + Font.getDefault());
-		// System.err.println("GPS Position = " + platform.positionProperty());
-		platform.info();
-		System.err.println();
-	}
+    private ChartView makeMap()
+    {
+        return resizeable(new ChartView(chartLocker, chart, dynamics, unitProfile, displayOptions));
+    }
 
-	public static void main(String[] args) {
-		Application.launch(KnowtiphyCharts.class, args);
-	}
+    private void setupPreferences(ToggleModel toggle)
+    {
+        var displayProperties = FXUtils.nonResizeable(
+                new PropertySheet(displayOptions.getProperties()));
+        BorderPane.setAlignment(displayProperties, Pos.CENTER);
+        displayProperties.setOnMouseExited(evt -> toggle.toggle());
+        toggle.getStateProperty()
+              .addListener(cl -> later(
+                      () -> overlay.setRight(toggle.isOn() ? displayProperties : null)));
+    }
+
+    private void showInitialSetup(IPlatform platform)
+    {
+
+        System.err.println("Platform = " + platform.getClass().getCanonicalName());
+        System.err.println("File System root = " + platform.rootDir());
+        System.err.println("File System root = " + platform.rootDir().toFile().exists());
+        System.err.println(
+                "File System root ENC = " + Paths.get(platform.rootDir().toString(), "ENC"));
+        System.err
+                .println("File System root ENC = " + Paths.get(platform.rootDir().toString(), "ENC")
+                                                          .toFile().exists());
+        System.err.println("Charts  dir = " + platform.chartsDir());
+        System.err.println("Charts  dir = " + platform.chartsDir().toFile().exists());
+        try(var dave = Files.list(Paths.get(platform.rootDir().toString(), "ENC")))
+        {
+            var files = dave.map(Path::getFileName).map(Path::toString).toList();
+            System.err.println("Files = " + files);
+        }
+        catch(IOException ex)
+        {
+            Logger.getLogger(KnowtiphyCharts.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        System.err.println("Screen dimensions = " + platform.screenDimensions());
+        System.err.println("Screen ppi = " + platform.ppi());
+        System.err.println("Screen ppcm = " + platform.ppcm());
+        System.err.println("Default font = " + Font.getDefault());
+        // System.err.println("GPS Position = " + platform.positionProperty());
+        platform.info();
+        System.err.println();
+    }
+
+    public static void main(String[] args)
+    {
+        Application.launch(KnowtiphyCharts.class, args);
+    }
 
 }
 

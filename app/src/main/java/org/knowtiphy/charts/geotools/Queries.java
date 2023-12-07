@@ -11,7 +11,7 @@ import java.util.List;
 import org.geotools.data.simple.SimpleFeatureCollection;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.knowtiphy.shapemap.api.IFeatureSourceIterator;
-import org.knowtiphy.shapemap.api.model.MapViewModel;
+import org.knowtiphy.shapemap.model.MapViewModel;
 import org.knowtiphy.shapemap.renderer.Transformation;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;

@@ -10,7 +10,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.scene.transform.NonInvertibleTransformException;
 import org.geotools.api.referencing.operation.TransformException;
-import org.knowtiphy.shapemap.api.model.MapViewModel;
+import org.knowtiphy.shapemap.model.MapViewModel;
 import org.knowtiphy.shapemap.renderer.ShapeMapRenderer;
 import org.knowtiphy.shapemap.renderer.context.RendererContext;
 import org.knowtiphy.shapemap.view.ShapeMapBaseSkin;

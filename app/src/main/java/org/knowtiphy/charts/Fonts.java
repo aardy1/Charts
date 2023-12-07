@@ -146,4 +146,8 @@ public class Fonts {
 		return FONT_AWESOME.create(FontAwesome.Glyph.SHIP);
 	}
 
+	public static Glyph history() {
+		return FONT_AWESOME.create(FontAwesome.Glyph.HISTORY);
+	}
+
 }

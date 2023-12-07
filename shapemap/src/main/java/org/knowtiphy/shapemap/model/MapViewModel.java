@@ -1,4 +1,4 @@
-package org.knowtiphy.shapemap.api.model;
+package org.knowtiphy.shapemap.model;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -14,6 +14,8 @@ import org.knowtiphy.shapemap.api.IFeatureAdapter;
 import org.knowtiphy.shapemap.api.IRenderablePolygonProvider;
 import org.knowtiphy.shapemap.api.ISVGProvider;
 import org.knowtiphy.shapemap.api.ISchemaAdapter;
+import org.knowtiphy.shapemap.renderer.context.RemoveHolesFromPolygon;
+import org.knowtiphy.shapemap.renderer.context.RenderGeomCache;
 import org.reactfx.Change;
 import org.reactfx.EventSource;
 import org.reactfx.EventStream;
@@ -57,6 +59,12 @@ public abstract class MapViewModel<S, F> {
 		this.totalRuleCount = 0;
 
 		viewPort = new MapViewport(bounds);
+	}
+
+	protected MapViewModel(ReferencedEnvelope bounds, ISchemaAdapter<S, F> schemaAdapter,
+			IFeatureAdapter<F> featureAdapter, ISVGProvider svgProvider)
+			throws TransformException, NonInvertibleTransformException, FactoryException {
+		this(bounds, schemaAdapter, featureAdapter, new RemoveHolesFromPolygon(new RenderGeomCache()), svgProvider);
 	}
 
 	public IFeatureAdapter<F> featureAdapter() {

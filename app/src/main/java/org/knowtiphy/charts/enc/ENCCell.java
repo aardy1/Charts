@@ -92,8 +92,8 @@ public class ENCCell {
 
 	@Override
 	public String toString() {
-		return "Cell{" + "name=" + name + ", scale=" + cScale + ", zipFileLocation=" + zipFileLocation + ", panels="
-				+ panels + '}';
+		return "ENCCell{" + "name=" + name + ", lname=" + lname + ", cScale=" + cScale + ", zipFileLocation="
+				+ zipFileLocation + ", panels=" + panels + '}';
 	}
 
 }

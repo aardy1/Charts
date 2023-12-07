@@ -1,4 +1,4 @@
-package org.knowtiphy.shapemap.api.model;
+package org.knowtiphy.shapemap.model;
 
 import javafx.geometry.Point2D;
 import javafx.geometry.Rectangle2D;

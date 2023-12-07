@@ -43,6 +43,8 @@ public class LocalChartProvider {
 					.resolve(cell.getName().replaceAll(" ", "_").replaceAll(",", "_") + "_" + cell.getcScale());
 			chartDescriptions.add(new ChartDescription(dir, cell));
 		}
+
+		System.err.println("Local charts = " + chartDescriptions);
 	}
 
 	// TODO -- needs to go away or be smarter

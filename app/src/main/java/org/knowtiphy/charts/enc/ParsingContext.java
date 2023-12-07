@@ -13,12 +13,12 @@ import org.geotools.api.feature.simple.SimpleFeatureType;
 import org.knowtiphy.charts.UnitProfile;
 import org.knowtiphy.charts.memstore.MemFeature;
 import org.knowtiphy.shapemap.api.IFeatureFunction;
-import org.knowtiphy.shapemap.api.IParsingContext;
+import org.knowtiphy.shapemap.api.IStyleParserAdapter;
 
 /**
  * @author graham
  */
-public class ParsingContext implements IParsingContext<MemFeature> {
+public class ParsingContext implements IStyleParserAdapter<MemFeature> {
 
 	private static final Map<String, Function<IFeatureFunction<MemFeature, Object>, IFeatureFunction<MemFeature, Object>>> UNIT_MAP = new HashMap<>();
 	static {

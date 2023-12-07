@@ -7,7 +7,6 @@ package org.knowtiphy.shapemap.style.parser.symbolizer;
 
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
-import org.knowtiphy.shapemap.api.IParsingContext;
 import org.knowtiphy.shapemap.renderer.symbolizer.ISymbolizer;
 import org.knowtiphy.shapemap.style.builder.PointSymbolizerBuilder;
 import org.knowtiphy.shapemap.style.parser.StyleSyntaxException;
@@ -18,12 +17,14 @@ import org.knowtiphy.shapemap.style.parser.expression.ExpressionParser;
 
 import static org.knowtiphy.shapemap.style.parser.Utils.normalize;
 
+import org.knowtiphy.shapemap.api.IStyleParserAdapter;
+
 /**
  * @author graham
  */
 public class PointSymbolizerParser {
 
-	public static <S, F> ISymbolizer<S, F> parse(IParsingContext<F> parsingContext, XMLEventReader reader)
+	public static <S, F> ISymbolizer<S, F> parse(IStyleParserAdapter<F> parsingContext, XMLEventReader reader)
 			throws XMLStreamException, StyleSyntaxException {
 
 		var builder = new PointSymbolizerBuilder<S, F>();

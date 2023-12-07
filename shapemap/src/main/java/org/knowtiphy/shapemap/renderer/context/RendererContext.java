@@ -11,7 +11,7 @@ import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.knowtiphy.shapemap.api.IFeatureAdapter;
 import org.knowtiphy.shapemap.api.IRenderablePolygonProvider;
 import org.knowtiphy.shapemap.api.ISVGProvider;
-import org.knowtiphy.shapemap.api.model.MapLayer;
+import org.knowtiphy.shapemap.model.MapLayer;
 
 /**
  * @author graham

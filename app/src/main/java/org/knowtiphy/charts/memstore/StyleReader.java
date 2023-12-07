@@ -3,10 +3,10 @@ package org.knowtiphy.charts.memstore;
 import java.io.IOException;
 import java.io.InputStream;
 import javax.xml.stream.XMLStreamException;
-import org.knowtiphy.shapemap.api.IParsingContext;
 import org.knowtiphy.shapemap.renderer.FeatureTypeStyle;
 import org.knowtiphy.shapemap.style.parser.StyleSyntaxException;
 import org.knowtiphy.shapemap.style.parser.StyledLayerDescriptorParser;
+import org.knowtiphy.shapemap.api.IStyleParserAdapter;
 
 /**
  * @author graham
@@ -21,14 +21,14 @@ public class StyleReader<S, F> {
 		this.dir = dir;
 	}
 
-	public FeatureTypeStyle<S, F> createStyle(String fileName, IParsingContext<F> parsingContext)
+	public FeatureTypeStyle<S, F> createStyle(String fileName, IStyleParserAdapter<F> parsingContext)
 			throws IOException, XMLStreamException, StyleSyntaxException {
 		var styleSheet = toSLDFile(fileName);
 		assert styleSheet != null;
 		return createFromSLD(styleSheet, parsingContext);
 	}
 
-	private FeatureTypeStyle<S, F> createFromSLD(InputStream stream, IParsingContext<F> parsingContext)
+	private FeatureTypeStyle<S, F> createFromSLD(InputStream stream, IStyleParserAdapter<F> parsingContext)
 			throws IOException, XMLStreamException, StyleSyntaxException {
 		return new StyledLayerDescriptorParser<S, F>(stream, parsingContext).read();
 	}

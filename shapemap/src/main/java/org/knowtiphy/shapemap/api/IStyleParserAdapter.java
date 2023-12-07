@@ -10,7 +10,7 @@ import java.util.Collection;
 /**
  * @author graham
  */
-public interface IParsingContext<F> {
+public interface IStyleParserAdapter<F> {
 
 	IFeatureFunction<F, Object> compilePropertyAccess(String name);
 

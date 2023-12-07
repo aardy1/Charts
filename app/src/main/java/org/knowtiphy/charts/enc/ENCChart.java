@@ -14,7 +14,7 @@ import org.geotools.api.referencing.operation.TransformException;
 import org.knowtiphy.charts.chartview.MapDisplayOptions;
 import org.knowtiphy.charts.chartview.markicons.ResourceLoader;
 import org.knowtiphy.charts.memstore.MemFeature;
-import org.knowtiphy.shapemap.api.model.MapViewModel;
+import org.knowtiphy.shapemap.model.MapViewModel;
 import org.knowtiphy.shapemap.renderer.context.RemoveHolesFromPolygon;
 import org.knowtiphy.shapemap.renderer.context.RenderGeomCache;
 import org.knowtiphy.shapemap.renderer.context.SVGCache;
