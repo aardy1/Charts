@@ -5,8 +5,8 @@ plugins {
 }
 
 repositories {
-    maven { url  'https://repo.osgeo.org/repository/release/' }
-    maven { url  'https://repo.osgeo.org/repository/snapshot/' }
+    maven { url 'https://repo.osgeo.org/repository/release/' }
+    maven { url 'https://repo.osgeo.org/repository/snapshot/' }
     maven { url 'https://nexus.gluonhq.com/nexus/content/repositories/releases/' }
     maven { url 'https://jitpack.io' }
     mavenCentral()
@@ -25,15 +25,15 @@ java {
 }
 
 compileJava {
-    options.compilerArgs.addAll(['-Xlint'])
+//    options.compilerArgs.addAll(['-Xlint'])
 }
 
 javafx {
     version = "21"
-    modules = [ 'javafx.base', 'javafx.graphics', 'javafx.controls' ]
+    modules = ['javafx.base', 'javafx.graphics', 'javafx.controls']
 }
 
-def buildTarget = findProperty('target')  ?: 'host'
+def buildTarget = findProperty('target') ?: 'host'
 println("Build target = " + buildTarget)
 
 gluonfx {
@@ -73,7 +73,7 @@ tasks.withType(JavaExec) {
 
 dependencies {
 
-    implementation  project(':shapemap')
+    implementation project(':shapemap')
 
     implementation libs.geotools.shapefile
     implementation libs.geotools.sld
@@ -87,17 +87,17 @@ dependencies {
 
     implementation libs.commons.lang3
     implementation libs.stax.api
- //   implementation libs.indriya
+    //   implementation libs.indriya
 //implementation 'javax.measure:unit-api:2.0'
     implementation libs.reactfx
     implementation libs.controlsfx
     implementation libs.fxsvgimage
 }
 
-   // attachConfig {
-   //     version = "$attach"
-     //   services 'display', 'lifecycle', 'statusbar', 'storage', 'position'
-   // }
+// attachConfig {
+//     version = "$attach"
+//   services 'display', 'lifecycle', 'statusbar', 'storage', 'position'
+// }
 //implementation 'com.gluonhq:charm-glisten:6.2.3'
 //implementation libs.glisten.charm
 //implementation libs.attach.display
@@ -107,10 +107,10 @@ dependencies {
 //implementation libs.attach.position
 //implementation libs.attach.util
 
-    //javaStaticSdkVersion = "17"
-    //javafxStaticSdkVersion = "21" // "22.1.0.1-Final"
-    //compilerArgs = ["-mmacosx-version-min=11"]
-    // linkerArgs may also need something like this "-mmacosx-version-min=12"
-    //["-Wl,-framework,Carbon"]
-    //linkerArgs = []
-        //bundleShortVersion = "BUND_NAME_SHORT"
+//javaStaticSdkVersion = "17"
+//javafxStaticSdkVersion = "21" // "22.1.0.1-Final"
+//compilerArgs = ["-mmacosx-version-min=11"]
+// linkerArgs may also need something like this "-mmacosx-version-min=12"
+//["-Wl,-framework,Carbon"]
+//linkerArgs = []
+//bundleShortVersion = "BUND_NAME_SHORT"

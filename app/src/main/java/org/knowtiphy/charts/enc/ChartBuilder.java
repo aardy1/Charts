@@ -46,11 +46,8 @@ public class ChartBuilder
   private MemStore store;
 
   public ChartBuilder(
-    ChartLocker chartLocker,
-    Path shapeDir,
-    ChartDescription chartDescription,
-    UnitProfile unitProfile,
-    StyleReader<SimpleFeatureType, MemFeature> styleReader,
+    ChartLocker chartLocker, Path shapeDir, ChartDescription chartDescription,
+    UnitProfile unitProfile, StyleReader<SimpleFeatureType, MemFeature> styleReader,
     MapDisplayOptions displayOptions)
   {
 
@@ -157,8 +154,7 @@ public class ChartBuilder
           }
           else
           {
-            var fileStore = new ShapefileDataStore(
-              new File(fileName).toURI().toURL());
+            var fileStore = new ShapefileDataStore(new File(fileName).toURI().toURL());
             var featureSource = fileStore.getFeatureSource();
 
             if(chart == null)
@@ -178,8 +174,7 @@ public class ChartBuilder
   }
 
   private MapLayer<SimpleFeatureType, MemFeature> readLayer(
-    ContentFeatureSource featureSource, MemStore store
-                                                           )
+    ContentFeatureSource featureSource, MemStore store)
     throws IOException, XMLStreamException, StyleSyntaxException
   {
 
@@ -199,13 +194,9 @@ public class ChartBuilder
 
         var geom = (Geometry) geoFeature.getDefaultGeometry();
 
-        // TODO -- get rid of this line? replaced with enum types
-        ExtraAttributes.geomType(geoFeature);
         var feature = new MemFeature(
-          geoFeature.getAttributes(),
-          geoFeature.getFeatureType(),
-          geom,
-          geoFeature.getIdentifier());
+          geoFeature);//geoFeature.getAttributes(), geoFeature.getFeatureType(), geom,
+//          geoFeature.getIdentifier());
         index.insert(geom.getEnvelopeInternal(), feature);
 
         var prop = feature.getProperty(S57.AT_SCAMIN);

@@ -6,12 +6,9 @@
 package org.knowtiphy.charts.memstore;
 
 import org.geotools.api.feature.simple.*;
-import org.geotools.api.filter.identity.*;
 import org.geotools.feature.simple.*;
 import org.knowtiphy.shapemap.api.*;
 import org.locationtech.jts.geom.*;
-
-import java.util.*;
 
 /**
  * @author graham
@@ -23,11 +20,14 @@ public class MemFeature extends SimpleFeatureImpl
 
   private final Geometry defaultGeometry;
 
-  public MemFeature(
-    List<Object> values, SimpleFeatureType featureType, Geometry defaultGeometry, FeatureId id)
+  public MemFeature(SimpleFeature geoFeature)
+//    List<Object> values, SimpleFeatureType featureType, Geometry defaultGeometry, FeatureId id)
   {
-    super(values, featureType, id);
-    this.defaultGeometry = defaultGeometry;
+    super(geoFeature.getAttributes(), geoFeature.getFeatureType(), geoFeature.getIdentifier());
+
+//    geoFeature.getAttributes(), geoFeature.getFeatureType(), geom,
+//      geoFeature.getIdentifier()
+    this.defaultGeometry = (Geometry) geoFeature.getDefaultGeometry();
     this.geomType = ExtraAttributes.geomType(defaultGeometry);
   }
 
@@ -38,7 +38,7 @@ public class MemFeature extends SimpleFeatureImpl
 
   public Geometry defaultGeometry()
   {
-    return defaultGeometry;//(Geometry) super.getDefaultGeometry();
+    return defaultGeometry;
   }
 
 }
