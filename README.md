@@ -27,7 +27,7 @@ To build and run:
 1. Check the code out
 2. Open a terminal, go to the root directory of the project and type `gradle run`
 
-This **should** cause Gradle to download all the libraries (including the OpenJFX libraries) it needs, and compile and run Knowtiphy Charts.
+This will cause Gradle to download all the libraries (including the OpenJFX libraries) it needs, and compile and run Knowtiphy Charts. I have tested this on a Mac and on Ubuntu (running under QEMU).
 
 **Note**: due to a known bug in recent versions of the JVM, it is possible that Knowtiphy Charts opens "in the background" (so you can't see it). Use whatever is right for your OS to see all running apps (on my Mac I use a three finger swipe up).
 
