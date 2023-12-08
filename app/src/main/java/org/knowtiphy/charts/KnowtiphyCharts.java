@@ -3,6 +3,7 @@ package org.knowtiphy.charts;
 import javafx.application.*;
 import javafx.geometry.*;
 import javafx.scene.*;
+import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.text.*;
 import javafx.stage.*;
@@ -80,7 +81,7 @@ public class KnowtiphyCharts extends Application
         var mapSurface = makeMap();
 
         var toggle = new ToggleModel();
-        setupPreferences(toggle);
+        chartSpecificPreferences(toggle);
 
         var chartHistory = new ChartHistory();
         var infoBar = new InfoBar(platform, toggle, chart, unitProfile, chartHistory,
@@ -91,7 +92,7 @@ public class KnowtiphyCharts extends Application
         VBox.setVgrow(mapSurface, Priority.ALWAYS);
         VBox.setVgrow(infoBar, Priority.NEVER);
         vbox.setFillWidth(true);
-        vbox.getChildren().addAll(mapSurface, infoBar);
+        vbox.getChildren().addAll(mainMenuBar(), mapSurface, infoBar);
 
         vbox.setPickOnBounds(false);
         overlay.setPickOnBounds(false);
@@ -116,7 +117,15 @@ public class KnowtiphyCharts extends Application
         return resizeable(new ChartView(chartLocker, chart, dynamics, unitProfile, displayOptions));
     }
 
-    private void setupPreferences(ToggleModel toggle)
+    private MenuBar mainMenuBar()
+    {
+        var menuBar = new MenuBar();
+        var menu = new Menu("Preferences");
+        menuBar.getMenus().addAll(menu);
+        return menuBar;
+    }
+
+    private void chartSpecificPreferences(ToggleModel toggle)
     {
         var displayProperties = FXUtils.nonResizeable(
                 new PropertySheet(displayOptions.getProperties()));
