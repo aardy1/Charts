@@ -19,14 +19,14 @@ import org.knowtiphy.shapemap.style.parser.symbolizer.TextSymbolizerParser;
 
 import static org.knowtiphy.shapemap.style.parser.Utils.normalize;
 
-import org.knowtiphy.shapemap.api.IStyleParserAdapter;
+import org.knowtiphy.shapemap.api.IStyleCompilerAdapter;
 
 /**
  * @author graham
  */
 public class RuleParser {
 
-	public static <S, F> Rule<S, F> parse(IStyleParserAdapter<F> parsingContext, XMLEventReader reader)
+	public static <S, F> Rule<S, F> parse(IStyleCompilerAdapter<F> parsingContext, XMLEventReader reader)
 			throws FileNotFoundException, XMLStreamException, StyleSyntaxException {
 
 		var builder = new RuleBuilder<S, F>();

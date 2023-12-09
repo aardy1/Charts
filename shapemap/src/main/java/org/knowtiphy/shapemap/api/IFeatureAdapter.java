@@ -5,15 +5,19 @@
 
 package org.knowtiphy.shapemap.api;
 
-import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.*;
 
 /**
- * A feature in an ESRI shape map.
+ * An adapter for features so that they can be used with the map renderer without requiring
+ * features to implement some interface or subclass some class (makes for flexibility at the cost
+ * of a function call)
  */
-public interface IFeatureAdapter<F> {
 
-	Geometry defaultGeometry(F feature);
+public interface IFeatureAdapter<F>
+{
 
-	GeomType geomType(F feature);
+  Geometry defaultGeometry(F feature);
+
+  GeomType geomType(F feature);
 
 }

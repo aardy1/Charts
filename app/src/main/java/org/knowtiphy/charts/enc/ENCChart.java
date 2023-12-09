@@ -5,58 +5,66 @@
 
 package org.knowtiphy.charts.enc;
 
-import java.util.Collection;
-import javafx.scene.transform.NonInvertibleTransformException;
-import org.geotools.api.feature.simple.SimpleFeatureType;
-import org.geotools.api.referencing.FactoryException;
-import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
-import org.geotools.api.referencing.operation.TransformException;
-import org.knowtiphy.charts.chartview.MapDisplayOptions;
-import org.knowtiphy.charts.chartview.markicons.ResourceLoader;
-import org.knowtiphy.charts.memstore.MemFeature;
-import org.knowtiphy.shapemap.model.MapViewModel;
-import org.knowtiphy.shapemap.renderer.context.RemoveHolesFromPolygon;
-import org.knowtiphy.shapemap.renderer.context.RenderGeomCache;
-import org.knowtiphy.shapemap.renderer.context.SVGCache;
+import javafx.scene.transform.*;
+import org.geotools.api.feature.simple.*;
+import org.geotools.api.referencing.*;
+import org.geotools.api.referencing.crs.*;
+import org.geotools.api.referencing.operation.*;
+import org.knowtiphy.charts.chartview.*;
+import org.knowtiphy.charts.chartview.markicons.*;
+import org.knowtiphy.charts.memstore.*;
+import org.knowtiphy.shapemap.model.*;
+import org.knowtiphy.shapemap.renderer.context.*;
+
+import java.util.*;
 
 /**
  * @author graham
  */
-public class ENCChart extends MapViewModel<SimpleFeatureType, MemFeature> {
+public class ENCChart extends MapViewModel<SimpleFeatureType, MemFeature>
+{
 
-	private final ChartDescription chartDescription;
+  private final ChartDescription chartDescription;
 
-	public ENCChart(ChartLocker chartLocker, ChartDescription chartDescription, CoordinateReferenceSystem crs,
-			MapDisplayOptions displayOptions)
-			throws TransformException, FactoryException, NonInvertibleTransformException {
+  public ENCChart(
+    ChartLocker chartLocker, ChartDescription chartDescription, CoordinateReferenceSystem crs,
+    MapDisplayOptions displayOptions)
+    throws TransformException, FactoryException, NonInvertibleTransformException
+  {
 
-		super(chartDescription.getBounds(crs), SchemaAdapter.ADAPTER, FeatureAdapter.ADAPTER,
-				new RemoveHolesFromPolygon(new RenderGeomCache()), new SVGCache(ResourceLoader.class));
-		this.chartDescription = chartDescription;
-	}
+    super(chartDescription.getBounds(crs), SchemaAdapter.ADAPTER, FeatureAdapter.ADAPTER,
+      new SVGCache(ResourceLoader.class));
+    this.chartDescription = chartDescription;
+  }
 
-	public ChartDescription getChartDescription() {
-		return chartDescription;
-	}
+  public ChartDescription getChartDescription()
+  {
+    return chartDescription;
+  }
 
-	public int cScale() {
-		return chartDescription.cScale();
-	}
+  public int cScale()
+  {
+    return chartDescription.cScale();
+  }
 
-	public double getZoomFactor() {
-		return 1 / (viewPortBounds().getWidth() / bounds().getWidth());
-	}
+  public double getZoomFactor()
+  {
+    return 1 / (viewPortBounds().getWidth() / bounds().getWidth());
+  }
 
-	public int currentScale() {
-		return (int) (cScale() / getZoomFactor());
-	}
+  public int currentScale()
+  {
+    return (int) (cScale() / getZoomFactor());
+  }
 
-	public Collection<Panel> getPanels() {
-		return chartDescription.getPanels();
-	}
+  public Collection<Panel> getPanels()
+  {
+    return chartDescription.getPanels();
+  }
 
-	public String title() {
-		return chartDescription.getName();
-	}
+  public String title()
+  {
+    return chartDescription.getName();
+  }
 
 }

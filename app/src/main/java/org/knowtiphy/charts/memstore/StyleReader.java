@@ -6,7 +6,7 @@ import javax.xml.stream.XMLStreamException;
 import org.knowtiphy.shapemap.renderer.FeatureTypeStyle;
 import org.knowtiphy.shapemap.style.parser.StyleSyntaxException;
 import org.knowtiphy.shapemap.style.parser.StyledLayerDescriptorParser;
-import org.knowtiphy.shapemap.api.IStyleParserAdapter;
+import org.knowtiphy.shapemap.api.IStyleCompilerAdapter;
 
 /**
  * @author graham
@@ -21,14 +21,14 @@ public class StyleReader<S, F> {
 		this.dir = dir;
 	}
 
-	public FeatureTypeStyle<S, F> createStyle(String fileName, IStyleParserAdapter<F> parsingContext)
+	public FeatureTypeStyle<S, F> createStyle(String fileName, IStyleCompilerAdapter<F> parsingContext)
 			throws IOException, XMLStreamException, StyleSyntaxException {
 		var styleSheet = toSLDFile(fileName);
 		assert styleSheet != null;
 		return createFromSLD(styleSheet, parsingContext);
 	}
 
-	private FeatureTypeStyle<S, F> createFromSLD(InputStream stream, IStyleParserAdapter<F> parsingContext)
+	private FeatureTypeStyle<S, F> createFromSLD(InputStream stream, IStyleCompilerAdapter<F> parsingContext)
 			throws IOException, XMLStreamException, StyleSyntaxException {
 		return new StyledLayerDescriptorParser<S, F>(stream, parsingContext).read();
 	}

@@ -14,7 +14,7 @@ import org.knowtiphy.shapemap.style.builder.FeatureTypeStyleBuilder;
 
 import static org.knowtiphy.shapemap.style.parser.Utils.normalize;
 
-import org.knowtiphy.shapemap.api.IStyleParserAdapter;
+import org.knowtiphy.shapemap.api.IStyleCompilerAdapter;
 
 /**
  * @author graham
@@ -23,9 +23,9 @@ public class StyledLayerDescriptorParser<S, F> {
 
 	private final InputStream input;
 
-	private final IStyleParserAdapter<F> parsingContext;
+	private final IStyleCompilerAdapter<F> parsingContext;
 
-	public StyledLayerDescriptorParser(InputStream input, IStyleParserAdapter<F> parsingContext) {
+	public StyledLayerDescriptorParser(InputStream input, IStyleCompilerAdapter<F> parsingContext) {
 		this.input = input;
 		this.parsingContext = parsingContext;
 	}

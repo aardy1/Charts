@@ -1,4 +1,3 @@
-
 //  plugin configuration
 
 pluginManagement {
@@ -20,45 +19,47 @@ dependencyResolutionManagement {
             version('fx', '21')
             version('attach', '4.0.19')
             version('connect', '2.0.1')
-    //        version('glisten', '6.2.3')
+            //        version('glisten', '6.2.3')
             version('stax', '1.0-2')
-            version('indriya', '2.2')
+            //       version('indriya', '2.2')
             version('reactfx', '1.4.1')
             version('controlsfx', '11.1.2')
             version('fxsvgimage', '1.1')
+            version('preferencesfx', '11.8.0')
 
             library('geotools-shapefile', 'org.geotools', 'gt-shapefile').versionRef('geotools')
             library('geotools-sld', 'org.geotools.xsd', 'gt-xsd-sld').versionRef('geotools')
             library('geotools-metadata', 'org.geotools', 'gt-metadata').versionRef('geotools')
 
-             library('fx-base', 'org.openjfx', 'javafx-base').versionRef('fx')
-             library('fx-graphics', 'org.openjfx', 'javafx-graphics').versionRef('fx')
-             library('fx-controls', 'org.openjfx', 'javafx-controls').versionRef('fx')
+            library('fx-base', 'org.openjfx', 'javafx-base').versionRef('fx')
+            library('fx-graphics', 'org.openjfx', 'javafx-graphics').versionRef('fx')
+            library('fx-controls', 'org.openjfx', 'javafx-controls').versionRef('fx')
 
-      //      library('glisten', 'com.gluonhq', 'charm-glisten').versionRef('glisten')
-            library('attach-display', 'com.gluonhq.attach', 'display').versionRef('attach')
-            library('attach-lifecycle', 'com.gluonhq.attach', 'lifecycle').versionRef('attach')
-            library('attach-statusbar', 'com.gluonhq.attach', 'statusbar').versionRef('attach')
-            library('attach-storage', 'com.gluonhq.attach', 'storage').versionRef('attach')
-            library('attach-position', 'com.gluonhq.attach', 'position').versionRef('attach')
-            library('attach-util', 'com.gluonhq.attach', 'util').versionRef('attach')
-            library('connect', 'com.gluonhq', 'connect').versionRef('connect')
+            //      library('glisten', 'com.gluonhq', 'charm-glisten').versionRef('glisten')
+//            library('attach-display', 'com.gluonhq.attach', 'display').versionRef('attach')
+//            library('attach-lifecycle', 'com.gluonhq.attach', 'lifecycle').versionRef('attach')
+//            library('attach-statusbar', 'com.gluonhq.attach', 'statusbar').versionRef('attach')
+//            library('attach-storage', 'com.gluonhq.attach', 'storage').versionRef('attach')
+//            library('attach-position', 'com.gluonhq.attach', 'position').versionRef('attach')
+//            library('attach-util', 'com.gluonhq.attach', 'util').versionRef('attach')
+//            library('connect', 'com.gluonhq', 'connect').versionRef('connect')
 
             library('commons-lang3', 'org.apache.commons', 'commons-lang3').versionRef('commons-lang')
             library('stax-api', 'javax.xml.stream', 'stax-api').versionRef('stax')
-            library('indriya', 'tech.units', 'indriya').versionRef('indriya')
+//            library('indriya', 'tech.units', 'indriya').versionRef('indriya')
 
             library('controlsfx', 'org.controlsfx', 'controlsfx').versionRef('controlsfx')
             library('reactfx', 'org.reactfx', 'reactfx').versionRef('reactfx')
+            library('preferencesfx', 'com.dlsc.preferencesfx', 'preferencesfx-core').versionRef('preferencesfx')
 
-            library( 'fxsvgimage', 'com.github.hervegirod', 'fxsvgimage').versionRef('fxsvgimage')
+            library('fxsvgimage', 'com.github.hervegirod', 'fxsvgimage').versionRef('fxsvgimage')
+        }
     }
-}
 
-rootProject.name = 'charts'
+    rootProject.name = 'charts'
 
 //  sub-projects
 
-include 'app'
-include 'shapemap'
+    include 'app'
+    include 'shapemap'
 }

@@ -10,7 +10,7 @@ import java.util.Collection;
 /**
  * @author graham
  */
-public interface IStyleParserAdapter<F> {
+public interface IStyleCompilerAdapter<F> {
 
 	IFeatureFunction<F, Object> compilePropertyAccess(String name);
 

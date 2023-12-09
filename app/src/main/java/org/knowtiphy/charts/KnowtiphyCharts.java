@@ -1,6 +1,14 @@
 package org.knowtiphy.charts;
 
+import com.dlsc.preferencesfx.PreferencesFx;
+import com.dlsc.preferencesfx.model.Category;
+import com.dlsc.preferencesfx.model.Group;
+import com.dlsc.preferencesfx.model.Setting;
+import java.io.*;
+import java.nio.file.*;
+import java.util.logging.*;
 import javafx.application.*;
+import javafx.beans.property.*;
 import javafx.geometry.*;
 import javafx.scene.*;
 import javafx.scene.control.*;
@@ -13,164 +21,169 @@ import org.knowtiphy.charts.chartview.*;
 import org.knowtiphy.charts.dynamics.*;
 import org.knowtiphy.charts.enc.*;
 import org.knowtiphy.charts.memstore.*;
-import org.knowtiphy.charts.platform.Platform;
 import org.knowtiphy.charts.platform.*;
+import org.knowtiphy.charts.platform.Platform;
 import org.knowtiphy.charts.utils.*;
-
-import java.io.*;
-import java.nio.file.*;
-import java.util.logging.*;
 
 import static org.knowtiphy.charts.utils.FXUtils.*;
 
-public class KnowtiphyCharts extends Application
-{
+public class KnowtiphyCharts extends Application {
 
-    // need to work these out from screen dimensions
-    private static final int WIDTH = 1300;
+	// need to work these out from screen dimensions
+	private static final int WIDTH = 1300;
 
-    private static final int HEIGHT = 750;
+	private static final int HEIGHT = 750;
 
-    private final UnitProfile unitProfile = new UnitProfile();
+	private final UnitProfile unitProfile = new UnitProfile();
 
-    private ChartLocker chartLocker;
+	private ChartLocker chartLocker;
 
-    private MapDisplayOptions displayOptions;
+	private MapDisplayOptions displayOptions;
 
-    private final AISModel dynamics = new AISModel();
+	private final AISModel dynamics = new AISModel();
 
-    private ENCChart chart;
+	private ENCChart chart;
 
-    private final BorderPane overlay = new BorderPane();
+	private final BorderPane overlay = new BorderPane();
 
-    @Override
-    public void start(Stage primaryStage) throws Exception
-    {
+	@Override
+	public void start(Stage primaryStage) throws Exception {
 
-        var platform = Platform.getPlatform();
+		var platform = Platform.getPlatform();
 
-        // var styleDir = Platform.getStylesPath();
-        showInitialSetup(platform);
+		// var styleDir = Platform.getStylesPath();
+		showInitialSetup(platform);
 
-        var catalogFile = platform.chartsDir()
-                                  .resolve("08Region_ENCProdCat.xml");// 08Region_ENCProdCat.xml");
-        var catalog = new CatalogReader(catalogFile).read();
+		var catalogFile = platform.chartsDir().resolve("08Region_ENCProdCat.xml");// 08Region_ENCProdCat.xml");
+		var catalog = new CatalogReader(catalogFile).read();
 
-        // var styleReader = new StyleReader(styleDir);
-        var styleReader = new StyleReader<SimpleFeatureType, MemFeature>(getClass());
-        var chartProvider = new LocalChartProvider(catalog, platform.chartsDir(), unitProfile,
-                styleReader);
-        chartLocker = new ChartLocker(chartProvider);
-        var chartDescription = chartProvider.getChartDescription("Gulf of Mexico", 2_160_000);
+		// var styleReader = new StyleReader(styleDir);
+		var styleReader = new StyleReader<SimpleFeatureType, MemFeature>(getClass());
+		var chartProvider = new LocalChartProvider(catalog, platform.chartsDir(), unitProfile, styleReader);
+		chartLocker = new ChartLocker(chartProvider);
+		var chartDescription = chartProvider.getChartDescription("Gulf of Mexico", 2_160_000);
 
-        displayOptions = new MapDisplayOptions();
-        chart = chartLocker.getChart(chartDescription, displayOptions);
+		displayOptions = new MapDisplayOptions();
+		chart = chartLocker.getChart(chartDescription, displayOptions);
 
-        chart.newMapViewModel().subscribe(c -> {
-            System.err.println("new chart " + c);
-        });
+		chart.newMapViewModel().subscribe(c -> {
+			System.err.println("new chart " + c);
+		});
 
-        // var stats = new MapStats(chart).stats();
-        // stats.print();
+		// var stats = new MapStats(chart).stats();
+		// stats.print();
 
-        // new Dump(mapContent, reader.getStore()).dump(S57.OC_BUAARE);
+		// new Dump(mapContent, reader.getStore()).dump(S57.OC_BUAARE);
 
-        // this won't be right after the info bar is done, but that will be resized later
-        // chart.setViewPortScreenArea(new Rectangle2D(0, 0, width, height));
+		// this won't be right after the info bar is done, but that will be resized later
+		// chart.setViewPortScreenArea(new Rectangle2D(0, 0, width, height));
 
-        var mapSurface = makeMap();
+		var mapSurface = makeMap();
 
-        var toggle = new ToggleModel();
-        chartSpecificPreferences(toggle);
+		var toggle = new ToggleModel();
+		chartSpecificPreferences(toggle);
 
-        var chartHistory = new ChartHistory();
-        var infoBar = new InfoBar(platform, toggle, chart, unitProfile, chartHistory,
-                displayOptions);
+		var chartHistory = new ChartHistory();
+		var infoBar = new InfoBar(platform, toggle, chart, unitProfile, chartHistory, displayOptions);
 
-        var vbox = new VBox();
-        vbox.getStyleClass().add("charts");
-        VBox.setVgrow(mapSurface, Priority.ALWAYS);
-        VBox.setVgrow(infoBar, Priority.NEVER);
-        vbox.setFillWidth(true);
-        vbox.getChildren().addAll(mainMenuBar(), mapSurface, infoBar);
+		var vbox = new VBox();
+		vbox.getStyleClass().add("charts");
+		VBox.setVgrow(mapSurface, Priority.ALWAYS);
+		VBox.setVgrow(infoBar, Priority.NEVER);
+		vbox.setFillWidth(true);
+		vbox.getChildren().addAll(mainMenuBar(), mapSurface, infoBar);
 
-        vbox.setPickOnBounds(false);
-        overlay.setPickOnBounds(false);
+		vbox.setPickOnBounds(false);
+		overlay.setPickOnBounds(false);
 
-        var scene = new Scene(new StackPane(vbox, overlay), WIDTH, HEIGHT);
-        scene.getStylesheets().add(getClass().getResource("charts.css").toExternalForm());
+		var scene = new Scene(new StackPane(vbox, overlay), WIDTH, HEIGHT);
+		scene.getStylesheets().add(getClass().getResource("charts.css").toExternalForm());
 
-        primaryStage.setScene(scene);
-        platform.setTitle(primaryStage, "Knowtiphy Charts");
-        primaryStage.sizeToScene();
-        platform.setWindowIcons(primaryStage, getClass());
-        // if (platform.isDesktop()) {
-        // primaryStage.getIcons().addAll(new
-        // Image(getClass().getResourceAsStream("knowtiphy_charts_icon_32.png")),
-        // new Image(getClass().getResourceAsStream("knowtiphy_charts_icon_64.png")));
-        // }
-        primaryStage.show();
-    }
+		primaryStage.setScene(scene);
+		platform.setTitle(primaryStage, "Knowtiphy Charts");
+		primaryStage.sizeToScene();
+		platform.setWindowIcons(primaryStage, getClass());
+		// if (platform.isDesktop()) {
+		// primaryStage.getIcons().addAll(new
+		// Image(getClass().getResourceAsStream("knowtiphy_charts_icon_32.png")),
+		// new Image(getClass().getResourceAsStream("knowtiphy_charts_icon_64.png")));
+		// }
+		primaryStage.show();
+	}
 
-    private ChartView makeMap()
-    {
-        return resizeable(new ChartView(chartLocker, chart, dynamics, unitProfile, displayOptions));
-    }
+	private ChartView makeMap() {
+		return resizeable(new ChartView(chartLocker, chart, dynamics, unitProfile, displayOptions));
+	}
 
-    private MenuBar mainMenuBar()
-    {
-        var menuBar = new MenuBar();
-        var menu = new Menu("Preferences");
-        menuBar.getMenus().addAll(menu);
-        return menuBar;
-    }
+	private MenuBar mainMenuBar() {
+		var menuBar = new MenuBar();
+		var menu = new Menu("App");
+		var menuPreferences = new MenuItem("Preferences");
+		menuPreferences.setOnAction(x -> showPreferences());
+		menu.getItems().add(menuPreferences);
+		menuBar.getMenus().addAll(menu);
+		return menuBar;
+	}
 
-    private void chartSpecificPreferences(ToggleModel toggle)
-    {
-        var displayProperties = FXUtils.nonResizeable(
-                new PropertySheet(displayOptions.getProperties()));
-        BorderPane.setAlignment(displayProperties, Pos.CENTER);
-        displayProperties.setOnMouseExited(evt -> toggle.toggle());
-        toggle.getStateProperty()
-              .addListener(cl -> later(
-                      () -> overlay.setRight(toggle.isOn() ? displayProperties : null)));
-    }
+	private void chartSpecificPreferences(ToggleModel toggle) {
+		var displayProperties = FXUtils.nonResizeable(new PropertySheet(displayOptions.getProperties()));
+		BorderPane.setAlignment(displayProperties, Pos.CENTER);
+		displayProperties.setOnMouseExited(evt -> toggle.toggle());
+		toggle.getStateProperty()
+				.addListener(cl -> later(() -> overlay.setRight(toggle.isOn() ? displayProperties : null)));
+	}
 
-    private void showInitialSetup(IPlatform platform)
-    {
+	private void showInitialSetup(IPlatform platform) {
 
-        System.err.println("Platform = " + platform.getClass().getCanonicalName());
-        System.err.println("File System root = " + platform.rootDir());
-        System.err.println("File System root = " + platform.rootDir().toFile().exists());
-        System.err.println(
-                "File System root ENC = " + Paths.get(platform.rootDir().toString(), "ENC"));
-        System.err
-                .println("File System root ENC = " + Paths.get(platform.rootDir().toString(), "ENC")
-                                                          .toFile().exists());
-        System.err.println("Charts  dir = " + platform.chartsDir());
-        System.err.println("Charts  dir = " + platform.chartsDir().toFile().exists());
-        try(var dave = Files.list(Paths.get(platform.rootDir().toString(), "ENC")))
-        {
-            var files = dave.map(Path::getFileName).map(Path::toString).toList();
-            System.err.println("Files = " + files);
-        }
-        catch(IOException ex)
-        {
-            Logger.getLogger(KnowtiphyCharts.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        System.err.println("Screen dimensions = " + platform.screenDimensions());
-        System.err.println("Screen ppi = " + platform.ppi());
-        System.err.println("Screen ppcm = " + platform.ppcm());
-        System.err.println("Default font = " + Font.getDefault());
-        // System.err.println("GPS Position = " + platform.positionProperty());
-        platform.info();
-        System.err.println();
-    }
+		System.err.println("Platform = " + platform.getClass().getCanonicalName());
+		System.err.println("File System root = " + platform.rootDir());
+		System.err.println("File System root = " + platform.rootDir().toFile().exists());
+		System.err.println("File System root ENC = " + Paths.get(platform.rootDir().toString(), "ENC"));
+		System.err
+				.println("File System root ENC = " + Paths.get(platform.rootDir().toString(), "ENC").toFile().exists());
+		System.err.println("Charts  dir = " + platform.chartsDir());
+		System.err.println("Charts  dir = " + platform.chartsDir().toFile().exists());
+		try (var dave = Files.list(Paths.get(platform.rootDir().toString(), "ENC"))) {
+			var files = dave.map(Path::getFileName).map(Path::toString).toList();
+			System.err.println("Files = " + files);
+		}
+		catch (IOException ex) {
+			Logger.getLogger(KnowtiphyCharts.class.getName()).log(Level.SEVERE, null, ex);
+		}
+		System.err.println("Screen dimensions = " + platform.screenDimensions());
+		System.err.println("Screen ppi = " + platform.ppi());
+		System.err.println("Screen ppcm = " + platform.ppcm());
+		System.err.println("Default font = " + Font.getDefault());
+		// System.err.println("GPS Position = " + platform.positionProperty());
+		platform.info();
+		System.err.println();
+	}
 
-    public static void main(String[] args)
-    {
-        Application.launch(KnowtiphyCharts.class, args);
-    }
+	private void showPreferences() {
+		StringProperty stringProperty = new SimpleStringProperty("String");
+		BooleanProperty booleanProperty = new SimpleBooleanProperty(true);
+		IntegerProperty integerProperty = new SimpleIntegerProperty(12);
+		DoubleProperty doubleProperty = new SimpleDoubleProperty(6.5);
+
+		PreferencesFx preferencesFx = PreferencesFx.of(KnowtiphyCharts.class,
+				// Save class (will be used to reference saved values of Settings to)
+				Category.of("Category title 1", Setting.of("Setting title 1", stringProperty),
+						// creates a group automatically
+						Setting.of("Setting title 2", booleanProperty) // which contains
+																		// both settings
+				), Category.of("Category title 2").expand() // Expand the parent
+						// category in the tree-view
+						.subCategories( // adds a subcategory to "Category title 2"
+								Category.of("Category title 3",
+										Group.of("Group title 1", Setting.of("Setting title 3", integerProperty)),
+										Group.of( // group without title
+												Setting.of("Setting title 3", doubleProperty)))));
+		preferencesFx.show();
+	}
+
+	public static void main(String[] args) {
+		Application.launch(KnowtiphyCharts.class, args);
+	}
 
 }
 

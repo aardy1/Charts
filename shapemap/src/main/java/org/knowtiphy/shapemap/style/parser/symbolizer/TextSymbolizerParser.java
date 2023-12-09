@@ -22,14 +22,14 @@ import org.knowtiphy.shapemap.style.parser.expression.ExpressionParser;
 
 import static org.knowtiphy.shapemap.style.parser.Utils.normalize;
 
-import org.knowtiphy.shapemap.api.IStyleParserAdapter;
+import org.knowtiphy.shapemap.api.IStyleCompilerAdapter;
 
 /**
  * @author graham
  */
 public class TextSymbolizerParser {
 
-	public static <S, F> TextSymbolizer<S, F> parse(IStyleParserAdapter<F> parsingContext, XMLEventReader reader)
+	public static <S, F> TextSymbolizer<S, F> parse(IStyleCompilerAdapter<F> parsingContext, XMLEventReader reader)
 			throws XMLStreamException, StyleSyntaxException {
 
 		var builder = new TextSymbolizerBuilder<S, F>();

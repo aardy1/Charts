@@ -17,14 +17,14 @@ import org.knowtiphy.shapemap.style.parser.expression.ExpressionParser;
 
 import static org.knowtiphy.shapemap.style.parser.Utils.normalize;
 
-import org.knowtiphy.shapemap.api.IStyleParserAdapter;
+import org.knowtiphy.shapemap.api.IStyleCompilerAdapter;
 
 /**
  * @author graham
  */
 public class PointSymbolizerParser {
 
-	public static <S, F> ISymbolizer<S, F> parse(IStyleParserAdapter<F> parsingContext, XMLEventReader reader)
+	public static <S, F> ISymbolizer<S, F> parse(IStyleCompilerAdapter<F> parsingContext, XMLEventReader reader)
 			throws XMLStreamException, StyleSyntaxException {
 
 		var builder = new PointSymbolizerBuilder<S, F>();

@@ -30,7 +30,7 @@ compileJava {
 
 javafx {
     version = "21"
-    modules = ['javafx.base', 'javafx.graphics', 'javafx.controls']
+    modules = ['javafx.base', 'javafx.graphics', 'javafx.controls',  'javafx.web', 'javafx.fxml']
 }
 
 def buildTarget = findProperty('target') ?: 'host'
@@ -82,8 +82,8 @@ dependencies {
     implementation libs.fx.base
     implementation libs.fx.graphics
     implementation libs.fx.controls
-
-    implementation libs.connect
+    implementation libs.preferencesfx
+//    implementation libs.connect
 
     implementation libs.commons.lang3
     implementation libs.stax.api

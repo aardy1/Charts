@@ -1,170 +1,192 @@
 package org.knowtiphy.shapemap.model;
 
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import javafx.geometry.Rectangle2D;
-import javafx.scene.transform.Affine;
-import javafx.scene.transform.NonInvertibleTransformException;
-import org.geotools.api.referencing.FactoryException;
-import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
-import org.geotools.api.referencing.operation.TransformException;
-import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.knowtiphy.shapemap.api.IFeatureAdapter;
-import org.knowtiphy.shapemap.api.IRenderablePolygonProvider;
-import org.knowtiphy.shapemap.api.ISVGProvider;
-import org.knowtiphy.shapemap.api.ISchemaAdapter;
-import org.knowtiphy.shapemap.renderer.context.RemoveHolesFromPolygon;
-import org.knowtiphy.shapemap.renderer.context.RenderGeomCache;
-import org.reactfx.Change;
-import org.reactfx.EventSource;
-import org.reactfx.EventStream;
+import javafx.geometry.*;
+import javafx.scene.transform.*;
+import org.geotools.api.referencing.*;
+import org.geotools.api.referencing.crs.*;
+import org.geotools.api.referencing.operation.*;
+import org.geotools.geometry.jts.*;
+import org.knowtiphy.shapemap.api.*;
+import org.knowtiphy.shapemap.renderer.context.*;
+import org.reactfx.*;
 
-public abstract class MapViewModel<S, F> {
+import java.util.*;
 
-	private final EventSource<Change<Boolean>> layerVisibilityEvent = new EventSource<>();
+public abstract class MapViewModel<S, F>
+{
 
-	private final EventSource<Change<ReferencedEnvelope>> viewPortBoundsEvent = new EventSource<>();
+  private final EventSource<Change<Boolean>> layerVisibilityEvent = new EventSource<>();
 
-	private final EventSource<Change<Rectangle2D>> viewPortScreenAreaEvent = new EventSource<>();
+  private final EventSource<Change<ReferencedEnvelope>> viewPortBoundsEvent = new EventSource<>();
 
-	private final EventSource<Change<MapViewModel<S, F>>> newMapViewModel = new EventSource<>();
+  private final EventSource<Change<Rectangle2D>> viewPortScreenAreaEvent = new EventSource<>();
 
-	private final ReferencedEnvelope bounds;
+  private final EventSource<Change<MapViewModel<S, F>>> newMapViewModel = new EventSource<>();
 
-	private final Map<String, MapLayer<S, F>> layers = new LinkedHashMap<>();
+  private final ReferencedEnvelope bounds;
 
-	private final MapViewport viewPort;
+  private final Map<String, MapLayer<S, F>> layers = new LinkedHashMap<>();
 
-	private final IFeatureAdapter<F> featureAdapter;
+  private final MapViewport viewPort;
 
-	private final ISchemaAdapter<S, F> schemaAdapter;
+  private final IFeatureAdapter<F> featureAdapter;
 
-	private final IRenderablePolygonProvider renderablePolygonProvider;
+  private final ISchemaAdapter<S, F> schemaAdapter;
 
-	private final ISVGProvider svgProvider;
+  private final IRenderablePolygonProvider renderablePolygonProvider;
 
-	// possibly shouldnt be here -- but it makes for faster rendering
-	private int totalRuleCount;
+  private final ISVGProvider svgProvider;
 
-	protected MapViewModel(ReferencedEnvelope bounds, ISchemaAdapter<S, F> schemaAdapter,
-			IFeatureAdapter<F> featureAdapter, IRenderablePolygonProvider renderablePolygonProvider,
-			ISVGProvider svgProvider) throws TransformException, NonInvertibleTransformException, FactoryException {
+  // possibly shouldnt be here -- but it makes for faster rendering
+  private int totalRuleCount;
 
-		this.bounds = bounds;
-		this.schemaAdapter = schemaAdapter;
-		this.featureAdapter = featureAdapter;
-		this.renderablePolygonProvider = renderablePolygonProvider;
-		this.svgProvider = svgProvider;
-		this.totalRuleCount = 0;
+  protected MapViewModel(
+    ReferencedEnvelope bounds, ISchemaAdapter<S, F> schemaAdapter,
+    IFeatureAdapter<F> featureAdapter, IRenderablePolygonProvider renderablePolygonProvider,
+    ISVGProvider svgProvider)
+    throws TransformException, NonInvertibleTransformException, FactoryException
+  {
 
-		viewPort = new MapViewport(bounds);
-	}
+    this.bounds = bounds;
+    this.schemaAdapter = schemaAdapter;
+    this.featureAdapter = featureAdapter;
+    this.renderablePolygonProvider = renderablePolygonProvider;
+    this.svgProvider = svgProvider;
+    this.totalRuleCount = 0;
 
-	protected MapViewModel(ReferencedEnvelope bounds, ISchemaAdapter<S, F> schemaAdapter,
-			IFeatureAdapter<F> featureAdapter, ISVGProvider svgProvider)
-			throws TransformException, NonInvertibleTransformException, FactoryException {
-		this(bounds, schemaAdapter, featureAdapter, new RemoveHolesFromPolygon(new RenderGeomCache()), svgProvider);
-	}
+    viewPort = new MapViewport(bounds);
+  }
 
-	public IFeatureAdapter<F> featureAdapter() {
-		return featureAdapter;
-	}
+  protected MapViewModel(
+    ReferencedEnvelope bounds, ISchemaAdapter<S, F> schemaAdapter,
+    IFeatureAdapter<F> featureAdapter, ISVGProvider svgProvider)
+    throws TransformException, NonInvertibleTransformException, FactoryException
+  {
 
-	protected MapViewport viewPort() {
-		return viewPort;
-	}
+    this(bounds, schemaAdapter, featureAdapter, new RemoveHolesFromPolygon(new RenderGeomCache()),
+      svgProvider);
+  }
 
-	public Collection<MapLayer<S, F>> layers() {
-		return layers.values();
-	}
+  public IFeatureAdapter<F> featureAdapter()
+  {
+    return featureAdapter;
+  }
 
-	public void addLayer(MapLayer<S, F> layer) {
-		layers.put(schemaAdapter.name(layer.getFeatureSource().getSchema()), layer);
-		totalRuleCount += layer.getStyle().rules().size();
-	}
+  protected MapViewport viewPort()
+  {
+    return viewPort;
+  }
 
-	public MapLayer<S, F> layer(String type) {
-		return layers.get(type);
-	}
+  public Collection<MapLayer<S, F>> layers()
+  {
+    return layers.values();
+  }
 
-	public int totalRuleCount() {
-		return totalRuleCount;
-	}
+  public void addLayer(MapLayer<S, F> layer)
+  {
+    layers.put(schemaAdapter.name(layer.getFeatureSource().getSchema()), layer);
+    totalRuleCount += layer.getStyle().rules().size();
+  }
 
-	public void setLayerVisible(String type, boolean visible) {
-		var layer = layer(type);
-		var oldVisible = layer.isVisible();
-		layer.setVisible(visible);
-		layerVisibilityEvent.push(new Change<>(oldVisible, visible));
-	}
+  public MapLayer<S, F> layer(String type)
+  {
+    return layers.get(type);
+  }
 
-	public ReferencedEnvelope viewPortBounds() {
-		return viewPort.getBounds();
-	}
+  public int totalRuleCount()
+  {
+    return totalRuleCount;
+  }
 
-	public void setViewPortBounds(ReferencedEnvelope bounds)
-			throws TransformException, NonInvertibleTransformException {
+  public void setLayerVisible(String type, boolean visible)
+  {
+    var layer = layer(type);
+    var oldVisible = layer.isVisible();
+    layer.setVisible(visible);
+    layerVisibilityEvent.push(new Change<>(oldVisible, visible));
+  }
 
-		var oldBounds = viewPort.getBounds();
-		viewPort.setBounds(bounds);
-		System.err.println("\n\nVP change " + bounds + "\n\n");
-		viewPortBoundsEvent.push(new Change<>(oldBounds, bounds));
-	}
+  public ReferencedEnvelope viewPortBounds()
+  {
+    return viewPort.getBounds();
+  }
 
-	public Rectangle2D viewPortScreenArea() {
-		return viewPort().getScreenArea();
-	}
+  public void setViewPortBounds(ReferencedEnvelope bounds)
+    throws TransformException, NonInvertibleTransformException
+  {
 
-	public void setViewPortScreenArea(Rectangle2D screenArea)
-			throws TransformException, NonInvertibleTransformException {
-		var oldScreenArea = viewPort.getScreenArea();
-		viewPort.setScreenArea(screenArea);
-		viewPortScreenAreaEvent.push(new Change<>(oldScreenArea, screenArea));
-	}
+    var oldBounds = viewPort.getBounds();
+    viewPort.setBounds(bounds);
+    System.err.println("\n\nVP change " + bounds + "\n\n");
+    viewPortBoundsEvent.push(new Change<>(oldBounds, bounds));
+  }
 
-	public IRenderablePolygonProvider renderablePolygonProvider() {
-		return renderablePolygonProvider;
-	}
+  public Rectangle2D viewPortScreenArea()
+  {
+    return viewPort().getScreenArea();
+  }
 
-	public ISVGProvider svgProvider() {
-		return svgProvider;
-	}
+  public void setViewPortScreenArea(Rectangle2D screenArea)
+    throws TransformException, NonInvertibleTransformException
+  {
+    var oldScreenArea = viewPort.getScreenArea();
+    viewPort.setScreenArea(screenArea);
+    viewPortScreenAreaEvent.push(new Change<>(oldScreenArea, screenArea));
+  }
 
-	public void setNewMapViewModel(MapViewModel<S, F> map) {
-		newMapViewModel.push(new Change<>(this, map));
-	}
+  public IRenderablePolygonProvider renderablePolygonProvider()
+  {
+    return renderablePolygonProvider;
+  }
 
-	public ReferencedEnvelope bounds() {
-		return bounds;
-	}
+  public ISVGProvider svgProvider()
+  {
+    return svgProvider;
+  }
 
-	public CoordinateReferenceSystem crs() {
-		return bounds.getCoordinateReferenceSystem();
-	}
+  public void setNewMapViewModel(MapViewModel<S, F> map)
+  {
+    newMapViewModel.push(new Change<>(this, map));
+  }
 
-	public Affine viewPortScreenToWorld() {
-		return viewPort.getScreenToWorld();
-	}
+  public ReferencedEnvelope bounds()
+  {
+    return bounds;
+  }
 
-	public Affine viewPortWorldToScreen() {
-		return viewPort.getWorldToScreen();
-	}
+  public CoordinateReferenceSystem crs()
+  {
+    return bounds.getCoordinateReferenceSystem();
+  }
 
-	public EventStream<Change<Boolean>> layerVisibilityEvent() {
-		return layerVisibilityEvent;
-	}
+  public Affine viewPortScreenToWorld()
+  {
+    return viewPort.getScreenToWorld();
+  }
 
-	public EventStream<Change<ReferencedEnvelope>> viewPortBoundsEvent() {
-		return viewPortBoundsEvent;
-	}
+  public Affine viewPortWorldToScreen()
+  {
+    return viewPort.getWorldToScreen();
+  }
 
-	public EventStream<Change<Rectangle2D>> viewPortScreenEvent() {
-		return viewPortScreenAreaEvent;
-	}
+  public EventStream<Change<Boolean>> layerVisibilityEvent()
+  {
+    return layerVisibilityEvent;
+  }
 
-	public EventStream<Change<MapViewModel<S, F>>> newMapViewModel() {
-		return newMapViewModel;
-	}
+  public EventStream<Change<ReferencedEnvelope>> viewPortBoundsEvent()
+  {
+    return viewPortBoundsEvent;
+  }
+
+  public EventStream<Change<Rectangle2D>> viewPortScreenAreaEvent()
+  {
+    return viewPortScreenAreaEvent;
+  }
+
+  public EventStream<Change<MapViewModel<S, F>>> newMapViewModel()
+  {
+    return newMapViewModel;
+  }
 
 }

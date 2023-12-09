@@ -5,14 +5,9 @@
 
 package org.knowtiphy.charts.enc;
 
-import com.gluonhq.connect.provider.FileClient;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.nio.file.Path;
-import javax.xml.stream.XMLEventReader;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamException;
+import java.io.*;
+import java.nio.file.*;
+import javax.xml.stream.*;
 import org.locationtech.jts.geom.Coordinate;
 
 /**
@@ -62,17 +57,21 @@ public class CatalogReader {
 
 		var xmlInputFactory = XMLInputFactory.newInstance();
 		XMLEventReader reader;
-		try {
-			reader = xmlInputFactory.createXMLEventReader(new FileInputStream(catalogFile.toFile()));
-		}
-		catch (Exception ex) {
-			System.err.println("catFile " + catalogFile);
-			var fileClient = FileClient.create(catalogFile.toFile());
-			System.err.println("File = " + fileClient);
-			System.err.println("DS = " + fileClient.createFileDataSource());
-			System.err.println("Stream = " + fileClient.createFileDataSource().getInputStream());
-			reader = xmlInputFactory.createXMLEventReader(fileClient.createFileDataSource().getInputStream());
-		}
+		// try
+		// {
+		reader = xmlInputFactory.createXMLEventReader(new FileInputStream(catalogFile.toFile()));
+		// }
+		// catch(Exception ex)
+		// {
+		// System.err.println("catFile " + catalogFile);
+		// var fileClient = FileClient.create(catalogFile.toFile());
+		// System.err.println("File = " + fileClient);
+		// System.err.println("DS = " + fileClient.createFileDataSource());
+		// System.err.println("Stream = " +
+		// fileClient.createFileDataSource().getInputStream());
+		// reader = xmlInputFactory.createXMLEventReader(fileClient.createFileDataSource()
+		// .getInputStream());
+		// }
 		ENCCell cell = null;
 		Panel panel = null;
 		Coordinate coordinate = null;
