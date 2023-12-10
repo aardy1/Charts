@@ -153,7 +153,7 @@ public class InfoBar extends StackPane {
         var mapWidth = distanceAcross(envelope) / 1000;
         // // currentExtent.setText(unitProfile.envelopeLabel(envelope));
         currentMapSpan.setText(
-                Coordinates.twoDec(unitProfile.convertDistance(mapWidth)) + " " + unitProfile.distanceUnit);
+                Coordinates.twoDec(unitProfile.convertDistance(mapWidth)) + " " + unitProfile.distanceUnit());
         // currentScreenToWorld.setText("1" + unitProfile.screenUnit + " : "
         // + Coordinates.twoDec(unitProfile.convertFromScreenUnit(mapWidth /
         // platform.windowWidthCM(this)))

@@ -5,63 +5,101 @@
 
 package org.knowtiphy.charts;
 
+import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.knowtiphy.charts.desktop.DistanceUnit;
+import org.knowtiphy.charts.desktop.SpeedUnit;
+
 import java.text.DecimalFormat;
 import java.util.function.DoubleFunction;
-import org.geotools.geometry.jts.ReferencedEnvelope;
 
 /**
  * @author graham
  */
-public class UnitProfile {
+public class UnitProfile
+{
+  private DistanceUnit distanceUnit;
 
-	public String distanceUnit = "km";
+  private SpeedUnit speedUnit;
 
-	public String speedUnit = "kph";
+  public DoubleFunction<Double> fKnotsToMapUnits = UnitProfile::identity;
 
-	public String depthUnit = "m";
+  public DoubleFunction<Double> fConvertDistance = x -> x;
 
-	public String temperatureUnit = "C";
+  public DoubleFunction<Double> fConvertSpeed = x -> x;
 
-	public String screenUnit = "cm";
+  public DoubleFunction<Double> fConvertDepth = x -> x;
 
-	public DoubleFunction<Double> fConvertDistance = x -> x;
+  public DoubleFunction<Double> fConvertTemperature = x -> x;
 
-	public DoubleFunction<Double> fConvertSpeed = x -> x;
+  public DoubleFunction<Double> fConvertScreenUnit = x -> x;
 
-	public DoubleFunction<Double> fConvertDepth = x -> x;
+  public DoubleFunction<String> fLatLongString = x -> x + "";
 
-	public DoubleFunction<Double> fConvertTemperature = x -> x;
+  public double convertDistance(double d)
+  {
+    return fConvertDistance.apply(d);
+  }
 
-	public DoubleFunction<Double> fConvertScreenUnit = x -> x;
+  public double convertSpeed(double d)
+  {
+    return fConvertSpeed.apply(d);
+  }
 
-	public DoubleFunction<String> fLatLongString = x -> x + "";
+  // e.g. if screen unit is inches, 1cm : 100km -> 1in : 254km
+  public double convertFromScreenUnit(double d)
+  {
+    return fConvertScreenUnit.apply(d);
+  }
 
-	public double convertDistance(double d) {
-		return fConvertDistance.apply(d);
-	}
+  public static String labelLongitude(double value)
+  {
+    var df = new DecimalFormat("###.#\u00B0");
+    return df.format(Math.abs(value)) + (value < 0 ? "W" : "E");
+  }
 
-	public double convertSpeed(double d) {
-		return fConvertSpeed.apply(d);
-	}
+  public String labelLattitude(double value)
+  {
+    var df = new DecimalFormat("###.#\u00B0");
+    return df.format(Math.abs(value)) + (value < 0 ? "S" : "N");
+  }
 
-	// e.g. if screen unit is inches, 1cm : 100km -> 1in : 254km
-	public double convertFromScreenUnit(double d) {
-		return fConvertScreenUnit.apply(d);
-	}
+  public String envelopeLabel(ReferencedEnvelope bounds)
+  {
+    return labelLongitude(bounds.getMinX()) + "-" + labelLongitude(
+      bounds.getMaxX()) + "   " + labelLattitude(bounds.getMinY()) + "-" + labelLattitude(
+      bounds.getMaxY());
+  }
 
-	public static String labelLongitude(double value) {
-		var df = new DecimalFormat("###.#\u00B0");
-		return df.format(Math.abs(value)) + (value < 0 ? "W" : "E");
-	}
+  public DistanceUnit distanceUnit(){return distanceUnit;}
 
-	public String labelLattitude(double value) {
-		var df = new DecimalFormat("###.#\u00B0");
-		return df.format(Math.abs(value)) + (value < 0 ? "S" : "N");
-	}
+  public void updateDistanceUnit(DistanceUnit newDistanceUnit)
+  {
+    this.distanceUnit = newDistanceUnit;
+//    switch(newDistanceUnit)
+//    {
+//      case KM -> ;
+//      case M -> ;
+//      case
+//    }
+  }
 
-	public String envelopeLabel(ReferencedEnvelope bounds) {
-		return labelLongitude(bounds.getMinX()) + "-" + labelLongitude(bounds.getMaxX()) + "   "
-				+ labelLattitude(bounds.getMinY()) + "-" + labelLattitude(bounds.getMaxY());
-	}
+  public SpeedUnit speedUnit(){return speedUnit;}
+
+  public void updateSpeedUnit(SpeedUnit newSpeedUnit)
+  {
+    System.err.println("Changing speed unit to " + newSpeedUnit);
+    this.speedUnit = newSpeedUnit;
+    switch(newSpeedUnit)
+    {
+      case KPH -> fKnotsToMapUnits = UnitProfile::knotsToKph;
+      case KNOTS -> fKnotsToMapUnits = UnitProfile::identity;
+    }
+  }
+
+  //  actual conversion functions
+
+  private static <T> T identity(T value){return value;}
+
+  private static double knotsToKph(double value){return value * 1.852;}
 
 }

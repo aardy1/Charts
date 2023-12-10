@@ -157,7 +157,7 @@ public class CoordinateGrid extends Pane {
 		try {
 			var scaleDistance = getScaleDistance(bounds, delta);
 			var distanceBox = new HBox(
-					new Label(twoDec(unitProfile.convertDistance(scaleDistance)) + " " + unitProfile.distanceUnit));
+					new Label(twoDec(unitProfile.convertDistance(scaleDistance)) + " " + unitProfile.distanceUnit()));
 			distanceBox.setAlignment(Pos.TOP_RIGHT);
 			legend.getChildren().add(distanceBox);
 		}
