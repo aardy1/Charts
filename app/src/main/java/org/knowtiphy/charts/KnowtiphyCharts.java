@@ -1,6 +1,7 @@
 package org.knowtiphy.charts;
 
 import javafx.application.Application;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Menu;
@@ -11,6 +12,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -77,11 +79,9 @@ public class KnowtiphyCharts extends Application
     // var styleDir = Platform.getStylesPath();
     showInitialSetup(platform);
 
-    var catalogFile = platform.chartsDir()
-                              .resolve("08Region_ENCProdCat.xml");// 08Region_ENCProdCat.xml");
+    var catalogFile = platform.chartsDir().resolve("08Region_ENCProdCat.xml");
     var catalog = new CatalogReader(catalogFile).read();
 
-    // var styleReader = new StyleReader(styleDir);
     var styleReader = new StyleReader<SimpleFeatureType, MemFeature>(getClass());
     var chartProvider = new LocalChartProvider(catalog, platform.chartsDir(), unitProfile,
       styleReader);
@@ -144,6 +144,9 @@ public class KnowtiphyCharts extends Application
     return resizeable(new ChartView(chartLocker, chart, dynamics, unitProfile, displayOptions));
   }
 
+  private static final int SETTINGS_WIDTH = 700;
+  private static final int SETTINGS_HEIGHT = 400;
+
   private MenuBar mainMenuBar(Window parent)
   {
     var menuBar = new MenuBar();
@@ -151,13 +154,20 @@ public class KnowtiphyCharts extends Application
 
     var settings = new MenuItem("Settings");
     settings.setAccelerator(new KeyCodeCombination(KeyCode.COMMA, KeyCombination.META_DOWN));
-    settings.setOnAction(x -> AppSettingsDialog.create(parent, appSettings).showAndWait());
+    settings.setOnAction(
+      x -> AppSettingsDialog.create(parent, SETTINGS_WIDTH, SETTINGS_HEIGHT, appSettings)
+                            .showAndWait());
 
     var quit = new MenuItem("Quit");
     quit.setAccelerator(new KeyCodeCombination(KeyCode.Q, KeyCombination.META_DOWN));
     quit.setOnAction(x -> System.exit(1));
 
-    menu.getItems().addAll(settings, new SeparatorMenuItem(), quit);
+    var separatorNode = new HBox();
+    separatorNode.setPadding(new Insets(5, 0, 0, 0));
+    var separator = new SeparatorMenuItem();
+    separator.setContent(separatorNode);
+
+    menu.getItems().addAll(settings, separator, quit);
     menuBar.getMenus().addAll(menu);
 
     return menuBar;
@@ -178,7 +188,9 @@ public class KnowtiphyCharts extends Application
 //    appSettings.distanceUnit.addListener(
 //      (observable, oldValue, newValue) -> unitProfile.updateDistanceUnit(newValue));
     appSettings.speedUnit.addListener(
-      (observable, oldValue, newValue) -> unitProfile.updateSpeedUnit(newValue));
+      (observable, oldValue, newValue) -> unitProfile.setSpeedUnit(newValue));
+    appSettings.speedUnitDecimals.addListener(
+      (observable, oldValue, newValue) -> unitProfile.setSpeedUnitDecimals(newValue));
   }
 
   private void showInitialSetup(IPlatform platform)

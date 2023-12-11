@@ -1,0 +1,21 @@
+.buttonbar {
+    -fx-background-color: white;
+}
+
+.buttonbar ToolBar {
+    -fx-background-color: white;
+}
+
+.buttonbar ToolBar Button {
+    -fx-background-color: transparent;
+    -fx-content-display: top;
+}
+
+.content {
+    -fx-padding: 20 20 20 20;
+}
+
+.content GridPane {
+    -fx-hgap: 16;
+    -fx-vgap: 6;
+}

@@ -8,6 +8,8 @@ package org.knowtiphy.charts;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.knowtiphy.charts.desktop.DistanceUnit;
 import org.knowtiphy.charts.desktop.SpeedUnit;
+import org.reactfx.EventSource;
+import org.reactfx.EventStream;
 
 import java.text.DecimalFormat;
 import java.util.function.DoubleFunction;
@@ -17,9 +19,12 @@ import java.util.function.DoubleFunction;
  */
 public class UnitProfile
 {
+  private EventSource<Boolean> unitChangeEvents = new EventSource<>();
+
   private DistanceUnit distanceUnit;
 
   private SpeedUnit speedUnit;
+  private int speedUnitDecimals;
 
   public DoubleFunction<Double> fKnotsToMapUnits = UnitProfile::identity;
 
@@ -72,7 +77,7 @@ public class UnitProfile
 
   public DistanceUnit distanceUnit(){return distanceUnit;}
 
-  public void updateDistanceUnit(DistanceUnit newDistanceUnit)
+  public void setDistanceUnit(DistanceUnit newDistanceUnit)
   {
     this.distanceUnit = newDistanceUnit;
 //    switch(newDistanceUnit)
@@ -81,11 +86,12 @@ public class UnitProfile
 //      case M -> ;
 //      case
 //    }
+    unitChangeEvents.push(true);
   }
 
   public SpeedUnit speedUnit(){return speedUnit;}
 
-  public void updateSpeedUnit(SpeedUnit newSpeedUnit)
+  public void setSpeedUnit(SpeedUnit newSpeedUnit)
   {
     System.err.println("Changing speed unit to " + newSpeedUnit);
     this.speedUnit = newSpeedUnit;
@@ -94,6 +100,19 @@ public class UnitProfile
       case KPH -> fKnotsToMapUnits = UnitProfile::knotsToKph;
       case KNOTS -> fKnotsToMapUnits = UnitProfile::identity;
     }
+    unitChangeEvents.push(true);
+  }
+
+  public void setSpeedUnitDecimals(Number numDigits)
+  {
+    System.err.println("Changing speed unit decimals " + numDigits);
+    this.speedUnitDecimals = numDigits.intValue();
+    unitChangeEvents.push(true);
+  }
+
+  public EventStream<Boolean> unitChangeEvents()
+  {
+    return unitChangeEvents;
   }
 
   //  actual conversion functions

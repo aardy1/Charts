@@ -1,11 +1,5 @@
 package org.knowtiphy.charts.chartview;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.event.ActionEvent;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.control.ContextMenu;
@@ -44,285 +38,337 @@ import org.knowtiphy.shapemap.view.ShapeMapView;
 import org.reactfx.EventStreams;
 import org.reactfx.Subscription;
 
-public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView> {
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-	private static final double PREFERRED_WIDTH = Region.USE_COMPUTED_SIZE;
+public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView>
+{
 
-	private static final double PREFERRED_HEIGHT = Region.USE_COMPUTED_SIZE;
+  private static final double PREFERRED_WIDTH = Region.USE_COMPUTED_SIZE;
 
-	private final StackPane root;
+  private static final double PREFERRED_HEIGHT = Region.USE_COMPUTED_SIZE;
 
-	private final ShapeMapView<SimpleFeatureType, MemFeature> mapSurface;
+  private final StackPane root;
 
-	private final ChartLocker chartLocker;
+  private final ShapeMapView<SimpleFeatureType, MemFeature> mapSurface;
 
-	private ENCChart chart;
+  private final ChartLocker chartLocker;
 
-	// private final AISModel dynamics;
+  private ENCChart chart;
 
-	private final EventModel eventModel;
+  // private final AISModel dynamics;
 
-	private final MapDisplayOptions displayOptions;
+  private final EventModel eventModel;
 
-	private final List<Subscription> subscriptions = new ArrayList<>();
+  private final MapDisplayOptions displayOptions;
 
-	// private final Pane iconsSurface;
+  private final UnitProfile unitProfile;
 
-	// private final Pane quiltingSurface;
+  private final List<Subscription> subscriptions = new ArrayList<>();
 
-	private final Pane coordinateGrid;
+  // private final Pane iconsSurface;
 
-	// private final Pane aisPane;
+  // private final Pane quiltingSurface;
 
-	// boat glyphs
-	private final Map<Long, Pair<AISInformation, Glyph>> boats = new HashMap<>();
+  private final Pane coordinateGrid;
 
-	public ChartViewSkin(ChartView fxMap, ChartLocker chartLocker, ENCChart chrt, AISModel dynamics,
-			EventModel eventModel, UnitProfile unitProfile, MapDisplayOptions displayOptions) {
+  // private final Pane aisPane;
 
-		super(fxMap);
+  // boat glyphs
+  private final Map<Long, Pair<AISInformation, Glyph>> boats = new HashMap<>();
 
-		this.chartLocker = chartLocker;
-		this.chart = chrt;
-		// this.dynamics = dynamics;
-		this.eventModel = eventModel;
-		this.displayOptions = displayOptions;
+  public ChartViewSkin(
+    ChartView fxMap, ChartLocker chartLocker, ENCChart chrt, AISModel dynamics,
+    EventModel eventModel, UnitProfile unitProfile, MapDisplayOptions displayOptions)
+  {
 
-		root = makeRoot();
-		getChildren().addAll(root);
+    super(fxMap);
 
-		var surfaceDragEventsPane = new Pane();
-		mapSurface = makeMapSurface();
-		// iconsSurface = makeIconsSurface();
-		// quiltingSurface = makeQuiltingSurface();
-		coordinateGrid = makeCoordinateGrid(unitProfile);
-		// aisPane = makeDynamicsSurface();
+    this.chartLocker = chartLocker;
+    this.chart = chrt;
+    this.unitProfile = unitProfile;
+    // this.dynamics = dynamics;
+    this.eventModel = eventModel;
+    this.displayOptions = displayOptions;
 
-		root.getChildren().addAll(surfaceDragEventsPane, mapSurface, coordinateGrid);// ,
-		// iconsSurface,
-		// //
-		// quiltingSurface,
-		// aisPane);
+    root = makeRoot();
+    getChildren().addAll(root);
 
-		if (Double.compare(S().getPrefWidth(), 0.0) <= 0 || Double.compare(S().getPrefHeight(), 0.0) <= 0
-				|| Double.compare(S().getWidth(), 0.0) <= 0 || Double.compare(S().getHeight(), 0.0) <= 0) {
-			if (S().getPrefWidth() > 0 && S().getPrefHeight() > 0) {
-				S().setPrefSize(S().getPrefWidth(), S().getPrefHeight());
-			}
-			else {
-				S().setPrefSize(PREFERRED_WIDTH, PREFERRED_HEIGHT);
-			}
-		}
+    var surfaceDragEventsPane = new Pane();
+    mapSurface = makeMapSurface();
+    // iconsSurface = makeIconsSurface();
+    // quiltingSurface = makeQuiltingSurface();
+    coordinateGrid = makeCoordinateGrid(unitProfile);
+    // aisPane = makeDynamicsSurface();
 
-		eventModel.mouseEvents.feedFrom(EventStreams.eventsOf(root, MouseEvent.ANY));
-		eventModel.scrollEvents.feedFrom(EventStreams.eventsOf(root, ScrollEvent.ANY));
-		eventModel.zoomEvents.feedFrom(EventStreams.eventsOf(root, ZoomEvent.ANY));
+    root.getChildren().addAll(surfaceDragEventsPane, mapSurface, coordinateGrid);// ,
+    // iconsSurface,
+    // //
+    // quiltingSurface,
+    // aisPane);
 
-		// windows on clicked, mac on pressed
-		eventModel.mouseClicked.filter(event -> event.isPopupTrigger())
-				.subscribe(event -> makeContextMenu(event).show(mapSurface, event.getScreenX(), event.getScreenY()));
-		eventModel.mousePressed.filter(event -> event.isPopupTrigger())
-				.subscribe(event -> makeContextMenu(event).show(mapSurface, event.getScreenX(), event.getScreenY()));
+    if(Double.compare(S().getPrefWidth(), 0.0) <= 0 || Double.compare(S().getPrefHeight(),
+      0.0) <= 0 || Double.compare(S().getWidth(), 0.0) <= 0 || Double.compare(S().getHeight(),
+      0.0) <= 0)
+    {
+      if(S().getPrefWidth() > 0 && S().getPrefHeight() > 0)
+      {
+        S().setPrefSize(S().getPrefWidth(), S().getPrefHeight());
+      }
+      else
+      {
+        S().setPrefSize(PREFERRED_WIDTH, PREFERRED_HEIGHT);
+      }
+    }
 
-		setupListeners();
-	}
+    eventModel.mouseEvents.feedFrom(EventStreams.eventsOf(root, MouseEvent.ANY));
+    eventModel.scrollEvents.feedFrom(EventStreams.eventsOf(root, ScrollEvent.ANY));
+    eventModel.zoomEvents.feedFrom(EventStreams.eventsOf(root, ZoomEvent.ANY));
 
-	private StackPane makeRoot() {
-		return new StackPane() {
+    // windows on clicked, mac on pressed
+    eventModel.mouseClicked.filter(event -> event.isPopupTrigger()).subscribe(
+      event -> makeContextMenu(event).show(mapSurface, event.getScreenX(), event.getScreenY()));
+    eventModel.mousePressed.filter(event -> event.isPopupTrigger()).subscribe(
+      event -> makeContextMenu(event).show(mapSurface, event.getScreenX(), event.getScreenY()));
 
-			@Override
-			public void layoutChildren() {
-				try {
-					// set the screen area of the viewport before laying out the children
-					chart.setViewPortScreenArea(new Rectangle2D(0, 0, (int) getWidth(), (int) getHeight()));
-				}
-				catch (TransformException | NonInvertibleTransformException ex) {
-					Logger.getLogger(ChartViewSkin.class.getName()).log(Level.SEVERE, null, ex);
-				}
+    unitProfile.unitChangeEvents().subscribe(e -> mapSurface.requestLayout());
+    setupListeners();
+  }
 
-				super.layoutChildren();
-			}
-		};
-	}
+  private StackPane makeRoot()
+  {
+    return new StackPane()
+    {
 
-	private Pane makeCoordinateGrid(UnitProfile unitProfile) {
+      @Override
+      public void layoutChildren()
+      {
+        try
+        {
+          // set the screen area of the viewport before laying out the children
+          chart.setViewPortScreenArea(new Rectangle2D(0, 0, (int) getWidth(), (int) getHeight()));
+        }
+        catch(TransformException | NonInvertibleTransformException ex)
+        {
+          Logger.getLogger(ChartViewSkin.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
-		var theGrid = new CoordinateGrid(chart, unitProfile);
-		theGrid.setPickOnBounds(false);
-		theGrid.setMouseTransparent(true);
-		return theGrid;
-	}
+        super.layoutChildren();
+      }
+    };
+  }
 
-	private Pane makeIconsSurface() {
-		return new IconSurface(chart);
-	}
+  private Pane makeCoordinateGrid(UnitProfile unitProfile)
+  {
 
-	private Pane makeQuiltingSurface() {
-		var theSurface = new QuiltingSurface(chartLocker, chart, displayOptions);
-		theSurface.setPickOnBounds(false);
-		return theSurface;
-	}
+    var theGrid = new CoordinateGrid(chart, unitProfile);
+    theGrid.setPickOnBounds(false);
+    theGrid.setMouseTransparent(true);
+    return theGrid;
+  }
 
-	private Pane makeDynamicsSurface() {
-		var pane = new Pane();
-		pane.setPickOnBounds(false);
-		pane.widthProperty().addListener(cl -> updateBoats());
-		pane.heightProperty().addListener(cl -> updateBoats());
-		return pane;
-	}
+  private Pane makeIconsSurface()
+  {
+    return new IconSurface(chart);
+  }
 
-	private ShapeMapView<SimpleFeatureType, MemFeature> makeMapSurface() {
-		var theSurface = new ShapeMapView<>(chart);
-		theSurface.setMouseTransparent(true);
-		return theSurface;
-	}
+  private Pane makeQuiltingSurface()
+  {
+    var theSurface = new QuiltingSurface(chartLocker, chart, displayOptions);
+    theSurface.setPickOnBounds(false);
+    return theSurface;
+  }
 
-	private void setupListeners() {
+  private Pane makeDynamicsSurface()
+  {
+    var pane = new Pane();
+    pane.setPickOnBounds(false);
+    pane.widthProperty().addListener(cl -> updateBoats());
+    pane.heightProperty().addListener(cl -> updateBoats());
+    return pane;
+  }
 
-		// unsubscribe listeners on the old chart
-		subscriptions.forEach(s -> s.unsubscribe());
-		subscriptions.clear();
+  private ShapeMapView<SimpleFeatureType, MemFeature> makeMapSurface()
+  {
+    var theSurface = new ShapeMapView<>(chart);
+    theSurface.setMouseTransparent(true);
+    return theSurface;
+  }
 
-		// add listeners on the new chart
-		subscriptions.add(DragPanZoomSupport.addPositionAtSupport(eventModel, chart));
-		subscriptions.add(DragPanZoomSupport.addDragSupport(eventModel, chart));
-		subscriptions.add(DragPanZoomSupport.addPanningSupport(eventModel, chart));
-		subscriptions.add(DragPanZoomSupport.addZoomSupport(eventModel, chart));
+  private void setupListeners()
+  {
 
-		// subscriptions.add(displayOptions.showGridEvents.subscribe(c ->
-		// gridPane.setVisible(c.getNewValue())));
+    // unsubscribe listeners on the old chart
+    subscriptions.forEach(s -> s.unsubscribe());
+    subscriptions.clear();
 
-		subscriptions.add(displayOptions.showLightsEvents
-				.subscribe(change -> chart.setLayerVisible(S57.OC_LIGHTS, change.getNewValue())));
-		subscriptions.add(displayOptions.showPlatformEvents
-				.subscribe(change -> chart.setLayerVisible(S57.OC_OFSPLF, change.getNewValue())));
-		subscriptions.add(displayOptions.showWreckEvents
-				.subscribe(change -> chart.setLayerVisible(S57.OC_WRECKS, change.getNewValue())));
-		subscriptions.add(displayOptions.showSoundingsEvents
-				.subscribe(change -> chart.setLayerVisible(S57.OC_SOUNDG, change.getNewValue())));
+    // add listeners on the new chart
+    subscriptions.add(DragPanZoomSupport.addPositionAtSupport(eventModel, chart));
+    subscriptions.add(DragPanZoomSupport.addDragSupport(eventModel, chart));
+    subscriptions.add(DragPanZoomSupport.addPanningSupport(eventModel, chart));
+    subscriptions.add(DragPanZoomSupport.addZoomSupport(eventModel, chart));
 
-		// gridPane.setVisible(c.getNewValue())));
+    // subscriptions.add(displayOptions.showGridEvents.subscribe(c ->
+    // gridPane.setVisible(c.getNewValue())));
 
-		// subscriptions.add(chart.viewPortBoundsEvent.subscribe(change ->
-		// updateBoats()));
-		subscriptions.add(chart.newMapViewModel().subscribe(change -> updateBoats()));
-		// subscriptions.add(dynamics.aisEvents.subscribe(this::updateAISInformation));
+    subscriptions.add(displayOptions.showLightsEvents.subscribe(
+      change -> chart.setLayerVisible(S57.OC_LIGHTS, change.getNewValue())));
+    subscriptions.add(displayOptions.showPlatformEvents.subscribe(
+      change -> chart.setLayerVisible(S57.OC_OFSPLF, change.getNewValue())));
+    subscriptions.add(displayOptions.showWreckEvents.subscribe(
+      change -> chart.setLayerVisible(S57.OC_WRECKS, change.getNewValue())));
+    subscriptions.add(displayOptions.showSoundingsEvents.subscribe(
+      change -> chart.setLayerVisible(S57.OC_SOUNDG, change.getNewValue())));
 
-		subscriptions.add(chart.newMapViewModel().subscribe(change -> {
-			chart = (ENCChart) change.getNewValue();
-			setupListeners();
-		}));
-	}
+    // gridPane.setVisible(c.getNewValue())));
 
-	private void showInfo(MouseEvent event) {
+    // subscriptions.add(chart.viewPortBoundsEvent.subscribe(change ->
+    // updateBoats()));
+    subscriptions.add(chart.newMapViewModel().subscribe(change -> updateBoats()));
+    // subscriptions.add(dynamics.aisEvents.subscribe(this::updateAISInformation));
 
-		try {
-			// TODO are these the right x and y?
-			var nearby = Queries.featuresNearXYWorld(chart, event.getX(), event.getY(), 1);
+    subscriptions.add(chart.newMapViewModel().subscribe(change -> {
+      chart = (ENCChart) change.getNewValue();
+      setupListeners();
+    }));
+  }
 
-			var tx = new Transformation(chart.viewPortScreenToWorld());
-			tx.apply(event.getX(), event.getY());
+  private void showInfo(MouseEvent event)
+  {
 
-			// this is a bit weird since surely you can do it one query?
-			var textToDisplay = new StringBuilder();
-			textToDisplay.append(tx.getX()).append(", ").append(tx.getY()).append("\n");
+    try
+    {
+      // TODO are these the right x and y?
+      var nearby = Queries.featuresNearXYWorld(chart, event.getX(), event.getY(), 1);
 
-			for (var iterator : nearby) {
-				while (iterator.hasNext()) {
-					var feature = iterator.next();
-					textToDisplay.append(feature.getIdentifier()).append("\n");
-					textToDisplay.append(feature.getDefaultGeometry()).append("\n");
-					for (var attr : feature.getFeatureType().getAttributeDescriptors()) {
-						if (!attr.getLocalName().equals("the_geom")) {
-							var attrVal = feature.getAttribute(attr.getLocalName());
-							if (attrVal != null && !(attrVal instanceof String x && x.isEmpty())) {
-								textToDisplay.append("\t").append(attr.getName()).append(" = ").append(attrVal)
-										.append("\n");
-							}
-						}
-					}
-				}
-			}
+      var tx = new Transformation(chart.viewPortScreenToWorld());
+      tx.apply(event.getX(), event.getY());
 
-			var text = new TextArea(textToDisplay.toString());
+      // this is a bit weird since surely you can do it one query?
+      var textToDisplay = new StringBuilder();
+      textToDisplay.append(tx.getX()).append(", ").append(tx.getY()).append("\n");
 
-			var popOver = new PopOver(text);
-			popOver.show(mapSurface, event.getScreenX(), event.getScreenY());
-		}
-		catch (Exception ex) {
-			Logger.getLogger(ChartViewSkin.class.getName()).log(Level.SEVERE, null, ex);
-		}
-	}
+      for(var iterator : nearby)
+      {
+        while(iterator.hasNext())
+        {
+          var feature = iterator.next();
+          textToDisplay.append(feature.getIdentifier()).append("\n");
+          textToDisplay.append(feature.getDefaultGeometry()).append("\n");
+          for(var attr : feature.getFeatureType().getAttributeDescriptors())
+          {
+            if(!attr.getLocalName().equals("the_geom"))
+            {
+              var attrVal = feature.getAttribute(attr.getLocalName());
+              if(attrVal != null && !(attrVal instanceof String x && x.isEmpty()))
+              {
+                textToDisplay.append("\t").append(attr.getName()).append(" = ").append(attrVal)
+                             .append("\n");
+              }
+            }
+          }
+        }
+      }
 
-	private void showMaxDetail(MouseEvent event) {
+      var text = new TextArea(textToDisplay.toString());
 
-		var envelope = Queries.tinyPolygon(chart, event.getX(), event.getY());
+      var popOver = new PopOver(text);
+      popOver.show(mapSurface, event.getScreenX(), event.getScreenY());
+    }
+    catch(Exception ex)
+    {
+      Logger.getLogger(ChartViewSkin.class.getName()).log(Level.SEVERE, null, ex);
+    }
+  }
 
-		ChartDescription mostDetailedChart = null;
-		var smallestScale = Integer.MAX_VALUE;
+  private void showMaxDetail(MouseEvent event)
+  {
 
-		for (var chartDescription : chartLocker.intersections(envelope)) {
-			if (chartDescription.cScale() < smallestScale) {
-				smallestScale = chartDescription.cScale();
-				mostDetailedChart = chartDescription;
-			}
-		}
+    var envelope = Queries.tinyPolygon(chart, event.getX(), event.getY());
 
-		if (mostDetailedChart != null) {
-			try {
-				var newChart = chartLocker.loadChart(mostDetailedChart, displayOptions);
-				chart.setNewMapViewModel(newChart);
-			}
-			catch (TransformException | FactoryException | NonInvertibleTransformException | StyleSyntaxException ex) {
-				Logger.getLogger(ChartViewSkin.class.getName()).log(Level.SEVERE, null, ex);
-			}
-		}
-	}
+    ChartDescription mostDetailedChart = null;
+    var smallestScale = Integer.MAX_VALUE;
 
-	private ContextMenu makeContextMenu(MouseEvent mouseEvent) {
-		var contextMenu = new ContextMenu();
-		var maxDetail = new MenuItem("Max Detail Here");
-		var whatsHere = new MenuItem("What's here");
+    for(var chartDescription : chartLocker.intersections(envelope))
+    {
+      if(chartDescription.cScale() < smallestScale)
+      {
+        smallestScale = chartDescription.cScale();
+        mostDetailedChart = chartDescription;
+      }
+    }
 
-		maxDetail.setOnAction((ActionEvent event) -> showMaxDetail(mouseEvent));
-		whatsHere.setOnAction((ActionEvent event) -> showInfo(mouseEvent));
+    if(mostDetailedChart != null)
+    {
+      try
+      {
+        var newChart = chartLocker.loadChart(mostDetailedChart, displayOptions);
+        chart.setNewMapViewModel(newChart);
+      }
+      catch(TransformException | FactoryException | NonInvertibleTransformException |
+            StyleSyntaxException ex)
+      {
+        Logger.getLogger(ChartViewSkin.class.getName()).log(Level.SEVERE, null, ex);
+      }
+    }
+  }
 
-		contextMenu.getItems().addAll(maxDetail, whatsHere);
-		return contextMenu;
-	}
+  private ContextMenu makeContextMenu(MouseEvent mouseEvent)
+  {
+    var contextMenu = new ContextMenu();
+    var maxDetail = new MenuItem("Max Detail Here");
+    var whatsHere = new MenuItem("What's here");
 
-	private ChartView S() {
-		return getSkinnable();
-	}
+    maxDetail.setOnAction((ActionEvent event) -> showMaxDetail(mouseEvent));
+    whatsHere.setOnAction((ActionEvent event) -> showInfo(mouseEvent));
 
-	private void updateAISInformation(AISEvent event) {
-		var asInfo = event.getAisInformation();
-		var id = asInfo.getId();
-		if (!boats.containsKey(id)) {
-			var newBoat = Fonts.boat();
-			boats.put(id, Pair.of(asInfo, newBoat));
-			setBoatPosition(newBoat, asInfo);
-			// later(() -> aisPane.getChildren().add(newBoat));
-		}
-		else {
-			var boat = boats.get(id).getRight();
-			boats.put(id, Pair.of(asInfo, boat));
-			setBoatPosition(boat, asInfo);
-		}
-	}
+    contextMenu.getItems().addAll(maxDetail, whatsHere);
+    return contextMenu;
+  }
 
-	private void setBoatPosition(Glyph boat, AISInformation aisInfo) {
-		// need to clip the position?
-		var tx = new Transformation(chart.viewPortWorldToScreen());
-		tx.apply(aisInfo.getPosition().x, aisInfo.getPosition().y);
-		boat.setTranslateX(tx.getX());
-		boat.setTranslateY(tx.getY());
-	}
+  private ChartView S()
+  {
+    return getSkinnable();
+  }
 
-	private void updateBoats() {
-		for (var boat : boats.values()) {
-			setBoatPosition(boat.getRight(), boat.getLeft());
-		}
-	}
+  private void updateAISInformation(AISEvent event)
+  {
+    var asInfo = event.getAisInformation();
+    var id = asInfo.getId();
+    if(!boats.containsKey(id))
+    {
+      var newBoat = Fonts.boat();
+      boats.put(id, Pair.of(asInfo, newBoat));
+      setBoatPosition(newBoat, asInfo);
+      // later(() -> aisPane.getChildren().add(newBoat));
+    }
+    else
+    {
+      var boat = boats.get(id).getRight();
+      boats.put(id, Pair.of(asInfo, boat));
+      setBoatPosition(boat, asInfo);
+    }
+  }
+
+  private void setBoatPosition(Glyph boat, AISInformation aisInfo)
+  {
+    // need to clip the position?
+    var tx = new Transformation(chart.viewPortWorldToScreen());
+    tx.apply(aisInfo.getPosition().x, aisInfo.getPosition().y);
+    boat.setTranslateX(tx.getX());
+    boat.setTranslateY(tx.getY());
+  }
+
+  private void updateBoats()
+  {
+    for(var boat : boats.values())
+    {
+      setBoatPosition(boat.getRight(), boat.getLeft());
+    }
+  }
 
 }

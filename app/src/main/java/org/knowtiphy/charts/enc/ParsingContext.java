@@ -52,7 +52,6 @@ public class ParsingContext implements IStyleCompilerAdapter<MemFeature>
   public IFeatureFunction<MemFeature, Object> compileFunctionCall(
     String name, Collection<IFeatureFunction<MemFeature, Object>> args)
   {
-    System.err.println("name = " + name);
     var function = UNIT_MAP.get(name);
     return function.apply(unitProfile, args.iterator().next());
   }

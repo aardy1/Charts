@@ -1,16 +1,25 @@
 package org.knowtiphy.shapemap.model;
 
-import javafx.geometry.*;
-import javafx.scene.transform.*;
-import org.geotools.api.referencing.*;
-import org.geotools.api.referencing.crs.*;
-import org.geotools.api.referencing.operation.*;
-import org.geotools.geometry.jts.*;
-import org.knowtiphy.shapemap.api.*;
-import org.knowtiphy.shapemap.renderer.context.*;
-import org.reactfx.*;
+import javafx.geometry.Rectangle2D;
+import javafx.scene.transform.Affine;
+import javafx.scene.transform.NonInvertibleTransformException;
+import org.geotools.api.referencing.FactoryException;
+import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
+import org.geotools.api.referencing.operation.TransformException;
+import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.knowtiphy.shapemap.api.IFeatureAdapter;
+import org.knowtiphy.shapemap.api.IRenderablePolygonProvider;
+import org.knowtiphy.shapemap.api.ISVGProvider;
+import org.knowtiphy.shapemap.api.ISchemaAdapter;
+import org.knowtiphy.shapemap.renderer.context.RemoveHolesFromPolygon;
+import org.knowtiphy.shapemap.renderer.context.RenderGeomCache;
+import org.reactfx.Change;
+import org.reactfx.EventSource;
+import org.reactfx.EventStream;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public abstract class MapViewModel<S, F>
 {

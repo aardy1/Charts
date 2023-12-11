@@ -170,7 +170,7 @@ public class Fonts
   public static Glyph units(int size)
   {
     var glyph = units();
-    glyph.setFontSize(24);
+    glyph.setFontSize(size);
     return glyph;
   }
 
@@ -187,7 +187,7 @@ public class Fonts
   public static Glyph boat(int size)
   {
     var glyph = FONT_AWESOME.create(FontAwesome.Glyph.SHIP);
-    glyph.setFontSize(24);
+    glyph.setFontSize(size);
     return glyph;
   }
 
