@@ -31,18 +31,6 @@ This will cause Gradle to download all the libraries (including the OpenJFX libr
 
 **Note**: due to a known bug in recent versions of the JVM, it is possible that Knowtiphy Charts opens "in the background" (so you can't see it). Use whatever is right for your OS to see all running apps (on my Mac I use a three finger swipe up).
 
-## Building Knowtiphy Charts with your favorite IDE
-
-So this bit is usually a pain in the neck.
-
-It's different for every IDE. There are some instructions [here](https://openjfx.io/openjfx-docs/#introduction).
-
-I followed the instructions for [IntelliJ](https://openjfx.io/openjfx-docs/#IDE-Intellij) for "Non-modular projects" -- except Step 1 of course since you already have a project! 
-
-After Step 3. I could run Knowtiphy Charts from the Gradle window in Intellij.
-
-If you want to, you can also need to do whatever you need to do in your IDE to get Gradle hooked into the UI build actions.
-
 ## Building a Native Image for Desktop
 
 The gradle build is configured for native image builds using Graal.
@@ -51,27 +39,38 @@ To get the build to work you will need some things:
 
 1. Gradle
 2. Graal -- get it from [Gluon](https://github.com/gluonhq/graal/releases/tag/gluon-22.1.0.1-Final)
-3. set `GRAALVM_HOME` environment variable to the parent of the bin directory in 1. So for me that is `export GRAALVM_HOME=/Users/graham/Downloads/graalvm-svm-java17-darwin-m1-gluon-22.1.0.1-Final/Contents/Home`
+3. set `GRAALVM_HOME` environment variable to the parent of the bin directory in 1. So for me that is `export GRAALVM_HOME=/Users/.../Downloads/graalvm-svm-java17-darwin-m1-gluon-22.1.0.1-Final/Contents/Home`
 
 In theory that should be it :-)
 
-To build and run a native image for platform `X`, go the project root dir, and do:
+To build and run a native image, go the project root dir, and do:
 ```
-gradle -Ptarget=X nativeCompile nativeLink nativePackage nativeInstall
+gradle -Ptarget=host nativeCompile nativeLink nativePackage nativeInstall
 ```
-(`X = host` (host = the platform you are running gradle on), `ios`, `ios-sim`, or `android`)
-
 The native image will be installed under `X/build/gluonfx/A` where X is the project root, and A is your architecture and operating system (e.g. aarch64-darwin).
 
-I have tested this process on MacOS X building for `host`, `ios` and `ios-sim`.
+I have tested this process on MacOS X.
 
 ## Running Knowtiphy Charts Native on a Desktop
 
-To run the app as a native image for a desktop platform `X` do:
+To run the app as a native image do:
 ```
 gradle -Ptarget=X nativeCompile nativeLink nativePackage nativeInstall nativeRun
 ```
-Or just `gradle -Ptarget=X nativeRun` if you have already built it, or just double click the native image that was previously built.
+Or just `gradle -Ptarget=host nativeRun` if you have already built it, or just double click the native image that was previously built.
+
+## Building Knowtiphy Charts with your favorite IDE
+
+Good luck :-)
+
+This bit is usually a pain in the neck and is different for every platform and IDE. There are some instructions [here](https://openjfx.io/openjfx-docs/#introduction).
+
+For Apache Netbeans (with UI build actions delegated to gradle), you shouldn't have to do anything.
+
+For IntelliJ I followed the 'instructions](https://openjfx.io/openjfx-docs/#IDE-Intellij) for "Non-modular projects" -- except Step 1 of course since you already have a project! 
+
+After Step 3. I could run Knowtiphy Charts from the Gradle window in Intellij.
+
 
 ## Running Knowtiphy Charts Native on a Phone or Tablet
 
