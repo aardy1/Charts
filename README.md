@@ -59,6 +59,8 @@ gradle -Ptarget=X nativeCompile nativeLink nativePackage nativeInstall nativeRun
 ```
 Or just `gradle -Ptarget=host nativeRun` if you have already built it, or just double click the native image that was previously built.
 
+You will also need some charts.
+
 ## Building Knowtiphy Charts with your favorite IDE
 
 Good luck :-)
@@ -67,7 +69,7 @@ This bit is usually a pain in the neck and is different for every platform and I
 
 For Apache Netbeans (with UI build actions delegated to gradle), you shouldn't have to do anything.
 
-For IntelliJ I followed the 'instructions](https://openjfx.io/openjfx-docs/#IDE-Intellij) for "Non-modular projects" -- except Step 1 of course since you already have a project! 
+For IntelliJ I followed the [instructions](https://openjfx.io/openjfx-docs/#IDE-Intellij) for "Non-modular projects" -- except Step 1 of course since you already have a project! 
 
 After Step 3. I could run Knowtiphy Charts from the Gradle window in Intellij.
 
