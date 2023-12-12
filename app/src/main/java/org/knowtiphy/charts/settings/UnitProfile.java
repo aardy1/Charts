@@ -14,7 +14,6 @@ import org.knowtiphy.charts.utils.Utils;
 import org.reactfx.EventSource;
 import org.reactfx.EventStream;
 
-import java.util.function.DoubleFunction;
 import java.util.function.UnaryOperator;
 
 import static org.knowtiphy.charts.settings.SpeedUnit.KNOTS;
@@ -43,8 +42,6 @@ public class UnitProfile
 
   public final ObjectProperty<LatLongFormat> latLongFormat = new SimpleObjectProperty<>(
     LatLongFormat.DECIMAL_DEGREES);
-
-  public DoubleFunction<Double> fConvertScreenUnit = x -> x;
 
   public UnitProfile()
   {
@@ -111,10 +108,10 @@ public class UnitProfile
   }
 
   // e.g. if screen unit is inches, 1cm : 100km -> 1in : 254km
-  public double convertFromScreenUnit(double d)
-  {
-    return fConvertScreenUnit.apply(d);
-  }
+//  public double convertFromScreenUnit(double d)
+//  {
+//    return fConvertScreenUnit.apply(d);
+//  }
 
   //  actual conversion functions
 
@@ -128,6 +125,16 @@ public class UnitProfile
     };
   }
 
+  public Number depthToMapUnits(Number value)
+  {
+    return switch(depthUnit.get())
+    {
+      case M -> value;
+      case FEET -> value.doubleValue() * 3.281;
+      case FATHOM -> value.doubleValue() * 0.5468066492;
+    };
+  }
+
   public Number knotsToMapUnits(Number value)
   {
     return switch(speedUnit.get())
@@ -136,9 +143,4 @@ public class UnitProfile
       case KNOTS -> value;
     };
   }
-
-  private static <T> T identity(T value){return value;}
-
-  private static double knotsToKph(double value){return value * 1.852;}
-
 }

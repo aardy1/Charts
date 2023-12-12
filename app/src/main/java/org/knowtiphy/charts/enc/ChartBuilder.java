@@ -118,7 +118,8 @@ public class ChartBuilder
         S57.OC_OBSTRN,
         S57.OC_OFSPLF,
         S57.OC_WRECKS,
-        S57.OC_RTPBCN
+        S57.OC_RTPBCN,
+        S57.OC_UWTROC
     };
     // @formatter:on
 

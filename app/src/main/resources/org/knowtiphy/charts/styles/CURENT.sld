@@ -28,7 +28,7 @@
           </PointSymbolizer>
           <TextSymbolizer>
             <Label>
-              <ogc:Function name = "knotsToMapUnit">
+              <ogc:Function name = "knotsToMapUnits">
                 <ogc:PropertyName>CURVEL</ogc:PropertyName>
               </ogc:Function>
             </Label>

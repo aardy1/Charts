@@ -28,7 +28,8 @@ public class ParsingContext implements IStyleCompilerAdapter<MemFeature>
 
   static
   {
-    UNIT_MAP.put("knotsToMapUnit", ParsingContext::knotsToMapUnits);
+    UNIT_MAP.put("knotsToMapUnits", ParsingContext::knotsToMapUnits);
+    UNIT_MAP.put("depthToMapUnits", ParsingContext::depthToMapUnits);
   }
 
   private final SimpleFeatureType featureType;
@@ -67,9 +68,14 @@ public class ParsingContext implements IStyleCompilerAdapter<MemFeature>
     };
   }
 
-  private static String formatDecimal(Number value, int numDigits)
+  private static IFeatureFunction<MemFeature, Object> depthToMapUnits(
+    AppSettings settings, IFeatureFunction<MemFeature, Object> quantity)
   {
-    var formatString = "%%.%df".formatted(numDigits);
-    return String.format(formatString, value);
+    return (f, g) -> {
+      var value = quantity.apply(f, g);
+      return value == null ? null : settings.unitProfile()
+                                            .formatDepth((Number) quantity.apply(f, g),
+                                              settings.unitProfile()::depthToMapUnits);
+    };
   }
 }

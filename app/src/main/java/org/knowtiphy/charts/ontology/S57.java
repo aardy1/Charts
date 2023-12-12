@@ -47,6 +47,7 @@ public class S57
   public static final String OC_SEAARE = "SEAARE";
   public static final String OC_SOUNDG = "SOUNDG";
   public static final String OC_UNSARE = "UNSARE";
+  public static final String OC_UWTROC = "UWTROC";
   public static final String OC_WRECKS = "WRECKS";
 
   //
