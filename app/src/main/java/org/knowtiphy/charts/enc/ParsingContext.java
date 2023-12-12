@@ -6,8 +6,8 @@
 package org.knowtiphy.charts.enc;
 
 import org.geotools.api.feature.simple.SimpleFeatureType;
-import org.knowtiphy.charts.UnitProfile;
 import org.knowtiphy.charts.memstore.MemFeature;
+import org.knowtiphy.charts.settings.AppSettings;
 import org.knowtiphy.shapemap.api.IFeatureFunction;
 import org.knowtiphy.shapemap.api.IStyleCompilerAdapter;
 
@@ -22,7 +22,7 @@ import java.util.function.BiFunction;
 public class ParsingContext implements IStyleCompilerAdapter<MemFeature>
 {
 
-  private static final Map<String, BiFunction<UnitProfile, IFeatureFunction<MemFeature, Object>,
+  private static final Map<String, BiFunction<AppSettings, IFeatureFunction<MemFeature, Object>,
                                                IFeatureFunction<MemFeature, Object>>> UNIT_MAP =
     new HashMap<>();
 
@@ -33,12 +33,12 @@ public class ParsingContext implements IStyleCompilerAdapter<MemFeature>
 
   private final SimpleFeatureType featureType;
 
-  private final UnitProfile unitProfile;
+  private final AppSettings settings;
 
-  public ParsingContext(SimpleFeatureType featureType, UnitProfile unitProfile)
+  public ParsingContext(SimpleFeatureType featureType, AppSettings settings)
   {
     this.featureType = featureType;
-    this.unitProfile = unitProfile;
+    this.settings = settings;
   }
 
   @Override
@@ -53,16 +53,23 @@ public class ParsingContext implements IStyleCompilerAdapter<MemFeature>
     String name, Collection<IFeatureFunction<MemFeature, Object>> args)
   {
     var function = UNIT_MAP.get(name);
-    return function.apply(unitProfile, args.iterator().next());
+    return function.apply(settings, args.iterator().next());
   }
 
   private static IFeatureFunction<MemFeature, Object> knotsToMapUnits(
-    UnitProfile unitProfile, IFeatureFunction<MemFeature, Object> quantity)
+    AppSettings settings, IFeatureFunction<MemFeature, Object> quantity)
   {
     return (f, g) -> {
       var value = quantity.apply(f, g);
-      return value == null ? null : unitProfile.fKnotsToMapUnits.apply(
-        ((Number) value).doubleValue());
+      return value == null ? null : settings.unitProfile()
+                                            .formatSpeed((Number) quantity.apply(f, g),
+                                              settings.unitProfile()::knotsToMapUnits);
     };
+  }
+
+  private static String formatDecimal(Number value, int numDigits)
+  {
+    var formatString = "%%.%df".formatted(numDigits);
+    return String.format(formatString, value);
   }
 }

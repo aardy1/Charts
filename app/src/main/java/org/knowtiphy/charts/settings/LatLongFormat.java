@@ -1,4 +1,4 @@
-package org.knowtiphy.charts.desktop;
+package org.knowtiphy.charts.settings;
 
 public enum LatLongFormat
 {

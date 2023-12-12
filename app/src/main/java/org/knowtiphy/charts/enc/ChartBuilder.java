@@ -1,27 +1,31 @@
 package org.knowtiphy.charts.enc;
 
-import javafx.scene.transform.*;
-import org.geotools.api.feature.simple.*;
-import org.geotools.api.feature.type.*;
-import org.geotools.api.referencing.*;
-import org.geotools.api.referencing.operation.*;
-import org.geotools.data.shapefile.*;
-import org.geotools.data.store.*;
-import org.knowtiphy.charts.*;
-import org.knowtiphy.charts.chartview.*;
-import org.knowtiphy.charts.memstore.*;
-import org.knowtiphy.charts.ontology.*;
-import org.knowtiphy.shapemap.model.*;
-import org.knowtiphy.shapemap.style.parser.*;
-import org.locationtech.jts.geom.*;
-import org.locationtech.jts.index.strtree.*;
+import javafx.scene.transform.NonInvertibleTransformException;
+import org.geotools.api.feature.simple.SimpleFeatureType;
+import org.geotools.api.feature.type.Name;
+import org.geotools.api.referencing.FactoryException;
+import org.geotools.api.referencing.operation.TransformException;
+import org.geotools.data.shapefile.ShapefileDataStore;
+import org.geotools.data.store.ContentFeatureSource;
+import org.knowtiphy.charts.chartview.MapDisplayOptions;
+import org.knowtiphy.charts.memstore.MemFeature;
+import org.knowtiphy.charts.memstore.MemStore;
+import org.knowtiphy.charts.memstore.StyleReader;
+import org.knowtiphy.charts.ontology.S57;
+import org.knowtiphy.charts.settings.AppSettings;
+import org.knowtiphy.shapemap.model.MapLayer;
+import org.knowtiphy.shapemap.style.parser.StyleSyntaxException;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.index.strtree.STRtree;
 
-import javax.xml.stream.*;
-import java.io.*;
-import java.nio.file.*;
-import java.util.*;
+import javax.xml.stream.XMLStreamException;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.HashSet;
+import java.util.Set;
 
-import static org.knowtiphy.charts.geotools.FileUtils.*;
+import static org.knowtiphy.charts.geotools.FileUtils.readShapeFilesInDir;
 
 /**
  * @author graham
@@ -35,7 +39,7 @@ public class ChartBuilder
 
   private final ChartDescription chartDescription;
 
-  private final UnitProfile unitProfile;
+  private final AppSettings settings;
 
   private final StyleReader<SimpleFeatureType, MemFeature> styleReader;
 
@@ -46,14 +50,13 @@ public class ChartBuilder
   private MemStore store;
 
   public ChartBuilder(
-    ChartLocker chartLocker, Path shapeDir, ChartDescription chartDescription,
-    UnitProfile unitProfile, StyleReader<SimpleFeatureType, MemFeature> styleReader,
-    MapDisplayOptions displayOptions)
+    ChartLocker chartLocker, Path shapeDir, ChartDescription chartDescription, AppSettings settings,
+    StyleReader<SimpleFeatureType, MemFeature> styleReader, MapDisplayOptions displayOptions)
   {
 
     this.chartLocker = chartLocker;
     this.shapeDir = shapeDir;
-    this.unitProfile = unitProfile;
+    this.settings = settings;
     this.chartDescription = chartDescription;
     this.styleReader = styleReader;
     this.displayOptions = displayOptions;
@@ -211,7 +214,7 @@ public class ChartBuilder
     var typeName = type.getName();
     var scaleLess = SCALELESS.contains(type.getTypeName()) || !hasScale;
     store.addSource(type, index);
-    var parsingContext = new ParsingContext(type, unitProfile);
+    var parsingContext = new ParsingContext(type, settings);
     var style = styleReader.createStyle(typeName.getLocalPart(), parsingContext);
     var memSource = store.featureSource(type);
 

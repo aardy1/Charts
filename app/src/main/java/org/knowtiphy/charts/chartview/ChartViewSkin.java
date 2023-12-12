@@ -21,7 +21,6 @@ import org.geotools.api.feature.simple.SimpleFeatureType;
 import org.geotools.api.referencing.FactoryException;
 import org.geotools.api.referencing.operation.TransformException;
 import org.knowtiphy.charts.Fonts;
-import org.knowtiphy.charts.UnitProfile;
 import org.knowtiphy.charts.chartview.ChartView.EventModel;
 import org.knowtiphy.charts.dynamics.AISEvent;
 import org.knowtiphy.charts.dynamics.AISInformation;
@@ -32,6 +31,7 @@ import org.knowtiphy.charts.enc.ENCChart;
 import org.knowtiphy.charts.geotools.Queries;
 import org.knowtiphy.charts.memstore.MemFeature;
 import org.knowtiphy.charts.ontology.S57;
+import org.knowtiphy.charts.settings.UnitProfile;
 import org.knowtiphy.shapemap.renderer.Transformation;
 import org.knowtiphy.shapemap.style.parser.StyleSyntaxException;
 import org.knowtiphy.shapemap.view.ShapeMapView;
@@ -130,9 +130,9 @@ public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView
     eventModel.zoomEvents.feedFrom(EventStreams.eventsOf(root, ZoomEvent.ANY));
 
     // windows on clicked, mac on pressed
-    eventModel.mouseClicked.filter(event -> event.isPopupTrigger()).subscribe(
+    eventModel.mouseClicked.filter(MouseEvent::isPopupTrigger).subscribe(
       event -> makeContextMenu(event).show(mapSurface, event.getScreenX(), event.getScreenY()));
-    eventModel.mousePressed.filter(event -> event.isPopupTrigger()).subscribe(
+    eventModel.mousePressed.filter(MouseEvent::isPopupTrigger).subscribe(
       event -> makeContextMenu(event).show(mapSurface, event.getScreenX(), event.getScreenY()));
 
     unitProfile.unitChangeEvents().subscribe(e -> mapSurface.requestLayout());

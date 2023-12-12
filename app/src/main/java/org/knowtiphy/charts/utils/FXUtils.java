@@ -52,14 +52,14 @@ public class FXUtils
     return tooltip;
   }
 
-  public static ColumnConstraints gridNeverGrow()
+  public static ColumnConstraints neverGrow()
   {
     var constraint = new ColumnConstraints();
     constraint.setHgrow(Priority.NEVER);
     return constraint;
   }
 
-  public static ColumnConstraints gridAlwaysGrow()
+  public static ColumnConstraints alwaysGrow()
   {
     var constraint = new ColumnConstraints();
     constraint.setHgrow(Priority.ALWAYS);

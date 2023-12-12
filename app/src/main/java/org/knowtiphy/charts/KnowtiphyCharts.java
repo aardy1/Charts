@@ -24,7 +24,6 @@ import org.geotools.api.feature.simple.SimpleFeatureType;
 import org.knowtiphy.charts.chartview.ChartHistory;
 import org.knowtiphy.charts.chartview.ChartView;
 import org.knowtiphy.charts.chartview.MapDisplayOptions;
-import org.knowtiphy.charts.desktop.AppSettings;
 import org.knowtiphy.charts.desktop.AppSettingsDialog;
 import org.knowtiphy.charts.dynamics.AISModel;
 import org.knowtiphy.charts.enc.CatalogReader;
@@ -35,6 +34,7 @@ import org.knowtiphy.charts.memstore.MemFeature;
 import org.knowtiphy.charts.memstore.StyleReader;
 import org.knowtiphy.charts.platform.IPlatform;
 import org.knowtiphy.charts.platform.Platform;
+import org.knowtiphy.charts.settings.AppSettings;
 import org.knowtiphy.charts.utils.FXUtils;
 import org.knowtiphy.charts.utils.ToggleModel;
 
@@ -55,8 +55,6 @@ public class KnowtiphyCharts extends Application
   private static final int WIDTH = 1300;
 
   private static final int HEIGHT = 750;
-
-  private final UnitProfile unitProfile = new UnitProfile();
 
   private ChartLocker chartLocker;
 
@@ -83,7 +81,7 @@ public class KnowtiphyCharts extends Application
     var catalog = new CatalogReader(catalogFile).read();
 
     var styleReader = new StyleReader<SimpleFeatureType, MemFeature>(getClass());
-    var chartProvider = new LocalChartProvider(catalog, platform.chartsDir(), unitProfile,
+    var chartProvider = new LocalChartProvider(catalog, platform.chartsDir(), appSettings,
       styleReader);
     chartLocker = new ChartLocker(chartProvider);
     var chartDescription = chartProvider.getChartDescription("Gulf of Mexico", 2_160_000);
@@ -109,7 +107,8 @@ public class KnowtiphyCharts extends Application
     chartSpecificSettings(toggle);
 
     var chartHistory = new ChartHistory();
-    var infoBar = new InfoBar(platform, toggle, chart, unitProfile, chartHistory, displayOptions);
+    var infoBar = new InfoBar(platform, toggle, chart, appSettings.unitProfile(), chartHistory,
+      displayOptions);
 
     var menuBar = mainMenuBar(primaryStage);
     bindUnitProfile();
@@ -141,7 +140,8 @@ public class KnowtiphyCharts extends Application
 
   private ChartView makeMap()
   {
-    return resizeable(new ChartView(chartLocker, chart, dynamics, unitProfile, displayOptions));
+    return resizeable(
+      new ChartView(chartLocker, chart, dynamics, appSettings.unitProfile(), displayOptions));
   }
 
   private static final int SETTINGS_WIDTH = 700;
@@ -187,10 +187,10 @@ public class KnowtiphyCharts extends Application
   {
 //    appSettings.distanceUnit.addListener(
 //      (observable, oldValue, newValue) -> unitProfile.updateDistanceUnit(newValue));
-    appSettings.speedUnit.addListener(
-      (observable, oldValue, newValue) -> unitProfile.setSpeedUnit(newValue));
-    appSettings.speedUnitDecimals.addListener(
-      (observable, oldValue, newValue) -> unitProfile.setSpeedUnitDecimals(newValue));
+//    appSettings.unitProfile().speedUnit.addListener(
+//      (observable, oldValue, newValue) -> unitProfile.setSpeedUnit(newValue));
+//    appSettings.unitProfile().speedUnitDecimals.addListener(
+//      (observable, oldValue, newValue) -> unitProfile.setSpeedUnitDecimals(newValue));
   }
 
   private void showInitialSetup(IPlatform platform)

@@ -24,9 +24,15 @@ import javafx.stage.Stage;
 import javafx.stage.Window;
 import org.controlsfx.glyphfont.Glyph;
 import org.knowtiphy.charts.Fonts;
+import org.knowtiphy.charts.settings.AppSettings;
+import org.knowtiphy.charts.settings.DepthUnit;
+import org.knowtiphy.charts.settings.DistanceUnit;
+import org.knowtiphy.charts.settings.LatLongFormat;
+import org.knowtiphy.charts.settings.SpeedUnit;
+import org.knowtiphy.charts.settings.TemperatureUnit;
 
-import static org.knowtiphy.charts.utils.FXUtils.gridAlwaysGrow;
-import static org.knowtiphy.charts.utils.FXUtils.gridNeverGrow;
+import static org.knowtiphy.charts.utils.FXUtils.alwaysGrow;
+import static org.knowtiphy.charts.utils.FXUtils.neverGrow;
 import static org.knowtiphy.charts.utils.FXUtils.resizeable;
 
 public class AppSettingsDialog
@@ -76,7 +82,7 @@ public class AppSettingsDialog
     var bar = new GridPane();
     bar.getStyleClass().add("buttonbar");
     bar.addRow(0, new Region(), new ToolBar(buttons), new Region());
-    bar.getColumnConstraints().addAll(gridAlwaysGrow(), gridNeverGrow(), gridAlwaysGrow());
+    bar.getColumnConstraints().addAll(alwaysGrow(), neverGrow(), alwaysGrow());
     return bar;
   }
 
@@ -92,22 +98,24 @@ public class AppSettingsDialog
   {
     var pane = new GridPane();
 
-    unitRow(pane, 0, "Distance", DistanceUnit.values(), settings.distanceUnit,
-      settings.distanceUnitDecimals);
-    unitRow(pane, 1, "Speed", SpeedUnit.values(), settings.speedUnit, settings.speedUnitDecimals);
-    unitRow(pane, 2, "Depth", DepthUnit.values(), settings.depthUnit, settings.depthUnitDecimals);
-    unitRow(pane, 3, "Temperature", TemperatureUnit.values(), settings.temperatureUnit,
-      settings.temperatureUnitDecimals);
+    unitRow(pane, 0, "Distance", DistanceUnit.values(), settings.unitProfile().distanceUnit,
+      settings.unitProfile().distanceUnitDecimals);
+    unitRow(pane, 1, "Speed", SpeedUnit.values(), settings.unitProfile().speedUnit,
+      settings.unitProfile().speedUnitDecimals);
+    unitRow(pane, 2, "Depth", DepthUnit.values(), settings.unitProfile().depthUnit,
+      settings.unitProfile().depthUnitDecimals);
+    unitRow(pane, 3, "Temperature", TemperatureUnit.values(),
+      settings.unitProfile().temperatureUnit, settings.unitProfile().temperatureUnitDecimals);
 
     var latLong = new Label("Lat/Long");
-    var latLongCombo = resizeable(comboBox(LatLongFormat.values(), settings.latLongFormat));
+    var latLongCombo = resizeable(
+      comboBox(LatLongFormat.values(), settings.unitProfile().latLongFormat));
     //  add a little but of extra spacing between units and Lat/Long
     GridPane.setMargin(latLong, new Insets(6, 0, 0, 0));
     GridPane.setMargin(latLongCombo, new Insets(6, 0, 0, 0));
     pane.addRow(4, latLong, latLongCombo);
 
-    pane.getColumnConstraints()
-        .addAll(gridNeverGrow(), gridAlwaysGrow(), gridNeverGrow(), gridAlwaysGrow());
+    pane.getColumnConstraints().addAll(neverGrow(), alwaysGrow(), neverGrow(), alwaysGrow());
 
     return pane;
   }
@@ -115,9 +123,9 @@ public class AppSettingsDialog
   private static Pane aisSettings(AppSettings settings)
   {
     var pane = new GridPane();
-    pane.addRow(0, new Label("COG Predictor Length (min)"),
-      decimalDigits(settings.distanceUnitDecimals));
-    pane.getColumnConstraints().addAll(gridNeverGrow(), gridAlwaysGrow());
+//    pane.addRow(0, new Label("COG Predictor Length (min)"),
+//      decimalDigits(settings.unitProfile().distanceUnitDecimals));
+    pane.getColumnConstraints().addAll(neverGrow(), alwaysGrow());
     return pane;
   }
 
