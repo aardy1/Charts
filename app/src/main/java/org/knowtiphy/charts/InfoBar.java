@@ -135,7 +135,6 @@ public class InfoBar extends StackPane
     widthProperty().addListener(ch -> showVariableChartInfo());
     heightProperty().addListener(ch -> showVariableChartInfo());
     unitProfile.unitChangeEvents().subscribe(ch -> {
-      System.err.println("XXXXX");
       showFixedChartInfo();
       showVariableChartInfo();
     });
@@ -164,7 +163,7 @@ public class InfoBar extends StackPane
     chartScale.setText(ShapeMapRenderer.count.get() + ""); // chart.currentScale() +
     // "");
     // chartScale.setText(chart.currentScale() + "");
-    // extentLabel.setText(unitProfile.envelopeLabel(chart.bounds()));
+    extentLabel.setText(unitProfile.formatEnvelope(chart.bounds()));
   }
 
   private void showVariableChartInfo()
