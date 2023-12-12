@@ -32,7 +32,6 @@ import static org.knowtiphy.charts.geotools.FileUtils.readShapeFilesInDir;
  */
 public class ChartBuilder
 {
-
   private final ChartLocker chartLocker;
 
   private final Path shapeDir;
@@ -60,16 +59,6 @@ public class ChartBuilder
     this.chartDescription = chartDescription;
     this.styleReader = styleReader;
     this.displayOptions = displayOptions;
-
-    // displayOptions.showLightsEvents.subscribe(change -> setLayerVisible(change,
-    // S57.OC_LIGHTS));
-    // displayOptions.showPlatformEvents.subscribe(change -> setLayerVisible(change,
-    // S57.OC_OFSPLF));
-    // displayOptions.showSoundingsEvents.subscribe(change -> setLayerVisible(change,
-    // S57.OC_SOUNDG));
-    // displayOptions.showWreckEvents.subscribe(change -> setLayerVisible(change,
-    // S57.OC_WRECKS));
-
   }
 
   public ENCChart getMap()
@@ -78,7 +67,6 @@ public class ChartBuilder
   }
 
   // conversion issue SBDAREA is a bunch of points, should be a bunch of polys?
-  // WRECKS -- there are lot of them
 
   // @formatter:off
     public static final String[] LAYER_ORDER = new String[] { //
@@ -101,6 +89,7 @@ public class ChartBuilder
         // land features
         S57.OC_BUAARE,
         S57.OC_RIVERS,
+        S57.OC_LAKARE,
         S57.OC_CANALS,
 
         // possibly poly styled sea features
@@ -113,7 +102,14 @@ public class ChartBuilder
         S57.OC_CAUSWY,
         S57.OC_DYKCON,
 
+        // point styled land features
+        S57.OC_LNDMRK,
+
         // point styled sea features
+        S57.OC_ACHARE,
+        S57.OC_BCNLAT,
+        S57.OC_BCNSAW,
+        S57.OC_BCNSPP,
         S57.OC_BOYLAT,
         S57.OC_BOYSPP,
         S57.OC_BOYSAW,
@@ -121,7 +117,8 @@ public class ChartBuilder
         S57.OC_CURENT,
         S57.OC_OBSTRN,
         S57.OC_OFSPLF,
-        S57.OC_WRECKS
+        S57.OC_WRECKS,
+        S57.OC_RTPBCN
     };
     // @formatter:on
 
@@ -142,6 +139,16 @@ public class ChartBuilder
   {
 
     var fileNames = readShapeFilesInDir(shapeDir);
+
+    var all = new HashSet<String>();
+
+    for(var fileName : fileNames)
+    {
+      var bits = fileName.split("/");
+      var type = bits[bits.length - 1].split("\\.")[0];
+      all.add(type);
+    }
+
     for(var include : LAYER_ORDER)
     {
       for(var fileName : fileNames)
@@ -157,6 +164,9 @@ public class ChartBuilder
           }
           else
           {
+            var bits = fileName.split("/");
+            var type = bits[bits.length - 1].split("\\.")[0];
+            all.remove(type);
             var fileStore = new ShapefileDataStore(new File(fileName).toURI().toURL());
             var featureSource = fileStore.getFeatureSource();
 
@@ -172,6 +182,13 @@ public class ChartBuilder
         }
       }
     }
+
+    System.err.println("------------------------------------------------------");
+    for(var type : all)
+    {
+      System.err.println(type);
+    }
+    System.err.println("------------------------------------------------------");
 
     return this;
   }
@@ -197,9 +214,7 @@ public class ChartBuilder
 
         var geom = (Geometry) geoFeature.getDefaultGeometry();
 
-        var feature = new MemFeature(
-          geoFeature);//geoFeature.getAttributes(), geoFeature.getFeatureType(), geom,
-//          geoFeature.getIdentifier());
+        var feature = new MemFeature(geoFeature);
         index.insert(geom.getEnvelopeInternal(), feature);
 
         var prop = feature.getProperty(S57.AT_SCAMIN);
