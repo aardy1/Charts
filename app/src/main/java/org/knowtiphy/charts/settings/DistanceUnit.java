@@ -2,7 +2,7 @@ package org.knowtiphy.charts.settings;
 
 public enum DistanceUnit
 {
-  KM("Kilometers"), M("Meters"), NM("Nautical Miles");
+  KM("km"), M("m"), NM("NM");
 
   private final String name;
 

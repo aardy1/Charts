@@ -2,7 +2,7 @@ package org.knowtiphy.charts.settings;
 
 public enum TemperatureUnit
 {
-  C("Celsius"), F("Fahrenheit");
+  C("C"), F("F");
 
   final String name;
 

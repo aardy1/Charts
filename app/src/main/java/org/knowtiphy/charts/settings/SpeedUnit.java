@@ -2,7 +2,7 @@ package org.knowtiphy.charts.settings;
 
 public enum SpeedUnit
 {
-  KPH("Kph"), KNOTS("Knots");
+  KPH("kph"), KNOTS("knots");
 
   private final String name;
 

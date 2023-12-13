@@ -5,90 +5,106 @@
 
 package org.knowtiphy.charts.memstore;
 
-import org.geotools.api.feature.simple.*;
-import org.geotools.geometry.jts.*;
-import org.knowtiphy.charts.enc.*;
-import org.knowtiphy.charts.ontology.*;
-import org.knowtiphy.shapemap.api.*;
-import org.locationtech.jts.index.strtree.*;
+import org.geotools.api.feature.simple.SimpleFeatureType;
+import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.knowtiphy.charts.enc.ENCChart;
+import org.knowtiphy.charts.ontology.S57;
+import org.knowtiphy.shapemap.api.IFeatureSource;
+import org.knowtiphy.shapemap.api.IFeatureSourceIterator;
+import org.locationtech.jts.index.strtree.STRtree;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * @author graham
  */
-public class MemStoreFeatureSource implements IFeatureSource<SimpleFeatureType, MemFeature> {
+public class MemStoreFeatureSource implements IFeatureSource<SimpleFeatureType, MemFeature>
+{
 
-    private final ENCChart map;
+  private final ENCChart map;
 
-    private final SimpleFeatureType featureType;
+  private final SimpleFeatureType featureType;
 
-    private final STRtree featureIndex;
+  private final STRtree featureIndex;
 
-    // TODO -- we really shouldn't be passing the map -- should be in the query
-    public MemStoreFeatureSource(ENCChart map, SimpleFeatureType featureType, STRtree featureIndex) {
+  // TODO -- we really shouldn't be passing the map -- should be in the query
+  public MemStoreFeatureSource(ENCChart map, SimpleFeatureType featureType, STRtree featureIndex)
+  {
 
-        this.map = map;
-        this.featureType = featureType;
-        this.featureIndex = featureIndex;
+    this.map = map;
+    this.featureType = featureType;
+    this.featureIndex = featureIndex;
+  }
+
+  @Override
+  public SimpleFeatureType getSchema()
+  {
+
+    return featureType;
+  }
+
+  @Override
+  public IFeatureSourceIterator<MemFeature> features(ReferencedEnvelope bounds, boolean scaleLess)
+  {
+    Collection<MemFeature> featuresInScale;
+
+    var ebounds = System.currentTimeMillis();
+    @SuppressWarnings("unchecked") var featuresInBounds = (List<MemFeature>) featureIndex.query(
+      bounds);
+    ebounds = System.currentTimeMillis() - ebounds;
+
+    var sbounds = System.currentTimeMillis();
+
+    var currentScale = map.currentScale();
+
+    featuresInScale = new ArrayList<>();
+    for(var feature : featuresInBounds)
+    {
+      var featureMinScale = feature.getAttribute(S57.AT_SCAMIN);
+      if(scaleLess || featureMinScale == null || (int) featureMinScale >= currentScale)
+      {
+        featuresInScale.add(feature);
+      }
     }
 
-    @Override
-    public SimpleFeatureType getSchema() {
+    sbounds = System.currentTimeMillis() - sbounds;
 
-        return featureType;
+    System.err.println(
+      "Source " + featureType.getTypeName() + ", #In Bounds = " + featuresInBounds.size() + " : " + ebounds + " millis, #In Scale = " + featuresInScale.size() + " : " + sbounds + " millis, current scale = " + currentScale + ", scaleLess = " + scaleLess);
+
+    return new MemStoreFeatureIterator(featuresInScale.iterator());
+  }
+
+  @Override
+  public IFeatureSourceIterator<MemFeature> features()
+  {
+
+    Collection<MemFeature> featuresInScale;
+
+    @SuppressWarnings("unchecked") var featuresInBounds = (List<MemFeature>) featureIndex.query(
+      map.bounds());
+
+    var currentScale = map.currentScale();
+
+    featuresInScale = new ArrayList<>();
+    for(var feature : featuresInBounds)
+    {
+      var featureMinScale = feature.getAttribute(S57.AT_SCAMIN);
+      if(featureMinScale == null || (int) featureMinScale >= currentScale)
+      {
+        featuresInScale.add(feature);
+      }
     }
 
-    @Override
-    public IFeatureSourceIterator<MemFeature> features(ReferencedEnvelope bounds, boolean scaleLess) {
-        Collection<MemFeature> featuresInScale;
+    return new MemStoreFeatureIterator(featuresInScale.iterator());
+  }
 
-        var ebounds = System.currentTimeMillis();
-        @SuppressWarnings("unchecked")
-        var featuresInBounds = (List<MemFeature>) featureIndex.query(bounds);
-        ebounds = System.currentTimeMillis() - ebounds;
-
-        var sbounds = System.currentTimeMillis();
-
-        var currentScale = map.currentScale();
-
-        featuresInScale = new ArrayList<>();
-        for (var feature : featuresInBounds) {
-            var featureMinScale = feature.getAttribute(S57.AT_SCAMIN);
-            if (scaleLess || featureMinScale == null || (int) featureMinScale >= currentScale) {
-                featuresInScale.add(feature);
-            }
-        }
-
-        sbounds = System.currentTimeMillis() - sbounds;
-
-        System.err.println("Source " + featureType.getTypeName() + ", #In Bounds = " + featuresInBounds.size() + " : "
-                + ebounds + " millis, #In Scale = " + featuresInScale.size() + " : " + sbounds
-                + " millis, current scale = " + currentScale + ", scaleLess = " + scaleLess);
-
-        return new MemStoreFeatureIterator(featuresInScale.iterator());
-    }
-
-    @Override
-    public IFeatureSourceIterator<MemFeature> features() {
-
-        Collection<MemFeature> featuresInScale;
-
-        @SuppressWarnings("unchecked")
-        var featuresInBounds = (List<MemFeature>) featureIndex.itemsTree();
-
-        var currentScale = map.currentScale();
-
-        featuresInScale = new ArrayList<>();
-        for (var feature : featuresInBounds) {
-            var featureMinScale = feature.getAttribute(S57.AT_SCAMIN);
-            if (featureMinScale == null || (int) featureMinScale >= currentScale) {
-                featuresInScale.add(feature);
-            }
-        }
-
-        return new MemStoreFeatureIterator(featuresInScale.iterator());
-    }
+  public int size()
+  {
+    return featureIndex.size();
+  }
 }
 
 // @Override

@@ -30,6 +30,8 @@ import org.knowtiphy.charts.enc.CatalogReader;
 import org.knowtiphy.charts.enc.ChartLocker;
 import org.knowtiphy.charts.enc.ENCChart;
 import org.knowtiphy.charts.enc.LocalChartProvider;
+import org.knowtiphy.charts.enc.SchemaAdapter;
+import org.knowtiphy.charts.memstore.MapStats;
 import org.knowtiphy.charts.memstore.MemFeature;
 import org.knowtiphy.charts.memstore.StyleReader;
 import org.knowtiphy.charts.platform.IPlatform;
@@ -93,10 +95,10 @@ public class KnowtiphyCharts extends Application
       System.err.println("new chart " + c);
     });
 
-    // var stats = new MapStats(chart).stats();
-    // stats.print();
+    var stats = new MapStats(chart, SchemaAdapter.ADAPTER).stats();
+    stats.print();
 
-    // new Dump(mapContent, reader.getStore()).dump(S57.OC_BUAARE);
+//    new Dump(chart, reader.getStore()).dump(S57.OC_BUAARE);
 
     // this won't be right after the info bar is done, but that will be resized later
     // chart.setViewPortScreenArea(new Rectangle2D(0, 0, width, height));
@@ -136,6 +138,25 @@ public class KnowtiphyCharts extends Application
     // new Image(getClass().getResourceAsStream("knowtiphy_charts_icon_64.png")));
     // }
     primaryStage.show();
+
+//    //  test for rendering speed with text on
+//    new Thread(() -> {
+//      try
+//      {
+//        Thread.sleep(35000);
+//      }
+//      catch(InterruptedException e)
+//      {
+//        throw new RuntimeException(e);
+//      }
+//      chart.setLayerVisible("SOUNDG", true);
+//      int n = 1000;
+//      for(int i = 0; i < n; i++)
+//      {
+//        runLater(() -> Coordinates.zoom(chart, 0.5));
+//        runLater(() -> Coordinates.zoom(chart, 2));
+//      }
+//    }).start();
   }
 
   private ChartView makeMap()

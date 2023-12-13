@@ -2,7 +2,7 @@ package org.knowtiphy.charts.settings;
 
 public enum DepthUnit
 {
-  M("Meters"), FEET("Feet"), FATHOM("Fathoms");
+  M("m"), FEET("ft"), FATHOM("fth");
 
   private final String name;
 

@@ -86,7 +86,7 @@ public class ChartBuilder
         // land areas
         S57.OC_ICEARE,
 
-        // land features
+        //  land features
         S57.OC_BUAARE,
         S57.OC_RIVERS,
         S57.OC_LAKARE,
@@ -230,7 +230,7 @@ public class ChartBuilder
     var typeName = type.getName();
     var scaleLess = SCALELESS.contains(type.getTypeName()) || !hasScale;
     store.addSource(type, index);
-    var parsingContext = new ParsingContext(type, settings);
+    var parsingContext = new StyleCompilerAdapter(type, settings);
     var style = styleReader.createStyle(typeName.getLocalPart(), parsingContext);
     var memSource = store.featureSource(type);
 

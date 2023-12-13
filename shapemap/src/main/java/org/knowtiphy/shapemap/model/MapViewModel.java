@@ -126,7 +126,6 @@ public abstract class MapViewModel<S, F>
 
     var oldBounds = viewPort.getBounds();
     viewPort.setBounds(bounds);
-    System.err.println("\n\nVP change " + bounds + "\n\n");
     viewPortBoundsEvent.push(new Change<>(oldBounds, bounds));
   }
 

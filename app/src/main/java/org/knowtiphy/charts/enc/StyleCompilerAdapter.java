@@ -19,7 +19,7 @@ import java.util.function.BiFunction;
 /**
  * @author graham
  */
-public class ParsingContext implements IStyleCompilerAdapter<MemFeature>
+public class StyleCompilerAdapter implements IStyleCompilerAdapter<MemFeature>
 {
 
   private static final Map<String, BiFunction<AppSettings, IFeatureFunction<MemFeature, Object>,
@@ -28,15 +28,15 @@ public class ParsingContext implements IStyleCompilerAdapter<MemFeature>
 
   static
   {
-    UNIT_MAP.put("knotsToMapUnits", ParsingContext::knotsToMapUnits);
-    UNIT_MAP.put("depthToMapUnits", ParsingContext::depthToMapUnits);
+    UNIT_MAP.put("knotsToMapUnits", StyleCompilerAdapter::knotsToMapUnits);
+    UNIT_MAP.put("depthToMapUnits", StyleCompilerAdapter::depthToMapUnits);
   }
 
   private final SimpleFeatureType featureType;
 
   private final AppSettings settings;
 
-  public ParsingContext(SimpleFeatureType featureType, AppSettings settings)
+  public StyleCompilerAdapter(SimpleFeatureType featureType, AppSettings settings)
   {
     this.featureType = featureType;
     this.settings = settings;
