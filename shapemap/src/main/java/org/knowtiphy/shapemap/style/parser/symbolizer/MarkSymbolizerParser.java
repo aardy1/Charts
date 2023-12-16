@@ -5,10 +5,6 @@
 
 package org.knowtiphy.shapemap.style.parser.symbolizer;
 
-import java.util.Map;
-import java.util.function.BiFunction;
-import javax.xml.stream.XMLEventReader;
-import javax.xml.stream.XMLStreamException;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.FillInfo;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.PathInfo;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.StrokeInfo;
@@ -26,6 +22,11 @@ import org.knowtiphy.shapemap.style.parser.XML;
 import org.knowtiphy.shapemap.style.parser.basic.FillParser;
 import org.knowtiphy.shapemap.style.parser.basic.StrokeParser;
 
+import javax.xml.stream.XMLEventReader;
+import javax.xml.stream.XMLStreamException;
+import java.util.Map;
+import java.util.function.BiFunction;
+
 import static org.knowtiphy.shapemap.style.parser.Utils.normalize;
 
 /**
@@ -33,10 +34,11 @@ import static org.knowtiphy.shapemap.style.parser.Utils.normalize;
  */
 
 // TODO -- this class is a mess
-public class MarkSymbolizerParser<S, F> {
+public class MarkSymbolizerParser<S, F>
+{
 
-	private final Map<String, BiFunction<FillInfo, StrokeInfo, IMarkSymbolizer<S, F>>> WKN = Map.of(
-	//@formatter:off
+  private final Map<String, BiFunction<FillInfo, StrokeInfo, IMarkSymbolizer<S, F>>> WKN = Map.of(
+    //@formatter:off
 			"circle", CircleMarkSymbolizer::new,
 			"square", SquareMarkSymbolizer::new,
 			"triangle", TriangleMarkSymbolizer::new,
@@ -46,64 +48,84 @@ public class MarkSymbolizerParser<S, F> {
 	);
 	//@formatter:on
 
-	public final Map<String, BiFunction<FillInfo, StrokeInfo, IMarkSymbolizer<S, F>>> S52 = Map.of("Hazard-Lighthouse",
-			(f, s) -> new SVGMarkSymbolizer<>(new PathInfo("Hazard-Lighthouse.svg"), f, s), "Hazard-Oil-Platform",
-			(f, s) -> new SVGMarkSymbolizer<>(new PathInfo("Hazard-Oil-Platform.svg"), f, s), "Hazard-Wreck",
-			(f, s) -> new SVGMarkSymbolizer<>(new PathInfo("Hazard-Wreck2.svg"), f, s), "Arrow",
-			(f, s) -> new SVGMarkSymbolizer<>(new PathInfo("Arrow.svg"), f, s));
+  public final Map<String, BiFunction<FillInfo, StrokeInfo, IMarkSymbolizer<S, F>>> S52 = Map.of(
+    //@formatter:off
+    "Hazard-Lighthouse",
+        (f, s) -> new SVGMarkSymbolizer<>(new PathInfo("Hazard-Lighthouse.svg"), f, s),
+"Hazard-Oil-Platform",
+      (f, s) -> new SVGMarkSymbolizer<>(new PathInfo("Hazard-Oil-Platform.svg"), f, s),
+"Hazard-Wreck", (f, s) -> new SVGMarkSymbolizer<>(new PathInfo("Hazard-Wreck2.svg"), f, s),
+"Arrow", (f, s) -> new SVGMarkSymbolizer<>(new PathInfo("Arrow.svg"), f, s),
+"Buoy",  (f, s) -> new SVGMarkSymbolizer<>(new PathInfo("Buoy.svg"), f, s),
+"Beacon",  (f, s) -> new SVGMarkSymbolizer<>(new PathInfo("Beacon.svg"), f, s),
+"Obstruction",  (f, s) -> new SVGMarkSymbolizer<>(new PathInfo("Obstruction.svg"), f, s),
+    "Rock",  (f, s) -> new SVGMarkSymbolizer<>(new PathInfo("Rock.svg"), f, s),
+    "Anchorage",  (f, s) -> new SVGMarkSymbolizer<>(new PathInfo("Anchorage.svg"), f, s));
 
-	public IMarkSymbolizer<S, F> parse(XMLEventReader reader) throws XMLStreamException, StyleSyntaxException {
+  //@formatter:on
 
-		var builder = new MarkSymbolizerBuilder<S, F>();
+  public IMarkSymbolizer<S, F> parse(XMLEventReader reader)
+    throws XMLStreamException, StyleSyntaxException
+  {
 
-		var done = false;
-		while (!done && reader.hasNext()) {
-			var nextEvent = reader.nextTag();
+    var builder = new MarkSymbolizerBuilder<S, F>();
 
-			if (nextEvent.isStartElement()) {
-				var startElement = nextEvent.asStartElement();
+    var done = false;
+    while(!done && reader.hasNext())
+    {
+      var nextEvent = reader.nextTag();
 
-				switch (normalize(startElement)) {
-					case XML.WELL_KNOWN_NAME ->
-						builder.symbolizerBuilder(getMarkSymbolizer(Utils.parseString(reader.nextEvent()).trim()));
-					case XML.FILL -> builder.fillInfo(FillParser.parse(reader));
-					case XML.STROKE -> builder.strokeInfo(StrokeParser.parse(reader));
-					default -> throw new IllegalArgumentException(startElement.toString());
-				}
-			}
+      if(nextEvent.isStartElement())
+      {
+        var startElement = nextEvent.asStartElement();
 
-			done = Utils.checkDone(nextEvent, XML.MARK);
-		}
+        switch(normalize(startElement))
+        {
+          case XML.WELL_KNOWN_NAME -> builder.symbolizerBuilder(
+            getMarkSymbolizer(Utils.parseString(reader.nextEvent()).trim()));
+          case XML.FILL -> builder.fillInfo(FillParser.parse(reader));
+          case XML.STROKE -> builder.strokeInfo(StrokeParser.parse(reader));
+          default -> throw new IllegalArgumentException(startElement.toString());
+        }
+      }
 
-		return builder.build();
-	}
+      done = Utils.checkDone(nextEvent, XML.MARK);
+    }
 
-	private BiFunction<FillInfo, StrokeInfo, IMarkSymbolizer<S, F>> getMarkSymbolizer(String name)
-			throws StyleSyntaxException {
+    return builder.build();
+  }
 
-		var parts = name.split(":");
+  private BiFunction<FillInfo, StrokeInfo, IMarkSymbolizer<S, F>> getMarkSymbolizer(String name)
+    throws StyleSyntaxException
+  {
 
-		if (parts.length == 1 || parts[0].equals("wkn")) {
-			var markName = parts[parts.length - 1];
-			var markSymbolizer = WKN.get(markName);
-			if (markSymbolizer == null) {
-				throw new IllegalArgumentException(name);
-			}
+    var parts = name.split(":");
 
-			return markSymbolizer;
-		}
+    if(parts.length == 1 || parts[0].equals("wkn"))
+    {
+      var markName = parts[parts.length - 1];
+      var markSymbolizer = WKN.get(markName);
+      if(markSymbolizer == null)
+      {
+        throw new IllegalArgumentException(name);
+      }
 
-		if (parts[0].equals("s52")) {
-			var markName = parts[parts.length - 1];
-			var markSymbolizer = S52.get(markName);
-			if (markSymbolizer == null) {
-				throw new IllegalArgumentException(name);
-			}
+      return markSymbolizer;
+    }
 
-			return markSymbolizer;
-		}
+    if(parts[0].equals("s52"))
+    {
+      var markName = parts[parts.length - 1];
+      var markSymbolizer = S52.get(markName);
+      if(markSymbolizer == null)
+      {
+        throw new IllegalArgumentException(name);
+      }
 
-		throw new StyleSyntaxException("Don't recognize mark name : " + name);
-	}
+      return markSymbolizer;
+    }
+
+    throw new StyleSyntaxException("Don't recognize mark name : " + name);
+  }
 
 }

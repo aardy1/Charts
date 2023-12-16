@@ -20,6 +20,9 @@
                 <ogc:PropertyName>VALDCO</ogc:PropertyName>
               </ogc:Function>
             </Label>
+            <Font>
+              <CssParameter name = "font-Size">12</CssParameter>
+            </Font>
             <VendorOption name = "group">yes</VendorOption>
             <VendorOption name = "goodnessOfFit">0.1</VendorOption>
             <VendorOption name = "maxDisplacement">200</VendorOption>

@@ -51,7 +51,6 @@ public class MapStats
 
   public MapStats stats() throws Exception
   {
-
     for(var layer : map.layers())
     {
       var layerSize = ((MemStoreFeatureSource) layer.getFeatureSource()).size();

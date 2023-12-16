@@ -21,6 +21,8 @@ import javafx.stage.Stage;
 import javafx.stage.Window;
 import org.controlsfx.control.PropertySheet;
 import org.geotools.api.feature.simple.SimpleFeatureType;
+import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.referencing.crs.DefaultEngineeringCRS;
 import org.knowtiphy.charts.chartview.ChartHistory;
 import org.knowtiphy.charts.chartview.ChartView;
 import org.knowtiphy.charts.chartview.MapDisplayOptions;
@@ -39,6 +41,10 @@ import org.knowtiphy.charts.platform.Platform;
 import org.knowtiphy.charts.settings.AppSettings;
 import org.knowtiphy.charts.utils.FXUtils;
 import org.knowtiphy.charts.utils.ToggleModel;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.index.strtree.STRtree;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -138,6 +144,38 @@ public class KnowtiphyCharts extends Application
     // new Image(getClass().getResourceAsStream("knowtiphy_charts_icon_64.png")));
     // }
     primaryStage.show();
+
+    var gf = new GeometryFactory();
+    var p1 = gf.createPoint(new Coordinate(100, 100));
+    var p2 = gf.createPoint(new Coordinate(200, 100));
+    var p3 = gf.createPoint(new Coordinate(300, 100));
+    var mp = gf.createMultiPoint(new Point[]{p1, p2, p3});
+
+    var pp1 = new Coordinate(50, 50);
+    var pp2 = new Coordinate(150, 50);
+    var pp3 = new Coordinate(150, 150);
+    var pp4 = new Coordinate(50, 150);
+    var pp5 = new Coordinate(50, 50);
+
+    var poly = gf.createPolygon(new Coordinate[]{pp1, pp2, pp3, pp4, pp5});
+
+    System.err.println("Poly contains p1 " + poly.contains(p1));
+    System.err.println("Poly contains p2 " + poly.contains(p2));
+    System.err.println("Poly contains p3 " + poly.contains(p3));
+    System.err.println("Poly contains mp " + poly.contains(mp));
+    System.err.println("Poly intersect mp " + poly.intersection(mp));
+    System.err.println("MP internal envelope " + mp.getEnvelopeInternal());
+    System.err.println("Poly internal envelope " + poly.getEnvelopeInternal());
+
+    var index = new STRtree();
+    index.insert(poly.getEnvelopeInternal(), poly);
+    index.insert(mp.getEnvelopeInternal(), mp);
+    index.insert(p1.getEnvelopeInternal(), p1);
+    index.insert(p2.getEnvelopeInternal(), p2);
+    index.insert(p3.getEnvelopeInternal(), p3);
+    var env = new ReferencedEnvelope(151, 152, 50, 150, DefaultEngineeringCRS.CARTESIAN_2D);
+    var res = index.query(env);
+    System.err.println("Res = " + res);
 
 //    //  test for rendering speed with text on
 //    new Thread(() -> {

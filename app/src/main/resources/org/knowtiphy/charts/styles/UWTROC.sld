@@ -12,7 +12,7 @@
           <PointSymbolizer>
             <Graphic>
               <Mark>
-                <WellKnownName>cross</WellKnownName>
+                <WellKnownName>s52:Rock</WellKnownName>
                 <Stroke>
                   <CssParameter name = "stroke">#FF0000</CssParameter>
                 </Stroke>

@@ -258,7 +258,7 @@ public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView
         {
           var feature = iterator.next();
           textToDisplay.append(feature.getIdentifier()).append("\n");
-          textToDisplay.append(feature.getDefaultGeometry()).append("\n");
+//          textToDisplay.append(feature.getDefaultGeometry()).append("\n");
           for(var attr : feature.getFeatureType().getAttributeDescriptors())
           {
             if(!attr.getLocalName().equals("the_geom"))
