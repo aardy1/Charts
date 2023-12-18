@@ -71,8 +71,10 @@ public class MemStoreFeatureSource implements IFeatureSource<SimpleFeatureType, 
 
     sbounds = System.currentTimeMillis() - sbounds;
 
-    System.err.println(
-      "Source " + featureType.getTypeName() + ", #In Bounds = " + featuresInBounds.size() + " : " + ebounds + " millis, #In Scale = " + featuresInScale.size() + " : " + sbounds + " millis, current scale = " + currentScale + ", scaleLess = " + scaleLess);
+//    System.err.println(
+//      "Source " + featureType.getTypeName() + ", #In Bounds = " + featuresInBounds.size() + " :
+//      " + ebounds + " millis, #In Scale = " + featuresInScale.size() + " : " + sbounds + "
+//      millis, current scale = " + currentScale + ", scaleLess = " + scaleLess);
 
     return new MemStoreFeatureIterator(featuresInScale.iterator());
   }

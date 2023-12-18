@@ -50,17 +50,18 @@ public class MarkSymbolizerParser<S, F>
 
   public final Map<String, BiFunction<FillInfo, StrokeInfo, IMarkSymbolizer<S, F>>> S52 = Map.of(
     //@formatter:off
-    "Hazard-Lighthouse",
+      "Hazard-Lighthouse",
         (f, s) -> new SVGMarkSymbolizer<>(new PathInfo("Hazard-Lighthouse.svg"), f, s),
-"Hazard-Oil-Platform",
+    "Hazard-Oil-Platform",
       (f, s) -> new SVGMarkSymbolizer<>(new PathInfo("Hazard-Oil-Platform.svg"), f, s),
-"Hazard-Wreck", (f, s) -> new SVGMarkSymbolizer<>(new PathInfo("Hazard-Wreck2.svg"), f, s),
-"Arrow", (f, s) -> new SVGMarkSymbolizer<>(new PathInfo("Arrow.svg"), f, s),
-"Buoy",  (f, s) -> new SVGMarkSymbolizer<>(new PathInfo("Buoy.svg"), f, s),
-"Beacon",  (f, s) -> new SVGMarkSymbolizer<>(new PathInfo("Beacon.svg"), f, s),
-"Obstruction",  (f, s) -> new SVGMarkSymbolizer<>(new PathInfo("Obstruction.svg"), f, s),
-    "Rock",  (f, s) -> new SVGMarkSymbolizer<>(new PathInfo("Rock.svg"), f, s),
-    "Anchorage",  (f, s) -> new SVGMarkSymbolizer<>(new PathInfo("Anchorage.svg"), f, s));
+    "Hazard-Wreck", (f, s) -> new SVGMarkSymbolizer<>(new PathInfo("Hazard-Wreck2.svg"), f, s),
+    "Arrow", (f, s) -> new SVGMarkSymbolizer<>(new PathInfo("Arrow.svg"), f, s),
+    "Buoy", (f, s) -> new SVGMarkSymbolizer<>(new PathInfo("Buoy.svg"), f, s),
+    "Beacon", (f, s) -> new SVGMarkSymbolizer<>(new PathInfo("Beacon.svg"), f, s),
+    "Obstruction", (f, s) -> new SVGMarkSymbolizer<>(new PathInfo("Obstruction.svg"), f, s),
+    "Rock", (f, s) -> new SVGMarkSymbolizer<>(new PathInfo("Rock.svg"), f, s),
+    "Anchorage", (f, s) -> new SVGMarkSymbolizer<>(new PathInfo("Anchorage.svg"), f, s),
+    "Radar-Beacon", (f, s) -> new SVGMarkSymbolizer<>(new PathInfo("Radar-Beacon.svg"), f, s));
 
   //@formatter:on
 

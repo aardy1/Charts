@@ -1,5 +1,6 @@
 .chartview .gridline {
     -fx-stroke-width: 1;
+    -fx-opacity: 0.7;
     -fx-stroke: #5F9EA0;
     -fx-stroke-dash-array: 1 3;
 }

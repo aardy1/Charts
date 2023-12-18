@@ -16,9 +16,11 @@ public class S57
   //
 
   public static final String OC_ACHARE = "ACHARE";
+  public static final String OC_ACHBRT = "ACHBRT";
   public static final String OC_BCNLAT = "BCNLAT";
   public static final String OC_BCNSAW = "BCNSAW";
   public static final String OC_BCNSPP = "BCNSPP";
+  public static final String OC_BERTHS = "BERTHS";
   public static final String OC_BOYLAT = "BOYLAT";
   public static final String OC_BOYSAW = "BOYSAW";
   public static final String OC_BOYSPP = "BOYSPP";

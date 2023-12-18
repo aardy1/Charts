@@ -13,7 +13,6 @@ import si.uom.SI;
 
 import javax.measure.Unit;
 import javax.measure.quantity.Length;
-import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Map;
 import java.util.logging.Level;
@@ -149,25 +148,6 @@ public class Coordinates
     return new ReferencedEnvelope(minX, maxX, minY, maxY, crs);
   }
 
-  public static String labelLongitude(double value)
-  {
-    var df = new DecimalFormat("###.#\u00B0");
-    return df.format(value) + (value < 0 ? "W" : "E");
-  }
-
-  public static String labelLattitude(double value)
-  {
-    var df = new DecimalFormat("###.#\u00B0");
-    return df.format(value) + (value < 0 ? "S" : "N");
-  }
-
-  public static String envelopeLabel(ReferencedEnvelope bounds)
-  {
-    return labelLongitude(bounds.getMinX()) + " to " + labelLongitude(
-      bounds.getMaxX()) + " : " + labelLattitude(bounds.getMinY()) + " to " + labelLattitude(
-      bounds.getMaxY());
-  }
-
   public static <S, F> double getMapScale(MapViewModel<S, F> map, int screenWidth, double dpi)
   {
     // if it's geodetic, we're dealing with lat/lon unit measures
@@ -251,8 +231,7 @@ public class Coordinates
     if(unit == null)
     {
       LOGGER.finer(
-        "toMeters: assuming the original size is in meters already, as the first crs axis unit is" +
-          " null. CRS is " + crs);
+        "toMeters: assuming the original size is in meters already, as the first crs axis unit " + "is" + " null. CRS is " + crs);
       return size;
     }
     if(!unit.isCompatible(SI.METRE))

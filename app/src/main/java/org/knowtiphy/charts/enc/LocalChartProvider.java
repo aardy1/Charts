@@ -11,6 +11,7 @@ import org.geotools.api.referencing.FactoryException;
 import org.geotools.api.referencing.operation.TransformException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.knowtiphy.charts.chartview.MapDisplayOptions;
+import org.knowtiphy.charts.memstore.MapStats;
 import org.knowtiphy.charts.memstore.MemFeature;
 import org.knowtiphy.charts.memstore.StyleReader;
 import org.knowtiphy.charts.settings.AppSettings;
@@ -81,6 +82,10 @@ public class LocalChartProvider
       settings, styleReader, displayOptions).read();
     var map = reader.getMap();
     map.setViewPortBounds(map.bounds());
+
+    var stats = new MapStats(map, SchemaAdapter.ADAPTER).stats();
+    stats.print();
+
     return map;
   }
 

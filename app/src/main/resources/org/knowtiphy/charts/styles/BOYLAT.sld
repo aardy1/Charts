@@ -13,11 +13,8 @@
             <Graphic>
               <Mark>
                 <WellKnownName>s52:Buoy</WellKnownName>
-                <Fill>
-                  <CssParameter name = "fill">#f3d948</CssParameter>
-                </Fill>
               </Mark>
-              <Size>6</Size>
+              <Size>8</Size>
             </Graphic>
             <!--          <VendorOption name= "labelObstacle">true</VendorOption>-->
           </PointSymbolizer>

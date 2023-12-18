@@ -11,6 +11,7 @@ import org.knowtiphy.shapemap.api.IFeatureAdapter;
 import org.knowtiphy.shapemap.api.IRenderablePolygonProvider;
 import org.knowtiphy.shapemap.api.ISVGProvider;
 import org.knowtiphy.shapemap.api.ISchemaAdapter;
+import org.knowtiphy.shapemap.api.ITextSizeProvider;
 import org.knowtiphy.shapemap.renderer.context.RemoveHolesFromPolygon;
 import org.knowtiphy.shapemap.renderer.context.RenderGeomCache;
 import org.reactfx.Change;
@@ -45,6 +46,7 @@ public abstract class MapViewModel<S, F>
   private final IRenderablePolygonProvider renderablePolygonProvider;
 
   private final ISVGProvider svgProvider;
+  private final ITextSizeProvider textSizeProvider;
 
   // possibly shouldnt be here -- but it makes for faster rendering
   private int totalRuleCount;
@@ -52,15 +54,15 @@ public abstract class MapViewModel<S, F>
   protected MapViewModel(
     ReferencedEnvelope bounds, ISchemaAdapter<S, F> schemaAdapter,
     IFeatureAdapter<F> featureAdapter, IRenderablePolygonProvider renderablePolygonProvider,
-    ISVGProvider svgProvider)
+    ISVGProvider svgProvider, ITextSizeProvider textSizeProvider)
     throws TransformException, NonInvertibleTransformException, FactoryException
   {
-
     this.bounds = bounds;
     this.schemaAdapter = schemaAdapter;
     this.featureAdapter = featureAdapter;
     this.renderablePolygonProvider = renderablePolygonProvider;
     this.svgProvider = svgProvider;
+    this.textSizeProvider = textSizeProvider;
     this.totalRuleCount = 0;
 
     viewPort = new MapViewport(bounds);
@@ -68,17 +70,21 @@ public abstract class MapViewModel<S, F>
 
   protected MapViewModel(
     ReferencedEnvelope bounds, ISchemaAdapter<S, F> schemaAdapter,
-    IFeatureAdapter<F> featureAdapter, ISVGProvider svgProvider)
+    IFeatureAdapter<F> featureAdapter, ISVGProvider svgProvider, ITextSizeProvider textSizeProvider)
     throws TransformException, NonInvertibleTransformException, FactoryException
   {
-
     this(bounds, schemaAdapter, featureAdapter, new RemoveHolesFromPolygon(new RenderGeomCache()),
-      svgProvider);
+      svgProvider, textSizeProvider);
   }
 
   public IFeatureAdapter<F> featureAdapter()
   {
     return featureAdapter;
+  }
+
+  public ITextSizeProvider textSizeProvider()
+  {
+    return textSizeProvider;
   }
 
   protected MapViewport viewPort()

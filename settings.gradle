@@ -21,9 +21,6 @@ dependencyResolutionManagement {
       version('reactfx', '1.4.1')
       version('controlsfx', '11.1.2')
       version('fxsvgimage', '1.1')
-      version('formsfx', '11.3.2')
-      version('preferencesfx', '11.8.0')
-      version('miglayout', '11.2')
 
       library('geotools-shapefile', 'org.geotools', 'gt-shapefile').versionRef('geotools')
       library('geotools-sld', 'org.geotools.xsd', 'gt-xsd-sld').versionRef('geotools')
@@ -38,10 +35,6 @@ dependencyResolutionManagement {
 
       library('controlsfx', 'org.controlsfx', 'controlsfx').versionRef('controlsfx')
       library('reactfx', 'org.reactfx', 'reactfx').versionRef('reactfx')
-      library('miglayout', 'com.miglayout', 'miglayout-javafx').versionRef('miglayout')
-      library('preferencesfx', 'com.dlsc.preferencesfx', 'preferencesfx-core').versionRef('preferencesfx')
-      library('formsfx', 'com.dlsc.formsfx', 'formsfx-core').versionRef('formsfx')
-
       library('fxsvgimage', 'com.github.hervegirod', 'fxsvgimage').versionRef('fxsvgimage')
     }
   }

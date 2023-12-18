@@ -88,8 +88,6 @@ dependencies {
 
   implementation libs.reactfx
   implementation libs.controlsfx
-  implementation libs.miglayout
-  implementation libs.preferencesfx
   implementation libs.fxsvgimage
 }
 

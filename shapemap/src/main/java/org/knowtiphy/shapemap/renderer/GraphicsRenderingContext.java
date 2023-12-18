@@ -17,10 +17,10 @@ import org.locationtech.jts.index.quadtree.Quadtree;
 public record GraphicsRenderingContext<S, F>(
 	RendererContext<S, F> rendererContext,
 	GraphicsContext graphicsContext,			// the canvas being drawn to
-	Transformation worldToScreen,				// world to screen transformation
-	double onePixelX,								// one pixel width in x direction in world coordinates
-	double onePixelY,								// one pixel width in y direction in world coordinates
-	Quadtree blocked,								// screen coordinates blocked from having text over them
-	ReferencedEnvelope bounds					//
+	Transformation worldToScreen,				  // world to screen transformation
+	double onePixelX,								      // one pixel width in x direction in world coordinates
+	double onePixelY,								      // one pixel width in y direction in world coordinates
+	Quadtree blocked,								      // screen coordinates blocked from having text over them
+	ReferencedEnvelope bounds
 ) {}
 //@formatter:on

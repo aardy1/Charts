@@ -5,18 +5,18 @@
 
 package org.knowtiphy.charts.enc;
 
-import javafx.scene.transform.*;
-import org.geotools.api.feature.simple.*;
-import org.geotools.api.referencing.*;
-import org.geotools.api.referencing.crs.*;
-import org.geotools.api.referencing.operation.*;
-import org.knowtiphy.charts.chartview.*;
-import org.knowtiphy.charts.chartview.markicons.*;
-import org.knowtiphy.charts.memstore.*;
-import org.knowtiphy.shapemap.model.*;
-import org.knowtiphy.shapemap.renderer.context.*;
+import javafx.scene.transform.NonInvertibleTransformException;
+import org.geotools.api.feature.simple.SimpleFeatureType;
+import org.geotools.api.referencing.FactoryException;
+import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
+import org.geotools.api.referencing.operation.TransformException;
+import org.knowtiphy.charts.chartview.MapDisplayOptions;
+import org.knowtiphy.charts.chartview.markicons.ResourceLoader;
+import org.knowtiphy.charts.memstore.MemFeature;
+import org.knowtiphy.shapemap.model.MapViewModel;
+import org.knowtiphy.shapemap.renderer.context.SVGCache;
 
-import java.util.*;
+import java.util.Collection;
 
 /**
  * @author graham
@@ -33,7 +33,7 @@ public class ENCChart extends MapViewModel<SimpleFeatureType, MemFeature>
   {
 
     super(chartDescription.getBounds(crs), SchemaAdapter.ADAPTER, FeatureAdapter.ADAPTER,
-      new SVGCache(ResourceLoader.class));
+      new SVGCache(ResourceLoader.class), TextSizeProvider.PROVIDER);
     this.chartDescription = chartDescription;
   }
 

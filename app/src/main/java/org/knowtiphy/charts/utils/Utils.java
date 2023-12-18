@@ -15,7 +15,6 @@ public class Utils
 
     if(FORMATS[numDigits] == null)
     {
-      System.err.println("Creating format for " + numDigits);
       FORMATS[numDigits] = "%%.%df".formatted(numDigits);
     }
 

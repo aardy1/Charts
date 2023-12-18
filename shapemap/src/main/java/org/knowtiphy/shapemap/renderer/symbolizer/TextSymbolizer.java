@@ -26,129 +26,152 @@ import org.locationtech.jts.index.quadtree.Quadtree;
 /**
  * @author graham
  */
-public class TextSymbolizer<S, F> {
+public class TextSymbolizer<S, F>
+{
 
-	private final IFeatureFunction<F, String> label;
+  private final IFeatureFunction<F, String> label;
 
-	private final Font font;
+  private final Font font;
 
-	private final FillInfo fillInfo;
+  private final FillInfo fillInfo;
 
-	private final StrokeInfo strokeInfo;
+  private final StrokeInfo strokeInfo;
 
-	private final LabelPlacement labelPlacement;
+  private final LabelPlacement labelPlacement;
 
-	public TextSymbolizer(IFeatureFunction<F, String> label, Font font, FillInfo fillInfo, StrokeInfo strokeInfo,
-			LabelPlacement labelPlacement) {
+  public TextSymbolizer(
+    IFeatureFunction<F, String> label, Font font, FillInfo fillInfo, StrokeInfo strokeInfo,
+    LabelPlacement labelPlacement)
+  {
 
-		this.label = label;
-		this.font = font;
-		this.fillInfo = fillInfo;
-		this.strokeInfo = strokeInfo;
-		this.labelPlacement = labelPlacement;
-	}
+    this.label = label;
+    this.font = font;
+    this.fillInfo = fillInfo;
+    this.strokeInfo = strokeInfo;
+    this.labelPlacement = labelPlacement;
+  }
 
-	public void render(GraphicsRenderingContext<S, F> context, F feature) {
+  public void render(GraphicsRenderingContext<S, F> context, F feature)
+  {
 
-		if (fillInfo != null) {
-			Fill.setup(context, fillInfo);
-		}
+    if(fillInfo != null)
+    {
+      Fill.setup(context, fillInfo);
+    }
 
-		if (strokeInfo != null) {
-			Text.setup(context, strokeInfo);
-		}
+    if(strokeInfo != null)
+    {
+      Text.setup(context, strokeInfo);
+    }
 
-		if (fillInfo != null || strokeInfo != null) {
-			context.graphicsContext().setFont(font);
-		}
+    if(fillInfo != null || strokeInfo != null)
+    {
+      context.graphicsContext().setFont(font);
+    }
 
-		text(context, feature, context.rendererContext().featureAdapter().defaultGeometry(feature));
-	}
+    text(context, feature, context.rendererContext().featureAdapter().defaultGeometry(feature));
+  }
 
-	private void text(GraphicsRenderingContext<S, F> context, F feature, Geometry geom) {
+  private void text(GraphicsRenderingContext<S, F> context, F feature, Geometry geom)
+  {
 
-		// TODO -- switch on strings is brain dead
-		switch (geom.getGeometryType()) {
-			case Geometry.TYPENAME_POINT -> textPoint(context, feature, (Point) geom);
-			case Geometry.TYPENAME_LINESTRING, Geometry.TYPENAME_LINEARRING ->
-				textPoint(context, feature, ((LineString) geom).getStartPoint());
-			case Geometry.TYPENAME_POLYGON -> textPoint(context, feature, ((Polygon) geom).getCentroid());
-			case Geometry.TYPENAME_MULTIPOINT, Geometry.TYPENAME_MULTILINESTRING, Geometry.TYPENAME_MULTIPOLYGON ->
-				recurse(context, feature, geom);
-			default -> throw new IllegalArgumentException(geom.getGeometryType());
-		}
-	}
+    // TODO -- switch on strings is brain dead
+    switch(geom.getGeometryType())
+    {
+      case Geometry.TYPENAME_POINT -> textPoint(context, feature, (Point) geom);
+      case Geometry.TYPENAME_LINESTRING, Geometry.TYPENAME_LINEARRING ->
+        textPoint(context, feature, ((LineString) geom).getStartPoint());
+      case Geometry.TYPENAME_POLYGON -> textPoint(context, feature, ((Polygon) geom).getCentroid());
+      case Geometry.TYPENAME_MULTIPOINT, Geometry.TYPENAME_MULTILINESTRING,
+             Geometry.TYPENAME_MULTIPOLYGON ->
+        recurse(context, feature, geom);
+      default -> throw new IllegalArgumentException(geom.getGeometryType());
+    }
+  }
 
-	private void textPoint(GraphicsRenderingContext<S, F> context, F feature, Point point) {
+  private void textPoint(GraphicsRenderingContext<S, F> context, F feature, Point point)
+  {
 
-		if (point != null && label != null) {
-			var text = label.apply(feature, point);
+    if(point != null && label != null)
+    {
+      var text = label.apply(feature, point);
 
-			// TODO -- get rid of debugging
-			// var bill =
-			// feature.getFeatureType().getName().getLocalPart().contains("CURENT");
+      // TODO -- get rid of debugging
+      // var bill =
+      // feature.getFeatureType().getName().getLocalPart().contains("CURENT");
 
-			if (!StringUtils.isBlank(text)) {
+      if(!StringUtils.isBlank(text))
+      {
+        var graphicsContext = context.graphicsContext();
+        var tx = context.worldToScreen();
+        var blocked = context.blocked();
 
-				var graphicsContext = context.graphicsContext();
-				var tx = context.worldToScreen();
-				var blocked = context.blocked();
+        tx.apply(point.getX(), point.getY());
+        // TODO -- this is wrong since it supposed to be from the bounding box
+        // of the pt feature?
 
-				tx.apply(point.getX(), point.getY());
-				// TODO -- this is wrong since it supposed to be from the bounding box
-				// of the pt feature?
+        var x = tx.getX() + (labelPlacement == null || labelPlacement.pointPlacement() == null ?
+                               0 : labelPlacement
+                                                                                                       .pointPlacement()
+                                                                                                       .getDisplacementX());
+        var y = tx.getY() + (labelPlacement == null || labelPlacement.pointPlacement() == null ?
+                               0 : labelPlacement
+                                                                                                       .pointPlacement()
+                                                                                                       .getDisplacementY());
 
-				var x = tx.getX() + (labelPlacement == null || labelPlacement.pointPlacement() == null ? 0
-						: labelPlacement.pointPlacement().getDisplacementX());
-				var y = tx.getY() + (labelPlacement == null || labelPlacement.pointPlacement() == null ? 0
-						: labelPlacement.pointPlacement().getDisplacementY());
+        var textDimensions = context.rendererContext().textSizeProvider().apply(font, text);
+        var textBounds = new ReferencedEnvelope(x, x + textDimensions.getWidth(), y,
+          y + textDimensions.getHeight(), DefaultEngineeringCRS.CARTESIAN_2D);
 
-				var textDimensions = Text.textSizeFast(font, text);
-				var textBounds = new ReferencedEnvelope(x, x + textDimensions.getWidth(), y,
-						y + textDimensions.getHeight(), DefaultEngineeringCRS.CARTESIAN_2D);
+        if(!overlaps(textBounds, blocked))
+        {
 
-				if (!overlaps(textBounds, blocked)) {
+          if(fillInfo != null)
+          {
+            graphicsContext.fillText(text, x, y);
+          }
 
-					if (fillInfo != null) {
-						graphicsContext.fillText(text, x, y);
-					}
+          if(strokeInfo != null)
+          {
+            graphicsContext.strokeText(text, x, y);
+          }
 
-					if (strokeInfo != null) {
-						graphicsContext.strokeText(text, x, y);
-					}
+          // TODO -- set bounds from greater of fill or stroke
+          blocked.insert(textBounds, textBounds);
+        }
+        // else if (bill)
+        // System.err.println(text + " : " + " blocked");
+      }
+    }
+  }
 
-					// TODO -- set bounds from greater of fill or stroke
-					blocked.insert(textBounds, textBounds);
-				}
-				// else if (bill)
-				// System.err.println(text + " : " + " blocked");
-			}
-		}
-	}
+  // TODO -- text along line strings ...
 
-	// TODO -- text along line strings ...
+  // only necessary if a multi-X, can contain another multi-X, rather than just X's
+  private void recurse(GraphicsRenderingContext<S, F> context, F feature, Geometry geom)
+  {
+    for(int i = 0; i < geom.getNumGeometries(); i++)
+    {
+      text(context, feature, geom.getGeometryN(i));
+    }
+  }
 
-	// only necessary if a multi-X, can contain another multi-X, rather than just X's
-	private void recurse(GraphicsRenderingContext<S, F> context, F feature, Geometry geom) {
-		for (int i = 0; i < geom.getNumGeometries(); i++) {
-			text(context, feature, geom.getGeometryN(i));
-		}
-	}
+  // quadtree queries can gives false positives (can they,or is that just multi-X
+  // related?) (so a query result of non empty does not necessarily imply overlaps)
 
-	// quadtree queries can gives false positives (can they,or is that just multi-X
-	// related?) (so a query result of non empty does not necessarily imply overlaps)
+  private boolean overlaps(ReferencedEnvelope bounds, Quadtree index)
+  {
+    for(var box : index.query(bounds))
+    {
+      if(((BoundingBox) box).intersects(bounds))
+      {
+        // System.err.println("Real intersection");
+        return true;
+      }
+    }
 
-	private boolean overlaps(ReferencedEnvelope bounds, Quadtree index) {
-
-		for (var box : index.query(bounds)) {
-			if (((BoundingBox) box).intersects(bounds)) {
-				// System.err.println("Real intersection");
-				return true;
-			}
-		}
-
-		return false;
-	}
+    return false;
+  }
 
 }
 // private void renderAt(RenderingContext context, SimpleFeature feature, Point point) {

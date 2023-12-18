@@ -7,12 +7,12 @@
   <NamedLayer>
     <UserStyle>
       <FeatureTypeStyle>
-        <FeatureTypeName>BOYSPP</FeatureTypeName>
+        <FeatureTypeName>BERTHS</FeatureTypeName>
         <Rule>
           <PointSymbolizer>
             <Graphic>
               <Mark>
-                <WellKnownName>s52:Buoy</WellKnownName>
+                <WellKnownName>s52:Anchorage</WellKnownName>
               </Mark>
               <Size>8</Size>
             </Graphic>

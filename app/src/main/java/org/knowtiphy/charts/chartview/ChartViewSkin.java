@@ -45,6 +45,8 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static org.knowtiphy.charts.utils.FXUtils.resizeable;
+
 public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView>
 {
 
@@ -164,8 +166,7 @@ public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView
 
   private Pane makeCoordinateGrid(UnitProfile unitProfile)
   {
-
-    var theGrid = new CoordinateGrid(chart, unitProfile);
+    var theGrid = resizeable(new CoordinateGrid(chart, unitProfile));
     theGrid.setPickOnBounds(false);
     theGrid.setMouseTransparent(true);
     return theGrid;
@@ -203,7 +204,7 @@ public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView
   {
 
     // unsubscribe listeners on the old chart
-    subscriptions.forEach(s -> s.unsubscribe());
+    subscriptions.forEach(Subscription::unsubscribe);
     subscriptions.clear();
 
     // add listeners on the new chart

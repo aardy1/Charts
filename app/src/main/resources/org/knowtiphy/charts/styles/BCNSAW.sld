@@ -13,21 +13,10 @@
             <Graphic>
               <Mark>
                 <WellKnownName>s52:Beacon</WellKnownName>
-                <Stroke>
-                  <CssParameter name = "stroke">#FF0000</CssParameter>
-                </Stroke>
               </Mark>
               <Size>8</Size>
             </Graphic>
-            <!--          <VendorOption name= "labelObstacle">true</VendorOption>-->
           </PointSymbolizer>
-          <!--          <LineSymbolizer>-->
-          <!--            <Stroke>-->
-          <!--              <CssParameter name = "stroke">#FFFF00</CssParameter>-->
-          <!--              <CssParameter name = "stroke-width">40</CssParameter>-->
-          <!--            </Stroke>-->
-          <!--            &lt;!&ndash;          <VendorOption name= "labelObstacle">true</VendorOption>&ndash;&gt;-->
-          <!--          </LineSymbolizer>-->
           <TextSymbolizer>
             <Label>
               <ogc:coalesce>

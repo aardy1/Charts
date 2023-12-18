@@ -10,16 +10,15 @@ import javafx.stage.Stage;
 /**
  * @author graham
  */
-public class MacOSX extends Desktop implements IPlatform {
+public class MacOSX extends Desktop implements IPlatform
+{
 
-	@Override
-	public void setTitle(Stage stage, String title) {
-		// Mac apps do not have window titles
-	}
+  @Override
+  public void setWindowIcons(Stage stage, Class<?> cls)
+  {
+    // Mac apps do not have window icons
+  }
 
-	@Override
-	public void setWindowIcons(Stage stage, Class<?> cls) {
-		// Mac apps do not have window icons
-	}
+  public boolean isMac(){return true;}
 
 }

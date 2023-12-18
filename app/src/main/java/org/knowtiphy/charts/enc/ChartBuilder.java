@@ -106,10 +106,12 @@ public class ChartBuilder
         S57.OC_LNDMRK,
 
         // point styled sea features
-        S57.OC_ACHARE,
-        S57.OC_BCNLAT,
-        S57.OC_BCNSAW,
-        S57.OC_BCNSPP,
+    S57.OC_ACHARE,
+    S57.OC_ACHBRT,
+    S57.OC_BCNLAT,
+    S57.OC_BCNSAW,
+    S57.OC_BCNSPP,
+    S57.OC_BERTHS,
         S57.OC_BOYLAT,
         S57.OC_BOYSPP,
         S57.OC_BOYSAW,
@@ -141,14 +143,14 @@ public class ChartBuilder
 
     var fileNames = readShapeFilesInDir(shapeDir);
 
-    var all = new HashSet<String>();
-
-    for(var fileName : fileNames)
-    {
-      var bits = fileName.split("/");
-      var type = bits[bits.length - 1].split("\\.")[0];
-      all.add(type);
-    }
+//    var all = new HashSet<String>();
+//
+//    for(var fileName : fileNames)
+//    {
+//      var bits = fileName.split("/");
+//      var type = bits[bits.length - 1].split("\\.")[0];
+//      all.add(type);
+//    }
 
     for(var include : LAYER_ORDER)
     {
@@ -156,7 +158,7 @@ public class ChartBuilder
       {
         if(fileName.contains(include))
         {
-          System.err.println(fileName);
+//          System.err.println(fileName);
           // if the file doesn't exist, is empty, or has no .shx file, ignore it
           var file = new File(fileName);
           if(!file.exists() || file.length() == 0)
@@ -165,9 +167,9 @@ public class ChartBuilder
           }
           else
           {
-            var bits = fileName.split("/");
-            var type = bits[bits.length - 1].split("\\.")[0];
-            all.remove(type);
+//            var bits = fileName.split("/");
+//            var type = bits[bits.length - 1].split("\\.")[0];
+//            all.remove(type);
             var fileStore = new ShapefileDataStore(new File(fileName).toURI().toURL());
             var featureSource = fileStore.getFeatureSource();
 
@@ -184,12 +186,12 @@ public class ChartBuilder
       }
     }
 
-    System.err.println("------------------------------------------------------");
-    for(var type : all)
-    {
-      System.err.println(type);
-    }
-    System.err.println("------------------------------------------------------");
+//    System.err.println("------------------------------------------------------");
+//    for(var type : all)
+//    {
+//      System.err.println(type);
+//    }
+//    System.err.println("------------------------------------------------------");
 
     return this;
   }

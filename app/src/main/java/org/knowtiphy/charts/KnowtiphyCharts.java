@@ -18,11 +18,8 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
-import javafx.stage.Window;
 import org.controlsfx.control.PropertySheet;
 import org.geotools.api.feature.simple.SimpleFeatureType;
-import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.geotools.referencing.crs.DefaultEngineeringCRS;
 import org.knowtiphy.charts.chartview.ChartHistory;
 import org.knowtiphy.charts.chartview.ChartView;
 import org.knowtiphy.charts.chartview.MapDisplayOptions;
@@ -41,15 +38,12 @@ import org.knowtiphy.charts.platform.Platform;
 import org.knowtiphy.charts.settings.AppSettings;
 import org.knowtiphy.charts.utils.FXUtils;
 import org.knowtiphy.charts.utils.ToggleModel;
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.GeometryFactory;
-import org.locationtech.jts.geom.Point;
-import org.locationtech.jts.index.strtree.STRtree;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -58,7 +52,6 @@ import static org.knowtiphy.charts.utils.FXUtils.resizeable;
 
 public class KnowtiphyCharts extends Application
 {
-
   // need to work these out from screen dimensions
   private static final int WIDTH = 1300;
 
@@ -76,13 +69,11 @@ public class KnowtiphyCharts extends Application
 
   private final AppSettings appSettings = new AppSettings();
 
+  private final IPlatform platform = Platform.getPlatform();
+
   @Override
   public void start(Stage primaryStage) throws Exception
   {
-
-    var platform = Platform.getPlatform();
-
-    // var styleDir = Platform.getStylesPath();
     showInitialSetup(platform);
 
     var catalogFile = platform.chartsDir().resolve("08Region_ENCProdCat.xml");
@@ -97,9 +88,10 @@ public class KnowtiphyCharts extends Application
     displayOptions = new MapDisplayOptions();
     chart = chartLocker.getChart(chartDescription, displayOptions);
 
-    chart.newMapViewModel().subscribe(c -> {
-      System.err.println("new chart " + c);
-    });
+    chart.newMapViewModel()
+         .subscribe(change -> setStageTitle(primaryStage, (ENCChart) change.getNewValue()));
+    appSettings.unitProfile().unitChangeEvents()
+               .subscribe(change -> setStageTitle(primaryStage, chart));
 
     var stats = new MapStats(chart, SchemaAdapter.ADAPTER).stats();
     stats.print();
@@ -115,11 +107,10 @@ public class KnowtiphyCharts extends Application
     chartSpecificSettings(toggle);
 
     var chartHistory = new ChartHistory();
-    var infoBar = new InfoBar(platform, toggle, chart, appSettings.unitProfile(), chartHistory,
+    var infoBar = new InfoBar(toggle, chart, appSettings.unitProfile(), chartLocker, chartHistory,
       displayOptions);
 
     var menuBar = mainMenuBar(primaryStage);
-    bindUnitProfile();
 
     var vbox = new VBox();
     vbox.getStyleClass().add("charts");
@@ -135,47 +126,42 @@ public class KnowtiphyCharts extends Application
     scene.getStylesheets().add(getClass().getResource("charts.css").toExternalForm());
 
     primaryStage.setScene(scene);
-    platform.setTitle(primaryStage, "Knowtiphy Charts");
+    setStageTitle(primaryStage, chart);
     primaryStage.sizeToScene();
     platform.setWindowIcons(primaryStage, getClass());
-    // if (platform.isDesktop()) {
-    // primaryStage.getIcons().addAll(new
-    // Image(getClass().getResourceAsStream("knowtiphy_charts_icon_32.png")),
-    // new Image(getClass().getResourceAsStream("knowtiphy_charts_icon_64.png")));
-    // }
     primaryStage.show();
 
-    var gf = new GeometryFactory();
-    var p1 = gf.createPoint(new Coordinate(100, 100));
-    var p2 = gf.createPoint(new Coordinate(200, 100));
-    var p3 = gf.createPoint(new Coordinate(300, 100));
-    var mp = gf.createMultiPoint(new Point[]{p1, p2, p3});
-
-    var pp1 = new Coordinate(50, 50);
-    var pp2 = new Coordinate(150, 50);
-    var pp3 = new Coordinate(150, 150);
-    var pp4 = new Coordinate(50, 150);
-    var pp5 = new Coordinate(50, 50);
-
-    var poly = gf.createPolygon(new Coordinate[]{pp1, pp2, pp3, pp4, pp5});
-
-    System.err.println("Poly contains p1 " + poly.contains(p1));
-    System.err.println("Poly contains p2 " + poly.contains(p2));
-    System.err.println("Poly contains p3 " + poly.contains(p3));
-    System.err.println("Poly contains mp " + poly.contains(mp));
-    System.err.println("Poly intersect mp " + poly.intersection(mp));
-    System.err.println("MP internal envelope " + mp.getEnvelopeInternal());
-    System.err.println("Poly internal envelope " + poly.getEnvelopeInternal());
-
-    var index = new STRtree();
-    index.insert(poly.getEnvelopeInternal(), poly);
-    index.insert(mp.getEnvelopeInternal(), mp);
-    index.insert(p1.getEnvelopeInternal(), p1);
-    index.insert(p2.getEnvelopeInternal(), p2);
-    index.insert(p3.getEnvelopeInternal(), p3);
-    var env = new ReferencedEnvelope(151, 152, 50, 150, DefaultEngineeringCRS.CARTESIAN_2D);
-    var res = index.query(env);
-    System.err.println("Res = " + res);
+//    var gf = new GeometryFactory();
+//    var p1 = gf.createPoint(new Coordinate(100, 100));
+//    var p2 = gf.createPoint(new Coordinate(200, 100));
+//    var p3 = gf.createPoint(new Coordinate(300, 100));
+//    var mp = gf.createMultiPoint(new Point[]{p1, p2, p3});
+//
+//    var pp1 = new Coordinate(50, 50);
+//    var pp2 = new Coordinate(150, 50);
+//    var pp3 = new Coordinate(150, 150);
+//    var pp4 = new Coordinate(50, 150);
+//    var pp5 = new Coordinate(50, 50);
+//
+//    var poly = gf.createPolygon(new Coordinate[]{pp1, pp2, pp3, pp4, pp5});
+//
+//    System.err.println("Poly contains p1 " + poly.contains(p1));
+//    System.err.println("Poly contains p2 " + poly.contains(p2));
+//    System.err.println("Poly contains p3 " + poly.contains(p3));
+//    System.err.println("Poly contains mp " + poly.contains(mp));
+//    System.err.println("Poly intersect mp " + poly.intersection(mp));
+//    System.err.println("MP internal envelope " + mp.getEnvelopeInternal());
+//    System.err.println("Poly internal envelope " + poly.getEnvelopeInternal());
+//
+//    var index = new STRtree();
+//    index.insert(poly.getEnvelopeInternal(), poly);
+//    index.insert(mp.getEnvelopeInternal(), mp);
+//    index.insert(p1.getEnvelopeInternal(), p1);
+//    index.insert(p2.getEnvelopeInternal(), p2);
+//    index.insert(p3.getEnvelopeInternal(), p3);
+//    var env = new ReferencedEnvelope(151, 152, 50, 150, DefaultEngineeringCRS.CARTESIAN_2D);
+//    var res = index.query(env);
+//    System.err.println("Res = " + res);
 
 //    //  test for rendering speed with text on
 //    new Thread(() -> {
@@ -206,27 +192,39 @@ public class KnowtiphyCharts extends Application
   private static final int SETTINGS_WIDTH = 700;
   private static final int SETTINGS_HEIGHT = 400;
 
-  private MenuBar mainMenuBar(Window parent)
+  private MenuBar mainMenuBar(Stage stage)
   {
     var menuBar = new MenuBar();
+    menuBar.setUseSystemMenuBar(true);
     var menu = new Menu("Knowtiphy Charts");
 
+    var items = new ArrayList<MenuItem>();
+
     var settings = new MenuItem("Settings");
+    items.add(settings);
     settings.setAccelerator(new KeyCodeCombination(KeyCode.COMMA, KeyCombination.META_DOWN));
     settings.setOnAction(
-      x -> AppSettingsDialog.create(parent, SETTINGS_WIDTH, SETTINGS_HEIGHT, appSettings)
+      x -> AppSettingsDialog.create(stage, SETTINGS_WIDTH, SETTINGS_HEIGHT, appSettings)
                             .showAndWait());
 
-    var quit = new MenuItem("Quit");
-    quit.setAccelerator(new KeyCodeCombination(KeyCode.Q, KeyCombination.META_DOWN));
-    quit.setOnAction(x -> System.exit(1));
+    if(platform.isMac())
+    {
+      stage.setOnCloseRequest(event -> shutdown());
+    }
+    else
+    {
+      var separatorNode = new HBox();
+      separatorNode.setPadding(new Insets(5, 0, 0, 0));
+      var separator = new SeparatorMenuItem();
+      separator.setContent(separatorNode);
+      items.add(separator);
+      var quit = new MenuItem("Quit");
+      items.add(quit);
+      quit.setAccelerator(new KeyCodeCombination(KeyCode.Q, KeyCombination.META_DOWN));
+      quit.setOnAction(event -> shutdown());
+    }
 
-    var separatorNode = new HBox();
-    separatorNode.setPadding(new Insets(5, 0, 0, 0));
-    var separator = new SeparatorMenuItem();
-    separator.setContent(separatorNode);
-
-    menu.getItems().addAll(settings, separator, quit);
+    menu.getItems().addAll(items);
     menuBar.getMenus().addAll(menu);
 
     return menuBar;
@@ -240,16 +238,6 @@ public class KnowtiphyCharts extends Application
     displayProperties.setOnMouseExited(evt -> toggle.toggle());
     toggle.getStateProperty().addListener(
       cl -> later(() -> overlay.setRight(toggle.isOn() ? displayProperties : null)));
-  }
-
-  private void bindUnitProfile()
-  {
-//    appSettings.distanceUnit.addListener(
-//      (observable, oldValue, newValue) -> unitProfile.updateDistanceUnit(newValue));
-//    appSettings.unitProfile().speedUnit.addListener(
-//      (observable, oldValue, newValue) -> unitProfile.setSpeedUnit(newValue));
-//    appSettings.unitProfile().speedUnitDecimals.addListener(
-//      (observable, oldValue, newValue) -> unitProfile.setSpeedUnitDecimals(newValue));
   }
 
   private void showInitialSetup(IPlatform platform)
@@ -280,6 +268,18 @@ public class KnowtiphyCharts extends Application
     // System.err.println("GPS Position = " + platform.positionProperty());
     platform.info();
     System.err.println();
+  }
+
+  private void setStageTitle(Stage stage, ENCChart chart)
+  {
+    platform.setStageTitle(stage, "%s             1::%d             %s".formatted(chart.title(),
+      chart.getChartDescription().cScale(),
+      appSettings.unitProfile().formatEnvelope(chart.bounds())));
+  }
+
+  private void shutdown()
+  {
+    System.exit(1);
   }
 
   public static void main(String[] args)

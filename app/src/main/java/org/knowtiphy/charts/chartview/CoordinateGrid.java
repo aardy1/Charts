@@ -7,9 +7,9 @@ package org.knowtiphy.charts.chartview;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Line;
@@ -25,38 +25,38 @@ import org.reactfx.Subscription;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.knowtiphy.charts.geotools.Coordinates.labelLattitude;
-import static org.knowtiphy.charts.geotools.Coordinates.labelLongitude;
-
 /**
  * @author graham
  */
 public class CoordinateGrid extends Pane
 {
-
   private ENCChart chart;
 
   private final UnitProfile unitProfile;
 
   private final List<Subscription> subscriptions = new ArrayList<>();
 
-  private final Insets LATTITUDE_INSET = new Insets(3, 0, 0, 3);
+  private final Insets LATITUDE_INSET = new Insets(3, 0, 0, 3);
 
   private final Insets LONGITUDE_INSET = new Insets(3, 0, 0, 3);
 
   public CoordinateGrid(ENCChart chrt, UnitProfile unitProfile)
   {
-
     this.chart = chrt;
     this.unitProfile = unitProfile;
     setupListeners();
+
+    //  listeners which don't depend on the chart
+    widthProperty().addListener(change -> drawGrid());
+    heightProperty().addListener(change -> drawGrid());
+    unitProfile.unitChangeEvents().subscribe(e -> drawGrid());
   }
 
   private void setupListeners()
   {
-    subscriptions.forEach(s -> s.unsubscribe());
+    subscriptions.forEach(Subscription::unsubscribe);
     subscriptions.clear();
-    subscriptions.add(chart.viewPortBoundsEvent().subscribe(extent -> requestLayout()));
+    subscriptions.add(chart.viewPortBoundsEvent().subscribe(extent -> drawGrid()));
     subscriptions.add(chart.newMapViewModel().subscribe(change -> {
       chart = (ENCChart) change.getNewValue();
       setupListeners();
@@ -64,132 +64,146 @@ public class CoordinateGrid extends Pane
     }));
   }
 
-  @Override
-  public void layoutChildren()
+  private void drawGrid()
   {
-
-    System.err.println("Yeah baby");
+    System.err.println("Grid layout");
+    System.err.println(getWidth());
+    System.err.println(getHeight());
+    System.err.println(chart.viewPortScreenArea());
     getChildren().clear();
 
     var transform = new Transformation(chart.viewPortWorldToScreen());
     var delta = getDelta();
 
-    var toAdd = new ArrayList<Node>();
-    longitudeLines(transform, delta, toAdd);
-    lattitudeLines(transform, delta, toAdd);
-    // toAdd.add(makeLegend(transform, delta));
-    getChildren().addAll(toAdd);
+    var lines = new ArrayList<Node>();
+    var labels = new ArrayList<Node>();
+    longitudeLines(transform, delta, lines, labels);
+//    latitudeLines(transform, delta, lines, labels);
+    var legend = legend(transform, delta);
+
+    getChildren().addAll(lines);
+    getChildren().addAll(labels);
+    getChildren().add(legend);
   }
 
-  private void longitudeLines(Transformation transform, double delta, List<Node> toAdd)
+  private void longitudeLines(
+    Transformation transform, double delta, List<Node> lines, List<Node> labels)
   {
-
     var extent = chart.viewPortBounds();
     var screenArea = chart.viewPortScreenArea();
 
     var startLongitude = getStartLongitude(extent);
-    for(double longitude = startLongitude; longitude < extent.getMaxX(); longitude += delta)
+    for(var longitude = startLongitude; longitude < extent.getMaxX(); longitude += delta)
     {
-      var line = makeLine(0, screenArea.getMinY(), 0, screenArea.getMaxY());
-      var label = makeLabel(labelLongitude(longitude), LONGITUDE_INSET);
-      transform.apply(longitude, 0);
-      line.setTranslateX(transform.getX());
-      label.setTranslateX(transform.getX());
-      toAdd.add(line);
-      toAdd.add(label);
+      longitudeLine(transform, screenArea, longitude, lines, labels);
     }
 
-    for(double longitude = startLongitude - delta; longitude > extent.getMinX(); longitude -= delta)
+    for(var longitude = startLongitude - delta; longitude > extent.getMinX(); longitude -= delta)
     {
-      var line = makeLine(0, screenArea.getMinY(), 0, screenArea.getMaxY());
-      var label = makeLabel(labelLongitude(longitude), LONGITUDE_INSET);
-      transform.apply(longitude, 0);
-      line.setTranslateX(transform.getX());
-      label.setTranslateX(transform.getX());
-      toAdd.add(line);
-      toAdd.add(label);
+      longitudeLine(transform, screenArea, longitude, lines, labels);
     }
   }
 
-  private void lattitudeLines(Transformation transform, double delta, List<Node> toAdd)
+  private void longitudeLine(
+    Transformation transform, Rectangle2D screenArea, double longitude, List<Node> lines,
+    List<Node> labels)
   {
+    transform.apply(longitude, 0);
 
+    var line = line(0, screenArea.getMinY(), 0, screenArea.getMaxY());
+    line.setTranslateX(transform.getX());
+    lines.add(line);
+
+    var label = label(unitProfile.formatLongitude(longitude), LONGITUDE_INSET);
+    label.setTranslateX(transform.getX());
+    label.setTranslateY(label.getBoundsInLocal().getHeight() + 1);
+    labels.add(label);
+  }
+
+  private void latitudeLines(
+    Transformation transform, double delta, List<Node> lines, List<Node> labels)
+  {
     var extent = chart.viewPortBounds();
     var screenArea = chart.viewPortScreenArea();
 
-    var startLattitude = getStartLattitude(extent);
-    for(double lattitude = startLattitude; lattitude < extent.getMaxY(); lattitude += delta)
+    var startLatitude = getStartLatitude(extent);
+    for(var latitude = startLatitude; latitude < extent.getMaxY(); latitude += delta)
     {
-      var line = makeLine(screenArea.getMinX(), 0, screenArea.getMaxX(), 0);
-      var label = makeLabel(labelLattitude(lattitude), LATTITUDE_INSET);
-      transform.apply(0, lattitude);
-      line.setTranslateY(transform.getY());
-      label.setTranslateY(transform.getY());
-      toAdd.add(line);
-      toAdd.add(label);
+      latitudeLine(transform, screenArea, latitude, lines, labels);
     }
 
-    for(double lattitude = startLattitude - delta; lattitude > extent.getMinY(); lattitude -= delta)
+    for(var latitude = startLatitude - delta; latitude > extent.getMinY(); latitude -= delta)
     {
-      var line = makeLine(screenArea.getMinX(), 0, screenArea.getMaxX(), 0);
-      var label = makeLabel(labelLattitude(lattitude), LATTITUDE_INSET);
-      transform.apply(0, lattitude);
-      line.setTranslateY(transform.getY());
-      label.setTranslateY(transform.getY());
-      toAdd.add(line);
-      toAdd.add(label);
+      latitudeLine(transform, screenArea, latitude, lines, labels);
     }
   }
 
-  private Label makeLabel(String title, Insets insets)
+  private void latitudeLine(
+    Transformation transform, Rectangle2D screenArea, double latitude, List<Node> lines,
+    List<Node> labels)
+  {
+    transform.apply(0, latitude);
+
+    var line = line(screenArea.getMinX(), 0, screenArea.getMaxX(), 0);
+    lines.add(line);
+    line.setTranslateY(transform.getY());
+
+    var label = label(unitProfile.formatLatitude(latitude), LATITUDE_INSET);
+    label.setTranslateY(transform.getY());
+    label.setTranslateX(label.getBoundsInLocal().getWidth() + 1);
+    labels.add(label);
+  }
+
+  private Label label(String title, Insets insets)
   {
     var label = new Label(title);
     label.setPadding(insets);
     return label;
   }
 
-  private Line makeLine(double x1, double y1, double x2, double y2)
+  private Line line(double x1, double y1, double x2, double y2)
   {
-    var line = new Line(x1, y1, x2, y2);
+    var line = new Line(x1, y1 + 1, x2, y2 - 1);
     line.getStyleClass().add("gridline");
     return line;
   }
 
-  private VBox makeLegend(Transformation transform, double delta)
+  private Node legend(Transformation transform, double delta)
   {
-
     var bounds = chart.viewPortBounds();
 
-    var legend = new VBox();
     transform.apply(bounds.getMinX() + delta, 0);
-    var line = new Line(0, 0, transform.getX(), 0);
-    line.setTranslateX(20);
-    line.getStyleClass().add("legendline");
-    legend.getChildren().add(line);
 
+    var line = new Line(0, 0, transform.getX(), 0);
+    line.getStyleClass().add("legendline");
+
+    double scaleDistance = 0;
     try
     {
-      var scaleDistance = getScaleDistance(bounds, delta);
-      var distanceBox = new HBox(
-        new Label(unitProfile.metersToMapUnits(scaleDistance) + " " + unitProfile.distanceUnit()));
-      distanceBox.setAlignment(Pos.TOP_RIGHT);
-      legend.getChildren().add(distanceBox);
+      scaleDistance = getScaleDistance(bounds, delta);
     }
     catch(TransformException ex)
     {
       // ignore
     }
 
+    var distance = unitProfile.formatDistance(scaleDistance, unitProfile::metersToMapUnits);
+    var distanceBox = new Label(distance);
+    distanceBox.setAlignment(Pos.CENTER);
+
+    var legend = new VBox(distanceBox, line);
+    legend.setAlignment(Pos.CENTER);
     legend.setTranslateX(20);
-    legend.setTranslateY(getBoundsInLocal().getMaxY() - 40);
+    //  TODO -- this is hacky, not sure how to do this properly
+    legend.setTranslateY(getHeight() - 40);
 
     return legend;
   }
 
-  public double getScaleDistance(ReferencedEnvelope bounds, double delta) throws TransformException
+  private double getScaleDistance(ReferencedEnvelope bounds, double delta) throws TransformException
   {
     return JTS.orthodromicDistance(new Coordinate(bounds.getMinX(), bounds.getMinY()),
-      new Coordinate(bounds.getMinX() + delta, bounds.getMinY()), chart.crs()) / 1000;
+      new Coordinate(bounds.getMinX() + delta, bounds.getMinY()), chart.crs());
   }
 
   // round the minimum longitude to the closest integer in the viewport bounds
@@ -200,10 +214,10 @@ public class CoordinateGrid extends Pane
     return (int) Math.ceil(envelope.getMinX());
   }
 
-  // round the minimum lattitude to the closest integer in the viewport bounds
-  // minimum lattitude is positive => round closer to the north pole, so 20.4 -> 21
-  // minimum lattitude is negative => round closer to the equator, -44.7 -> -44
-  private int getStartLattitude(ReferencedEnvelope envelope)
+  // round the minimum latitude to the closest integer in the viewport bounds
+  // minimum latitude is positive => round closer to the north pole, so 20.4 -> 21
+  // minimum latitude is negative => round closer to the equator, -44.7 -> -44
+  private int getStartLatitude(ReferencedEnvelope envelope)
   {
     return (int) Math.ceil(envelope.getMinY());
   }

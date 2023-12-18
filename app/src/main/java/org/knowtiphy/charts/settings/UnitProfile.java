@@ -75,7 +75,8 @@ public class UnitProfile
 
   public String formatDistance(Number value, UnaryOperator<Number> converter)
   {
-    return Utils.formatDecimal(converter.apply(value), distanceUnitDecimals.getValue());
+    return Utils.formatDecimal(converter.apply(value),
+      distanceUnitDecimals.getValue()) + " " + distanceUnit.get();
   }
 
   public String formatSpeed(Number value, UnaryOperator<Number> converter)
@@ -103,7 +104,7 @@ public class UnitProfile
     };
   }
 
-  public String formatLattitude(double value)
+  public String formatLatitude(double value)
   {
     var direction = value < 0 ? S : N;
     return switch(latLongFormat.get())
@@ -115,7 +116,7 @@ public class UnitProfile
 
   public String formatEnvelope(ReferencedEnvelope envelope)
   {
-    return formatLattitude(envelope.getMinY()) + " : " + formatLattitude(
+    return formatLatitude(envelope.getMinY()) + " : " + formatLatitude(
       envelope.getMaxY()) + " / " + formatLongitude(envelope.getMinX()) + " : " + formatLongitude(
       envelope.getMaxX());
   }

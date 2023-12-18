@@ -5,23 +5,29 @@
 
 package org.knowtiphy.charts.chartview;
 
-import java.util.ArrayList;
-import java.util.List;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import org.knowtiphy.charts.enc.ChartDescription;
 
 /**
  * @author graham
  */
-public class ChartHistory {
+public class ChartHistory
+{
 
-	private final List<ChartDescription> history = new ArrayList<>();
+  private final ObservableList<ChartDescription> history = FXCollections.observableArrayList();
 
-	public void addChart(ChartDescription chart) {
-		history.add(chart);
-	}
+  public void addChart(ChartDescription chart)
+  {
+    if(!history.contains(chart))
+    {
+      history.add(chart);
+    }
+  }
 
-	public List<ChartDescription> history() {
-		return history;
-	}
+  public ObservableList<ChartDescription> history()
+  {
+    return history;
+  }
 
 }

@@ -5,34 +5,37 @@
 
 package org.knowtiphy.charts.platform;
 
-import java.nio.file.Path;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.layout.Region;
 import javafx.stage.Stage;
 
+import java.nio.file.Path;
+
 /**
  * Abstraction of the underlying platform.
  */
-public interface IPlatform {
+public interface IPlatform
+{
+  void setStageTitle(Stage stage, String title);
 
-	void setTitle(Stage stage, String title);
+  void setWindowIcons(Stage stage, Class<?> cls);
 
-	void setWindowIcons(Stage stage, Class<?> cls);
+  Path rootDir();
 
-	Path rootDir();
+  Path chartsDir();
 
-	Path chartsDir();
+  Rectangle2D screenDimensions();
 
-	Rectangle2D screenDimensions();
+  double windowWidthCM(Region region);
 
-	double windowWidthCM(Region region);
+  double ppi();
 
-	double ppi();
+  double ppcm();
 
-	double ppcm();
+  // ReadOnlyObjectProperty<Position> positionProperty();
 
-	// ReadOnlyObjectProperty<Position> positionProperty();
+  boolean isMac();
 
-	void info();
+  void info();
 
 }

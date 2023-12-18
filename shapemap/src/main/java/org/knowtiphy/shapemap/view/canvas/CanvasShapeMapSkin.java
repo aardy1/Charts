@@ -1,7 +1,5 @@
 package org.knowtiphy.shapemap.view.canvas;
 
-import java.util.ArrayList;
-import java.util.List;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.layout.BorderPane;
@@ -17,6 +15,9 @@ import org.knowtiphy.shapemap.view.ShapeMapBaseSkin;
 import org.knowtiphy.shapemap.view.ShapeMapView;
 import org.reactfx.Subscription;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * A skin for a shape map view that uses a JavaFX canvas to show an ESRI shape of layers
  * of features of some schema type.
@@ -25,109 +26,123 @@ import org.reactfx.Subscription;
  * @param <F> the type of the features
  */
 
-public class CanvasShapeMapSkin<S, F> extends ShapeMapBaseSkin<S, F> {
+public class CanvasShapeMapSkin<S, F> extends ShapeMapBaseSkin<S, F>
+{
 
-	private static final double PREFERRED_WIDTH = Region.USE_COMPUTED_SIZE;
+  private static final double PREFERRED_WIDTH = Region.USE_COMPUTED_SIZE;
 
-	private static final double PREFERRED_HEIGHT = Region.USE_COMPUTED_SIZE;
+  private static final double PREFERRED_HEIGHT = Region.USE_COMPUTED_SIZE;
 
-	private MapViewModel<S, F> map;
+  private MapViewModel<S, F> map;
 
-	private final Pane root;
+  private final Pane root;
 
-	private final BorderPane borderPane;
+  private final BorderPane borderPane;
 
-	private final List<Subscription> subscriptions = new ArrayList<>();
+  private final List<Subscription> subscriptions = new ArrayList<>();
 
-	public CanvasShapeMapSkin(ShapeMapView<S, F> surface, MapViewModel<S, F> map) {
-		super(surface);
+  public CanvasShapeMapSkin(ShapeMapView<S, F> surface, MapViewModel<S, F> map)
+  {
+    super(surface);
 
-		this.map = map;
-		borderPane = new BorderPane();
-		root = new Pane(borderPane);
-		getChildren().addAll(root);
+    this.map = map;
+    borderPane = new BorderPane();
+    root = new Pane(borderPane);
+    getChildren().addAll(root);
 
-		initGraphics();
+    initGraphics();
 
-		// root.addEventHandler(MouseEvent.ANY, (MouseEvent event) -> {
-		// eventModel.mouseEvents.push(event);
-		// });
+    // root.addEventHandler(MouseEvent.ANY, (MouseEvent event) -> {
+    // eventModel.mouseEvents.push(event);
+    // });
 
-		setupListeners();
-	}
+    setupListeners();
+  }
 
-	private void setupListeners() {
-		// unsubscribe listeners on the old map
-		subscriptions.forEach(s -> s.unsubscribe());
-		subscriptions.clear();
-		subscriptions.add(map.layerVisibilityEvent().subscribe(b -> root.requestLayout()));
-		subscriptions.add(map.viewPortBoundsEvent().subscribe(b -> root.requestLayout()));
-		subscriptions.add(map.newMapViewModel().subscribe(change -> {
-			this.map = change.getNewValue();
-			setupListeners();
-			System.err.println("NEW MAP");
-			root.requestLayout();
-		}));
-	}
+  private void setupListeners()
+  {
+    // unsubscribe listeners on the old map
+    subscriptions.forEach(s -> s.unsubscribe());
+    subscriptions.clear();
+    subscriptions.add(map.layerVisibilityEvent().subscribe(b -> root.requestLayout()));
+    subscriptions.add(map.viewPortBoundsEvent().subscribe(b -> root.requestLayout()));
+    subscriptions.add(map.newMapViewModel().subscribe(change -> {
+      this.map = change.getNewValue();
+      setupListeners();
+      System.err.println("NEW MAP");
+      root.requestLayout();
+    }));
+  }
 
-	private void initGraphics() {
-		if (Double.compare(S().getPrefWidth(), 0.0) <= 0 || Double.compare(S().getPrefHeight(), 0.0) <= 0
-				|| Double.compare(S().getWidth(), 0.0) <= 0 || Double.compare(S().getHeight(), 0.0) <= 0) {
-			if (S().getPrefWidth() > 0 && S().getPrefHeight() > 0) {
-				S().setPrefSize(S().getPrefWidth(), S().getPrefHeight());
-			}
-			else {
-				S().setPrefSize(PREFERRED_WIDTH, PREFERRED_HEIGHT);
-			}
-		}
-	}
+  private void initGraphics()
+  {
+    if(Double.compare(S().getPrefWidth(), 0.0) <= 0 || Double.compare(S().getPrefHeight(),
+      0.0) <= 0 || Double.compare(S().getWidth(), 0.0) <= 0 || Double.compare(S().getHeight(),
+      0.0) <= 0)
+    {
+      if(S().getPrefWidth() > 0 && S().getPrefHeight() > 0)
+      {
+        S().setPrefSize(S().getPrefWidth(), S().getPrefHeight());
+      }
+      else
+      {
+        S().setPrefSize(PREFERRED_WIDTH, PREFERRED_HEIGHT);
+      }
+    }
+  }
 
-	@Override
-	public void layoutChildren(final double x, final double y, final double width, final double height) {
-		super.layoutChildren(x, y, width, height);
-		repaint();
-	}
+  @Override
+  public void layoutChildren(
+    final double x, final double y, final double width, final double height)
+  {
+    super.layoutChildren(x, y, width, height);
+    repaint();
+  }
 
-	private void repaint() {
+  private void repaint()
+  {
 
-		var width = (int) root.getWidth();
-		var height = (int) root.getHeight();
+    var width = (int) root.getWidth();
+    var height = (int) root.getHeight();
 
-		var canvas = new Canvas(width, height);
-		var graphics = canvas.getGraphicsContext2D();
-		graphics.setFill(Color.LIGHTGREY);
-		graphics.fillRect(0, 0, width, height);
+    var canvas = new Canvas(width, height);
+    var graphics = canvas.getGraphicsContext2D();
+    graphics.setFill(Color.LIGHTGREY);
+    graphics.fillRect(0, 0, width, height);
 
-		var rendererContext = new RendererContext<>(
-		//@formatter:off
+    var rendererContext = new RendererContext<>(
+      //@formatter:off
 				map.layers(),
 				map.totalRuleCount(),
 				map.viewPortBounds(),
 				new Rectangle2D(0, 0, width, height),
 				map.featureAdapter(),
 				map.renderablePolygonProvider(),
-				map.svgProvider());
+				map.svgProvider(),
+        map.textSizeProvider());
 		//@formatter:on
 
-		var renderer = new ShapeMapRenderer<>(rendererContext, graphics);
-		try {
-			renderer.paint();
-			borderPane.setCenter(canvas);
-		}
-		catch (NonInvertibleTransformException | TransformException ex) {
-			ex.printStackTrace(System.err);
-		}
-	}
-	//
-	// private class MyThreadFactory implements ThreadFactory {
-	//
-	// @Override
-	// public Thread newThread(Runnable r) {
-	// var thread = new Thread(r);
-	// thread.setDaemon(true);
-	// return thread;
-	// }
-	//
-	// }
+    var renderer = new ShapeMapRenderer<>(rendererContext, graphics);
+    try
+    {
+      renderer.paint();
+      borderPane.setCenter(canvas);
+    }
+    catch(NonInvertibleTransformException | TransformException ex)
+    {
+      ex.printStackTrace(System.err);
+    }
+  }
+  //
+  // private class MyThreadFactory implements ThreadFactory {
+  //
+  // @Override
+  // public Thread newThread(Runnable r) {
+  // var thread = new Thread(r);
+  // thread.setDaemon(true);
+  // return thread;
+  // }
+  //
+  // }
 
 }

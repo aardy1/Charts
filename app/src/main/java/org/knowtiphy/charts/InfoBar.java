@@ -5,9 +5,11 @@
 
 package org.knowtiphy.charts;
 
+import javafx.collections.ListChangeListener;
+import javafx.geometry.Side;
 import javafx.scene.control.Button;
-import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ToolBar;
 import javafx.scene.control.Tooltip;
@@ -17,16 +19,20 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.transform.NonInvertibleTransformException;
+import org.geotools.api.referencing.FactoryException;
 import org.geotools.api.referencing.operation.TransformException;
 import org.knowtiphy.charts.chartview.ChartHistory;
+import org.knowtiphy.charts.chartview.ChartViewSkin;
 import org.knowtiphy.charts.chartview.MapDisplayOptions;
+import org.knowtiphy.charts.enc.ChartDescription;
+import org.knowtiphy.charts.enc.ChartLocker;
 import org.knowtiphy.charts.enc.ENCChart;
 import org.knowtiphy.charts.geotools.Coordinates;
-import org.knowtiphy.charts.platform.IPlatform;
 import org.knowtiphy.charts.settings.UnitProfile;
 import org.knowtiphy.charts.utils.FXUtils;
 import org.knowtiphy.charts.utils.ToggleModel;
 import org.knowtiphy.shapemap.renderer.ShapeMapRenderer;
+import org.knowtiphy.shapemap.style.parser.StyleSyntaxException;
 import org.reactfx.Subscription;
 
 import java.util.ArrayList;
@@ -34,29 +40,18 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static org.knowtiphy.charts.geotools.Coordinates.distanceAcross;
-
 /**
  * @author graham
  */
 public class InfoBar extends StackPane
 {
-
-  private final Label chartName = new Label();
-
   private final Label chartScale = new Label();
-
-  private final Label extentLabel = new Label();
 
   private final Label currentExtent = new Label();
 
   private final Label currentMapSpan = new Label();
 
-  private final Label currentScreenToWorld = new Label();
-
   private final Label currentZoomLevel = new Label();
-
-  private final IPlatform platform;
 
   private final UnitProfile unitProfile;
 
@@ -64,19 +59,21 @@ public class InfoBar extends StackPane
 
   private final ChartHistory chartHistory;
 
-  private final List<MenuItem> chartHistoryItems = new ArrayList<>();
+  private final ChartLocker chartLocker;
+  private final MenuButton history;
+  private final MapDisplayOptions displayOptions;
 
   private final List<Subscription> subscriptions = new ArrayList<>();
 
   public InfoBar(
-    IPlatform platform, ToggleModel toggleModel, ENCChart chrt, UnitProfile unitProfile,
+    ToggleModel toggleModel, ENCChart chrt, UnitProfile unitProfile, ChartLocker chartLocker,
     ChartHistory chartHistory, MapDisplayOptions displayOptions)
   {
-
-    this.platform = platform;
     this.chart = chrt;
     this.unitProfile = unitProfile;
     this.chartHistory = chartHistory;
+    this.chartLocker = chartLocker;
+    this.displayOptions = displayOptions;
 
     var zoomIn = new Button("", Fonts.plus());
     zoomIn.setTooltip(new Tooltip("Zoom In"));
@@ -102,13 +99,12 @@ public class InfoBar extends StackPane
       }
     });
 
-    // var history = new MenuButton("", Fonts.history(), chartHistoryItems);
-    // history.setTooltip(new Tooltip("Chart History"));
-    // history.setOnAction(x -> showHistory());
+    history = new MenuButton("", Fonts.history());
+    history.setPopupSide(Side.TOP);
+    history.setTooltip(new Tooltip("Chart History"));
 
-    var toolbar = FXUtils.nonResizeable(new ToolBar(zoomIn, zoomOut, resetViewPort,
-      // history,
-      mapDisplaySettings));
+    var toolbar = FXUtils.nonResizeable(
+      new ToolBar(zoomIn, zoomOut, resetViewPort, mapDisplaySettings, history));
     toolbar.getStyleClass().add("controlbar");
 
     var buttons = new GridPane();
@@ -116,27 +112,36 @@ public class InfoBar extends StackPane
     buttons.getColumnConstraints()
            .addAll(FXUtils.alwaysGrow(), FXUtils.neverGrow(), FXUtils.alwaysGrow());
 
-    var fixedLabels = new HBox(chartScale, extentLabel);
-    fixedLabels.getStyleClass().add("infobar");
+//
+//    var leftBar = FXUtils.nonResizeable(
+//      new ToolBar(new Button("SAVE"), new Button("FED"), history));
+//    leftBar.getStyleClass().add("controlbar");
 
-    var variableLabels = new HBox(currentExtent, currentMapSpan, currentScreenToWorld,
-      currentZoomLevel);
+    var variableLabels = new HBox(currentExtent, currentMapSpan, currentZoomLevel);
     variableLabels.getStyleClass().add("infobar");
 
     var labels = new BorderPane();
-    labels.setLeft(fixedLabels);
+//    labels.setLeft(leftBar);
     labels.setRight(variableLabels);
 
     getChildren().addAll(labels, buttons);
 
-    showFixedChartInfo();
     showVariableChartInfo();
 
     widthProperty().addListener(ch -> showVariableChartInfo());
     heightProperty().addListener(ch -> showVariableChartInfo());
     unitProfile.unitChangeEvents().subscribe(ch -> {
-      showFixedChartInfo();
+//      showFixedChartInfo();
       showVariableChartInfo();
+    });
+    chartHistory.history().addListener((ListChangeListener<ChartDescription>) c -> {
+      c.next();
+      for(var description : c.getAddedSubList())
+      {
+        var menuItem = new MenuItem(description.getName() + "1:" + description.cScale());
+        menuItem.setOnAction(event -> loadChart(description));
+        history.getItems().add(menuItem);
+      }
     });
 
     setupListeners();
@@ -150,29 +155,29 @@ public class InfoBar extends StackPane
     subscriptions.clear();
     subscriptions.add(chart.viewPortBoundsEvent().subscribe(c -> showVariableChartInfo()));
     subscriptions.add(chart.newMapViewModel().subscribe(change -> {
+      chartHistory.addChart(chart.getChartDescription());
       chart = (ENCChart) change.getNewValue();
-      showFixedChartInfo();
       showVariableChartInfo();
       setupListeners();
     }));
   }
 
+  //  TODO -- needs to go away
   private void showFixedChartInfo()
   {
-    chartName.setText(chart.title());
+//    chartName.setText(chart.title());
     chartScale.setText(ShapeMapRenderer.count.get() + ""); // chart.currentScale() +
     // "");
     // chartScale.setText(chart.currentScale() + "");
-    extentLabel.setText(unitProfile.formatEnvelope(chart.bounds()));
+//    extentLabel.setText(unitProfile.formatEnvelope(chart.bounds()));
   }
 
   private void showVariableChartInfo()
   {
     var envelope = chart.viewPortBounds();
-    var mapWidth = distanceAcross(envelope);
+    var mapWidth = Coordinates.distanceAcross(envelope);
     // // currentExtent.setText(unitProfile.envelopeLabel(envelope));
-    currentMapSpan.setText(unitProfile.formatDistance(mapWidth,
-      unitProfile::metersToMapUnits) + " " + unitProfile.distanceUnit());
+    currentMapSpan.setText(unitProfile.formatDistance(mapWidth, unitProfile::metersToMapUnits));
     // currentScreenToWorld.setText("1" + unitProfile.screenUnit + " : "
     // + Coordinates.twoDec(unitProfile.convertFromScreenUnit(mapWidth /
     // platform.windowWidthCM(this)))
@@ -181,16 +186,17 @@ public class InfoBar extends StackPane
     currentZoomLevel.setText(Coordinates.twoDec(chart.getZoomFactor()));
   }
 
-  private ContextMenu showHistory()
+  private void loadChart(ChartDescription chartDescription)
   {
-
-    var contextMenu = new ContextMenu();
-    for(var chartDescription : chartHistory.history())
+    try
     {
-      var item = new MenuItem(chartDescription.getName());
-      contextMenu.getItems().add(item);
+      var newChart = chartLocker.loadChart(chartDescription, displayOptions);
+      chart.setNewMapViewModel(newChart);
     }
-
-    return contextMenu;
+    catch(TransformException | FactoryException | NonInvertibleTransformException |
+          StyleSyntaxException ex)
+    {
+      Logger.getLogger(ChartViewSkin.class.getName()).log(Level.SEVERE, null, ex);
+    }
   }
 }
