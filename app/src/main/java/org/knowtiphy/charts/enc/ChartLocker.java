@@ -5,13 +5,9 @@
 
 package org.knowtiphy.charts.enc;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.scene.transform.NonInvertibleTransformException;
-import javax.xml.stream.XMLStreamException;
 import org.geotools.api.referencing.FactoryException;
 import org.geotools.api.referencing.operation.TransformException;
 import org.geotools.geometry.jts.JTS;
@@ -19,53 +15,85 @@ import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.knowtiphy.charts.chartview.MapDisplayOptions;
 import org.knowtiphy.shapemap.style.parser.StyleSyntaxException;
 
+import javax.xml.stream.XMLStreamException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  * @author graham
  */
-public class ChartLocker {
+public class ChartLocker
+{
+  // eventually this will be a list of providers
+  private final LocalChartProvider chartProvider;
 
-	// eventually this will be a list of providers
-	private final LocalChartProvider chartProvider;
+  private final ObservableList<ChartDescription> history = FXCollections.observableArrayList();
 
-	public ChartLocker(LocalChartProvider chartProvider) {
-		this.chartProvider = chartProvider;
-	}
+  public ChartLocker(LocalChartProvider chartProvider)
+  {
+    this.chartProvider = chartProvider;
+  }
 
-	public Collection<ChartDescription> intersections(ReferencedEnvelope envelope) {
+  public Collection<ChartDescription> intersections(ReferencedEnvelope envelope)
+  {
 
-		var bounds = JTS.toGeometry(envelope);
+    var bounds = JTS.toGeometry(envelope);
 
-		var result = new ArrayList<ChartDescription>();
-		for (var chartDescription : chartProvider.getChartDescriptions()) {
-			if (chartDescription.intersects(bounds))
-				result.add(chartDescription);
-		}
+    var result = new ArrayList<ChartDescription>();
+    for(var chartDescription : chartProvider.getChartDescriptions())
+    {
+      if(chartDescription.intersects(bounds))
+      {
+        result.add(chartDescription);
+      }
+    }
 
-		return result;
-	}
+    return result;
+  }
 
-	public ENCChart getChart(ChartDescription chartDescription, MapDisplayOptions displayOptions)
-			throws IOException, XMLStreamException, TransformException, FactoryException,
-			NonInvertibleTransformException, StyleSyntaxException {
+  public ENCChart getChart(ChartDescription chartDescription, MapDisplayOptions displayOptions)
+    throws IOException, XMLStreamException, TransformException, FactoryException,
+           NonInvertibleTransformException, StyleSyntaxException
+  {
+    var chart = chartProvider.loadChart(this, chartDescription, displayOptions);
+    addChartHistory(chartDescription);
+    return chart;
+  }
 
-		return chartProvider.loadChart(this, chartDescription, displayOptions);
-	}
+  public ENCChart loadChart(ChartDescription chartDescription, MapDisplayOptions displayOptions)
+    throws TransformException, FactoryException, NonInvertibleTransformException,
+           StyleSyntaxException
+  {
+    ENCChart newChart;
+    try
+    {
+      newChart = chartProvider.loadChart(this, chartDescription, displayOptions);
+    }
+    catch(IOException | XMLStreamException ex)
+    {
+      Logger.getLogger(ChartLocker.class.getName()).log(Level.SEVERE, null, ex);
+      return null;
+    }
 
-	public ENCChart loadChart(ChartDescription chartDescription, MapDisplayOptions displayOptions)
-			throws TransformException, FactoryException, NonInvertibleTransformException, StyleSyntaxException {
+    // newChart.setViewPortScreenArea(screenArea);
+    newChart.setViewPortBounds(newChart.bounds());
+    addChartHistory(chartDescription);
+    return newChart;
+  }
 
-		ENCChart newChart;
-		try {
-			newChart = getChart(chartDescription, displayOptions);
-		}
-		catch (IOException | XMLStreamException ex) {
-			Logger.getLogger(ChartLocker.class.getName()).log(Level.SEVERE, null, ex);
-			return null;
-		}
+  public ObservableList<ChartDescription> history()
+  {
+    return history;
+  }
 
-		// newChart.setViewPortScreenArea(screenArea);
-		newChart.setViewPortBounds(newChart.bounds());
-		return newChart;
-	}
-
+  private void addChartHistory(ChartDescription chartDescription)
+  {
+    if(!history.contains(chartDescription))
+    {
+      history.add(chartDescription);
+    }
+  }
 }

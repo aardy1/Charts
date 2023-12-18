@@ -20,7 +20,6 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import org.controlsfx.control.PropertySheet;
 import org.geotools.api.feature.simple.SimpleFeatureType;
-import org.knowtiphy.charts.chartview.ChartHistory;
 import org.knowtiphy.charts.chartview.ChartView;
 import org.knowtiphy.charts.chartview.MapDisplayOptions;
 import org.knowtiphy.charts.desktop.AppSettingsDialog;
@@ -106,8 +105,7 @@ public class KnowtiphyCharts extends Application
     var toggle = new ToggleModel();
     chartSpecificSettings(toggle);
 
-    var chartHistory = new ChartHistory();
-    var infoBar = new InfoBar(toggle, chart, appSettings.unitProfile(), chartLocker, chartHistory,
+    var infoBar = new InfoBar(toggle, chart, appSettings.unitProfile(), chartLocker,
       displayOptions);
 
     var menuBar = mainMenuBar(primaryStage);

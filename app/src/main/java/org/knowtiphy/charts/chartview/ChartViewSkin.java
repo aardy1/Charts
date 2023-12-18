@@ -68,8 +68,6 @@ public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView
 
   private final MapDisplayOptions displayOptions;
 
-  private final UnitProfile unitProfile;
-
   private final List<Subscription> subscriptions = new ArrayList<>();
 
   // private final Pane iconsSurface;
@@ -92,7 +90,6 @@ public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView
 
     this.chartLocker = chartLocker;
     this.chart = chrt;
-    this.unitProfile = unitProfile;
     // this.dynamics = dynamics;
     this.eventModel = eventModel;
     this.displayOptions = displayOptions;
@@ -131,6 +128,9 @@ public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView
     eventModel.scrollEvents.feedFrom(EventStreams.eventsOf(root, ScrollEvent.ANY));
     eventModel.zoomEvents.feedFrom(EventStreams.eventsOf(root, ZoomEvent.ANY));
 
+    root.setOnScrollStarted(event -> {
+      System.err.println("SCROLL STARTED");
+    });
     // windows on clicked, mac on pressed
     eventModel.mouseClicked.filter(MouseEvent::isPopupTrigger).subscribe(
       event -> makeContextMenu(event).show(mapSurface, event.getScreenX(), event.getScreenY()));
@@ -303,7 +303,7 @@ public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView
       }
     }
 
-    if(mostDetailedChart != null)
+    if(mostDetailedChart != null && mostDetailedChart != chart.getChartDescription())
     {
       try
       {

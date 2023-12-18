@@ -77,7 +77,6 @@ public class LocalChartProvider
     throws IOException, XMLStreamException, TransformException, FactoryException,
            NonInvertibleTransformException, StyleSyntaxException
   {
-
     var reader = new ChartBuilder(chartLocker, chartDescription.getDir(), chartDescription,
       settings, styleReader, displayOptions).read();
     var map = reader.getMap();
@@ -95,7 +94,6 @@ public class LocalChartProvider
     throws IOException, XMLStreamException, TransformException, FactoryException,
            NonInvertibleTransformException, StyleSyntaxException
   {
-
     var reader = new ChartBuilder(chartLocker, chartDescription.getDir(), chartDescription,
       settings, styleReader, displayOptions).read();
     var map = reader.getMap();

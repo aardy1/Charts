@@ -19,7 +19,6 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.transform.NonInvertibleTransformException;
 import org.geotools.api.referencing.FactoryException;
 import org.geotools.api.referencing.operation.TransformException;
-import org.knowtiphy.charts.chartview.ChartHistory;
 import org.knowtiphy.charts.chartview.ChartViewSkin;
 import org.knowtiphy.charts.chartview.MapDisplayOptions;
 import org.knowtiphy.charts.enc.ChartDescription;
@@ -55,8 +54,6 @@ public class InfoBar extends StackPane
 
   private ENCChart chart;
 
-  private final ChartHistory chartHistory;
-
   private final ChartLocker chartLocker;
   private final MenuButton history;
   private final MapDisplayOptions displayOptions;
@@ -65,11 +62,10 @@ public class InfoBar extends StackPane
 
   public InfoBar(
     ToggleModel toggleModel, ENCChart chrt, UnitProfile unitProfile, ChartLocker chartLocker,
-    ChartHistory chartHistory, MapDisplayOptions displayOptions)
+    MapDisplayOptions displayOptions)
   {
     this.chart = chrt;
     this.unitProfile = unitProfile;
-    this.chartHistory = chartHistory;
     this.chartLocker = chartLocker;
     this.displayOptions = displayOptions;
 
@@ -105,6 +101,15 @@ public class InfoBar extends StackPane
     history = new MenuButton("", Fonts.history());
     history.setPopupSide(Side.TOP);
     history.setTooltip(new Tooltip("Chart History"));
+    var items = new ArrayList<MenuItem>();
+    for(var description : chartLocker.history())
+    {
+      var menuItem = new MenuItem(description.getName() + "  1:" + description.cScale());
+      menuItem.setOnAction(event -> loadChart(description));
+      items.add(menuItem);
+    }
+    history.getItems().addAll(items);
+
     var leftControlsBar = FXUtils.nonResizeable(new ToolBar(history));
     leftControlsBar.getStyleClass().add("controlbar");
     StackPane.setAlignment(leftControlsBar, Pos.BOTTOM_LEFT);
@@ -124,7 +129,7 @@ public class InfoBar extends StackPane
 //      showFixedChartInfo();
       showVariableChartInfo();
     });
-    chartHistory.history().addListener((ListChangeListener<ChartDescription>) c -> {
+    chartLocker.history().addListener((ListChangeListener<ChartDescription>) c -> {
       c.next();
       for(var description : c.getAddedSubList())
       {
@@ -145,7 +150,6 @@ public class InfoBar extends StackPane
     subscriptions.clear();
     subscriptions.add(chart.viewPortBoundsEvent().subscribe(c -> showVariableChartInfo()));
     subscriptions.add(chart.newMapViewModel().subscribe(change -> {
-      chartHistory.addChart(chart.getChartDescription());
       chart = (ENCChart) change.getNewValue();
       showVariableChartInfo();
       setupListeners();
