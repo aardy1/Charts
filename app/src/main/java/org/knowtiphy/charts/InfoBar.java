@@ -6,6 +6,7 @@
 package org.knowtiphy.charts;
 
 import javafx.collections.ListChangeListener;
+import javafx.geometry.Pos;
 import javafx.geometry.Side;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -13,10 +14,7 @@ import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ToolBar;
 import javafx.scene.control.Tooltip;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.transform.NonInvertibleTransformException;
 import org.geotools.api.referencing.FactoryException;
@@ -99,32 +97,24 @@ public class InfoBar extends StackPane
       }
     });
 
+    var centerControlsBar = FXUtils.nonResizeable(
+      new ToolBar(zoomIn, zoomOut, resetViewPort, mapDisplaySettings));
+    centerControlsBar.getStyleClass().add("controlbar");
+    StackPane.setAlignment(centerControlsBar, Pos.BOTTOM_CENTER);
+
     history = new MenuButton("", Fonts.history());
     history.setPopupSide(Side.TOP);
     history.setTooltip(new Tooltip("Chart History"));
+    var leftControlsBar = FXUtils.nonResizeable(new ToolBar(history));
+    leftControlsBar.getStyleClass().add("controlbar");
+    StackPane.setAlignment(leftControlsBar, Pos.BOTTOM_LEFT);
 
-    var toolbar = FXUtils.nonResizeable(
-      new ToolBar(zoomIn, zoomOut, resetViewPort, mapDisplaySettings, history));
-    toolbar.getStyleClass().add("controlbar");
-
-    var buttons = new GridPane();
-    buttons.addRow(0, new Region(), toolbar, new Region());
-    buttons.getColumnConstraints()
-           .addAll(FXUtils.alwaysGrow(), FXUtils.neverGrow(), FXUtils.alwaysGrow());
-
-//
-//    var leftBar = FXUtils.nonResizeable(
-//      new ToolBar(new Button("SAVE"), new Button("FED"), history));
-//    leftBar.getStyleClass().add("controlbar");
-
-    var variableLabels = new HBox(currentExtent, currentMapSpan, currentZoomLevel);
+    var variableLabels = FXUtils.nonResizeable(
+      new HBox(currentExtent, currentMapSpan, currentZoomLevel));
     variableLabels.getStyleClass().add("infobar");
+    StackPane.setAlignment(variableLabels, Pos.BOTTOM_RIGHT);
 
-    var labels = new BorderPane();
-//    labels.setLeft(leftBar);
-    labels.setRight(variableLabels);
-
-    getChildren().addAll(labels, buttons);
+    getChildren().addAll(leftControlsBar, centerControlsBar, variableLabels);
 
     showVariableChartInfo();
 
@@ -138,7 +128,7 @@ public class InfoBar extends StackPane
       c.next();
       for(var description : c.getAddedSubList())
       {
-        var menuItem = new MenuItem(description.getName() + "1:" + description.cScale());
+        var menuItem = new MenuItem(description.getName() + "  1:" + description.cScale());
         menuItem.setOnAction(event -> loadChart(description));
         history.getItems().add(menuItem);
       }
