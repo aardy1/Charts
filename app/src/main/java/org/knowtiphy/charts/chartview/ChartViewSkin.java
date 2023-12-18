@@ -210,7 +210,7 @@ public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView
     // add listeners on the new chart
     subscriptions.add(DragPanZoomSupport.addPositionAtSupport(eventModel, chart));
     subscriptions.add(DragPanZoomSupport.addDragSupport(eventModel, chart));
-    subscriptions.add(DragPanZoomSupport.addPanningSupport(eventModel, chart));
+    subscriptions.addAll(DragPanZoomSupport.addPanningSupport(eventModel, chart));
     subscriptions.add(DragPanZoomSupport.addZoomSupport(eventModel, chart));
 
     // subscriptions.add(displayOptions.showGridEvents.subscribe(c ->
