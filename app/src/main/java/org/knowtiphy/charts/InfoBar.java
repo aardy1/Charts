@@ -12,6 +12,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.Separator;
 import javafx.scene.control.ToolBar;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
@@ -94,11 +95,6 @@ public class InfoBar extends StackPane
       }
     });
 
-    var centerControlsBar = FXUtils.nonResizeable(
-      new ToolBar(zoomIn, zoomOut, resetViewPort, mapDisplaySettings));
-    centerControlsBar.getStyleClass().add("controlbar");
-    StackPane.setAlignment(centerControlsBar, Pos.BOTTOM_CENTER);
-
     history = new MenuButton("", Fonts.history());
     history.setPopupSide(Side.TOP);
     history.setTooltip(new Tooltip("Chart History"));
@@ -111,7 +107,13 @@ public class InfoBar extends StackPane
     }
     history.getItems().addAll(items);
 
-    var leftControlsBar = FXUtils.nonResizeable(new ToolBar(history, chartScale));
+    var centerControlsBar = FXUtils.nonResizeable(
+      new ToolBar(zoomIn, zoomOut, resetViewPort, new Separator(), history, new Separator(),
+        mapDisplaySettings));
+    centerControlsBar.getStyleClass().add("controlbar");
+    StackPane.setAlignment(centerControlsBar, Pos.BOTTOM_CENTER);
+
+    var leftControlsBar = FXUtils.nonResizeable(new ToolBar(chartScale));
     leftControlsBar.getStyleClass().add("controlbar");
     StackPane.setAlignment(leftControlsBar, Pos.BOTTOM_LEFT);
 
