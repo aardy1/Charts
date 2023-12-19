@@ -11,43 +11,49 @@ import javafx.scene.text.FontWeight;
 
 /**
  * A builder of fonts used in styling.
- *
+ * <p>
  * The default font is given by the underlying JavaFX framework.
  */
-public class FontBuilder {
+public class FontBuilder
+{
 
-	private static final Font DEFAULT_FONT = Font.getDefault();
+  private static final Font DEFAULT_FONT = Font.getDefault();
 
-	private String family = DEFAULT_FONT.getFamily();
+  private String family = DEFAULT_FONT.getFamily();
 
-	private double size = DEFAULT_FONT.getSize();
+  private double size = DEFAULT_FONT.getSize();
 
-	private FontWeight weight = FontWeight.NORMAL;
+  private FontWeight weight = FontWeight.NORMAL;
 
-	private FontPosture posture = FontPosture.REGULAR;
+  private FontPosture posture = FontPosture.REGULAR;
 
-	public FontBuilder family(String family) {
-		this.family = family;
-		return this;
-	}
+  public FontBuilder family(String family)
+  {
+    this.family = family;
+    return this;
+  }
 
-	public FontBuilder size(double size) {
-		this.size = size;
-		return this;
-	}
+  public FontBuilder size(double size)
+  {
+    this.size = size;
+    return this;
+  }
 
-	public FontBuilder weight(FontWeight weight) {
-		this.weight = weight;
-		return this;
-	}
+  public FontBuilder weight(FontWeight weight)
+  {
+    this.weight = weight;
+    return this;
+  }
 
-	public FontBuilder posture(FontPosture posture) {
-		this.posture = posture;
-		return this;
-	}
+  public FontBuilder posture(FontPosture posture)
+  {
+    this.posture = posture;
+    return this;
+  }
 
-	public Font build() {
-		return Font.font(family, weight, posture, size);
-	}
+  public Font build()
+  {
+    return Font.font(family, weight, posture, size);
+  }
 
 }

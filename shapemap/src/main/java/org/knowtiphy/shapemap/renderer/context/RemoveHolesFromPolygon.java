@@ -5,10 +5,6 @@
 
 package org.knowtiphy.shapemap.renderer.context;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
 import org.apache.commons.lang3.tuple.Pair;
 import org.knowtiphy.shapemap.api.IRenderablePolygonProvider;
 import org.locationtech.jts.geom.Coordinate;
@@ -16,179 +12,215 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LinearRing;
 import org.locationtech.jts.geom.Polygon;
 
-public class RemoveHolesFromPolygon implements IRenderablePolygonProvider {
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
-	private static final GeometryFactory GF = new GeometryFactory();
+public class RemoveHolesFromPolygon implements IRenderablePolygonProvider
+{
 
-	private final RenderGeomCache renderGeomCache;
+  private static final GeometryFactory GF = new GeometryFactory();
 
-	public RemoveHolesFromPolygon(RenderGeomCache renderGeomCache) {
-		this.renderGeomCache = renderGeomCache;
-	}
+  private final RenderGeomCache renderGeomCache;
 
-	@Override
-	public Polygon apply(Polygon polygon) {
+  public RemoveHolesFromPolygon(RenderGeomCache renderGeomCache)
+  {
+    this.renderGeomCache = renderGeomCache;
+  }
 
-		var renderGeom = renderGeomCache.fetch(polygon);
-		if (renderGeom == null) {
-			renderGeom = remove(polygon);
-			renderGeomCache.cache(polygon, renderGeom);
-		}
+  @Override
+  public Polygon apply(Polygon polygon)
+  {
 
-		return (Polygon) renderGeom;
-	}
+    var renderGeom = renderGeomCache.fetch(polygon);
+    if(renderGeom == null)
+    {
+      renderGeom = remove(polygon);
+      renderGeomCache.cache(polygon, renderGeom);
+    }
 
-	private Polygon remove(Polygon polygon) {
+    return (Polygon) renderGeom;
+  }
 
-		if (polygon.getNumInteriorRing() == 0)
-			return polygon;
-		else {
-			// get the holes in the polygon
-			var holes = holes(polygon);
+  private Polygon remove(Polygon polygon)
+  {
 
-			// copy the boundary of the polygon
-			List<Coordinate> newBoundary = new ArrayList<>();
-			var extRing = polygon.getExteriorRing();
-			for (int i = 0; i < extRing.getNumPoints(); i++) {
-				newBoundary.add(extRing.getCoordinateN(i));
-			}
+    if(polygon.getNumInteriorRing() == 0)
+    {
+      return polygon;
+    }
+    else
+    {
+      // get the holes in the polygon
+      var holes = holes(polygon);
 
-			// remove each hole in order, building a new polygon boundary each time
-			for (var hole : holes) {
-				newBoundary = removeHole(hole, newBoundary);
-			}
+      // copy the boundary of the polygon
+      List<Coordinate> newBoundary = new ArrayList<>();
+      var extRing = polygon.getExteriorRing();
+      for(int i = 0; i < extRing.getNumPoints(); i++)
+      {
+        newBoundary.add(extRing.getCoordinateN(i));
+      }
 
-			return GF.createPolygon(GF.createLinearRing(newBoundary.toArray(Coordinate[]::new)));
-		}
-	}
+      // remove each hole in order, building a new polygon boundary each time
+      for(var hole : holes)
+      {
+        newBoundary = removeHole(hole, newBoundary);
+      }
 
-	/**
-	 * Get a list of pairs of a hole, and the "top most" coordinate in the hole, ordered
-	 * by the y part of that coordinate (top most y-coordinate first)
-	 * @param polygon
-	 * @return
-	 */
+      return GF.createPolygon(GF.createLinearRing(newBoundary.toArray(Coordinate[]::new)));
+    }
+  }
 
-	private List<Pair<LinearRing, Integer>> holes(Polygon polygon) {
+  /**
+   * Get a list of pairs of a hole, and the "top most" coordinate in the hole, ordered
+   * by the y part of that coordinate (top most y-coordinate first)
+   *
+   * @param polygon the polygon
+   * @return the list of pairs of a hole and the "top most" coordinate
+   */
 
-		var map = new HashMap<LinearRing, Integer>();
-		var result = new ArrayList<LinearRing>();
+  private List<Pair<LinearRing, Integer>> holes(Polygon polygon)
+  {
 
-		for (var i = 0; i < polygon.getNumInteriorRing(); i++) {
-			var ring = polygon.getInteriorRingN(i);
-			result.add(ring);
-			var minPos = -1;
-			for (var j = 0; j < ring.getNumPoints(); j++) {
-				if (minPos == -1 || northOf(ring.getCoordinateN(j), ring.getCoordinateN(minPos))) {
-					minPos = j;
-				}
-			}
+    var map = new HashMap<LinearRing, Integer>();
+    var result = new ArrayList<LinearRing>();
 
-			map.put(ring, minPos);
-		}
+    for(var i = 0; i < polygon.getNumInteriorRing(); i++)
+    {
+      var ring = polygon.getInteriorRingN(i);
+      result.add(ring);
+      var minPos = -1;
+      for(var j = 0; j < ring.getNumPoints(); j++)
+      {
+        if(minPos == -1 || northOf(ring.getCoordinateN(j), ring.getCoordinateN(minPos)))
+        {
+          minPos = j;
+        }
+      }
 
-		Collections.sort(result, (h1, h2) -> compareY(h1.getCoordinateN(map.get(h1)), h2.getCoordinateN(map.get(h2))));
-		return result.stream().map(ring -> Pair.of(ring, map.get(ring))).toList();
-	}
+      map.put(ring, minPos);
+    }
 
-	private int compareY(Coordinate a, Coordinate b) {
-		return -Double.compare(a.y, b.y);
-	}
+    result.sort(
+      (h1, h2) -> compareY(h1.getCoordinateN(map.get(h1)), h2.getCoordinateN(map.get(h2))));
+    return result.stream().map(ring -> Pair.of(ring, map.get(ring))).toList();
+  }
 
-	private boolean northOf(Coordinate a, Coordinate b) {
-		return compareY(a, b) < 0;
-	}
+  private int compareY(Coordinate a, Coordinate b)
+  {
+    return -Double.compare(a.y, b.y);
+  }
 
-	private List<Coordinate> removeHole(Pair<LinearRing, Integer> hole, List<Coordinate> polygon) {
+  private boolean northOf(Coordinate a, Coordinate b)
+  {
+    return compareY(a, b) < 0;
+  }
 
-		var ring = hole.getLeft();
-		var holeTop = ring.getCoordinateN(hole.getRight());
+  private List<Coordinate> removeHole(Pair<LinearRing, Integer> hole, List<Coordinate> polygon)
+  {
 
-		// find the (v_b, v_(b_1)) segment on the boundary "directly above" the top most
-		// point of the hole
+    var ring = hole.getLeft();
+    var holeTop = ring.getCoordinateN(hole.getRight());
 
-		var b = boundaryIntersection(holeTop, polygon);
-		var vb = polygon.get(b);
+    // find the (v_b, v_(b_1)) segment on the boundary "directly above" the top most
+    // point of the hole
 
-		var newBoundary = new ArrayList<Coordinate>();
+    var b = boundaryIntersection(holeTop, polygon);
+    var vb = polygon.get(b);
 
-		// copy v_i (i <= b) from the old boundary to the new boundary
-		for (int i = 0; i <= b; i++) {
-			newBoundary.add(polygon.get(i));
-		}
+    var newBoundary = new ArrayList<Coordinate>();
 
-		// the point at which we must add the bridge to the hole boundary
-		Coordinate bridgePt;
+    // copy v_i (i <= b) from the old boundary to the new boundary
+    for(int i = 0; i <= b; i++)
+    {
+      newBoundary.add(polygon.get(i));
+    }
 
-		// if the intersection point is at v_b
-		if (vb.x == holeTop.x) {
-			bridgePt = vb;
-		}
-		// else, the intersection point is somewhere on (v_b, v_(b+1))
-		else {
-			// TODO -- is this correct if we use long/lat?
-			var vb1 = polygon.get(b + 1);
-			var slope = (vb1.y - vb.y) / (vb1.x - vb.x);
-			var bridgeY = slope * (holeTop.x - vb.x) + vb.y;
-			bridgePt = new Coordinate(holeTop.x, bridgeY);
+    // the point at which we must add the bridge to the hole boundary
+    Coordinate bridgePt;
 
-			// add (v_b, bridgePt) to the new boundary
-			newBoundary.add(bridgePt);
-		}
+    // if the intersection point is at v_b
+    if(vb.x == holeTop.x)
+    {
+      bridgePt = vb;
+    }
+    // else, the intersection point is somewhere on (v_b, v_(b+1))
+    else
+    {
+      // TODO -- is this correct if we use long/lat?
+      var vb1 = polygon.get(b + 1);
+      var slope = (vb1.y - vb.y) / (vb1.x - vb.x);
+      var bridgeY = slope * (holeTop.x - vb.x) + vb.y;
+      bridgePt = new Coordinate(holeTop.x, bridgeY);
 
-		// add the hole boundary to the new boundary, maintaining counter-clockwise
-		// orientation of the hole
-		for (int i = hole.getRight(); i < ring.getNumPoints() - 1; i++) {
-			newBoundary.add(ring.getCoordinateN(i));
-		}
+      // add (v_b, bridgePt) to the new boundary
+      newBoundary.add(bridgePt);
+    }
 
-		for (int i = 0; i < hole.getRight(); i++) {
-			newBoundary.add(ring.getCoordinateN(i));
-		}
+    // add the hole boundary to the new boundary, maintaining counter-clockwise
+    // orientation of the hole
+    for(int i = hole.getRight(); i < ring.getNumPoints() - 1; i++)
+    {
+      newBoundary.add(ring.getCoordinateN(i));
+    }
 
-		newBoundary.add(ring.getCoordinateN(hole.getRight()));
+    for(int i = 0; i < hole.getRight(); i++)
+    {
+      newBoundary.add(ring.getCoordinateN(i));
+    }
 
-		// close the bridge back to to the old boundary
-		newBoundary.add(bridgePt);
+    newBoundary.add(ring.getCoordinateN(hole.getRight()));
 
-		// add the remainder of the old boundary to the new boundary
-		for (int i = b + 1; i < polygon.size(); i++) {
-			newBoundary.add(polygon.get(i));
-		}
+    // close the bridge back to to the old boundary
+    newBoundary.add(bridgePt);
 
-		return newBoundary;
-	}
+    // add the remainder of the old boundary to the new boundary
+    for(int i = b + 1; i < polygon.size(); i++)
+    {
+      newBoundary.add(polygon.get(i));
+    }
 
-	/**
-	 * Given a coordinate point, p, and a polygon, P, find where the line, L, drawn
-	 * directly upwards from c.y "first" intersects the boundary of P.
-	 * @param pt the coordinate point p
-	 * @param poly the polygon P
-	 * @return the index, i, of a segment (v_i, v_(i+1)) of the boundary of P, st:
-	 * <p>
-	 * a) v_i <= c.x < v_(i+1)
-	 * <p>
-	 * b) the line drawn directly upwards from c.y intersects (v_i, v_(i+1))
-	 * <p>
-	 * c) the y-coordinate of the intersection point on (v_i, v_(i+1)) is minimal among
-	 * all possible choices for i
-	 */
+    return newBoundary;
+  }
 
-	private int boundaryIntersection(Coordinate pt, List<Coordinate> poly) {
+  /**
+   * Given a coordinate point, p, and a polygon, P, find where the line, L, drawn
+   * directly upwards from c.y "first" intersects the boundary of P.
+   *
+   * @param pt   the coordinate point p
+   * @param poly the polygon P
+   * @return the index, i, of a segment (v_i, v_(i+1)) of the boundary of P, st:
+   * <p>
+   * a) v_i <= c.x < v_(i+1)
+   * <p>
+   * b) the line drawn directly upwards from c.y intersects (v_i, v_(i+1))
+   * <p>
+   * c) the y-coordinate of the intersection point on (v_i, v_(i+1)) is minimal among
+   * all possible choices for i
+   */
 
-		var res = -1;
+  private int boundaryIntersection(Coordinate pt, List<Coordinate> poly)
+  {
 
-		for (var i = 0; i < poly.size() - 1; i++) {
-			var vi = poly.get(i);
-			var vi1 = poly.get(i + 1);
-			if (vi.x <= pt.x && pt.x < vi1.x && (res == -1 || northOf(poly.get(res), vi)))
-				res = i;
-		}
+    var res = -1;
 
-		if (res == -1)
-			throw new IllegalArgumentException();
+    for(var i = 0; i < poly.size() - 1; i++)
+    {
+      var vi = poly.get(i);
+      var vi1 = poly.get(i + 1);
+      if(vi.x <= pt.x && pt.x < vi1.x && (res == -1 || northOf(poly.get(res), vi)))
+      {
+        res = i;
+      }
+    }
 
-		return res;
-	}
+    if(res == -1)
+    {
+      throw new IllegalArgumentException();
+    }
+
+    return res;
+  }
 
 }

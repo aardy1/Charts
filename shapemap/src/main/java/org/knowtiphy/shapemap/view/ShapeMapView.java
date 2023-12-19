@@ -35,7 +35,7 @@ public class ShapeMapView<S, F> extends Control
 
   private static String DEFAULT_STYLE_SHEET;
 
-  private SkinType skinType;
+  private final SkinType skinType;
 
   private final MapViewModel<S, F> map;
 
@@ -50,12 +50,6 @@ public class ShapeMapView<S, F> extends Control
     this.map = map;
     this.skinType = skinType;
     getStyleClass().add("shapemap-view");
-  }
-
-  @Override
-  public boolean isResizable()
-  {
-    return true;
   }
 
   @Override

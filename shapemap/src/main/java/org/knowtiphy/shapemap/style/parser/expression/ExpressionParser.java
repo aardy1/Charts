@@ -80,10 +80,6 @@ public class ExpressionParser
                  org.knowtiphy.shapemap.style.parser.XML.IS_LIKE,
                  org.knowtiphy.shapemap.style.parser.XML.COALESCE ->
             startFrame(stack);
-          default ->
-          {
-            throw new IllegalArgumentException(normalize(startElement));
-          }
         }
       }
 

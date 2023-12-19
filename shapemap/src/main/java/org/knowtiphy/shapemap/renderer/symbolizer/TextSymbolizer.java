@@ -20,7 +20,6 @@ import org.knowtiphy.shapemap.renderer.symbolizer.basic.StrokeInfo;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Point;
-import org.locationtech.jts.geom.Polygon;
 import org.locationtech.jts.index.quadtree.Quadtree;
 
 /**
@@ -81,7 +80,7 @@ public class TextSymbolizer<S, F>
       case Geometry.TYPENAME_POINT -> textPoint(context, feature, (Point) geom);
       case Geometry.TYPENAME_LINESTRING, Geometry.TYPENAME_LINEARRING ->
         textPoint(context, feature, ((LineString) geom).getStartPoint());
-      case Geometry.TYPENAME_POLYGON -> textPoint(context, feature, ((Polygon) geom).getCentroid());
+      case Geometry.TYPENAME_POLYGON -> textPoint(context, feature, geom.getCentroid());
       case Geometry.TYPENAME_MULTIPOINT, Geometry.TYPENAME_MULTILINESTRING,
              Geometry.TYPENAME_MULTIPOLYGON ->
         recurse(context, feature, geom);
@@ -95,10 +94,6 @@ public class TextSymbolizer<S, F>
     if(point != null && label != null)
     {
       var text = label.apply(feature, point);
-
-      // TODO -- get rid of debugging
-      // var bill =
-      // feature.getFeatureType().getName().getLocalPart().contains("CURENT");
 
       if(!StringUtils.isBlank(text))
       {
@@ -139,8 +134,6 @@ public class TextSymbolizer<S, F>
           // TODO -- set bounds from greater of fill or stroke
           blocked.insert(textBounds, textBounds);
         }
-        // else if (bill)
-        // System.err.println(text + " : " + " blocked");
       }
     }
   }

@@ -24,22 +24,6 @@ public class Fonts
 
   public static final Font DEFAULT_FONT_9 = Font.font(9);
 
-  public static int DEFAULT_FONT_WIDTH_12 = 0;
-
-  public static int DEFAULT_FONT_WIDTH_10 = 0;
-
-  public static int DEFAULT_FONT_WIDTH_9 = 0;
-
-  static
-  {
-    var size9 = textSize(DEFAULT_FONT_9);
-    DEFAULT_FONT_WIDTH_9 = size9.getLeft().intValue();
-    var size10 = textSize(DEFAULT_FONT_10);
-    DEFAULT_FONT_WIDTH_10 = size10.getLeft().intValue();
-    var size12 = textSize(DEFAULT_FONT_12);
-    DEFAULT_FONT_WIDTH_12 = size12.getLeft().intValue();
-  }
-
   private static Text TEXT = new Text();
 
   public static Pair<Double, Double> textSize(Font font, String s)

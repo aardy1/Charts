@@ -6,7 +6,6 @@
 package org.knowtiphy.shapemap.renderer;
 
 import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.Point;
 
 import java.util.HashMap;
 import java.util.List;
@@ -64,7 +63,7 @@ public class Functions
     var geom = (Geometry) arg;
     return switch(geom.getGeometryType())
     {
-      case "Point" -> ((Point) geom).getCoordinate().getZ();
+      case "Point" -> geom.getCoordinate().getZ();
       default -> throw new IllegalArgumentException(arg.toString());
     };
   }

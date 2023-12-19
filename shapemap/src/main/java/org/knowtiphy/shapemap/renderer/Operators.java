@@ -32,27 +32,25 @@ public class Operators
   public static <F> boolean le(
     IFeatureFunction<F, ?> l, IFeatureFunction<F, ?> r, F feature, Geometry geom)
   {
-    return ((Comparable) l.apply(feature, geom)).compareTo(
-      (Comparable) r.apply(feature, geom)) <= 0;
+    return ((Comparable) l.apply(feature, geom)).compareTo(r.apply(feature, geom)) <= 0;
   }
 
   public static <F> boolean lt(
     IFeatureFunction<F, ?> l, IFeatureFunction<F, ?> r, F feature, Geometry geom)
   {
-    return ((Comparable) l.apply(feature, geom)).compareTo((Comparable) r.apply(feature, geom)) < 0;
+    return ((Comparable) l.apply(feature, geom)).compareTo(r.apply(feature, geom)) < 0;
   }
 
   public static <F> boolean ge(
     IFeatureFunction<F, ?> l, IFeatureFunction<F, ?> r, F feature, Geometry geom)
   {
-    return ((Comparable) l.apply(feature, geom)).compareTo(
-      (Comparable) r.apply(feature, geom)) >= 0;
+    return ((Comparable) l.apply(feature, geom)).compareTo(r.apply(feature, geom)) >= 0;
   }
 
   public static <F> boolean gt(
     IFeatureFunction<F, ?> l, IFeatureFunction<F, ?> r, F feature, Geometry geom)
   {
-    return ((Comparable) l.apply(feature, geom)).compareTo((Comparable) r.apply(feature, geom)) > 0;
+    return ((Comparable) l.apply(feature, geom)).compareTo(r.apply(feature, geom)) > 0;
   }
 
   // TODO -- would be good to compile a regexp pattern

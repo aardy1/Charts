@@ -49,20 +49,14 @@ public class CanvasShapeMapSkin<S, F> extends ShapeMapBaseSkin<S, F>
     borderPane = new BorderPane();
     root = new Pane(borderPane);
     getChildren().addAll(root);
-
     initGraphics();
-
-    // root.addEventHandler(MouseEvent.ANY, (MouseEvent event) -> {
-    // eventModel.mouseEvents.push(event);
-    // });
-
     setupListeners();
   }
 
   private void setupListeners()
   {
     // unsubscribe listeners on the old map
-    subscriptions.forEach(s -> s.unsubscribe());
+    subscriptions.forEach(Subscription::unsubscribe);
     subscriptions.clear();
     subscriptions.add(map.layerVisibilityEvent().subscribe(b -> root.requestLayout()));
     subscriptions.add(map.viewPortBoundsEvent().subscribe(b -> root.requestLayout()));
@@ -133,16 +127,4 @@ public class CanvasShapeMapSkin<S, F> extends ShapeMapBaseSkin<S, F>
       ex.printStackTrace(System.err);
     }
   }
-  //
-  // private class MyThreadFactory implements ThreadFactory {
-  //
-  // @Override
-  // public Thread newThread(Runnable r) {
-  // var thread = new Thread(r);
-  // thread.setDaemon(true);
-  // return thread;
-  // }
-  //
-  // }
-
 }

@@ -232,8 +232,7 @@ public class ChartBuilder
     var style = styleReader.createStyle(typeName.getLocalPart(), parsingContext);
     var memSource = store.featureSource(type);
 
-    return new MapLayer<>(typeName.getLocalPart(), memSource, style, isVisible(typeName),
-      scaleLess);
+    return new MapLayer<>(memSource, style, isVisible(typeName), scaleLess);
   }
 
   public boolean isVisible(Name typeName)

@@ -138,8 +138,6 @@ public class ShapeMapRenderer<S, F>
 
     for(var layer : layers)
     {
-      // System.err.println("Layer " + layer.title() + " vis = " +
-      // layer.isVisible());
       if(layerNeedsTextLayout[layerPos])
       {
         try(var iterator = layer.getFeatures(viewPortBounds, true))

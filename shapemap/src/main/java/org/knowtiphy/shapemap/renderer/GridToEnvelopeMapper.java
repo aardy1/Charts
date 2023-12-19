@@ -5,8 +5,6 @@
 
 package org.knowtiphy.shapemap.renderer;
 
-import java.text.MessageFormat;
-import java.util.Arrays;
 import javafx.scene.transform.Affine;
 import org.geotools.api.coverage.grid.GridEnvelope;
 import org.geotools.api.geometry.Bounds;
@@ -20,6 +18,11 @@ import org.geotools.referencing.operation.LinearTransform;
 import org.geotools.referencing.operation.matrix.MatrixFactory;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
 import org.geotools.util.Utilities;
+
+import java.text.MessageFormat;
+import java.util.Arrays;
+
+import static java.lang.Boolean.valueOf;
 
 /**
  * A helper class for building <var>n</var>-dimensional {@linkplain Affine affine
@@ -77,483 +80,587 @@ import org.geotools.util.Utilities;
  * are increasing down in an {@link BufferedImage}'s CRS.
  * </ul>
  *
- * @since 2.3
- * @version $Id$
  * @author Martin Desruisseaux (IRD)
+ * @version $Id$
+ * @since 2.3
  */
-public class GridToEnvelopeMapper {
+public class GridToEnvelopeMapper
+{
 
-	/**
-	 * A bit mask for the {@link #setSwapXY swapXY} property.
-	 *
-	 * @see #isAutomatic
-	 * @see #setAutomatic
-	 */
-	public static final int SWAP_XY = 1;
+  /**
+   * A bit mask for the {@link #setSwapXY swapXY} property.
+   *
+   * @see #isAutomatic
+   * @see #setAutomatic
+   */
+  public static final int SWAP_XY = 1;
 
-	/**
-	 * A bit mask for the {@link #setReverseAxis reverseAxis} property.
-	 *
-	 * @see #isAutomatic
-	 * @see #setAutomatic
-	 */
-	public static final int REVERSE_AXIS = 2;
+  /**
+   * A bit mask for the {@link #setReverseAxis reverseAxis} property.
+   *
+   * @see #isAutomatic
+   * @see #setAutomatic
+   */
+  public static final int REVERSE_AXIS = 2;
 
-	/**
-	 * A combination of bit masks telling which property were user-defined.
-	 *
-	 * @see #isAutomatic
-	 * @see #setAutomatic
-	 */
-	private int defined;
+  /**
+   * A combination of bit masks telling which property were user-defined.
+   *
+   * @see #isAutomatic
+   * @see #setAutomatic
+   */
+  private int defined;
 
-	/** The grid range, or {@code null} if not yet specified. */
-	private GridEnvelope gridRange;
+  /**
+   * The grid range, or {@code null} if not yet specified.
+   */
+  private GridEnvelope gridRange;
 
-	/** The envelope, or {@code null} if not yet specified. */
-	private Bounds envelope;
+  /**
+   * The envelope, or {@code null} if not yet specified.
+   */
+  private Bounds envelope;
 
-	/**
-	 * Whatever the {@code gridToCRS} transform will maps pixel center or corner. The
-	 * default value is {@link PixelInCell#CELL_CENTER}.
-	 */
-	private PixelInCell anchor = PixelInCell.CELL_CENTER;
+  /**
+   * Whatever the {@code gridToCRS} transform will maps pixel center or corner. The
+   * default value is {@link PixelInCell#CELL_CENTER}.
+   */
+  private PixelInCell anchor = PixelInCell.CELL_CENTER;
 
-	/**
-	 * {@code true} if we should swap the two first axis, {@code false} if we should not
-	 * swap and {@code null} if this state is not yet determined.
-	 */
-	private Boolean swapXY;
+  /**
+   * {@code true} if we should swap the two first axis, {@code false} if we should not
+   * swap and {@code null} if this state is not yet determined.
+   */
+  private Boolean swapXY;
 
-	/** The axis to reverse, or {@code null} if none or not yet determined. */
-	private boolean[] reverseAxis;
+  /**
+   * The axis to reverse, or {@code null} if none or not yet determined.
+   */
+  private boolean[] reverseAxis;
 
-	/** The math transform, or {@code null} if not yet computed. */
-	private Affine transform;
+  /**
+   * The math transform, or {@code null} if not yet computed.
+   */
+  private Affine transform;
 
-	/** Creates a new instance of {@code GridToEnvelopeMapper}. */
-	public GridToEnvelopeMapper() {
-	}
+  /**
+   * Creates a new instance of {@code GridToEnvelopeMapper}.
+   */
+  public GridToEnvelopeMapper()
+  {
+  }
 
-	/**
-	 * Creates a new instance for the specified grid range and envelope.
-	 * @param gridRange The valid coordinate range of a grid coverage.
-	 * @param userRange The corresponding coordinate range in user coordinate. This
-	 * envelope must contains entirely all pixels, i.e. the envelope's upper left corner
-	 * must coincide with the upper left corner of the first pixel and the envelope's
-	 * lower right corner must coincide with the lower right corner of the last pixel.
-	 * @throws MismatchedDimensionException if the grid range and the envelope doesn't
-	 * have consistent dimensions.
-	 */
-	public GridToEnvelopeMapper(final GridEnvelope gridRange, final Bounds userRange)
-			throws MismatchedDimensionException {
-		ensureNonNull("gridRange", gridRange);
-		ensureNonNull("userRange", userRange);
-		var gridDim = gridRange.getDimension();
-		var userDim = userRange.getDimension();
-		if (userDim != gridDim) {
-			throw new MismatchedDimensionException(
-					MessageFormat.format(ErrorKeys.MISMATCHED_DIMENSION_$2, gridDim, userDim));
-		}
-		this.gridRange = gridRange;
-		this.envelope = userRange;
-	}
+  /**
+   * Creates a new instance for the specified grid range and envelope.
+   *
+   * @param gridRange The valid coordinate range of a grid coverage.
+   * @param userRange The corresponding coordinate range in user coordinate. This
+   *                  envelope must contains entirely all pixels, i.e. the envelope's upper left
+   *                  corner
+   *                  must coincide with the upper left corner of the first pixel and the envelope's
+   *                  lower right corner must coincide with the lower right corner of the last
+   *                  pixel.
+   * @throws MismatchedDimensionException if the grid range and the envelope doesn't
+   *                                      have consistent dimensions.
+   */
+  public GridToEnvelopeMapper(final GridEnvelope gridRange, final Bounds userRange)
+    throws MismatchedDimensionException
+  {
+    ensureNonNull("gridRange", gridRange);
+    ensureNonNull("userRange", userRange);
+    var gridDim = gridRange.getDimension();
+    var userDim = userRange.getDimension();
+    if(userDim != gridDim)
+    {
+      throw new MismatchedDimensionException(
+        MessageFormat.format(ErrorKeys.MISMATCHED_DIMENSION_$2, gridDim, userDim));
+    }
+    this.gridRange = gridRange;
+    this.envelope = userRange;
+  }
 
-	/** Makes sure that an argument is non-null. */
-	private static void ensureNonNull(final String name, final Object object) throws IllegalArgumentException {
-		if (object == null) {
-			throw new IllegalArgumentException(MessageFormat.format(ErrorKeys.NULL_ARGUMENT_$1, name));
-		}
-	}
+  /**
+   * Makes sure that an argument is non-null.
+   */
+  private static void ensureNonNull(final String name, final Object object)
+    throws IllegalArgumentException
+  {
+    if(object == null)
+    {
+      throw new IllegalArgumentException(MessageFormat.format(ErrorKeys.NULL_ARGUMENT_$1, name));
+    }
+  }
 
-	/** Makes sure that the specified objects have the same dimension. */
-	private static void ensureDimensionMatch(final GridEnvelope gridRange, final Bounds envelope,
-			final boolean checkingRange) {
-		if (gridRange != null && envelope != null) {
-			final String label;
-			final int dim1, dim2;
-			if (checkingRange) {
-				label = "gridRange";
-				dim1 = gridRange.getDimension();
-				dim2 = envelope.getDimension();
-			}
-			else {
-				label = "envelope";
-				dim1 = envelope.getDimension();
-				dim2 = gridRange.getDimension();
-			}
-			if (dim1 != dim2) {
-				throw new MismatchedDimensionException(
-						MessageFormat.format(ErrorKeys.MISMATCHED_DIMENSION_$3, label, dim1, dim2));
-			}
-		}
-	}
+  /**
+   * Makes sure that the specified objects have the same dimension.
+   */
+  private static void ensureDimensionMatch(
+    final GridEnvelope gridRange, final Bounds envelope, final boolean checkingRange)
+  {
+    if(gridRange != null && envelope != null)
+    {
+      final String label;
+      final int dim1, dim2;
+      if(checkingRange)
+      {
+        label = "gridRange";
+        dim1 = gridRange.getDimension();
+        dim2 = envelope.getDimension();
+      }
+      else
+      {
+        label = "envelope";
+        dim1 = envelope.getDimension();
+        dim2 = gridRange.getDimension();
+      }
+      if(dim1 != dim2)
+      {
+        throw new MismatchedDimensionException(
+          MessageFormat.format(ErrorKeys.MISMATCHED_DIMENSION_$3, label, dim1, dim2));
+      }
+    }
+  }
 
-	/** Flush any information cached in this object. */
-	private void reset() {
-		transform = null;
-		if (isAutomatic(REVERSE_AXIS)) {
-			reverseAxis = null;
-		}
-		if (isAutomatic(SWAP_XY)) {
-			swapXY = null;
-		}
-	}
+  /**
+   * Flush any information cached in this object.
+   */
+  private void reset()
+  {
+    transform = null;
+    if(isAutomatic(REVERSE_AXIS))
+    {
+      reverseAxis = null;
+    }
+    if(isAutomatic(SWAP_XY))
+    {
+      swapXY = null;
+    }
+  }
 
-	/**
-	 * Returns whatever the grid range maps {@linkplain PixelInCell#CELL_CENTER pixel
-	 * center} or {@linkplain PixelInCell#CELL_CORNER pixel corner}. The former is OGC
-	 * convention while the later is Java2D/JAI convention. The default is cell center
-	 * (OGC convention).
-	 * @return Whatever the grid range maps pixel center or corner.
-	 * @since 2.5
-	 */
-	public PixelInCell getPixelAnchor() {
-		return anchor;
-	}
+  /**
+   * Returns whatever the grid range maps {@linkplain PixelInCell#CELL_CENTER pixel
+   * center} or {@linkplain PixelInCell#CELL_CORNER pixel corner}. The former is OGC
+   * convention while the later is Java2D/JAI convention. The default is cell center
+   * (OGC convention).
+   *
+   * @return Whatever the grid range maps pixel center or corner.
+   * @since 2.5
+   */
+  public PixelInCell getPixelAnchor()
+  {
+    return anchor;
+  }
 
-	/**
-	 * Sets whatever the grid range maps {@linkplain PixelInCell#CELL_CENTER pixel center}
-	 * or {@linkplain PixelInCell#CELL_CORNER pixel corner}. The former is OGC convention
-	 * while the later is Java2D/JAI convention.
-	 * @param anchor Whatever the grid range maps pixel center or corner.
-	 * @since 2.5
-	 */
-	public void setPixelAnchor(final PixelInCell anchor) {
-		ensureNonNull("anchor", anchor);
-		if (!Utilities.equals(this.anchor, anchor)) {
-			this.anchor = anchor;
-			reset();
-		}
-	}
+  /**
+   * Sets whatever the grid range maps {@linkplain PixelInCell#CELL_CENTER pixel center}
+   * or {@linkplain PixelInCell#CELL_CORNER pixel corner}. The former is OGC convention
+   * while the later is Java2D/JAI convention.
+   *
+   * @param anchor Whatever the grid range maps pixel center or corner.
+   * @since 2.5
+   */
+  public void setPixelAnchor(final PixelInCell anchor)
+  {
+    ensureNonNull("anchor", anchor);
+    if(!Utilities.equals(this.anchor, anchor))
+    {
+      this.anchor = anchor;
+      reset();
+    }
+  }
 
-	/**
-	 * Returns the grid range.
-	 * @return The grid range.
-	 * @throws IllegalStateException if the grid range has not yet been defined.
-	 */
-	public GridEnvelope getGridRange() throws IllegalStateException {
-		if (gridRange == null) {
-			throw new IllegalStateException(MessageFormat.format(ErrorKeys.MISSING_PARAMETER_VALUE_$1, "gridRange"));
-		}
-		return gridRange;
-	}
+  /**
+   * Returns the grid range.
+   *
+   * @return The grid range.
+   * @throws IllegalStateException if the grid range has not yet been defined.
+   */
+  public GridEnvelope getGridRange() throws IllegalStateException
+  {
+    if(gridRange == null)
+    {
+      throw new IllegalStateException(
+        MessageFormat.format(ErrorKeys.MISSING_PARAMETER_VALUE_$1, "gridRange"));
+    }
+    return gridRange;
+  }
 
-	/**
-	 * Sets the grid range.
-	 * @param gridRange The new grid range.
-	 */
-	public void setGridRange(final GridEnvelope gridRange) {
-		ensureNonNull("gridRange", gridRange);
-		ensureDimensionMatch(gridRange, envelope, true);
-		if (!Utilities.equals(this.gridRange, gridRange)) {
-			this.gridRange = gridRange;
-			reset();
-		}
-	}
+  /**
+   * Sets the grid range.
+   *
+   * @param gridRange The new grid range.
+   */
+  public void setGridRange(final GridEnvelope gridRange)
+  {
+    ensureNonNull("gridRange", gridRange);
+    ensureDimensionMatch(gridRange, envelope, true);
+    if(!Utilities.equals(this.gridRange, gridRange))
+    {
+      this.gridRange = gridRange;
+      reset();
+    }
+  }
 
-	/**
-	 * Returns the envelope. For performance reason, this method do not clone the
-	 * envelope. So the returned object should not be modified.
-	 * @return The envelope.
-	 * @throws IllegalStateException if the envelope has not yet been defined.
-	 */
-	public Bounds getEnvelope() throws IllegalStateException {
-		if (envelope == null) {
-			throw new IllegalStateException(MessageFormat.format(ErrorKeys.MISSING_PARAMETER_VALUE_$1, "envelope"));
-		}
-		return envelope;
-	}
+  /**
+   * Returns the envelope. For performance reason, this method do not clone the
+   * envelope. So the returned object should not be modified.
+   *
+   * @return The envelope.
+   * @throws IllegalStateException if the envelope has not yet been defined.
+   */
+  public Bounds getEnvelope() throws IllegalStateException
+  {
+    if(envelope == null)
+    {
+      throw new IllegalStateException(
+        MessageFormat.format(ErrorKeys.MISSING_PARAMETER_VALUE_$1, "envelope"));
+    }
+    return envelope;
+  }
 
-	/**
-	 * Sets the envelope. This method do not clone the specified envelope, so it should
-	 * not be modified after this method has been invoked.
-	 * @param envelope The new envelope.
-	 */
-	public void setEnvelope(final Bounds envelope) {
-		ensureNonNull("envelope", envelope);
-		ensureDimensionMatch(gridRange, envelope, false);
-		if (!Utilities.equals(this.envelope, envelope)) {
-			this.envelope = envelope;
-			reset();
-		}
-	}
+  /**
+   * Sets the envelope. This method do not clone the specified envelope, so it should
+   * not be modified after this method has been invoked.
+   *
+   * @param envelope The new envelope.
+   */
+  public void setEnvelope(final Bounds envelope)
+  {
+    ensureNonNull("envelope", envelope);
+    ensureDimensionMatch(gridRange, envelope, false);
+    if(!Utilities.equals(this.envelope, envelope))
+    {
+      this.envelope = envelope;
+      reset();
+    }
+  }
 
-	/**
-	 * Applies heuristic rules in order to determine if the two first axis should be
-	 * interchanged.
-	 */
-	private static boolean swapXY(final CoordinateSystem cs) {
-		if (cs != null && cs.getDimension() >= 2) {
-			return AxisDirection.NORTH.equals(cs.getAxis(0).getDirection().absolute())
-					&& AxisDirection.EAST.equals(cs.getAxis(1).getDirection().absolute());
-		}
-		return false;
-	}
+  /**
+   * Applies heuristic rules in order to determine if the two first axis should be
+   * interchanged.
+   */
+  private static boolean swapXY(final CoordinateSystem cs)
+  {
+    if(cs != null && cs.getDimension() >= 2)
+    {
+      return AxisDirection.NORTH.equals(
+        cs.getAxis(0).getDirection().absolute()) && AxisDirection.EAST.equals(
+        cs.getAxis(1).getDirection().absolute());
+    }
+    return false;
+  }
 
-	/**
-	 * Returns {@code true} if the two first axis should be interchanged. If <code>
-	 * {@linkplain #isAutomatic isAutomatic}({@linkplain #SWAP_XY})</code> returns
-	 * {@code true} (which is the default), then this method make the following
-	 * assumptions:
-	 *
-	 * <ul>
-	 * <li>
-	 * <p>
-	 * Axis order in the grid range matches exactly axis order in the envelope, except for
-	 * the special case described in the next point. In other words, if axis order in the
-	 * underlying image is (<var>column</var>, <var>row</var>) (which is the case for a
-	 * majority of images), then the envelope should probably have a
-	 * (<var>longitude</var>, <var>latitude</var>) or (<var>easting</var>,
-	 * <var>northing</var>) axis order.
-	 * <li>
-	 * <p>
-	 * An exception to the above rule applies for CRS using exactly the following axis
-	 * order: ({@link AxisDirection#NORTH NORTH}|{@link AxisDirection#SOUTH SOUTH},
-	 * {@link AxisDirection#EAST EAST}|{@link AxisDirection#WEST WEST}). An example of
-	 * such CRS is {@code EPSG:4326}. In this particular case, this method will returns
-	 * {@code true}, thus suggesting to interchange the (<var>y</var>,<var>x</var>) axis
-	 * for such CRS.
-	 * </ul>
-	 * @return {@code true} if the two first axis should be interchanged.
-	 */
-	public boolean getSwapXY() {
-		if (swapXY == null) {
-			var value = false;
-			if (isAutomatic(SWAP_XY)) {
-				value = swapXY(getCoordinateSystem());
-			}
-			swapXY = Boolean.valueOf(value);
-		}
-		return swapXY.booleanValue();
-	}
+  /**
+   * Returns {@code true} if the two first axis should be interchanged. If <code>
+   * {@linkplain #isAutomatic isAutomatic}({@linkplain #SWAP_XY})</code> returns
+   * {@code true} (which is the default), then this method make the following
+   * assumptions:
+   *
+   * <ul>
+   * <li>
+   * <p>
+   * Axis order in the grid range matches exactly axis order in the envelope, except for
+   * the special case described in the next point. In other words, if axis order in the
+   * underlying image is (<var>column</var>, <var>row</var>) (which is the case for a
+   * majority of images), then the envelope should probably have a
+   * (<var>longitude</var>, <var>latitude</var>) or (<var>easting</var>,
+   * <var>northing</var>) axis order.
+   * <li>
+   * <p>
+   * An exception to the above rule applies for CRS using exactly the following axis
+   * order: ({@link AxisDirection#NORTH NORTH}|{@link AxisDirection#SOUTH SOUTH},
+   * {@link AxisDirection#EAST EAST}|{@link AxisDirection#WEST WEST}). An example of
+   * such CRS is {@code EPSG:4326}. In this particular case, this method will returns
+   * {@code true}, thus suggesting to interchange the (<var>y</var>,<var>x</var>) axis
+   * for such CRS.
+   * </ul>
+   *
+   * @return {@code true} if the two first axis should be interchanged.
+   */
+  public boolean getSwapXY()
+  {
+    if(swapXY == null)
+    {
+      var value = false;
+      if(isAutomatic(SWAP_XY))
+      {
+        value = swapXY(getCoordinateSystem());
+      }
+      swapXY = value;
+    }
+    return swapXY;
+  }
 
-	/**
-	 * Tells if the two first axis should be interchanged. Invoking this method force
-	 * <code>
-	 * {@linkplain #isAutomatic isAutomatic}({@linkplain #SWAP_XY})</code> to
-	 * {@code false}.
-	 * @param swapXY {@code true} if the two first axis should be interchanged.
-	 */
-	public void setSwapXY(final boolean swapXY) {
-		var newValue = Boolean.valueOf(swapXY);
-		if (!newValue.equals(this.swapXY)) {
-			reset();
-		}
-		this.swapXY = newValue;
-		defined |= SWAP_XY;
-	}
+  /**
+   * Tells if the two first axis should be interchanged. Invoking this method force
+   * <code>
+   * {@linkplain #isAutomatic isAutomatic}({@linkplain #SWAP_XY})</code> to
+   * {@code false}.
+   *
+   * @param swapXY {@code true} if the two first axis should be interchanged.
+   */
+  public void setSwapXY(final boolean swapXY)
+  {
+    var newValue = valueOf(swapXY);
+    if(!newValue.equals(this.swapXY))
+    {
+      reset();
+    }
+    this.swapXY = newValue;
+    defined |= SWAP_XY;
+  }
 
-	/**
-	 * Returns which (if any) axis in <cite>user</cite> space (not grid space) should have
-	 * their direction reversed. If <code>
-	 * {@linkplain #isAutomatic isAutomatic}({@linkplain #REVERSE_AXIS})</code> returns
-	 * {@code true} (which is the default), then this method make the following
-	 * assumptions:
-	 *
-	 * <p>
-	 *
-	 * <ul>
-	 * <li>Axis should be reverted if needed in order to point toward their
-	 * "{@linkplain AxisDirection#absolute absolute}" direction.
-	 * <li>An exception to the above rule is the second axis in grid space, which is
-	 * assumed to be the <var>y</var> axis on output device (usually the screen). This
-	 * axis is reversed again in order to match the bottom direction often used with such
-	 * devices.
-	 * </ul>
-	 * @return The reversal state of each axis, or {@code null} if unspecified.
-	 */
-	public boolean[] getReverseAxis() {
-		if (reverseAxis == null) {
-			final CoordinateSystem cs = getCoordinateSystem();
-			if (cs != null) {
-				var dimension = cs.getDimension();
-				reverseAxis = new boolean[dimension];
-				if (isAutomatic(REVERSE_AXIS)) {
-					for (int i = 0; i < dimension; i++) {
-						var direction = cs.getAxis(i).getDirection();
-						var absolute = direction.absolute();
-						reverseAxis[i] = direction != AxisDirection.OTHER && direction.equals(absolute.opposite());
-					}
-					if (dimension >= 2) {
-						var i = getSwapXY() ? 0 : 1;
-						reverseAxis[i] = !reverseAxis[i];
-					}
-				}
-			}
-			else {
-				// No coordinate system. Reverse the second axis inconditionnaly
-				// (except if there is not enough dimensions).
-				int length = 0;
-				if (gridRange != null) {
-					length = gridRange.getDimension();
-				}
-				else if (envelope != null) {
-					length = envelope.getDimension();
-				}
-				if (length >= 2) {
-					reverseAxis = new boolean[length];
-					reverseAxis[1] = true;
-				}
-			}
-		}
-		return reverseAxis;
-	}
+  /**
+   * Returns which (if any) axis in <cite>user</cite> space (not grid space) should have
+   * their direction reversed. If <code>
+   * {@linkplain #isAutomatic isAutomatic}({@linkplain #REVERSE_AXIS})</code> returns
+   * {@code true} (which is the default), then this method make the following
+   * assumptions:
+   *
+   * <p>
+   *
+   * <ul>
+   * <li>Axis should be reverted if needed in order to point toward their
+   * "{@linkplain AxisDirection#absolute absolute}" direction.
+   * <li>An exception to the above rule is the second axis in grid space, which is
+   * assumed to be the <var>y</var> axis on output device (usually the screen). This
+   * axis is reversed again in order to match the bottom direction often used with such
+   * devices.
+   * </ul>
+   *
+   * @return The reversal state of each axis, or {@code null} if unspecified.
+   */
+  public boolean[] getReverseAxis()
+  {
+    if(reverseAxis == null)
+    {
+      final CoordinateSystem cs = getCoordinateSystem();
+      if(cs != null)
+      {
+        var dimension = cs.getDimension();
+        reverseAxis = new boolean[dimension];
+        if(isAutomatic(REVERSE_AXIS))
+        {
+          for(int i = 0; i < dimension; i++)
+          {
+            var direction = cs.getAxis(i).getDirection();
+            var absolute = direction.absolute();
+            reverseAxis[i] = direction != AxisDirection.OTHER && direction.equals(
+              absolute.opposite());
+          }
+          if(dimension >= 2)
+          {
+            var i = getSwapXY() ? 0 : 1;
+            reverseAxis[i] = !reverseAxis[i];
+          }
+        }
+      }
+      else
+      {
+        // No coordinate system. Reverse the second axis inconditionnaly
+        // (except if there is not enough dimensions).
+        int length = 0;
+        if(gridRange != null)
+        {
+          length = gridRange.getDimension();
+        }
+        else if(envelope != null)
+        {
+          length = envelope.getDimension();
+        }
+        if(length >= 2)
+        {
+          reverseAxis = new boolean[length];
+          reverseAxis[1] = true;
+        }
+      }
+    }
+    return reverseAxis;
+  }
 
-	/**
-	 * Set which (if any) axis in <cite>user</cite> space (not grid space) should have
-	 * their direction reversed. Invoking this method force <code>
-	 * {@linkplain #isAutomatic isAutomatic}({@linkplain #REVERSE_AXIS})</code> to
-	 * {@code false}.
-	 * @param reverse The reversal state of each axis. A {@code null} value means to
-	 * reverse no axis.
-	 */
-	public void setReverseAxis(final boolean[] reverse) {
-		if (!Arrays.equals(reverseAxis, reverse)) {
-			reset();
-		}
-		this.reverseAxis = reverse;
-		defined |= REVERSE_AXIS;
-	}
+  /**
+   * Set which (if any) axis in <cite>user</cite> space (not grid space) should have
+   * their direction reversed. Invoking this method force <code>
+   * {@linkplain #isAutomatic isAutomatic}({@linkplain #REVERSE_AXIS})</code> to
+   * {@code false}.
+   *
+   * @param reverse The reversal state of each axis. A {@code null} value means to
+   *                reverse no axis.
+   */
+  public void setReverseAxis(final boolean[] reverse)
+  {
+    if(!Arrays.equals(reverseAxis, reverse))
+    {
+      reset();
+    }
+    this.reverseAxis = reverse;
+    defined |= REVERSE_AXIS;
+  }
 
-	/**
-	 * Reverses a single axis in user space. Invoking this methods <var>n</var> time is
-	 * equivalent to creating a boolean {@code reverse} array of the appropriate length,
-	 * setting {@code
-	 * reverse[dimension] = true} for the <var>n</var> axis to be reversed, and invoke
-	 * <code>
-	 * {@linkplain #setReverseAxis setReverseAxis}(reverse)</code>.
-	 * @param dimension The index of the axis to reverse.
-	 */
-	public void reverseAxis(final int dimension) {
-		if (reverseAxis == null) {
-			final int length;
-			if (gridRange != null) {
-				length = gridRange.getDimension();
-			}
-			else {
-				ensureNonNull("envelope", envelope);
-				length = envelope.getDimension();
-			}
-			reverseAxis = new boolean[length];
-		}
-		if (!reverseAxis[dimension]) {
-			reset();
-		}
-		reverseAxis[dimension] = true;
-		defined |= REVERSE_AXIS;
-	}
+  /**
+   * Reverses a single axis in user space. Invoking this methods <var>n</var> time is
+   * equivalent to creating a boolean {@code reverse} array of the appropriate length,
+   * setting {@code
+   * reverse[dimension] = true} for the <var>n</var> axis to be reversed, and invoke
+   * <code>
+   * {@linkplain #setReverseAxis setReverseAxis}(reverse)</code>.
+   *
+   * @param dimension The index of the axis to reverse.
+   */
+  public void reverseAxis(final int dimension)
+  {
+    if(reverseAxis == null)
+    {
+      final int length;
+      if(gridRange != null)
+      {
+        length = gridRange.getDimension();
+      }
+      else
+      {
+        ensureNonNull("envelope", envelope);
+        length = envelope.getDimension();
+      }
+      reverseAxis = new boolean[length];
+    }
+    if(!reverseAxis[dimension])
+    {
+      reset();
+    }
+    reverseAxis[dimension] = true;
+    defined |= REVERSE_AXIS;
+  }
 
-	/**
-	 * Returns {@code true} if all properties designed by the specified bit mask will be
-	 * computed automatically.
-	 * @param mask Any combination of {@link #REVERSE_AXIS} or {@link #SWAP_XY}.
-	 * @return {@code true} if all properties given by the mask will be computed
-	 * automatically.
-	 */
-	public boolean isAutomatic(final int mask) {
-		return (defined & mask) == 0;
-	}
+  /**
+   * Returns {@code true} if all properties designed by the specified bit mask will be
+   * computed automatically.
+   *
+   * @param mask Any combination of {@link #REVERSE_AXIS} or {@link #SWAP_XY}.
+   * @return {@code true} if all properties given by the mask will be computed
+   * automatically.
+   */
+  public boolean isAutomatic(final int mask)
+  {
+    return (defined & mask) == 0;
+  }
 
-	/**
-	 * Set all properties designed by the specified bit mask as automatic. Their value
-	 * will be computed automatically by the corresponding methods (e.g.
-	 * {@link #getReverseAxis}, {@link #getSwapXY}). By default, all properties are
-	 * automatic.
-	 * @param mask Any combination of {@link #REVERSE_AXIS} or {@link #SWAP_XY}.
-	 */
-	public void setAutomatic(final int mask) {
-		defined &= ~mask;
-	}
+  /**
+   * Set all properties designed by the specified bit mask as automatic. Their value
+   * will be computed automatically by the corresponding methods (e.g.
+   * {@link #getReverseAxis}, {@link #getSwapXY}). By default, all properties are
+   * automatic.
+   *
+   * @param mask Any combination of {@link #REVERSE_AXIS} or {@link #SWAP_XY}.
+   */
+  public void setAutomatic(final int mask)
+  {
+    defined &= ~mask;
+  }
 
-	/** Returns the coordinate system in use with the envelope. */
-	private CoordinateSystem getCoordinateSystem() {
-		if (envelope != null) {
-			final CoordinateReferenceSystem crs = envelope.getCoordinateReferenceSystem();
-			if (crs != null) {
-				return crs.getCoordinateSystem();
-			}
-		}
-		return null;
-	}
+  /**
+   * Returns the coordinate system in use with the envelope.
+   */
+  private CoordinateSystem getCoordinateSystem()
+  {
+    if(envelope != null)
+    {
+      final CoordinateReferenceSystem crs = envelope.getCoordinateReferenceSystem();
+      if(crs != null)
+      {
+        return crs.getCoordinateSystem();
+      }
+    }
+    return null;
+  }
 
-	/**
-	 * Creates a math transform using the information provided by setter methods.
-	 * @return The math transform.
-	 * @throws IllegalStateException if the grid range or the envelope were not set.
-	 */
-	public Affine createTransform() throws IllegalStateException {
-		// if (transform == null) {
-		var gridRange = getGridRange();
-		var userRange = getEnvelope();
-		var swapXY = getSwapXY();
-		var reverse = getReverseAxis();
-		var gridType = getPixelAnchor();
-		var dimension = gridRange.getDimension();
-		/*
-		 * Setup the multi-dimensional affine transform for use with OpenGIS. According
-		 * OpenGIS specification, transforms must map pixel center. This is done by adding
-		 * 0.5 to grid coordinates.
-		 */
-		final double translate;
-		if (PixelInCell.CELL_CENTER.equals(gridType)) {
-			translate = 0.5;
-		}
-		else if (PixelInCell.CELL_CORNER.equals(gridType)) {
-			translate = 0.0;
-		}
-		else {
-			throw new IllegalStateException(MessageFormat.format(ErrorKeys.ILLEGAL_ARGUMENT_$2, "gridType", gridType));
-		}
-		var matrix = MatrixFactory.create(dimension + 1);
-		for (var i = 0; i < dimension; i++) {
-			// NOTE: i is a dimension in the 'gridRange' space (source coordinates).
-			// j is a dimension in the 'userRange' space (target coordinates).
-			var j = i;
-			if (swapXY && j <= 1) {
-				j = 1 - j;
-			}
-			var scale = userRange.getSpan(j) / gridRange.getSpan(i);
-			double offset;
-			if (reverse == null || j >= reverse.length || !reverse[j]) {
-				offset = userRange.getMinimum(j);
-			}
-			else {
-				scale = -scale;
-				offset = userRange.getMaximum(j);
-			}
-			offset -= scale * (gridRange.getLow(i) - translate);
-			matrix.setElement(j, j, 0.0);
-			matrix.setElement(j, i, scale);
-			matrix.setElement(j, dimension, offset);
-		}
+  /**
+   * Creates a math transform using the information provided by setter methods.
+   *
+   * @return The math transform.
+   * @throws IllegalStateException if the grid range or the envelope were not set.
+   */
+  public Affine createTransform() throws IllegalStateException
+  {
+    // if (transform == null) {
+    var gridRange = getGridRange();
+    var userRange = getEnvelope();
+    var swapXY = getSwapXY();
+    var reverse = getReverseAxis();
+    var gridType = getPixelAnchor();
+    var dimension = gridRange.getDimension();
+    /*
+     * Setup the multi-dimensional affine transform for use with OpenGIS. According
+     * OpenGIS specification, transforms must map pixel center. This is done by adding
+     * 0.5 to grid coordinates.
+     */
+    final double translate;
+    if(PixelInCell.CELL_CENTER.equals(gridType))
+    {
+      translate = 0.5;
+    }
+    else if(PixelInCell.CELL_CORNER.equals(gridType))
+    {
+      translate = 0.0;
+    }
+    else
+    {
+      throw new IllegalStateException(
+        MessageFormat.format(ErrorKeys.ILLEGAL_ARGUMENT_$2, "gridType", gridType));
+    }
+    var matrix = MatrixFactory.create(dimension + 1);
+    for(var i = 0; i < dimension; i++)
+    {
+      // NOTE: i is a dimension in the 'gridRange' space (source coordinates).
+      // j is a dimension in the 'userRange' space (target coordinates).
+      var j = i;
+      if(swapXY && j <= 1)
+      {
+        j = 1 - j;
+      }
+      var scale = userRange.getSpan(j) / gridRange.getSpan(i);
+      double offset;
+      if(reverse == null || j >= reverse.length || !reverse[j])
+      {
+        offset = userRange.getMinimum(j);
+      }
+      else
+      {
+        scale = -scale;
+        offset = userRange.getMaximum(j);
+      }
+      offset -= scale * (gridRange.getLow(i) - translate);
+      matrix.setElement(j, j, 0.0);
+      matrix.setElement(j, i, scale);
+      matrix.setElement(j, dimension, offset);
+    }
 
-		return createAffine(ProjectiveTransform.create(matrix));
-	}
+    return createAffine(ProjectiveTransform.create(matrix));
+  }
 
-	// Geotools
-	// [ x'] [ m00 m01 m02 ] [ x ]
-	// [ y'] = [ m10 m11 m12 ] [ y ]
-	// [ 1 ] [ m20 m21 1 ] [ 1 ]
-	// x' = m * x
-	//
-	// Javafx
-	// [ x'] [ mxx mxy mxz tx ] [ x ] [ mxx * x + mxy * y + mxz * z + tx ]
-	// [ y'] = [ myx myy myz ty ] [ y ] = [ myx * x + myy * y + myz * z + ty ]
-	// [ z'] [ mzx mzy mzz tz ] [ z ] [ mzx * x + mzy * y + mzz * z + tz ]
-	// [ 1 ]
+  // Geotools
+  // [ x'] [ m00 m01 m02 ] [ x ]
+  // [ y'] = [ m10 m11 m12 ] [ y ]
+  // [ 1 ] [ m20 m21 1 ] [ 1 ]
+  // x' = m * x
+  //
+  // Javafx
+  // [ x'] [ mxx mxy mxz tx ] [ x ] [ mxx * x + mxy * y + mxz * z + tx ]
+  // [ y'] = [ myx myy myz ty ] [ y ] = [ myx * x + myy * y + myz * z + ty ]
+  // [ z'] [ mzx mzy mzz tz ] [ z ] [ mzx * x + mzy * y + mzz * z + tz ]
+  // [ 1 ]
 
-	public static Affine createAffine(LinearTransform at) {
+  public static Affine createAffine(LinearTransform at)
+  {
 
-		var gMatrix = at.getMatrix();
-		// Affine(double mxx, double mxy, double tx, double myx, double myy, double ty)
-		return new Affine(//
-				gMatrix.getElement(0, 0), //
-				gMatrix.getElement(0, 1), //
-				gMatrix.getElement(0, 2), //
-				gMatrix.getElement(1, 0), //
-				gMatrix.getElement(1, 1), //
-				gMatrix.getElement(1, 2));
-	}
+    var gMatrix = at.getMatrix();
+    // Affine(double mxx, double mxy, double tx, double myx, double myy, double ty)
+    return new Affine(//
+      gMatrix.getElement(0, 0), //
+      gMatrix.getElement(0, 1), //
+      gMatrix.getElement(0, 2), //
+      gMatrix.getElement(1, 0), //
+      gMatrix.getElement(1, 1), //
+      gMatrix.getElement(1, 2));
+  }
 
 }
