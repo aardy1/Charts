@@ -29,11 +29,11 @@ public class SVGCache implements ISVGProvider
     SVG_RENDERING_PARAMETERS.setFill(Color.TRANSPARENT);
   }
 
-  private final Class<?> resourceClass;
+  private final Class<?> resourceLoader;
 
-  public SVGCache(Class<?> resourceClass)
+  public SVGCache(Class<?> resourceLoader)
   {
-    this.resourceClass = resourceClass;
+    this.resourceLoader = resourceLoader;
   }
 
   //@formatter:on
@@ -50,7 +50,7 @@ public class SVGCache implements ISVGProvider
     var image = cache.get(Triple.of(name, size, rotation));
     if(image == null)
     {
-      var svgImage = SVGLoader.load(resourceClass.getResource(name));
+      var svgImage = SVGLoader.load(resourceLoader.getResource(name));
       svgImage.setScaleX(size / svgImage.getWidth());
       svgImage.setScaleY(size / svgImage.getHeight());
       // for some reason SVGLoader loads the images upside down ...

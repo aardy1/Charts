@@ -108,7 +108,7 @@ public class ChartView extends Control
       default:
         if(DEFAULT_STYLE_SHEET == null)
         {
-          DEFAULT_STYLE_SHEET = ChartView.class.getResource("chartview.css").toExternalForm();
+          DEFAULT_STYLE_SHEET = ResourceLoader.class.getResource("chartview.css").toExternalForm();
         }
         return DEFAULT_STYLE_SHEET;
     }

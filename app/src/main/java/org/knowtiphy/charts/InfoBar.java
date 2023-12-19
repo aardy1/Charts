@@ -19,7 +19,6 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.transform.NonInvertibleTransformException;
 import org.geotools.api.referencing.FactoryException;
 import org.geotools.api.referencing.operation.TransformException;
-import org.knowtiphy.charts.chartview.ChartViewSkin;
 import org.knowtiphy.charts.chartview.MapDisplayOptions;
 import org.knowtiphy.charts.enc.ChartDescription;
 import org.knowtiphy.charts.enc.ChartLocker;
@@ -55,7 +54,9 @@ public class InfoBar extends StackPane
   private ENCChart chart;
 
   private final ChartLocker chartLocker;
+
   private final MenuButton history;
+
   private final MapDisplayOptions displayOptions;
 
   private final List<Subscription> subscriptions = new ArrayList<>();
@@ -110,7 +111,7 @@ public class InfoBar extends StackPane
     }
     history.getItems().addAll(items);
 
-    var leftControlsBar = FXUtils.nonResizeable(new ToolBar(history));
+    var leftControlsBar = FXUtils.nonResizeable(new ToolBar(history, chartScale));
     leftControlsBar.getStyleClass().add("controlbar");
     StackPane.setAlignment(leftControlsBar, Pos.BOTTOM_LEFT);
 
@@ -121,12 +122,13 @@ public class InfoBar extends StackPane
 
     getChildren().addAll(leftControlsBar, centerControlsBar, variableLabels);
 
+    showFixedChartInfo();
     showVariableChartInfo();
 
     widthProperty().addListener(ch -> showVariableChartInfo());
     heightProperty().addListener(ch -> showVariableChartInfo());
     unitProfile.unitChangeEvents().subscribe(ch -> {
-//      showFixedChartInfo();
+      showFixedChartInfo();
       showVariableChartInfo();
     });
     chartLocker.history().addListener((ListChangeListener<ChartDescription>) c -> {
@@ -190,7 +192,7 @@ public class InfoBar extends StackPane
     catch(TransformException | FactoryException | NonInvertibleTransformException |
           StyleSyntaxException ex)
     {
-      Logger.getLogger(ChartViewSkin.class.getName()).log(Level.SEVERE, null, ex);
+      Logger.getLogger(InfoBar.class.getName()).log(Level.SEVERE, null, ex);
     }
   }
 }

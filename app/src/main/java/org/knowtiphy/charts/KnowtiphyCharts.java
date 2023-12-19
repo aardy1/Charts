@@ -78,7 +78,7 @@ public class KnowtiphyCharts extends Application
     var catalogFile = platform.chartsDir().resolve("08Region_ENCProdCat.xml");
     var catalog = new CatalogReader(catalogFile).read();
 
-    var styleReader = new StyleReader<SimpleFeatureType, MemFeature>(getClass());
+    var styleReader = new StyleReader<SimpleFeatureType, MemFeature>(ResourceLoader.class);
     var chartProvider = new LocalChartProvider(catalog, platform.chartsDir(), appSettings,
       styleReader);
     chartLocker = new ChartLocker(chartProvider);
@@ -121,12 +121,12 @@ public class KnowtiphyCharts extends Application
     overlay.setPickOnBounds(false);
 
     var scene = new Scene(new StackPane(vbox, overlay), WIDTH, HEIGHT);
-    scene.getStylesheets().add(getClass().getResource("charts.css").toExternalForm());
+    scene.getStylesheets().add(ResourceLoader.class.getResource("charts.css").toExternalForm());
 
     primaryStage.setScene(scene);
     setStageTitle(primaryStage, chart);
     primaryStage.sizeToScene();
-    platform.setWindowIcons(primaryStage, getClass());
+    platform.setWindowIcons(primaryStage, ResourceLoader.class);
     primaryStage.show();
 
 //    var gf = new GeometryFactory();

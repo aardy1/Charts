@@ -101,7 +101,6 @@ public class DragPanZoomSupport
         return;
       }
 
-      System.err.println("Zoom factor = " + event.getZoomFactor());
       Coordinates.zoom(map, event.getZoomFactor());
     });
   }

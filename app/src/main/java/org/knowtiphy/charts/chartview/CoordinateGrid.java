@@ -66,19 +66,15 @@ public class CoordinateGrid extends Pane
 
   private void drawGrid()
   {
-    System.err.println("Grid layout");
-    System.err.println(getWidth());
-    System.err.println(getHeight());
-    System.err.println(chart.viewPortScreenArea());
     getChildren().clear();
 
     var transform = new Transformation(chart.viewPortWorldToScreen());
-    var delta = getDelta();
+    var delta = getLongitudeDelta();
 
     var lines = new ArrayList<Node>();
     var labels = new ArrayList<Node>();
     longitudeLines(transform, delta, lines, labels);
-//    latitudeLines(transform, delta, lines, labels);
+    latitudeLines(transform, lines, labels);
     var legend = legend(transform, delta);
 
     getChildren().addAll(lines);
@@ -110,7 +106,8 @@ public class CoordinateGrid extends Pane
   {
     transform.apply(longitude, 0);
 
-    var line = line(0, screenArea.getMinY(), 0, screenArea.getMaxY());
+    //  can't be maxY as that produces an infinite loop -- the +/- 5 gives a nice visual
+    var line = line(0, screenArea.getMinY() + 5, 0, screenArea.getMaxY() - 5);
     line.setTranslateX(transform.getX());
     lines.add(line);
 
@@ -121,10 +118,11 @@ public class CoordinateGrid extends Pane
   }
 
   private void latitudeLines(
-    Transformation transform, double delta, List<Node> lines, List<Node> labels)
+    Transformation transform, List<Node> lines, List<Node> labels)
   {
     var extent = chart.viewPortBounds();
     var screenArea = chart.viewPortScreenArea();
+    var delta = getLatitudeDelta();
 
     var startLatitude = getStartLatitude(extent);
     for(var latitude = startLatitude; latitude < extent.getMaxY(); latitude += delta)
@@ -144,7 +142,8 @@ public class CoordinateGrid extends Pane
   {
     transform.apply(0, latitude);
 
-    var line = line(screenArea.getMinX(), 0, screenArea.getMaxX(), 0);
+    //  can't be maxX as that produces an infinite loop -- the +/- 5 gives a nice visual
+    var line = line(screenArea.getMinX() + 5, 0, screenArea.getMaxX() - 5, 0);
     lines.add(line);
     line.setTranslateY(transform.getY());
 
@@ -209,23 +208,28 @@ public class CoordinateGrid extends Pane
   // round the minimum longitude to the closest integer in the viewport bounds
   // minimum longitude is positive => round away from the prime meridian, so 40.4 -> 41
   // minimum longitude is negative => round closer to the prime meridian, -98.7 -> -98
-  private int getStartLongitude(ReferencedEnvelope envelope)
+  private double getStartLongitude(ReferencedEnvelope envelope)
   {
-    return (int) Math.ceil(envelope.getMinX());
+    return Math.ceil(envelope.getMinX());
   }
 
   // round the minimum latitude to the closest integer in the viewport bounds
   // minimum latitude is positive => round closer to the north pole, so 20.4 -> 21
   // minimum latitude is negative => round closer to the equator, -44.7 -> -44
-  private int getStartLatitude(ReferencedEnvelope envelope)
+  private double getStartLatitude(ReferencedEnvelope envelope)
   {
-    return (int) Math.ceil(envelope.getMinY());
+    return Math.ceil(envelope.getMinY());
   }
 
   // get the gap between grid lines
-  private double getDelta()
+  private double getLongitudeDelta()
   {
     return chart.viewPortBounds().getWidth() / 10;
+  }
+
+  private double getLatitudeDelta()
+  {
+    return chart.viewPortBounds().getHeight() / 10;
   }
 
 }

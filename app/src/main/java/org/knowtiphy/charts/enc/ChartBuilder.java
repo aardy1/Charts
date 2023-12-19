@@ -32,8 +32,6 @@ import static org.knowtiphy.charts.geotools.FileUtils.readShapeFilesInDir;
  */
 public class ChartBuilder
 {
-  private final ChartLocker chartLocker;
-
   private final Path shapeDir;
 
   private final ChartDescription chartDescription;
@@ -49,11 +47,9 @@ public class ChartBuilder
   private MemStore store;
 
   public ChartBuilder(
-    ChartLocker chartLocker, Path shapeDir, ChartDescription chartDescription, AppSettings settings,
+    Path shapeDir, ChartDescription chartDescription, AppSettings settings,
     StyleReader<SimpleFeatureType, MemFeature> styleReader, MapDisplayOptions displayOptions)
   {
-
-    this.chartLocker = chartLocker;
     this.shapeDir = shapeDir;
     this.settings = settings;
     this.chartDescription = chartDescription;
@@ -176,7 +172,7 @@ public class ChartBuilder
             if(chart == null)
             {
               var crs = featureSource.getBounds().getCoordinateReferenceSystem();
-              chart = new ENCChart(chartLocker, chartDescription, crs, displayOptions);
+              chart = new ENCChart(chartDescription, crs);
               store = new MemStore(chart);
             }
 

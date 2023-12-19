@@ -7,5 +7,6 @@
 
 .chartview .legendline {
     -fx-stroke-width: 2;
-    -fx-stroke: #000000;
+/*    -fx-stroke: #000000; */
+    -fx-stroke: #FFFF00;
 }

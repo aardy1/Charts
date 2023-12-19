@@ -127,10 +127,7 @@ public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView
     eventModel.mouseEvents.feedFrom(EventStreams.eventsOf(root, MouseEvent.ANY));
     eventModel.scrollEvents.feedFrom(EventStreams.eventsOf(root, ScrollEvent.ANY));
     eventModel.zoomEvents.feedFrom(EventStreams.eventsOf(root, ZoomEvent.ANY));
-
-    root.setOnScrollStarted(event -> {
-      System.err.println("SCROLL STARTED");
-    });
+    
     // windows on clicked, mac on pressed
     eventModel.mouseClicked.filter(MouseEvent::isPopupTrigger).subscribe(
       event -> makeContextMenu(event).show(mapSurface, event.getScreenX(), event.getScreenY()));

@@ -1,6 +1,5 @@
 package org.knowtiphy.shapemap.view;
 
-import java.util.List;
 import javafx.css.CssMetaData;
 import javafx.css.Styleable;
 import javafx.css.StyleablePropertyFactory;
@@ -8,6 +7,8 @@ import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 import org.knowtiphy.shapemap.model.MapViewModel;
 import org.knowtiphy.shapemap.view.canvas.CanvasShapeMapSkin;
+
+import java.util.List;
 
 /**
  * A shape map view -- a control that shows an ESRI shape map of layers of features of
@@ -17,67 +18,80 @@ import org.knowtiphy.shapemap.view.canvas.CanvasShapeMapSkin;
  * @param <F> the type of the features
  */
 
-public class ShapeMapView<S, F> extends Control {
+public class ShapeMapView<S, F> extends Control
+{
 
-	public enum SkinType {
+  public enum SkinType
+  {
 
-		CANVAS
+    CANVAS
 
-	}
+  }
 
-	// CSS styling
-	private static final StyleablePropertyFactory<ShapeMapView<?, ?>> FACTORY = new StyleablePropertyFactory<>(
-			Control.getClassCssMetaData());
+  // CSS styling
+  private static final StyleablePropertyFactory<ShapeMapView<?, ?>> FACTORY =
+    new StyleablePropertyFactory<>(
+    Control.getClassCssMetaData());
 
-	private static String DEFAULT_STYLE_SHEET;
+  private static String DEFAULT_STYLE_SHEET;
 
-	private SkinType skinType;
+  private SkinType skinType;
 
-	private final MapViewModel<S, F> map;
+  private final MapViewModel<S, F> map;
 
-	public ShapeMapView(MapViewModel<S, F> map) {
-		this(map, SkinType.CANVAS);
-	}
+  public ShapeMapView(MapViewModel<S, F> map)
+  {
+    this(map, SkinType.CANVAS);
+  }
 
-	public ShapeMapView(MapViewModel<S, F> map, SkinType skinType) {
+  public ShapeMapView(MapViewModel<S, F> map, SkinType skinType)
+  {
 
-		this.map = map;
-		this.skinType = skinType;
-		getStyleClass().add("shapemap-view");
-	}
+    this.map = map;
+    this.skinType = skinType;
+    getStyleClass().add("shapemap-view");
+  }
 
-	@Override
-	public boolean isResizable() {
-		return true;
-	}
+  @Override
+  public boolean isResizable()
+  {
+    return true;
+  }
 
-	@Override
-	protected Skin<ShapeMapView<S, F>> createDefaultSkin() {
-		return switch (skinType) {
-			default -> new CanvasShapeMapSkin<>(this, map);
-		};
-	}
+  @Override
+  protected Skin<ShapeMapView<S, F>> createDefaultSkin()
+  {
+    return switch(skinType)
+    {
+      default -> new CanvasShapeMapSkin<>(this, map);
+    };
+  }
 
-	@Override
-	public synchronized String getUserAgentStylesheet() {
+  @Override
+  public synchronized String getUserAgentStylesheet()
+  {
 
-		switch (skinType) {
-			case CANVAS:
-			default:
-				if (DEFAULT_STYLE_SHEET == null) {
-					DEFAULT_STYLE_SHEET = ShapeMapView.class.getResource("canvas.css").toExternalForm();
-				}
-				return DEFAULT_STYLE_SHEET;
-		}
-	}
+    switch(skinType)
+    {
+      case CANVAS:
+      default:
+        if(DEFAULT_STYLE_SHEET == null)
+        {
+          DEFAULT_STYLE_SHEET = ShapeMapView.class.getResource("canvas.css").toExternalForm();
+        }
+        return DEFAULT_STYLE_SHEET;
+    }
+  }
 
-	public static List<CssMetaData<? extends Styleable, ?>> getClassCssMetaData() {
-		return FACTORY.getCssMetaData();
-	}
+  public static List<CssMetaData<? extends Styleable, ?>> getClassCssMetaData()
+  {
+    return FACTORY.getCssMetaData();
+  }
 
-	@Override
-	public List<CssMetaData<? extends Styleable, ?>> getControlCssMetaData() {
-		return FACTORY.getCssMetaData();
-	}
+  @Override
+  public List<CssMetaData<? extends Styleable, ?>> getControlCssMetaData()
+  {
+    return FACTORY.getCssMetaData();
+  }
 
 }

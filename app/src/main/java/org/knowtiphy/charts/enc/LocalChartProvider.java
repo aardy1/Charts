@@ -72,13 +72,12 @@ public class LocalChartProvider
     return chartDescriptions;
   }
 
-  public ENCChart loadChart(
-    ChartLocker chartLocker, ChartDescription chartDescription, MapDisplayOptions displayOptions)
+  public ENCChart loadChart(ChartDescription chartDescription, MapDisplayOptions displayOptions)
     throws IOException, XMLStreamException, TransformException, FactoryException,
            NonInvertibleTransformException, StyleSyntaxException
   {
-    var reader = new ChartBuilder(chartLocker, chartDescription.getDir(), chartDescription,
-      settings, styleReader, displayOptions).read();
+    var reader = new ChartBuilder(chartDescription.getDir(), chartDescription, settings,
+      styleReader, displayOptions).read();
     var map = reader.getMap();
     map.setViewPortBounds(map.bounds());
 
@@ -89,13 +88,12 @@ public class LocalChartProvider
   }
 
   public ENCChart loadChart(
-    ChartLocker chartLocker, ChartDescription chartDescription, ReferencedEnvelope bounds,
-    MapDisplayOptions displayOptions)
+    ChartDescription chartDescription, ReferencedEnvelope bounds, MapDisplayOptions displayOptions)
     throws IOException, XMLStreamException, TransformException, FactoryException,
            NonInvertibleTransformException, StyleSyntaxException
   {
-    var reader = new ChartBuilder(chartLocker, chartDescription.getDir(), chartDescription,
-      settings, styleReader, displayOptions).read();
+    var reader = new ChartBuilder(chartDescription.getDir(), chartDescription, settings,
+      styleReader, displayOptions).read();
     var map = reader.getMap();
     map.setViewPortBounds(bounds);
     return map;

@@ -10,7 +10,6 @@ import org.geotools.api.feature.simple.SimpleFeatureType;
 import org.geotools.api.referencing.FactoryException;
 import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.api.referencing.operation.TransformException;
-import org.knowtiphy.charts.chartview.MapDisplayOptions;
 import org.knowtiphy.charts.chartview.markicons.ResourceLoader;
 import org.knowtiphy.charts.memstore.MemFeature;
 import org.knowtiphy.shapemap.model.MapViewModel;
@@ -23,15 +22,11 @@ import java.util.Collection;
  */
 public class ENCChart extends MapViewModel<SimpleFeatureType, MemFeature>
 {
-
   private final ChartDescription chartDescription;
 
-  public ENCChart(
-    ChartLocker chartLocker, ChartDescription chartDescription, CoordinateReferenceSystem crs,
-    MapDisplayOptions displayOptions)
+  public ENCChart(ChartDescription chartDescription, CoordinateReferenceSystem crs)
     throws TransformException, FactoryException, NonInvertibleTransformException
   {
-
     super(chartDescription.getBounds(crs), SchemaAdapter.ADAPTER, FeatureAdapter.ADAPTER,
       new SVGCache(ResourceLoader.class), TextSizeProvider.PROVIDER);
     this.chartDescription = chartDescription;

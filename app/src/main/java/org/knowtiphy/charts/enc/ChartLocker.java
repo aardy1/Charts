@@ -58,7 +58,7 @@ public class ChartLocker
     throws IOException, XMLStreamException, TransformException, FactoryException,
            NonInvertibleTransformException, StyleSyntaxException
   {
-    var chart = chartProvider.loadChart(this, chartDescription, displayOptions);
+    var chart = chartProvider.loadChart(chartDescription, displayOptions);
     addChartHistory(chartDescription);
     return chart;
   }
@@ -70,7 +70,7 @@ public class ChartLocker
     ENCChart newChart;
     try
     {
-      newChart = chartProvider.loadChart(this, chartDescription, displayOptions);
+      newChart = chartProvider.loadChart(chartDescription, displayOptions);
     }
     catch(IOException | XMLStreamException ex)
     {
