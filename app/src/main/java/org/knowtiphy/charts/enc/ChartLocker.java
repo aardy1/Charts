@@ -27,14 +27,13 @@ import java.util.logging.Logger;
  */
 public class ChartLocker
 {
-  // eventually this will be a list of providers
-  private final LocalChartProvider chartProvider;
+  private final ChartLoader chartLoader;
 
   private final ObservableList<ChartDescription> history = FXCollections.observableArrayList();
 
-  public ChartLocker(LocalChartProvider chartProvider)
+  public ChartLocker(ChartLoader chartLoader)
   {
-    this.chartProvider = chartProvider;
+    this.chartLoader = chartLoader;
   }
 
   public Collection<ChartDescription> intersections(ReferencedEnvelope envelope)
@@ -43,7 +42,7 @@ public class ChartLocker
     var bounds = JTS.toGeometry(envelope);
 
     var result = new ArrayList<ChartDescription>();
-    for(var chartDescription : chartProvider.getChartDescriptions())
+    for(var chartDescription : chartLoader.getChartDescriptions())
     {
       if(chartDescription.intersects(bounds))
       {
@@ -58,7 +57,7 @@ public class ChartLocker
     throws IOException, XMLStreamException, TransformException, FactoryException,
            NonInvertibleTransformException, StyleSyntaxException
   {
-    var chart = chartProvider.loadChart(chartDescription, displayOptions);
+    var chart = chartLoader.loadChart(chartDescription, displayOptions);
     addChartHistory(chartDescription);
     return chart;
   }
@@ -70,7 +69,7 @@ public class ChartLocker
     ENCChart newChart;
     try
     {
-      newChart = chartProvider.loadChart(chartDescription, displayOptions);
+      newChart = chartLoader.loadChart(chartDescription, displayOptions);
     }
     catch(IOException | XMLStreamException ex)
     {
@@ -82,6 +81,11 @@ public class ChartLocker
     newChart.setViewPortBounds(newChart.bounds());
     addChartHistory(chartDescription);
     return newChart;
+  }
+
+  public ChartLoader chartLoader()
+  {
+    return chartLoader;
   }
 
   public ObservableList<ChartDescription> history()

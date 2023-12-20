@@ -19,38 +19,52 @@ import org.knowtiphy.shapemap.style.parser.StyleSyntaxException;
 
 import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
+import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
- * @author graham
+ * A loader of charts from the local chart cache.
  */
-public class LocalChartProvider
-{
 
+public class ChartLoader
+{
   private final StyleReader<SimpleFeatureType, MemFeature> styleReader;
+
+  private final List<Catalog> availableCatalogs = new ArrayList<>();
 
   private final List<ChartDescription> chartDescriptions = new ArrayList<>();
 
   private final AppSettings settings;
 
-  public LocalChartProvider(
-    Catalog catalog, Path shapeBaseDir, AppSettings settings,
-    StyleReader<SimpleFeatureType, MemFeature> styleReader)
+  public ChartLoader(
+    Path chartDir, AppSettings settings, StyleReader<SimpleFeatureType, MemFeature> styleReader)
+    throws IOException, XMLStreamException
   {
-
     this.styleReader = styleReader;
     this.settings = settings;
 
-    for(var cell : catalog.getCells())
-    {
-      var dir = shapeBaseDir.resolve(
-        cell.getName().replaceAll(" ", "_").replaceAll(",", "_") + "_" + cell.getcScale());
-      chartDescriptions.add(new ChartDescription(dir, cell));
-    }
+    //  load the local catalogs
+    var catalogFiles = readAvailableCatalogs(chartDir);
+    System.err.println("AC = " + catalogFiles);
 
-//    System.err.println("Local charts = " + chartDescriptions);
+    //  load the local chart descriptions
+    for(var catalogFile : catalogFiles)
+    {
+      System.err.println("CF = " + catalogFile);
+      var catalog = new CatalogReader(catalogFile).read();
+      availableCatalogs.add(catalog);
+      var parent = catalogFile.getParent();
+      for(var cell : catalog.getCells())
+      {
+        var dir = parent.resolve(
+          cell.getName().replaceAll(" ", "_").replaceAll(",", "_") + "_" + cell.getcScale());
+        chartDescriptions.add(new ChartDescription(dir, cell));
+      }
+    }
   }
 
   // TODO -- needs to go away or be smarter
@@ -99,4 +113,48 @@ public class LocalChartProvider
     return map;
   }
 
+  public Collection<Catalog> availableCatalogs()
+  {
+    return availableCatalogs;
+  }
+
+  private static Collection<Path> readAvailableCatalogs(Path chartDir) throws IOException
+  {
+    var catalogFiles = new ArrayList<Path>();
+
+    try(var walker = Files.walk(chartDir))
+    {
+      var directories = walker.filter(Files::isDirectory).toList();
+      for(var subDir : directories)
+      {
+        try(var files = Files.find(subDir, Integer.MAX_VALUE,
+          (path, basicFileAttributes) -> path.toFile().getName().matches(".*_ENCProdCat.xml")))
+        {
+          catalogFiles.addAll(files.toList());
+        }
+      }
+    }
+
+    return catalogFiles;
+  }
+
+  public Catalog readCatalog(URL url)
+  {
+    try
+    {
+      return new CatalogReader(url).read();
+//      availableCatalogs.add(catalog);
+//      for(var cell : catalog.getCells())
+//      {
+////        var dir = parent.resolve(
+////          cell.getName().replaceAll(" ", "_").replaceAll(",", "_") + "_" + cell.getcScale());
+//        chartDescriptions.add(new ChartDescription(Path.of("."), cell));
+//      }
+//      return catalog;
+    }
+    catch(IOException | XMLStreamException e)
+    {
+      throw new RuntimeException(e);
+    }
+  }
 }

@@ -20,14 +20,14 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import org.controlsfx.control.PropertySheet;
 import org.geotools.api.feature.simple.SimpleFeatureType;
+import org.knowtiphy.charts.chartview.ChartLockerDialog;
 import org.knowtiphy.charts.chartview.ChartView;
 import org.knowtiphy.charts.chartview.MapDisplayOptions;
 import org.knowtiphy.charts.desktop.AppSettingsDialog;
 import org.knowtiphy.charts.dynamics.AISModel;
-import org.knowtiphy.charts.enc.CatalogReader;
+import org.knowtiphy.charts.enc.ChartLoader;
 import org.knowtiphy.charts.enc.ChartLocker;
 import org.knowtiphy.charts.enc.ENCChart;
-import org.knowtiphy.charts.enc.LocalChartProvider;
 import org.knowtiphy.charts.enc.SchemaAdapter;
 import org.knowtiphy.charts.memstore.MapStats;
 import org.knowtiphy.charts.memstore.MemFeature;
@@ -75,12 +75,8 @@ public class KnowtiphyCharts extends Application
   {
     showInitialSetup(platform);
 
-    var catalogFile = platform.chartsDir().resolve("08Region_ENCProdCat.xml");
-    var catalog = new CatalogReader(catalogFile).read();
-
     var styleReader = new StyleReader<SimpleFeatureType, MemFeature>(ResourceLoader.class);
-    var chartProvider = new LocalChartProvider(catalog, platform.chartsDir(), appSettings,
-      styleReader);
+    var chartProvider = new ChartLoader(platform.chartsDir(), appSettings, styleReader);
     chartLocker = new ChartLocker(chartProvider);
     var chartDescription = chartProvider.getChartDescription("Gulf of Mexico", 2_160_000);
 
@@ -198,11 +194,17 @@ public class KnowtiphyCharts extends Application
 
     var items = new ArrayList<MenuItem>();
 
-    var settings = new MenuItem("Settings");
-    items.add(settings);
-    settings.setAccelerator(new KeyCodeCombination(KeyCode.COMMA, KeyCombination.META_DOWN));
-    settings.setOnAction(
+    var showSettings = new MenuItem("Settings");
+    items.add(showSettings);
+    showSettings.setAccelerator(new KeyCodeCombination(KeyCode.COMMA, KeyCombination.META_DOWN));
+    showSettings.setOnAction(
       x -> AppSettingsDialog.create(stage, SETTINGS_WIDTH, SETTINGS_HEIGHT, appSettings)
+                            .showAndWait());
+
+    var showChartLocker = new MenuItem("Chart Locker");
+    items.add(showChartLocker);
+    showChartLocker.setOnAction(
+      x -> ChartLockerDialog.create(stage, SETTINGS_WIDTH, SETTINGS_HEIGHT, chartLocker)
                             .showAndWait());
 
     if(platform.isMac())
