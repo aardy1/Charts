@@ -36,7 +36,7 @@ public class ChartLoader
 
   private final List<Catalog> availableCatalogs = new ArrayList<>();
 
-  private final List<ChartDescription> chartDescriptions = new ArrayList<>();
+//  private final List<ChartDescription> cells = new ArrayList<>();
 
   private final AppSettings settings;
 
@@ -57,41 +57,44 @@ public class ChartLoader
       System.err.println("CF = " + catalogFile);
       var catalog = new CatalogReader(catalogFile).read();
       availableCatalogs.add(catalog);
-      var parent = catalogFile.getParent();
-      for(var cell : catalog.getCells())
-      {
-        var dir = parent.resolve(
-          cell.getName().replaceAll(" ", "_").replaceAll(",", "_") + "_" + cell.getcScale());
-        chartDescriptions.add(new ChartDescription(dir, cell));
-      }
+//      var parent = catalogFile.getParent();
+//      for(var cell : catalog.getCells())
+//      {
+//        var dir = parent.resolve(
+//          cell.getName().replaceAll(" ", "_").replaceAll(",", "_") + "_" + cell.getcScale());
+//        cells.add(new ChartDescription(dir, cell));
+//      }
     }
   }
 
   // TODO -- needs to go away or be smarter
-  public ChartDescription getChartDescription(String lname, int cscale)
+  public ENCCell getChartDescription(String lname, int cscale)
   {
-    for(var chartDescription : chartDescriptions)
+    for(var catalog : availableCatalogs)
     {
-      if(chartDescription.getCell().getLname().equals(lname) && chartDescription.cScale() == cscale)
+      for(var cell : catalog.getCells())
       {
-        return chartDescription;
+        if(cell.getLname().equals(lname) && cell.cScale() == cscale)
+        {
+          return cell;
+        }
       }
     }
 
     return null;
   }
 
-  public List<ChartDescription> getChartDescriptions()
-  {
-    return chartDescriptions;
-  }
+//  public List<ChartDescription> getChartDescriptions()
+//  {
+//    return cells;
+//  }
 
-  public ENCChart loadChart(ChartDescription chartDescription, MapDisplayOptions displayOptions)
+  public ENCChart loadChart(ENCCell cell, MapDisplayOptions displayOptions)
     throws IOException, XMLStreamException, TransformException, FactoryException,
            NonInvertibleTransformException, StyleSyntaxException
   {
-    var reader = new ChartBuilder(chartDescription.getDir(), chartDescription, settings,
-      styleReader, displayOptions).read();
+    var reader = new ChartBuilder(cell.shapeFileDir(), cell, settings, styleReader,
+      displayOptions).read();
     var map = reader.getMap();
     map.setViewPortBounds(map.bounds());
 
@@ -102,12 +105,12 @@ public class ChartLoader
   }
 
   public ENCChart loadChart(
-    ChartDescription chartDescription, ReferencedEnvelope bounds, MapDisplayOptions displayOptions)
+    ENCCell cell, ReferencedEnvelope bounds, MapDisplayOptions displayOptions)
     throws IOException, XMLStreamException, TransformException, FactoryException,
            NonInvertibleTransformException, StyleSyntaxException
   {
-    var reader = new ChartBuilder(chartDescription.getDir(), chartDescription, settings,
-      styleReader, displayOptions).read();
+    var reader = new ChartBuilder(cell.shapeFileDir(), cell, settings, styleReader,
+      displayOptions).read();
     var map = reader.getMap();
     map.setViewPortBounds(bounds);
     return map;
@@ -143,18 +146,21 @@ public class ChartLoader
     try
     {
       return new CatalogReader(url).read();
-//      availableCatalogs.add(catalog);
-//      for(var cell : catalog.getCells())
-//      {
-////        var dir = parent.resolve(
-////          cell.getName().replaceAll(" ", "_").replaceAll(",", "_") + "_" + cell.getcScale());
-//        chartDescriptions.add(new ChartDescription(Path.of("."), cell));
-//      }
-//      return catalog;
     }
     catch(IOException | XMLStreamException e)
     {
       throw new RuntimeException(e);
     }
+  }
+
+  public void addCatalog(Catalog catalog)
+  {
+    availableCatalogs.add(catalog);
+//    for(var cell : catalog.getCells())
+//    {
+////        var dir = parent.resolve(
+////          cell.getName().replaceAll(" ", "_").replaceAll(",", "_") + "_" + cell.getcScale());
+//      cells.add(new ChartDescription(Path.of("."), cell));
+//    }
   }
 }

@@ -22,9 +22,9 @@ import java.util.Collection;
  */
 public class ENCChart extends MapViewModel<SimpleFeatureType, MemFeature>
 {
-  private final ChartDescription chartDescription;
+  private final ENCCell chartDescription;
 
-  public ENCChart(ChartDescription chartDescription, CoordinateReferenceSystem crs)
+  public ENCChart(ENCCell chartDescription, CoordinateReferenceSystem crs)
     throws TransformException, FactoryException, NonInvertibleTransformException
   {
     super(chartDescription.getBounds(crs), SchemaAdapter.ADAPTER, FeatureAdapter.ADAPTER,
@@ -32,7 +32,7 @@ public class ENCChart extends MapViewModel<SimpleFeatureType, MemFeature>
     this.chartDescription = chartDescription;
   }
 
-  public ChartDescription getChartDescription()
+  public ENCCell getChartDescription()
   {
     return chartDescription;
   }

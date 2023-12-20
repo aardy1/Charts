@@ -186,6 +186,9 @@ public class KnowtiphyCharts extends Application
   private static final int SETTINGS_WIDTH = 700;
   private static final int SETTINGS_HEIGHT = 400;
 
+  private static final int CHART_LOCKER_WIDTH = 800;
+  private static final int CHART_LOCKER_HEIGHT = 400;
+
   private MenuBar mainMenuBar(Stage stage)
   {
     var menuBar = new MenuBar();
@@ -203,9 +206,9 @@ public class KnowtiphyCharts extends Application
 
     var showChartLocker = new MenuItem("Chart Locker");
     items.add(showChartLocker);
-    showChartLocker.setOnAction(
-      x -> ChartLockerDialog.create(stage, SETTINGS_WIDTH, SETTINGS_HEIGHT, chartLocker)
-                            .showAndWait());
+    showChartLocker.setOnAction(x -> ChartLockerDialog
+                                       .create(stage, CHART_LOCKER_WIDTH, CHART_LOCKER_HEIGHT,
+                                         chartLocker, chart).showAndWait());
 
     if(platform.isMac())
     {

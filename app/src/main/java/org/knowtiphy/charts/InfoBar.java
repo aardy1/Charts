@@ -21,8 +21,8 @@ import javafx.scene.transform.NonInvertibleTransformException;
 import org.geotools.api.referencing.FactoryException;
 import org.geotools.api.referencing.operation.TransformException;
 import org.knowtiphy.charts.chartview.MapDisplayOptions;
-import org.knowtiphy.charts.enc.ChartDescription;
 import org.knowtiphy.charts.enc.ChartLocker;
+import org.knowtiphy.charts.enc.ENCCell;
 import org.knowtiphy.charts.enc.ENCChart;
 import org.knowtiphy.charts.geotools.Coordinates;
 import org.knowtiphy.charts.settings.UnitProfile;
@@ -133,7 +133,7 @@ public class InfoBar extends StackPane
       showFixedChartInfo();
       showVariableChartInfo();
     });
-    chartLocker.history().addListener((ListChangeListener<ChartDescription>) c -> {
+    chartLocker.history().addListener((ListChangeListener<ENCCell>) c -> {
       c.next();
       for(var description : c.getAddedSubList())
       {
@@ -184,7 +184,7 @@ public class InfoBar extends StackPane
     currentZoomLevel.setText(Coordinates.twoDec(chart.getZoomFactor()));
   }
 
-  private void loadChart(ChartDescription chartDescription)
+  private void loadChart(ENCCell chartDescription)
   {
     try
     {

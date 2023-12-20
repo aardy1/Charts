@@ -1,19 +1,13 @@
 package org.knowtiphy.charts.chartview;
 
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleListProperty;
-import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.control.Spinner;
+import javafx.scene.control.TitledPane;
 import javafx.scene.control.ToolBar;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
@@ -25,6 +19,8 @@ import javafx.stage.Window;
 import org.controlsfx.glyphfont.Glyph;
 import org.knowtiphy.charts.Fonts;
 import org.knowtiphy.charts.enc.ChartLocker;
+import org.knowtiphy.charts.enc.ENCCell;
+import org.knowtiphy.charts.enc.ENCChart;
 
 import java.net.URL;
 import java.util.Map;
@@ -32,17 +28,16 @@ import java.util.Map;
 import static org.knowtiphy.charts.chartview.AvailableCatalogs.AVAILABLE_CATALOGS;
 import static org.knowtiphy.charts.utils.FXUtils.alwaysGrow;
 import static org.knowtiphy.charts.utils.FXUtils.neverGrow;
-import static org.knowtiphy.charts.utils.FXUtils.resizeable;
 
 public class ChartLockerDialog
 {
   //  can't set the size in CSS :-(
   private static final int BUTTON_SIZE = 16;
 
-  public static Stage create(Window parent, int width, int height, ChartLocker chartLocker)
+  public static Stage create(
+    Window parent, int width, int height, ChartLocker chartLocker, ENCChart chart)
   {
-
-    var loaded = loadedCharts(chartLocker);
+    var loaded = loadedCharts(chartLocker, chart);
     var catalogs = availableCatalogs(chartLocker);
 
     var content = content(loaded);
@@ -132,66 +127,68 @@ public class ChartLockerDialog
     return new ScrollPane(pane);
   }
 
-  private static ScrollPane loadedCharts(ChartLocker chartLocker)
+  private static ScrollPane loadedCharts(ChartLocker chartLocker, ENCChart chart)
   {
-    var pane = new GridPane();
-    var row = 0;
-    for(var chart : chartLocker.chartLoader().getChartDescriptions())
+    var catalogPanes = new VBox();
+
+    for(var catalog : chartLocker.chartLoader().availableCatalogs())
     {
-      var chartName = new Label(chart.getName());
-      var chartScale = new Label(" 1:" + chart.cScale());
-      var loaded = new CheckBox("")
+      var grid = new GridPane();
+      grid.getColumnConstraints().addAll(neverGrow(), neverGrow(), neverGrow());
+
+      var row = 0;
+      for(var cell : catalog.getCells())
       {
-        @Override
-        public void arm()
-        {
-          // intentionally do nothing
-        }
-      };
-      loaded.selectedProperty().set(true);
-      pane.addRow(row, chartName, chartScale);
-      row++;
+        var name = new Label(cell.getLname());
+        var scale = new Label(" 1:" + cell.cScale());
+        var load = loadButton(chartLocker, cell, chart);
+        grid.addRow(row++, name, scale, load);
+      }
+
+      var tp = new TitledPane(catalog.getTitle(), grid);
+      tp.animatedProperty().set(false);
+      catalogPanes.getChildren().add(tp);
     }
 
-    pane.getColumnConstraints().addAll(alwaysGrow(), alwaysGrow());
+    var scrollPane = new ScrollPane(catalogPanes);
+    scrollPane.setFitToHeight(true);
+    scrollPane.setFitToWidth(true);
 
-    return new ScrollPane(pane);
+    return scrollPane;
+  }
+
+  private static Button loadButton(ChartLocker chartLocker, ENCCell cell, ENCChart chart)
+  {
+    var button = new Button("Load");
+    button.setOnAction(event -> {
+      try
+      {
+        var newChart = chartLocker.loadChart(cell, new MapDisplayOptions());
+        chart.setNewMapViewModel(newChart);
+      }
+      catch(Exception e)
+      {
+        throw new RuntimeException(e);
+      }
+    });
+
+    return button;
   }
 
   private static void loadCatalog(ChartLocker chartLocker, Map.Entry<String, URL> catalogURL)
   {
-    System.err.println("Load catalog " + catalogURL);
     var catalog = chartLocker.chartLoader().readCatalog(catalogURL.getValue());
-    System.err.println("Catalog = " + catalog);
+    chartLocker.chartLoader().addCatalog(catalog);
   }
 
-  private static <T> void unitRow(
-    GridPane pane, int row, String labelText, T[] possibleValues, ObjectProperty<T> property,
-    IntegerProperty decimals)
-  {
-    var editor = resizeable(comboBox(possibleValues, property));
-    var decSpinner = resizeable(decimalDigits(decimals));
-    pane.addRow(row, new Label(labelText), editor, new Label("Decimal Digits"), decSpinner);
-  }
-
-  private static <T> ComboBox<T> comboBox(T[] possibleValues, ObjectProperty<T> property)
-  {
-    var comboBox = new ComboBox<>(all(possibleValues));
-    comboBox.setValue(property.getValue());
-    property.bind(comboBox.valueProperty());
-    return comboBox;
-  }
-
-  private static Spinner<Integer> decimalDigits(IntegerProperty property)
-  {
-    var spinner = new Spinner<Integer>(0, 6, property.get(), 1);
-    spinner.setEditable(false);
-    property.bind(spinner.valueProperty());
-    return spinner;
-  }
-
-  private static <T> SimpleListProperty<T> all(T[] possibleValues)
-  {
-    return new SimpleListProperty<>(FXCollections.observableArrayList(possibleValues));
-  }
 }
+
+//var loaded = new CheckBox("")
+//{
+//  @Override
+//  public void arm()
+//  {
+//    // intentionally do nothing
+//  }
+//};
+//        loaded.selectedProperty().set(true);

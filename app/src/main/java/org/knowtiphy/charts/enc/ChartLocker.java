@@ -29,31 +29,34 @@ public class ChartLocker
 {
   private final ChartLoader chartLoader;
 
-  private final ObservableList<ChartDescription> history = FXCollections.observableArrayList();
+  private final ObservableList<ENCCell> history = FXCollections.observableArrayList();
 
   public ChartLocker(ChartLoader chartLoader)
   {
     this.chartLoader = chartLoader;
   }
 
-  public Collection<ChartDescription> intersections(ReferencedEnvelope envelope)
+  public Collection<ENCCell> intersections(ReferencedEnvelope envelope)
   {
 
     var bounds = JTS.toGeometry(envelope);
 
-    var result = new ArrayList<ChartDescription>();
-    for(var chartDescription : chartLoader.getChartDescriptions())
+    var result = new ArrayList<ENCCell>();
+    for(var catalog : chartLoader.availableCatalogs())
     {
-      if(chartDescription.intersects(bounds))
+      for(var cell : catalog.getCells())
       {
-        result.add(chartDescription);
+        if(cell.intersects(bounds))
+        {
+          result.add(cell);
+        }
       }
     }
 
     return result;
   }
 
-  public ENCChart getChart(ChartDescription chartDescription, MapDisplayOptions displayOptions)
+  public ENCChart getChart(ENCCell chartDescription, MapDisplayOptions displayOptions)
     throws IOException, XMLStreamException, TransformException, FactoryException,
            NonInvertibleTransformException, StyleSyntaxException
   {
@@ -62,7 +65,7 @@ public class ChartLocker
     return chart;
   }
 
-  public ENCChart loadChart(ChartDescription chartDescription, MapDisplayOptions displayOptions)
+  public ENCChart loadChart(ENCCell chartDescription, MapDisplayOptions displayOptions)
     throws TransformException, FactoryException, NonInvertibleTransformException,
            StyleSyntaxException
   {
@@ -88,12 +91,12 @@ public class ChartLocker
     return chartLoader;
   }
 
-  public ObservableList<ChartDescription> history()
+  public ObservableList<ENCCell> history()
   {
     return history;
   }
 
-  private void addChartHistory(ChartDescription chartDescription)
+  private void addChartHistory(ENCCell chartDescription)
   {
     if(!history.contains(chartDescription))
     {

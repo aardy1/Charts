@@ -34,7 +34,7 @@ public class ChartBuilder
 {
   private final Path shapeDir;
 
-  private final ChartDescription chartDescription;
+  private final ENCCell chartDescription;
 
   private final AppSettings settings;
 
@@ -47,7 +47,7 @@ public class ChartBuilder
   private MemStore store;
 
   public ChartBuilder(
-    Path shapeDir, ChartDescription chartDescription, AppSettings settings,
+    Path shapeDir, ENCCell chartDescription, AppSettings settings,
     StyleReader<SimpleFeatureType, MemFeature> styleReader, MapDisplayOptions displayOptions)
   {
     this.shapeDir = shapeDir;
@@ -102,12 +102,12 @@ public class ChartBuilder
         S57.OC_LNDMRK,
 
         // point styled sea features
-    S57.OC_ACHARE,
-    S57.OC_ACHBRT,
-    S57.OC_BCNLAT,
-    S57.OC_BCNSAW,
-    S57.OC_BCNSPP,
-    S57.OC_BERTHS,
+        S57.OC_ACHARE,
+        S57.OC_ACHBRT,
+        S57.OC_BCNLAT,
+        S57.OC_BCNSAW,
+        S57.OC_BCNSPP,
+        S57.OC_BERTHS,
         S57.OC_BOYLAT,
         S57.OC_BOYSPP,
         S57.OC_BOYSAW,
@@ -136,7 +136,6 @@ public class ChartBuilder
     throws IOException, XMLStreamException, TransformException, FactoryException,
            NonInvertibleTransformException, StyleSyntaxException
   {
-
     var fileNames = readShapeFilesInDir(shapeDir);
 
 //    var all = new HashSet<String>();

@@ -5,95 +5,120 @@
 
 package org.knowtiphy.charts.enc;
 
-import java.util.ArrayList;
-import java.util.List;
 import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.locationtech.jts.geom.Geometry;
 
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author graham
  */
-public class ENCCell {
+public class ENCCell
+{
+  private final Path root;
 
-	private String name;
+  private String name;
 
-	private String lname;
+  private String lname;
 
-	private int cScale;
+  private int cScale;
 
-	private String zipFileLocation;
+  private String zipFileLocation;
 
-	private final List<Panel> panels = new ArrayList<>();
+  private final List<Panel> panels = new ArrayList<>();
 
-	public String getName() {
-		return name;
-	}
+  public ENCCell(Path root)
+  {
+    this.root = root;
+  }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+  public Path shapeFileDir(){return root.resolve(name + "_" + cScale);}
 
-	public String getLname() {
-		return lname;
-	}
+  public String getName()
+  {
+    return name;
+  }
 
-	public void setLname(String lname) {
-		this.lname = lname;
-	}
+  public void setName(String name)
+  {
+    this.name = name;
+  }
 
-	public int getcScale() {
-		return cScale;
-	}
+  public String getLname()
+  {
+    return lname;
+  }
 
-	public void setcScale(int scale) {
-		this.cScale = scale;
-	}
+  public void setLname(String lname)
+  {
+    this.lname = lname;
+  }
 
-	public List<Panel> getPanels() {
-		return panels;
-	}
+  public int cScale()
+  {
+    return cScale;
+  }
 
-	public void addPanel(Panel panel) {
-		this.panels.add(panel);
-	}
+  public void setcScale(int scale)
+  {
+    this.cScale = scale;
+  }
 
-	public String getZipFileLocation() {
-		return zipFileLocation;
-	}
+  public List<Panel> getPanels()
+  {
+    return panels;
+  }
 
-	public void setZipFileLocation(String zipFileLocation) {
-		this.zipFileLocation = zipFileLocation;
-	}
+  public void addPanel(Panel panel)
+  {
+    this.panels.add(panel);
+  }
 
-	public boolean intersects(Geometry envelope) {
-		return panels.stream().anyMatch(p -> p.intersects(envelope));
-	}
+  public String getZipFileLocation()
+  {
+    return zipFileLocation;
+  }
 
-	public ReferencedEnvelope getBounds(CoordinateReferenceSystem crs) {
+  public void setZipFileLocation(String zipFileLocation)
+  {
+    this.zipFileLocation = zipFileLocation;
+  }
 
-		var minX = Double.POSITIVE_INFINITY;
-		var minY = Double.POSITIVE_INFINITY;
-		var maxX = Double.NEGATIVE_INFINITY;
-		var maxY = Double.NEGATIVE_INFINITY;
+  public boolean intersects(Geometry envelope)
+  {
+    return panels.stream().anyMatch(p -> p.intersects(envelope));
+  }
 
-		for (var panel : panels) {
-			for (var coordinate : panel.getVertices()) {
-				minX = Math.min(minX, coordinate.x);
-				minY = Math.min(minY, coordinate.y);
-				maxX = Math.max(maxX, coordinate.x);
-				maxY = Math.max(maxY, coordinate.y);
-			}
-		}
+  public ReferencedEnvelope getBounds(CoordinateReferenceSystem crs)
+  {
 
-		// TODO -- get the CRS from the cell file
-		return new ReferencedEnvelope(minX, maxX, minY, maxY, crs);
-	}
+    var minX = Double.POSITIVE_INFINITY;
+    var minY = Double.POSITIVE_INFINITY;
+    var maxX = Double.NEGATIVE_INFINITY;
+    var maxY = Double.NEGATIVE_INFINITY;
 
-	@Override
-	public String toString() {
-		return "ENCCell{" + "name=" + name + ", lname=" + lname + ", cScale=" + cScale + ", zipFileLocation="
-				+ zipFileLocation + ", panels=" + panels + '}';
-	}
+    for(var panel : panels)
+    {
+      for(var coordinate : panel.getVertices())
+      {
+        minX = Math.min(minX, coordinate.x);
+        minY = Math.min(minY, coordinate.y);
+        maxX = Math.max(maxX, coordinate.x);
+        maxY = Math.max(maxY, coordinate.y);
+      }
+    }
 
+    // TODO -- get the CRS from the cell file
+    return new ReferencedEnvelope(minX, maxX, minY, maxY, crs);
+  }
+
+  @Override
+  public String toString()
+  {
+    return "ENCCell{" + "root=" + root + ", name='" + name + '\'' + ", lname='" + lname + '\'' +
+             ", cScale=" + cScale + ", zipFileLocation='" + zipFileLocation + '\'' + ", panels=" + panels + '}';
+  }
 }

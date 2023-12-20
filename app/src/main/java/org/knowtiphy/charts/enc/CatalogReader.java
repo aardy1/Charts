@@ -23,8 +23,8 @@ import java.nio.file.Path;
 public class CatalogReader
 {
 
+  private static final String HEADER = "header";
   private static final String TITLE = "title";
-
   private static final String CELL = "cell";
 
   private static final String CELL_NAME = "name";
@@ -47,11 +47,14 @@ public class CatalogReader
 
   private Catalog catalog;
 
-  private InputStream stream;
+  private final InputStream stream;
+
+  private Path catalogFile;
 
   public CatalogReader(Path catalogFile) throws FileNotFoundException
   {
     stream = new FileInputStream(catalogFile.toFile());
+    this.catalogFile = catalogFile;
   }
 
   public CatalogReader(URL catalogFile) throws IOException
@@ -70,7 +73,6 @@ public class CatalogReader
   @SuppressWarnings("null")
   public Catalog read() throws XMLStreamException, IOException
   {
-
     var xmlInputFactory = XMLInputFactory.newInstance();
     XMLEventReader reader;
     // try
@@ -109,7 +111,7 @@ public class CatalogReader
           }
           case CELL ->
           {
-            cell = new ENCCell();
+            cell = new ENCCell(catalogFile == null ? Path.of(".") : catalogFile.getParent());
           }
           case CELL_NAME ->
           {
@@ -180,4 +182,8 @@ public class CatalogReader
     return catalog;
   }
 
+  public Path catalogFile()
+  {
+    return catalogFile;
+  }
 }

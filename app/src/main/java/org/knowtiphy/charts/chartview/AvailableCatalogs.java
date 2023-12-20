@@ -13,8 +13,8 @@ public class AvailableCatalogs
   {
     try
     {
-      AVAILABLE_CATALOGS.put("Bulgaria Inland ENC", new URL(
-        "https://raw.githubusercontent.com/chartcatalogs/catalogs/master/BG_IENC_Catalog.xml"));
+      AVAILABLE_CATALOGS.put("Region 04 - Chesapeake and Delaware Bays",
+        new URL("https://www.charts.noaa.gov/ENCs/04Region_ENCProdCat.xml"));
     }
     catch(MalformedURLException e)
     {

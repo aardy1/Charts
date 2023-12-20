@@ -25,8 +25,8 @@ import org.knowtiphy.charts.chartview.ChartView.EventModel;
 import org.knowtiphy.charts.dynamics.AISEvent;
 import org.knowtiphy.charts.dynamics.AISInformation;
 import org.knowtiphy.charts.dynamics.AISModel;
-import org.knowtiphy.charts.enc.ChartDescription;
 import org.knowtiphy.charts.enc.ChartLocker;
+import org.knowtiphy.charts.enc.ENCCell;
 import org.knowtiphy.charts.enc.ENCChart;
 import org.knowtiphy.charts.geotools.Queries;
 import org.knowtiphy.charts.memstore.MemFeature;
@@ -127,7 +127,7 @@ public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView
     eventModel.mouseEvents.feedFrom(EventStreams.eventsOf(root, MouseEvent.ANY));
     eventModel.scrollEvents.feedFrom(EventStreams.eventsOf(root, ScrollEvent.ANY));
     eventModel.zoomEvents.feedFrom(EventStreams.eventsOf(root, ZoomEvent.ANY));
-    
+
     // windows on clicked, mac on pressed
     eventModel.mouseClicked.filter(MouseEvent::isPopupTrigger).subscribe(
       event -> makeContextMenu(event).show(mapSurface, event.getScreenX(), event.getScreenY()));
@@ -288,7 +288,7 @@ public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView
 
     var envelope = Queries.tinyPolygon(chart, event.getX(), event.getY());
 
-    ChartDescription mostDetailedChart = null;
+    ENCCell mostDetailedChart = null;
     var smallestScale = Integer.MAX_VALUE;
 
     for(var chartDescription : chartLocker.intersections(envelope))
