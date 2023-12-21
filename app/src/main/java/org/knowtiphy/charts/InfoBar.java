@@ -181,7 +181,7 @@ public class InfoBar extends StackPane
     // platform.windowWidthCM(this)))
     // + unitProfile.distanceUnit);
 
-    currentZoomLevel.setText(Coordinates.twoDec(chart.getZoomFactor()));
+    currentZoomLevel.setText(Coordinates.twoDec(chart.zoomFactor()));
   }
 
   private void loadChart(ENCCell chartDescription)

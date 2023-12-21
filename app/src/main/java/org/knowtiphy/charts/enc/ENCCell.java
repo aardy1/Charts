@@ -12,13 +12,14 @@ import org.locationtech.jts.geom.Geometry;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author graham
  */
 public class ENCCell
 {
-  private Path location;
+  private final Catalog catalog;
 
   private String name;
 
@@ -26,18 +27,22 @@ public class ENCCell
 
   private int cScale;
 
+  private boolean active;
+
   private String zipFileLocation;
 
   private final List<Panel> panels = new ArrayList<>();
 
-  public Path location(){return location;}
+  private Path location;
 
-  public void setLocation(Path location)
+  public ENCCell(Catalog catalog)
   {
-    this.location = location;
+    this.catalog = catalog;
   }
 
-  public String getName()
+  public Catalog catalog(){return catalog;}
+
+  public String name()
   {
     return name;
   }
@@ -67,14 +72,14 @@ public class ENCCell
     this.cScale = scale;
   }
 
-  public List<Panel> getPanels()
+  public boolean active()
   {
-    return panels;
+    return active;
   }
 
-  public void addPanel(Panel panel)
+  public void setActive(boolean active)
   {
-    this.panels.add(panel);
+    this.active = active;
   }
 
   public String zipFileLocation()
@@ -87,14 +92,35 @@ public class ENCCell
     this.zipFileLocation = zipFileLocation;
   }
 
+  public List<Panel> panels()
+  {
+    return panels;
+  }
+
+  public void addPanel(Panel panel)
+  {
+    this.panels.add(panel);
+  }
+
+  public Path location(){return location;}
+
+  public void setLocation(Path location)
+  {
+    this.location = location;
+  }
+
+  public boolean isLoaded()
+  {
+    return location.toFile().exists();
+  }
+
   public boolean intersects(Geometry envelope)
   {
     return panels.stream().anyMatch(p -> p.intersects(envelope));
   }
 
-  public ReferencedEnvelope getBounds(CoordinateReferenceSystem crs)
+  public ReferencedEnvelope bounds(CoordinateReferenceSystem crs)
   {
-
     var minX = Double.POSITIVE_INFINITY;
     var minY = Double.POSITIVE_INFINITY;
     var maxX = Double.NEGATIVE_INFINITY;
@@ -102,7 +128,7 @@ public class ENCCell
 
     for(var panel : panels)
     {
-      for(var coordinate : panel.getVertices())
+      for(var coordinate : panel.vertices())
       {
         minX = Math.min(minX, coordinate.x);
         minY = Math.min(minY, coordinate.y);
@@ -113,6 +139,28 @@ public class ENCCell
 
     // TODO -- get the CRS from the cell file
     return new ReferencedEnvelope(minX, maxX, minY, maxY, crs);
+  }
+
+  //  TODO -- how can we tell if two ENCs are the same?
+  @Override
+  public boolean equals(Object o)
+  {
+    if(this == o)
+    {
+      return true;
+    }
+    if(o == null || getClass() != o.getClass())
+    {
+      return false;
+    }
+    ENCCell encCell = (ENCCell) o;
+    return Objects.equals(zipFileLocation, encCell.zipFileLocation);
+  }
+
+  @Override
+  public int hashCode()
+  {
+    return Objects.hash(zipFileLocation);
   }
 
   @Override

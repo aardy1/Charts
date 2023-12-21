@@ -30,8 +30,34 @@ public class ChartDownloader
   private static final List<String> CONVERT_COMMAND = List.of("/Users/graham/anaconda3/bin/ogr2ogr",
     "-skipfailures", "-splitlistfields", "-update", "-append", "-f", "ESRI Shapefile");
 
-  public static void downloadAndPrepare(
-    Catalog catalog, Path chartsDir, ChartDownLoaderNotifier notifier) throws IOException
+  //  TODO -- refactor with next method
+  public static void downloadCell(ENCCell cell, Path chartsDir, ChartDownloaderNotifier notifier)
+    throws IOException
+  {
+    notifier.start();
+
+    var downloadTo = Files.createTempDirectory(null);
+
+    try
+    {
+      notifier.reading(cell);
+      unzipFolder(new URL(cell.zipFileLocation()), downloadTo);
+      notifier.converting(cell);
+      convertCell(cell, chartsDir, downloadTo);
+    }
+    finally
+    {
+      notifier.cleaningUp();
+      notifier.finished();
+      if(downloadTo != null)
+      {
+        deleteDirectory(downloadTo);
+      }
+    }
+  }
+
+  public static void downloadCatalog(
+    Catalog catalog, Path chartsDir, ChartDownloaderNotifier notifier) throws IOException
   {
     notifier.start();
 
@@ -40,36 +66,30 @@ public class ChartDownloader
     try
     {
       //  download the zip files referenced in the catalog
-      for(var cell : catalog.cells())
+      for(var cell : catalog.activeCells())
       {
         notifier.reading(cell);
         unzipFolder(new URL(cell.zipFileLocation()), downloadTo);
       }
 
       //  convert the downloaded ENC files into shape files
-      for(var cell : catalog.cells())
+      for(var cell : catalog.activeCells())
       {
-        var downloadPath = downloadTo.resolve(
-          Path.of("ENC_ROOT", cell.getName(), cell.getName() + ".000"));
-        System.err.println("download path = " + downloadPath);
-        var convertedPath = Naming.cellName(chartsDir, catalog, cell.getName());
-        System.err.println("target path = " + convertedPath);
-        notifier.converting(cell);
-        convert(downloadPath, convertedPath);
+        convertCell(cell, chartsDir, downloadTo);
       }
     }
     finally
     {
+      notifier.cleaningUp();
+      notifier.finished();
       if(downloadTo != null)
       {
-        notifier.cleaningUp();
         deleteDirectory(downloadTo);
       }
     }
 
-    notifier.finished();
   }
-  
+
   private static void unzipFolder(URL url, Path target) throws IOException
   {
     try(ZipInputStream zis = new ZipInputStream(url.openStream()))
@@ -131,6 +151,15 @@ public class ChartDownloader
     }
 
     return normalizePath;
+  }
+
+  private static void convertCell(ENCCell cell, Path chartsDir, Path downloadTo) throws IOException
+  {
+    var downloadPath = downloadTo.resolve(Path.of("ENC_ROOT", cell.name(), cell.name() + ".000"));
+    System.err.println("download path = " + downloadPath);
+    var convertedPath = Naming.cellName(chartsDir, cell);
+    System.err.println("target path = " + convertedPath);
+    convert(downloadPath, convertedPath);
   }
 
   private static void convert(Path srcFile, Path targetDir) throws IOException

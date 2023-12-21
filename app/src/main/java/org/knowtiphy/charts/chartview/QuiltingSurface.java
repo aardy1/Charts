@@ -90,11 +90,11 @@ public class QuiltingSurface extends StackPane
     // should sort here
     for(var chartDescription : intersecting)
     {
-      if(chartDescription == chart.getCell())
+      if(chartDescription.equals(chart.cell()))
       {
         continue;
       }
-      if(chartDescription.getPanels().isEmpty())
+      if(chartDescription.panels().isEmpty())
       {
         System.err.println("EMPTY");
       }
@@ -128,12 +128,12 @@ public class QuiltingSurface extends StackPane
 
     displaySurface.getChildren().clear();
 
-    for(var panel : chartDescription.getPanels())
+    for(var panel : chartDescription.panels())
     {
-      var pts = new double[panel.getVertices().size() * 2];
+      var pts = new double[panel.vertices().size() * 2];
       for(int i = 0, j = 0; j < pts.length; i++, j += 2)
       {
-        var vertex = panel.getVertices().get(i);
+        var vertex = panel.vertices().get(i);
         pts[j] = vertex.x;
         pts[j + 1] = vertex.y;
       }

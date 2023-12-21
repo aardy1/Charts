@@ -5,10 +5,10 @@ import java.nio.file.Paths;
 
 public class Naming
 {
-  public static Path cellName(Path chartsDir, Catalog catalog, String name)
+  public static Path cellName(Path chartsDir, ENCCell cell)
   {
-    var region = regionName(catalog);
-    return chartsDir.resolve(Paths.get(region, name));
+    var region = regionName(cell.catalog());
+    return chartsDir.resolve(Paths.get(region, cell.name()));
   }
 
   private static String regionName(Catalog catalog)

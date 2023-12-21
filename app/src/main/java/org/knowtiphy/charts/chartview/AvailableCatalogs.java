@@ -7,13 +7,13 @@ import java.util.Map;
 
 public class AvailableCatalogs
 {
-  public static final Map<String, URL> AVAILABLE_CATALOGS = new HashMap<>();
+  public static final Map<String, URL> BUILTIN_CATALOGS = new HashMap<>();
 
   static
   {
     try
     {
-      AVAILABLE_CATALOGS.put("Region 04 - Chesapeake and Delaware Bays",
+      BUILTIN_CATALOGS.put("Region 04 - Chesapeake and Delaware Bays",
         new URL("https://www.charts.noaa.gov/ENCs/04Region_ENCProdCat.xml"));
     }
     catch(MalformedURLException e)

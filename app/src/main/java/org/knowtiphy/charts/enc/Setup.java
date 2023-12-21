@@ -33,14 +33,14 @@ public class Setup
 
     ensureDirExists(baseTarget);
 
-    for(var cell : catalog.cells())
+    for(var cell : catalog.activeCells())
     {
-      var cellTargetDir = baseTarget + "/" + cell.getName().replaceAll(" ", "_")
+      var cellTargetDir = baseTarget + "/" + cell.name().replaceAll(" ", "_")
                                                  .replaceAll(",", "_") + "_" + cell.cScale();
 
       ensureDirExists(cellTargetDir);
 
-      var cellSrcFile = src + "/" + cell.getName() + "/" + cell.getName() + ".000";
+      var cellSrcFile = src + "/" + cell.name() + "/" + cell.name() + ".000";
       buildShapeFiles(cellTargetDir, cellSrcFile);
     }
 

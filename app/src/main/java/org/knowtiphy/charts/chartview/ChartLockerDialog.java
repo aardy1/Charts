@@ -18,16 +18,17 @@ import javafx.stage.Stage;
 import javafx.stage.Window;
 import org.controlsfx.glyphfont.Glyph;
 import org.knowtiphy.charts.Fonts;
+import org.knowtiphy.charts.enc.ChartDownloaderNotifier;
 import org.knowtiphy.charts.enc.ChartLocker;
 import org.knowtiphy.charts.enc.ENCCell;
 import org.knowtiphy.charts.enc.ENCChart;
 
+import java.io.IOException;
 import java.net.URL;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static org.knowtiphy.charts.chartview.AvailableCatalogs.AVAILABLE_CATALOGS;
+import static org.knowtiphy.charts.chartview.AvailableCatalogs.BUILTIN_CATALOGS;
 import static org.knowtiphy.charts.utils.FXUtils.alwaysGrow;
 import static org.knowtiphy.charts.utils.FXUtils.neverGrow;
 
@@ -36,17 +37,29 @@ public class ChartLockerDialog
   //  can't set the size in CSS :-(
   private static final int BUTTON_SIZE = 16;
 
-  public static Stage create(
-    Window parent, int width, int height, ChartLocker chartLocker, ENCChart chart)
+  private final ChartLocker chartLocker;
+
+  private final ENCChart chart;
+
+  private final MapDisplayOptions mapDisplayOptions;
+
+  public ChartLockerDialog(
+    ChartLocker chartLocker, ENCChart chart, MapDisplayOptions mapDisplayOptions)
   {
-    var loaded = loadedCharts(chartLocker, chart);
-    var catalogs = availableCatalogs(chartLocker);
+    this.chartLocker = chartLocker;
+    this.chart = chart;
+    this.mapDisplayOptions = mapDisplayOptions;
+  }
 
-    var content = content(loaded);
+  public Stage create(Window parent, int width, int height)
+  {
+    var availableCharts = availableCharts();
+    var content = content(availableCharts);
 
-    var loadedB = button("Loaded Charts", Fonts.boat(BUTTON_SIZE), x -> content.setCenter(loaded));
-    var catalogsB = button("Available Catalogs", Fonts.units(BUTTON_SIZE),
-      x -> content.setCenter(catalogs));
+    var loadedB = button("Charts", Fonts.boat(BUTTON_SIZE),
+      x -> content.setCenter(availableCharts()));
+    var catalogsB = button("Catalogs", Fonts.units(BUTTON_SIZE),
+      x -> content.setCenter(availableCatalogs()));
 
     var buttons = buttonBar(loadedB, catalogsB);
 
@@ -69,7 +82,7 @@ public class ChartLockerDialog
     return stage;
   }
 
-  private static BorderPane content(Node initialContent)
+  private BorderPane content(Node initialContent)
   {
     var content = new BorderPane();
     content.getStyleClass().add("content");
@@ -77,7 +90,7 @@ public class ChartLockerDialog
     return content;
   }
 
-  private static Node buttonBar(Button... buttons)
+  private Node buttonBar(Button... buttons)
   {
     var bar = new GridPane();
     bar.getStyleClass().add("buttonbar");
@@ -86,7 +99,7 @@ public class ChartLockerDialog
     return bar;
   }
 
-  private static Button button(String text, Glyph glyph, EventHandler<ActionEvent> handler)
+  private Button button(String text, Glyph glyph, EventHandler<ActionEvent> handler)
   {
     var button = new Button(text);
     button.setGraphic(glyph);
@@ -94,7 +107,7 @@ public class ChartLockerDialog
     return button;
   }
 
-  private static ScrollPane availableCatalogs(ChartLocker chartLocker)
+  private ScrollPane availableCatalogs()
   {
     var pane = new GridPane();
     var loaded = new Label("Loaded");
@@ -103,7 +116,7 @@ public class ChartLockerDialog
 
     var row = 1;
 
-    for(var catalog : chartLocker.chartLoader().availableCatalogs())
+    for(var catalog : chartLocker.availableCatalogs())
     {
       var catalogName = new Label(catalog.title());
       pane.add(catalogName, 1, row);
@@ -115,11 +128,11 @@ public class ChartLockerDialog
     pane.addRow(row, available);
     row++;
 
-    for(var catalog : AVAILABLE_CATALOGS.entrySet())
+    for(var catalog : BUILTIN_CATALOGS.entrySet())
     {
       var catalogName = new Label(catalog.getKey());
       var loadButton = new Button("Load");
-      loadButton.setOnAction(event -> loadCatalog(chartLocker, catalog));
+      loadButton.setOnAction(event -> loadCatalog(catalog.getValue()));
       pane.add(catalogName, 1, row);
       pane.add(loadButton, 2, row);
       row++;
@@ -130,22 +143,25 @@ public class ChartLockerDialog
     return new ScrollPane(pane);
   }
 
-  private static ScrollPane loadedCharts(ChartLocker chartLocker, ENCChart chart)
+  private ScrollPane availableCharts()
   {
     var catalogPanes = new VBox();
 
-    for(var catalog : chartLocker.chartLoader().availableCatalogs())
+    for(var catalog : chartLocker.availableCatalogs())
     {
       var grid = new GridPane();
       grid.getColumnConstraints().addAll(neverGrow(), neverGrow(), neverGrow());
 
       var row = 0;
-      for(var cell : catalog.cells())
+      for(var cell : catalog.activeCells())
       {
         var name = new Label(cell.lName());
         var scale = new Label(" 1:" + cell.cScale());
-        var load = loadButton(chartLocker, cell, chart);
-        grid.addRow(row++, load, name, scale);
+        var show = showButton(cell);
+        show.setDisable(!cell.isLoaded());
+        var load = loadButton(cell, show);
+        load.setDisable(cell.isLoaded());
+        grid.addRow(row++, name, scale, show, load);
       }
 
       var section = new TitledPane(catalog.title(), grid);
@@ -160,13 +176,34 @@ public class ChartLockerDialog
     return scrollPane;
   }
 
-  private static Button loadButton(ChartLocker chartLocker, ENCCell cell, ENCChart chart)
+  private Button loadButton(ENCCell cell, Button show)
   {
     var button = new Button("Load");
     button.setOnAction(event -> {
+      System.err.println("Load this chart");
+
       try
       {
-        var newChart = chartLocker.loadChart(cell, new MapDisplayOptions());
+        chartLocker.downloadChart(cell, new ChartDownloaderNotifier());
+        button.setDisable(true);
+        show.setDisable(false);
+      }
+      catch(IOException e)
+      {
+        //  TODO
+      }
+    });
+
+    return button;
+  }
+
+  private Button showButton(ENCCell cell)
+  {
+    var button = new Button("Show");
+    button.setOnAction(event -> {
+      try
+      {
+        var newChart = chartLocker.loadChart(cell, mapDisplayOptions);
         chart.setNewMapViewModel(newChart);
       }
       catch(Exception ex)
@@ -178,12 +215,11 @@ public class ChartLockerDialog
     return button;
   }
 
-  private static void loadCatalog(ChartLocker chartLocker, Map.Entry<String, URL> catalogURL)
+  private void loadCatalog(URL catalogURL)
   {
     try
     {
-      var catalog = chartLocker.chartLoader().readCatalog(catalogURL.getValue());
-      chartLocker.chartLoader().addCatalog(catalog);
+      chartLocker.addCatalog(catalogURL);
     }
     catch(Exception ex)
     {

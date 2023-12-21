@@ -76,10 +76,10 @@ public class KnowtiphyCharts extends Application
     showInitialSetup(platform);
 
     var styleReader = new StyleReader<SimpleFeatureType, MemFeature>(ResourceLoader.class);
-    var chartProvider = new ChartLoader(platform.chartsDir(), appSettings, styleReader);
-    chartLocker = new ChartLocker(chartProvider);
+    var chartProvider = new ChartLoader(appSettings, styleReader);
+    chartLocker = new ChartLocker(platform.chartsDir(), chartProvider);
 
-    var cell = chartProvider.getCell("Gulf of Mexico", 2_160_000);
+    var cell = chartLocker.getCell("Gulf of Mexico", 2_160_000);
 
     displayOptions = new MapDisplayOptions();
     chart = chartLocker.getChart(cell, displayOptions);
@@ -185,9 +185,11 @@ public class KnowtiphyCharts extends Application
   }
 
   private static final int SETTINGS_WIDTH = 700;
+
   private static final int SETTINGS_HEIGHT = 400;
 
-  private static final int CHART_LOCKER_WIDTH = 800;
+  private static final int CHART_LOCKER_WIDTH = 900;
+
   private static final int CHART_LOCKER_HEIGHT = 400;
 
   private MenuBar mainMenuBar(Stage stage)
@@ -207,9 +209,9 @@ public class KnowtiphyCharts extends Application
 
     var showChartLocker = new MenuItem("Chart Locker");
     items.add(showChartLocker);
-    showChartLocker.setOnAction(x -> ChartLockerDialog
-                                       .create(stage, CHART_LOCKER_WIDTH, CHART_LOCKER_HEIGHT,
-                                         chartLocker, chart).showAndWait());
+    showChartLocker.setOnAction(x -> new ChartLockerDialog(chartLocker, chart, displayOptions)
+                                       .create(stage, CHART_LOCKER_WIDTH, CHART_LOCKER_HEIGHT)
+                                       .showAndWait());
 
     if(platform.isMac())
     {
@@ -277,7 +279,7 @@ public class KnowtiphyCharts extends Application
   private void setStageTitle(Stage stage, ENCChart chart)
   {
     platform.setStageTitle(stage,
-      "%s             1::%d             %s".formatted(chart.title(), chart.getCell().cScale(),
+      "%s             1::%d             %s".formatted(chart.title(), chart.cell().cScale(),
         appSettings.unitProfile().formatEnvelope(chart.bounds())));
   }
 

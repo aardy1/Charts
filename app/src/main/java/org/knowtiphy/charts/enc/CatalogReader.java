@@ -23,18 +23,31 @@ import java.nio.file.Path;
 public class CatalogReader
 {
   private static final String TITLE = "title";
+
   private static final String CELL = "cell";
+
   private static final String CELL_NAME = "name";
+
   private static final String CELL_LNAME = "lname";
+
   private static final String CSCALE = "cscale";
+
+  private static final String STATUS = "status";
+
   private static final String ZIP_FILE_LOCATION = "zipfile_location";
+
   private static final String PANEL = "panel";
+
   private static final String PANEL_NO = "panel_no";
+
   private static final String VERTEX = "vertex";
+
   private static final String LAT = "lat";
+
   private static final String LONG = "long";
 
   private final Path chartsDir;
+
   private Catalog catalog;
 
   private final InputStream stream;
@@ -79,57 +92,55 @@ public class CatalogReader
           case TITLE ->
           {
             catalog = new Catalog();
-            nextEvent = reader.nextEvent();
-            catalog.setTitle(nextEvent.asCharacters().getData());
+            catalog.setTitle(reader.nextEvent().asCharacters().getData());
           }
           case CELL ->
           {
-            cell = new ENCCell();
+            assert catalog != null;
+            cell = new ENCCell(catalog);
           }
           case CELL_NAME ->
           {
-            var name = reader.nextEvent().asCharacters().getData();
-            cell.setName(name);
-            cell.setLocation(Naming.cellName(chartsDir, catalog, name));
-
+            assert cell != null;
+            cell.setName(reader.nextEvent().asCharacters().getData());
+            cell.setLocation(Naming.cellName(chartsDir, cell));
           }
           case CELL_LNAME ->
           {
-            nextEvent = reader.nextEvent();
-            cell.setLname(nextEvent.asCharacters().getData());
+            assert cell != null;
+            cell.setLname(reader.nextEvent().asCharacters().getData());
           }
           case CSCALE ->
           {
-            nextEvent = reader.nextEvent();
-            cell.setcScale(Integer.parseInt(nextEvent.asCharacters().getData()));
+            assert cell != null;
+            cell.setcScale(Integer.parseInt(reader.nextEvent().asCharacters().getData()));
+          }
+          case STATUS ->
+          {
+            assert cell != null;
+            cell.setActive(reader.nextEvent().asCharacters().getData().equalsIgnoreCase("active"));
           }
           case ZIP_FILE_LOCATION ->
           {
-            nextEvent = reader.nextEvent();
-            cell.setZipFileLocation(nextEvent.asCharacters().getData());
+            assert cell != null;
+            cell.setZipFileLocation(reader.nextEvent().asCharacters().getData());
           }
-          case PANEL ->
-          {
-            panel = new Panel();
-          }
+          case PANEL -> panel = new Panel();
           case PANEL_NO ->
           {
-            nextEvent = reader.nextEvent();
-            panel.setPanelNumber(Integer.parseInt(nextEvent.asCharacters().getData()));
+            assert panel != null;
+            panel.setPanelNumber(Integer.parseInt(reader.nextEvent().asCharacters().getData()));
           }
-          case VERTEX ->
-          {
-            coordinate = new Coordinate();
-          }
+          case VERTEX -> coordinate = new Coordinate();
           case LONG ->
           {
-            nextEvent = reader.nextEvent();
-            coordinate.x = Double.parseDouble(nextEvent.asCharacters().getData());
+            assert coordinate != null;
+            coordinate.x = Double.parseDouble(reader.nextEvent().asCharacters().getData());
           }
           case LAT ->
           {
-            nextEvent = reader.nextEvent();
-            coordinate.y = Double.parseDouble(nextEvent.asCharacters().getData());
+            assert coordinate != null;
+            coordinate.y = Double.parseDouble(reader.nextEvent().asCharacters().getData());
           }
           default ->
           {
@@ -146,10 +157,16 @@ public class CatalogReader
           case CELL -> catalog.addCell(cell);
           case PANEL ->
           {
+            assert panel != null;
             panel.createGeom();
+            assert cell != null;
             cell.addPanel(panel);
           }
-          case VERTEX -> panel.addVertex(coordinate);
+          case VERTEX ->
+          {
+            assert panel != null;
+            panel.addVertex(coordinate);
+          }
         }
       }
     }

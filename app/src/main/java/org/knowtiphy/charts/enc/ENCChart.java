@@ -15,11 +15,10 @@ import org.knowtiphy.charts.memstore.MemFeature;
 import org.knowtiphy.shapemap.model.MapViewModel;
 import org.knowtiphy.shapemap.renderer.context.SVGCache;
 
-import java.util.Collection;
-
 /**
- * @author graham
+ * An ENC chart -- a map view model for an ENC cell
  */
+
 public class ENCChart extends MapViewModel<SimpleFeatureType, MemFeature>
 {
   private final ENCCell cell;
@@ -27,12 +26,12 @@ public class ENCChart extends MapViewModel<SimpleFeatureType, MemFeature>
   public ENCChart(ENCCell cell, CoordinateReferenceSystem crs)
     throws TransformException, FactoryException, NonInvertibleTransformException
   {
-    super(cell.getBounds(crs), SchemaAdapter.ADAPTER, FeatureAdapter.ADAPTER,
+    super(cell.bounds(crs), SchemaAdapter.ADAPTER, FeatureAdapter.ADAPTER,
       new SVGCache(ResourceLoader.class), TextSizeProvider.PROVIDER);
     this.cell = cell;
   }
 
-  public ENCCell getCell()
+  public ENCCell cell()
   {
     return cell;
   }
@@ -42,24 +41,15 @@ public class ENCChart extends MapViewModel<SimpleFeatureType, MemFeature>
     return cell.cScale();
   }
 
-  public double getZoomFactor()
+  public double zoomFactor()
   {
     return 1 / (viewPortBounds().getWidth() / bounds().getWidth());
   }
 
   public int currentScale()
   {
-    return (int) (cScale() / getZoomFactor());
+    return (int) (cScale() / zoomFactor());
   }
 
-  public Collection<Panel> getPanels()
-  {
-    return cell.getPanels();
-  }
-
-  public String title()
-  {
-    return cell.lName();
-  }
-
+  public String title(){return cell.lName();}
 }

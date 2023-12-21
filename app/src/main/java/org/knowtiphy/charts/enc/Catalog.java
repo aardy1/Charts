@@ -8,6 +8,7 @@ package org.knowtiphy.charts.enc;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * An ENC catalog.
@@ -34,9 +35,31 @@ public class Catalog
     cells.add(cell);
   }
 
-  public Collection<ENCCell> cells()
+  public Collection<ENCCell> activeCells()
   {
-    return cells;
+    return cells.stream().filter(ENCCell::active).toList();
+  }
+
+  //  TODO -- when are two catalogs the same?
+  @Override
+  public boolean equals(Object o)
+  {
+    if(this == o)
+    {
+      return true;
+    }
+    if(o == null || getClass() != o.getClass())
+    {
+      return false;
+    }
+    Catalog catalog = (Catalog) o;
+    return Objects.equals(title, catalog.title);
+  }
+
+  @Override
+  public int hashCode()
+  {
+    return Objects.hash(title);
   }
 
   @Override
