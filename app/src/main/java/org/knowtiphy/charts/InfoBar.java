@@ -101,7 +101,7 @@ public class InfoBar extends StackPane
     var items = new ArrayList<MenuItem>();
     for(var description : chartLocker.history())
     {
-      var menuItem = new MenuItem(description.getName() + "  1:" + description.cScale());
+      var menuItem = new MenuItem(description.lName() + "  1:" + description.cScale());
       menuItem.setOnAction(event -> loadChart(description));
       items.add(menuItem);
     }
@@ -137,7 +137,7 @@ public class InfoBar extends StackPane
       c.next();
       for(var description : c.getAddedSubList())
       {
-        var menuItem = new MenuItem(description.getName() + "  1:" + description.cScale());
+        var menuItem = new MenuItem(description.lName() + "  1:" + description.cScale());
         menuItem.setOnAction(event -> loadChart(description));
         history.getItems().add(menuItem);
       }

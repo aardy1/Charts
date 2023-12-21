@@ -22,74 +22,47 @@ import java.nio.file.Path;
  */
 public class CatalogReader
 {
-
-  private static final String HEADER = "header";
   private static final String TITLE = "title";
   private static final String CELL = "cell";
-
   private static final String CELL_NAME = "name";
-
   private static final String CELL_LNAME = "lname";
-
   private static final String CSCALE = "cscale";
-
   private static final String ZIP_FILE_LOCATION = "zipfile_location";
-
   private static final String PANEL = "panel";
-
   private static final String PANEL_NO = "panel_no";
-
   private static final String VERTEX = "vertex";
-
   private static final String LAT = "lat";
-
   private static final String LONG = "long";
 
+  private final Path chartsDir;
   private Catalog catalog;
 
   private final InputStream stream;
 
-  private Path catalogFile;
-
-  public CatalogReader(Path catalogFile) throws FileNotFoundException
+  public CatalogReader(Path chartsDir, Path catalogFile) throws FileNotFoundException
   {
+    this.chartsDir = chartsDir;
     stream = new FileInputStream(catalogFile.toFile());
-    this.catalogFile = catalogFile;
   }
 
-  public CatalogReader(URL catalogFile) throws IOException
+  public CatalogReader(Path chartsDir, URL catalogFile) throws IOException
   {
+    this.chartsDir = chartsDir;
     stream = catalogFile.openStream();
   }
 
   /**
-   * Read an exchange set from a catalog file, constructing a map from scale -> list of
-   * cells at that scale.
+   * Read a catalog from a stream.
    *
-   * @return
-   * @throws FileNotFoundException
-   * @throws XMLStreamException
+   * @return the catalog
+   * @throws XMLStreamException on a malformed catalog file
    */
   @SuppressWarnings("null")
-  public Catalog read() throws XMLStreamException, IOException
+
+  public Catalog read() throws XMLStreamException
   {
-    var xmlInputFactory = XMLInputFactory.newInstance();
-    XMLEventReader reader;
-    // try
-    // {
-    reader = xmlInputFactory.createXMLEventReader(stream);
-    // }
-    // catch(Exception ex)
-    // {
-    // System.err.println("catFile " + catalogFile);
-    // var fileClient = FileClient.create(catalogFile.toFile());
-    // System.err.println("File = " + fileClient);
-    // System.err.println("DS = " + fileClient.createFileDataSource());
-    // System.err.println("Stream = " +
-    // fileClient.createFileDataSource().getInputStream());
-    // reader = xmlInputFactory.createXMLEventReader(fileClient.createFileDataSource()
-    // .getInputStream());
-    // }
+    XMLEventReader reader = XMLInputFactory.newInstance().createXMLEventReader(stream);
+
     ENCCell cell = null;
     Panel panel = null;
     Coordinate coordinate = null;
@@ -111,12 +84,14 @@ public class CatalogReader
           }
           case CELL ->
           {
-            cell = new ENCCell(catalogFile == null ? Path.of(".") : catalogFile.getParent());
+            cell = new ENCCell();
           }
           case CELL_NAME ->
           {
-            nextEvent = reader.nextEvent();
-            cell.setName(nextEvent.asCharacters().getData());
+            var name = reader.nextEvent().asCharacters().getData();
+            cell.setName(name);
+            cell.setLocation(Naming.cellName(chartsDir, catalog, name));
+
           }
           case CELL_LNAME ->
           {
@@ -180,10 +155,5 @@ public class CatalogReader
     }
 
     return catalog;
-  }
-
-  public Path catalogFile()
-  {
-    return catalogFile;
   }
 }

@@ -44,7 +44,7 @@ public class ChartLocker
     var result = new ArrayList<ENCCell>();
     for(var catalog : chartLoader.availableCatalogs())
     {
-      for(var cell : catalog.getCells())
+      for(var cell : catalog.cells())
       {
         if(cell.intersects(bounds))
         {

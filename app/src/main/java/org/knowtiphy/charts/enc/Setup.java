@@ -26,14 +26,14 @@ public class Setup
   public static Catalog setup(Path catalogFile)
     throws XMLStreamException, IOException, InterruptedException
   {
-    var catalog = new CatalogReader(catalogFile).read();
+    var catalog = new CatalogReader(null, catalogFile).read();
 
     var src = "/Users/graham/Documents/Charts/ENC/US_REGION08";
-    var baseTarget = "/Users/graham/tmp/ENC/" + regionName(catalog.getTitle());
+    var baseTarget = "/Users/graham/tmp/ENC/" + regionName(catalog.title());
 
     ensureDirExists(baseTarget);
 
-    for(var cell : catalog.getCells())
+    for(var cell : catalog.cells())
     {
       var cellTargetDir = baseTarget + "/" + cell.getName().replaceAll(" ", "_")
                                                  .replaceAll(",", "_") + "_" + cell.cScale();

@@ -300,7 +300,7 @@ public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView
       }
     }
 
-    if(mostDetailedChart != null && mostDetailedChart != chart.getChartDescription())
+    if(mostDetailedChart != null && mostDetailedChart != chart.getCell())
     {
       try
       {

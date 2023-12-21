@@ -22,24 +22,24 @@ import java.util.Collection;
  */
 public class ENCChart extends MapViewModel<SimpleFeatureType, MemFeature>
 {
-  private final ENCCell chartDescription;
+  private final ENCCell cell;
 
-  public ENCChart(ENCCell chartDescription, CoordinateReferenceSystem crs)
+  public ENCChart(ENCCell cell, CoordinateReferenceSystem crs)
     throws TransformException, FactoryException, NonInvertibleTransformException
   {
-    super(chartDescription.getBounds(crs), SchemaAdapter.ADAPTER, FeatureAdapter.ADAPTER,
+    super(cell.getBounds(crs), SchemaAdapter.ADAPTER, FeatureAdapter.ADAPTER,
       new SVGCache(ResourceLoader.class), TextSizeProvider.PROVIDER);
-    this.chartDescription = chartDescription;
+    this.cell = cell;
   }
 
-  public ENCCell getChartDescription()
+  public ENCCell getCell()
   {
-    return chartDescription;
+    return cell;
   }
 
   public int cScale()
   {
-    return chartDescription.cScale();
+    return cell.cScale();
   }
 
   public double getZoomFactor()
@@ -54,12 +54,12 @@ public class ENCChart extends MapViewModel<SimpleFeatureType, MemFeature>
 
   public Collection<Panel> getPanels()
   {
-    return chartDescription.getPanels();
+    return cell.getPanels();
   }
 
   public String title()
   {
-    return chartDescription.getName();
+    return cell.lName();
   }
 
 }

@@ -21,7 +21,6 @@ import org.locationtech.jts.index.strtree.STRtree;
 import javax.xml.stream.XMLStreamException;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -32,9 +31,7 @@ import static org.knowtiphy.charts.geotools.FileUtils.readShapeFilesInDir;
  */
 public class ChartBuilder
 {
-  private final Path shapeDir;
-
-  private final ENCCell chartDescription;
+  private final ENCCell cell;
 
   private final AppSettings settings;
 
@@ -47,12 +44,11 @@ public class ChartBuilder
   private MemStore store;
 
   public ChartBuilder(
-    Path shapeDir, ENCCell chartDescription, AppSettings settings,
-    StyleReader<SimpleFeatureType, MemFeature> styleReader, MapDisplayOptions displayOptions)
+    ENCCell cell, AppSettings settings, StyleReader<SimpleFeatureType, MemFeature> styleReader,
+    MapDisplayOptions displayOptions)
   {
-    this.shapeDir = shapeDir;
     this.settings = settings;
-    this.chartDescription = chartDescription;
+    this.cell = cell;
     this.styleReader = styleReader;
     this.displayOptions = displayOptions;
   }
@@ -136,7 +132,7 @@ public class ChartBuilder
     throws IOException, XMLStreamException, TransformException, FactoryException,
            NonInvertibleTransformException, StyleSyntaxException
   {
-    var fileNames = readShapeFilesInDir(shapeDir);
+    var fileNames = readShapeFilesInDir(cell.location());
 
 //    var all = new HashSet<String>();
 //
@@ -171,7 +167,7 @@ public class ChartBuilder
             if(chart == null)
             {
               var crs = featureSource.getBounds().getCoordinateReferenceSystem();
-              chart = new ENCChart(chartDescription, crs);
+              chart = new ENCChart(cell, crs);
               store = new MemStore(chart);
             }
 

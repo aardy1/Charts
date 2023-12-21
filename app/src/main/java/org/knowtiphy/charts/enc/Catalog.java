@@ -10,33 +10,38 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * @author graham
+ * An ENC catalog.
  */
-public class Catalog {
 
-	private String title;
+public class Catalog
+{
+  private String title;
 
-	private final List<ENCCell> cells = new ArrayList<>();
+  private final List<ENCCell> cells = new ArrayList<>();
 
-	public void addCell(ENCCell cell) {
-		cells.add(cell);
-	}
+  public String title()
+  {
+    return title;
+  }
 
-	public Collection<ENCCell> getCells() {
-		return cells;
-	}
+  public void setTitle(String title)
+  {
+    this.title = title;
+  }
 
-	public String getTitle() {
-		return title;
-	}
+  public void addCell(ENCCell cell)
+  {
+    cells.add(cell);
+  }
 
-	public void setTitle(String title) {
-		this.title = title;
-	}
+  public Collection<ENCCell> cells()
+  {
+    return cells;
+  }
 
-	@Override
-	public String toString() {
-		return "Catalog{" + "cells=" + cells + '}';
-	}
-
+  @Override
+  public String toString()
+  {
+    return "Catalog{" + "title='" + title + '\'' + ", cells=" + cells + '}';
+  }
 }

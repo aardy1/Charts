@@ -24,6 +24,8 @@ import org.knowtiphy.charts.enc.ENCChart;
 
 import java.net.URL;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static org.knowtiphy.charts.chartview.AvailableCatalogs.AVAILABLE_CATALOGS;
 import static org.knowtiphy.charts.utils.FXUtils.alwaysGrow;
@@ -49,13 +51,14 @@ public class ChartLockerDialog
     var buttons = buttonBar(loadedB, catalogsB);
 
     var root = new VBox();
+    root.getStyleClass().add("content");
     VBox.setVgrow(buttons, Priority.NEVER);
     VBox.setVgrow(content, Priority.ALWAYS);
     root.getChildren().addAll(buttons, content);
 
     var scene = new Scene(root, width, height);
     scene.getStylesheets()
-         .add(ResourceLoader.class.getResource("chartlocker.css").toExternalForm());
+         .add(ResourceLoader.class.getResource("chartlockerdialog.css").toExternalForm());
 
     var stage = new Stage();
     stage.setScene(scene);
@@ -102,7 +105,7 @@ public class ChartLockerDialog
 
     for(var catalog : chartLocker.chartLoader().availableCatalogs())
     {
-      var catalogName = new Label(catalog.getTitle());
+      var catalogName = new Label(catalog.title());
       pane.add(catalogName, 1, row);
       row++;
     }
@@ -137,17 +140,17 @@ public class ChartLockerDialog
       grid.getColumnConstraints().addAll(neverGrow(), neverGrow(), neverGrow());
 
       var row = 0;
-      for(var cell : catalog.getCells())
+      for(var cell : catalog.cells())
       {
-        var name = new Label(cell.getLname());
+        var name = new Label(cell.lName());
         var scale = new Label(" 1:" + cell.cScale());
         var load = loadButton(chartLocker, cell, chart);
-        grid.addRow(row++, name, scale, load);
+        grid.addRow(row++, load, name, scale);
       }
 
-      var tp = new TitledPane(catalog.getTitle(), grid);
-      tp.animatedProperty().set(false);
-      catalogPanes.getChildren().add(tp);
+      var section = new TitledPane(catalog.title(), grid);
+      section.animatedProperty().set(false);
+      catalogPanes.getChildren().add(section);
     }
 
     var scrollPane = new ScrollPane(catalogPanes);
@@ -166,9 +169,9 @@ public class ChartLockerDialog
         var newChart = chartLocker.loadChart(cell, new MapDisplayOptions());
         chart.setNewMapViewModel(newChart);
       }
-      catch(Exception e)
+      catch(Exception ex)
       {
-        throw new RuntimeException(e);
+        Logger.getLogger(ChartLockerDialog.class.getName()).log(Level.SEVERE, null, ex);
       }
     });
 
@@ -177,8 +180,15 @@ public class ChartLockerDialog
 
   private static void loadCatalog(ChartLocker chartLocker, Map.Entry<String, URL> catalogURL)
   {
-    var catalog = chartLocker.chartLoader().readCatalog(catalogURL.getValue());
-    chartLocker.chartLoader().addCatalog(catalog);
+    try
+    {
+      var catalog = chartLocker.chartLoader().readCatalog(catalogURL.getValue());
+      chartLocker.chartLoader().addCatalog(catalog);
+    }
+    catch(Exception ex)
+    {
+      Logger.getLogger(ChartLockerDialog.class.getName()).log(Level.SEVERE, null, ex);
+    }
   }
 
 }

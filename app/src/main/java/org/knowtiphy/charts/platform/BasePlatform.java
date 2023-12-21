@@ -10,7 +10,6 @@ import javafx.scene.layout.Region;
 import javafx.stage.Screen;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 /**
  * @author graham
@@ -45,7 +44,7 @@ public abstract class BasePlatform
 
   public Path chartsDir()
   {
-    return rootDir().resolve(Paths.get("ENC", "US_REGION08"));
+    return rootDir().resolve(Path.of("ENC"));
   }
 
   public double ppi()

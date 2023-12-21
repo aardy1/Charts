@@ -90,7 +90,7 @@ public class QuiltingSurface extends StackPane
     // should sort here
     for(var chartDescription : intersecting)
     {
-      if(chartDescription == chart.getChartDescription())
+      if(chartDescription == chart.getCell())
       {
         continue;
       }

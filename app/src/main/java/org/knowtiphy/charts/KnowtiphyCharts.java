@@ -78,10 +78,11 @@ public class KnowtiphyCharts extends Application
     var styleReader = new StyleReader<SimpleFeatureType, MemFeature>(ResourceLoader.class);
     var chartProvider = new ChartLoader(platform.chartsDir(), appSettings, styleReader);
     chartLocker = new ChartLocker(chartProvider);
-    var chartDescription = chartProvider.getChartDescription("Gulf of Mexico", 2_160_000);
+
+    var cell = chartProvider.getCell("Gulf of Mexico", 2_160_000);
 
     displayOptions = new MapDisplayOptions();
-    chart = chartLocker.getChart(chartDescription, displayOptions);
+    chart = chartLocker.getChart(cell, displayOptions);
 
     chart.newMapViewModel()
          .subscribe(change -> setStageTitle(primaryStage, (ENCChart) change.getNewValue()));
@@ -275,9 +276,9 @@ public class KnowtiphyCharts extends Application
 
   private void setStageTitle(Stage stage, ENCChart chart)
   {
-    platform.setStageTitle(stage, "%s             1::%d             %s".formatted(chart.title(),
-      chart.getChartDescription().cScale(),
-      appSettings.unitProfile().formatEnvelope(chart.bounds())));
+    platform.setStageTitle(stage,
+      "%s             1::%d             %s".formatted(chart.title(), chart.getCell().cScale(),
+        appSettings.unitProfile().formatEnvelope(chart.bounds())));
   }
 
   private void shutdown()

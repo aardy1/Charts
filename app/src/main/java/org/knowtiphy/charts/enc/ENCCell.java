@@ -18,7 +18,7 @@ import java.util.List;
  */
 public class ENCCell
 {
-  private final Path root;
+  private Path location;
 
   private String name;
 
@@ -30,12 +30,12 @@ public class ENCCell
 
   private final List<Panel> panels = new ArrayList<>();
 
-  public ENCCell(Path root)
-  {
-    this.root = root;
-  }
+  public Path location(){return location;}
 
-  public Path shapeFileDir(){return root.resolve(name + "_" + cScale);}
+  public void setLocation(Path location)
+  {
+    this.location = location;
+  }
 
   public String getName()
   {
@@ -47,7 +47,7 @@ public class ENCCell
     this.name = name;
   }
 
-  public String getLname()
+  public String lName()
   {
     return lname;
   }
@@ -77,7 +77,7 @@ public class ENCCell
     this.panels.add(panel);
   }
 
-  public String getZipFileLocation()
+  public String zipFileLocation()
   {
     return zipFileLocation;
   }
@@ -118,7 +118,6 @@ public class ENCCell
   @Override
   public String toString()
   {
-    return "ENCCell{" + "root=" + root + ", name='" + name + '\'' + ", lname='" + lname + '\'' +
-             ", cScale=" + cScale + ", zipFileLocation='" + zipFileLocation + '\'' + ", panels=" + panels + '}';
+    return "ENCCell{" + "location=" + location + ", name='" + name + '\'' + ", lname='" + lname + '\'' + ", cScale=" + cScale + ", zipFileLocation='" + zipFileLocation + '\'' + '}';
   }
 }
