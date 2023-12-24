@@ -2,27 +2,27 @@ package org.knowtiphy.charts.enc;
 
 public class ChartDownloaderNotifier
 {
-  void start()
+  public void start()
   {
     //  do nothing
   }
 
-  void reading(ENCCell cell)
+  public void reading(ENCCell cell)
   {
     //  do nothing
   }
 
-  void converting(ENCCell cell)
+  public void converting(ENCCell cell)
   {
     //  do nothing
   }
 
-  void cleaningUp()
+  public void cleaningUp()
   {
     //  do nothing
   }
 
-  void finished()
+  public void finished()
   {
     //  do nothing
   }

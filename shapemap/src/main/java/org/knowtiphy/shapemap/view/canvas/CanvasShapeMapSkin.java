@@ -28,7 +28,6 @@ import java.util.List;
 
 public class CanvasShapeMapSkin<S, F> extends ShapeMapBaseSkin<S, F>
 {
-
   private static final double PREFERRED_WIDTH = Region.USE_COMPUTED_SIZE;
 
   private static final double PREFERRED_HEIGHT = Region.USE_COMPUTED_SIZE;
@@ -53,19 +52,22 @@ public class CanvasShapeMapSkin<S, F> extends ShapeMapBaseSkin<S, F>
     setupListeners();
   }
 
-  private void setupListeners()
+  public void setMap(MapViewModel<S, F> newMap)
   {
     // unsubscribe listeners on the old map
     subscriptions.forEach(Subscription::unsubscribe);
     subscriptions.clear();
+
+    map = newMap;
+
+    setupListeners();
+    root.requestLayout();
+  }
+
+  private void setupListeners()
+  {
     subscriptions.add(map.layerVisibilityEvent().subscribe(b -> root.requestLayout()));
     subscriptions.add(map.viewPortBoundsEvent().subscribe(b -> root.requestLayout()));
-    subscriptions.add(map.newMapViewModel().subscribe(change -> {
-      this.map = change.getNewValue();
-      setupListeners();
-      System.err.println("NEW MAP");
-      root.requestLayout();
-    }));
   }
 
   private void initGraphics()

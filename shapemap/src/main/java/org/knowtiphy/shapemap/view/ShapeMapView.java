@@ -20,7 +20,6 @@ import java.util.List;
 
 public class ShapeMapView<S, F> extends Control
 {
-
   public enum SkinType
   {
 
@@ -46,7 +45,6 @@ public class ShapeMapView<S, F> extends Control
 
   public ShapeMapView(MapViewModel<S, F> map, SkinType skinType)
   {
-
     this.map = map;
     this.skinType = skinType;
     getStyleClass().add("shapemap-view");
@@ -88,4 +86,8 @@ public class ShapeMapView<S, F> extends Control
     return FACTORY.getCssMetaData();
   }
 
+  public void setMap(MapViewModel<S, F> newMap)
+  {
+    ((ShapeMapBaseSkin<S, F>) getSkin()).setMap(newMap);
+  }
 }

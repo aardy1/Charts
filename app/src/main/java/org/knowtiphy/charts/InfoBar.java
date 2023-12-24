@@ -24,11 +24,13 @@ import org.knowtiphy.charts.chartview.MapDisplayOptions;
 import org.knowtiphy.charts.enc.ChartLocker;
 import org.knowtiphy.charts.enc.ENCCell;
 import org.knowtiphy.charts.enc.ENCChart;
+import org.knowtiphy.charts.enc.event.ChartLockerEvent;
 import org.knowtiphy.charts.geotools.Coordinates;
 import org.knowtiphy.charts.settings.UnitProfile;
 import org.knowtiphy.charts.utils.FXUtils;
 import org.knowtiphy.charts.utils.ToggleModel;
 import org.knowtiphy.shapemap.renderer.ShapeMapRenderer;
+import org.knowtiphy.shapemap.renderer.context.SVGCache;
 import org.knowtiphy.shapemap.style.parser.StyleSyntaxException;
 import org.reactfx.Subscription;
 
@@ -60,16 +62,19 @@ public class InfoBar extends StackPane
 
   private final MapDisplayOptions displayOptions;
 
+  private final SVGCache svgCache;
+
   private final List<Subscription> subscriptions = new ArrayList<>();
 
   public InfoBar(
     ToggleModel toggleModel, ENCChart chrt, UnitProfile unitProfile, ChartLocker chartLocker,
-    MapDisplayOptions displayOptions)
+    MapDisplayOptions displayOptions, SVGCache svgCache)
   {
     this.chart = chrt;
     this.unitProfile = unitProfile;
     this.chartLocker = chartLocker;
     this.displayOptions = displayOptions;
+    this.svgCache = svgCache;
 
     var zoomIn = new Button("", Fonts.plus());
     zoomIn.setTooltip(new Tooltip("Zoom In"));
@@ -133,6 +138,7 @@ public class InfoBar extends StackPane
       showFixedChartInfo();
       showVariableChartInfo();
     });
+
     chartLocker.history().addListener((ListChangeListener<ENCCell>) c -> {
       c.next();
       for(var description : c.getAddedSubList())
@@ -143,6 +149,19 @@ public class InfoBar extends StackPane
       }
     });
 
+    chartLocker.chartEvents().filter(ChartLockerEvent::isUnload).subscribe(event -> {
+      // unsubscribe listeners on the old chart
+      subscriptions.forEach(Subscription::unsubscribe);
+      subscriptions.clear();
+    });
+
+    chartLocker.chartEvents().filter(ChartLockerEvent::isLoad).subscribe(event -> {
+      chart = event.chart();
+      setupListeners();
+      showFixedChartInfo();
+      showVariableChartInfo();
+    });
+
     setupListeners();
 
     ShapeMapRenderer.count.addListener(x -> showFixedChartInfo());
@@ -150,14 +169,7 @@ public class InfoBar extends StackPane
 
   private void setupListeners()
   {
-    subscriptions.forEach(Subscription::unsubscribe);
-    subscriptions.clear();
     subscriptions.add(chart.viewPortBoundsEvent().subscribe(c -> showVariableChartInfo()));
-    subscriptions.add(chart.newMapViewModel().subscribe(change -> {
-      chart = (ENCChart) change.getNewValue();
-      showVariableChartInfo();
-      setupListeners();
-    }));
   }
 
   //  TODO -- needs to go away
@@ -188,8 +200,7 @@ public class InfoBar extends StackPane
   {
     try
     {
-      var newChart = chartLocker.loadChart(chartDescription, displayOptions);
-      chart.setNewMapViewModel(newChart);
+      chartLocker.loadChart(chartDescription, displayOptions, svgCache);
     }
     catch(TransformException | FactoryException | NonInvertibleTransformException |
           StyleSyntaxException ex)

@@ -28,11 +28,13 @@ import org.knowtiphy.charts.dynamics.AISModel;
 import org.knowtiphy.charts.enc.ChartLocker;
 import org.knowtiphy.charts.enc.ENCCell;
 import org.knowtiphy.charts.enc.ENCChart;
+import org.knowtiphy.charts.enc.event.ChartLockerEvent;
 import org.knowtiphy.charts.geotools.Queries;
 import org.knowtiphy.charts.memstore.MemFeature;
 import org.knowtiphy.charts.ontology.S57;
 import org.knowtiphy.charts.settings.UnitProfile;
 import org.knowtiphy.shapemap.renderer.Transformation;
+import org.knowtiphy.shapemap.renderer.context.SVGCache;
 import org.knowtiphy.shapemap.style.parser.StyleSyntaxException;
 import org.knowtiphy.shapemap.view.ShapeMapView;
 import org.reactfx.EventStreams;
@@ -68,6 +70,8 @@ public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView
 
   private final MapDisplayOptions displayOptions;
 
+  private final SVGCache svgCache;
+
   private final List<Subscription> subscriptions = new ArrayList<>();
 
   // private final Pane iconsSurface;
@@ -83,9 +87,9 @@ public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView
 
   public ChartViewSkin(
     ChartView fxMap, ChartLocker chartLocker, ENCChart chrt, AISModel dynamics,
-    EventModel eventModel, UnitProfile unitProfile, MapDisplayOptions displayOptions)
+    EventModel eventModel, UnitProfile unitProfile, MapDisplayOptions displayOptions,
+    SVGCache svgCache)
   {
-
     super(fxMap);
 
     this.chartLocker = chartLocker;
@@ -93,6 +97,7 @@ public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView
     // this.dynamics = dynamics;
     this.eventModel = eventModel;
     this.displayOptions = displayOptions;
+    this.svgCache = svgCache;
 
     root = makeRoot();
     getChildren().addAll(root);
@@ -129,10 +134,29 @@ public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView
     eventModel.zoomEvents.feedFrom(EventStreams.eventsOf(root, ZoomEvent.ANY));
 
     // windows on clicked, mac on pressed
-    eventModel.mouseClicked.filter(MouseEvent::isPopupTrigger).subscribe(
-      event -> makeContextMenu(event).show(mapSurface, event.getScreenX(), event.getScreenY()));
-    eventModel.mousePressed.filter(MouseEvent::isPopupTrigger).subscribe(
-      event -> makeContextMenu(event).show(mapSurface, event.getScreenX(), event.getScreenY()));
+    eventModel.mouseClicked.filter(MouseEvent::isPopupTrigger)
+                           .subscribe(
+                             event -> makeContextMenu(event).show(mapSurface, event.getScreenX(),
+                               event.getScreenY()));
+    eventModel.mousePressed.filter(MouseEvent::isPopupTrigger)
+                           .subscribe(
+                             event -> makeContextMenu(event).show(mapSurface, event.getScreenX(),
+                               event.getScreenY()));
+
+    subscriptions.add(chartLocker.chartEvents().subscribe(change -> updateBoats()));
+    // subscriptions.add(dynamics.aisEvents.subscribe(this::updateAISInformation));
+
+    chartLocker.chartEvents().filter(ChartLockerEvent::isUnload).subscribe(event -> {
+      // unsubscribe listeners on the old chart
+      subscriptions.forEach(Subscription::unsubscribe);
+      subscriptions.clear();
+    });
+
+    chartLocker.chartEvents().filter(ChartLockerEvent::isLoad).subscribe(event -> {
+      chart = event.chart();
+      mapSurface.setMap(chart);
+      setupListeners();
+    });
 
     unitProfile.unitChangeEvents().subscribe(e -> mapSurface.requestLayout());
     setupListeners();
@@ -163,7 +187,7 @@ public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView
 
   private Pane makeCoordinateGrid(UnitProfile unitProfile)
   {
-    var theGrid = resizeable(new CoordinateGrid(chart, unitProfile));
+    var theGrid = resizeable(new CoordinateGrid(chartLocker, chart, unitProfile));
     theGrid.setPickOnBounds(false);
     theGrid.setMouseTransparent(true);
     return theGrid;
@@ -171,12 +195,12 @@ public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView
 
   private Pane makeIconsSurface()
   {
-    return new IconSurface(chart);
+    return new IconSurface(chartLocker, chart);
   }
 
   private Pane makeQuiltingSurface()
   {
-    var theSurface = new QuiltingSurface(chartLocker, chart, displayOptions);
+    var theSurface = new QuiltingSurface(chartLocker, chart, displayOptions, svgCache);
     theSurface.setPickOnBounds(false);
     return theSurface;
   }
@@ -199,11 +223,6 @@ public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView
 
   private void setupListeners()
   {
-
-    // unsubscribe listeners on the old chart
-    subscriptions.forEach(Subscription::unsubscribe);
-    subscriptions.clear();
-
     // add listeners on the new chart
     subscriptions.add(DragPanZoomSupport.addPositionAtSupport(eventModel, chart));
     subscriptions.add(DragPanZoomSupport.addDragSupport(eventModel, chart));
@@ -222,17 +241,8 @@ public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView
     subscriptions.add(displayOptions.showSoundingsEvents.subscribe(
       change -> chart.setLayerVisible(S57.OC_SOUNDG, change.getNewValue())));
 
-    // gridPane.setVisible(c.getNewValue())));
-
     // subscriptions.add(chart.viewPortBoundsEvent.subscribe(change ->
     // updateBoats()));
-    subscriptions.add(chart.newMapViewModel().subscribe(change -> updateBoats()));
-    // subscriptions.add(dynamics.aisEvents.subscribe(this::updateAISInformation));
-
-    subscriptions.add(chart.newMapViewModel().subscribe(change -> {
-      chart = (ENCChart) change.getNewValue();
-      setupListeners();
-    }));
   }
 
   private void showInfo(MouseEvent event)
@@ -264,7 +274,10 @@ public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView
               var attrVal = feature.getAttribute(attr.getLocalName());
               if(attrVal != null && !(attrVal instanceof String x && x.isEmpty()))
               {
-                textToDisplay.append("\t").append(attr.getName()).append(" = ").append(attrVal)
+                textToDisplay.append("\t")
+                             .append(attr.getName())
+                             .append(" = ")
+                             .append(attrVal)
                              .append("\n");
               }
             }
@@ -304,8 +317,7 @@ public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView
     {
       try
       {
-        var newChart = chartLocker.loadChart(mostDetailedChart, displayOptions);
-        chart.setNewMapViewModel(newChart);
+        chartLocker.loadChart(mostDetailedChart, displayOptions, svgCache);
       }
       catch(TransformException | FactoryException | NonInvertibleTransformException |
             StyleSyntaxException ex)

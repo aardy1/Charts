@@ -13,7 +13,11 @@ import org.geotools.api.referencing.operation.TransformException;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.knowtiphy.charts.chartview.MapDisplayOptions;
+import org.knowtiphy.charts.enc.event.ChartLockerEvent;
+import org.knowtiphy.shapemap.renderer.context.SVGCache;
 import org.knowtiphy.shapemap.style.parser.StyleSyntaxException;
+import org.reactfx.EventSource;
+import org.reactfx.EventStream;
 
 import javax.xml.stream.XMLStreamException;
 import java.io.FileOutputStream;
@@ -38,6 +42,8 @@ public class ChartLocker
 
   private final Path chartsDir;
 
+  private final EventSource<ChartLockerEvent> chartEvents = new EventSource<>();
+
   private final List<Catalog> availableCatalogs = new ArrayList<>();
 
   private final ObservableList<ENCCell> history = FXCollections.observableArrayList();
@@ -58,6 +64,8 @@ public class ChartLocker
     System.err.println(availableCatalogs);
   }
 
+  public EventStream<ChartLockerEvent> chartEvents(){return chartEvents;}
+
   public Collection<ENCCell> intersections(ReferencedEnvelope envelope)
   {
     var bounds = JTS.toGeometry(envelope);
@@ -77,23 +85,15 @@ public class ChartLocker
     return result;
   }
 
-  public ENCChart getChart(ENCCell chartDescription, MapDisplayOptions displayOptions)
-    throws IOException, XMLStreamException, TransformException, FactoryException,
-           NonInvertibleTransformException, StyleSyntaxException
-  {
-    var chart = chartLoader.loadChart(chartDescription, displayOptions);
-    addChartHistory(chartDescription);
-    return chart;
-  }
-
-  public ENCChart loadChart(ENCCell chartDescription, MapDisplayOptions displayOptions)
+  public ENCChart loadChart(
+    ENCCell chartDescription, MapDisplayOptions displayOptions, SVGCache svgCache)
     throws TransformException, FactoryException, NonInvertibleTransformException,
            StyleSyntaxException
   {
     ENCChart newChart;
     try
     {
-      newChart = chartLoader.loadChart(chartDescription, displayOptions);
+      newChart = chartLoader.loadChart(chartDescription, displayOptions, svgCache);
     }
     catch(IOException | XMLStreamException ex)
     {
@@ -104,6 +104,9 @@ public class ChartLocker
     // newChart.setViewPortScreenArea(screenArea);
     newChart.setViewPortBounds(newChart.bounds());
     addChartHistory(chartDescription);
+    //  notify that the old chart is unloaded, and the new chart is available
+    chartEvents.push(new ChartLockerEvent(ChartLockerEvent.Type.UNLOADED, null));
+    chartEvents.push(new ChartLockerEvent(ChartLockerEvent.Type.LOADED, newChart));
     return newChart;
   }
 

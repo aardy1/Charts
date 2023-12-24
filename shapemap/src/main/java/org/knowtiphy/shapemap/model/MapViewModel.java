@@ -46,6 +46,7 @@ public abstract class MapViewModel<S, F>
   private final IRenderablePolygonProvider renderablePolygonProvider;
 
   private final ISVGProvider svgProvider;
+
   private final ITextSizeProvider textSizeProvider;
 
   // possibly shouldnt be here -- but it makes for faster rendering
@@ -158,10 +159,10 @@ public abstract class MapViewModel<S, F>
     return svgProvider;
   }
 
-  public void setNewMapViewModel(MapViewModel<S, F> map)
-  {
-    newMapViewModel.push(new Change<>(this, map));
-  }
+//  public void setNewMapViewModel(MapViewModel<S, F> map)
+//  {
+//    newMapViewModel.push(new Change<>(this, map));
+//  }
 
   public ReferencedEnvelope bounds()
   {
@@ -198,9 +199,9 @@ public abstract class MapViewModel<S, F>
     return viewPortScreenAreaEvent;
   }
 
-  public EventStream<Change<MapViewModel<S, F>>> newMapViewModel()
-  {
-    return newMapViewModel;
-  }
+//  public EventStream<Change<MapViewModel<S, F>>> newMapViewModel()
+//  {
+//    return newMapViewModel;
+//  }
 
 }

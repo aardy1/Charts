@@ -14,6 +14,7 @@ import org.knowtiphy.charts.memstore.StyleReader;
 import org.knowtiphy.charts.ontology.S57;
 import org.knowtiphy.charts.settings.AppSettings;
 import org.knowtiphy.shapemap.model.MapLayer;
+import org.knowtiphy.shapemap.renderer.context.SVGCache;
 import org.knowtiphy.shapemap.style.parser.StyleSyntaxException;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.index.strtree.STRtree;
@@ -39,18 +40,21 @@ public class ChartBuilder
 
   private final MapDisplayOptions displayOptions;
 
+  private final SVGCache svgCache;
+
   private ENCChart chart;
 
   private MemStore store;
 
   public ChartBuilder(
     ENCCell cell, AppSettings settings, StyleReader<SimpleFeatureType, MemFeature> styleReader,
-    MapDisplayOptions displayOptions)
+    MapDisplayOptions displayOptions, SVGCache svgCache)
   {
     this.settings = settings;
     this.cell = cell;
     this.styleReader = styleReader;
     this.displayOptions = displayOptions;
+    this.svgCache = svgCache;
   }
 
   public ENCChart getMap()
@@ -167,7 +171,7 @@ public class ChartBuilder
             if(chart == null)
             {
               var crs = featureSource.getBounds().getCoordinateReferenceSystem();
-              chart = new ENCChart(cell, crs);
+              chart = new ENCChart(cell, crs, svgCache);
               store = new MemStore(chart);
             }
 

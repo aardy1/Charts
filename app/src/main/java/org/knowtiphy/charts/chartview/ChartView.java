@@ -16,6 +16,7 @@ import org.knowtiphy.charts.dynamics.AISModel;
 import org.knowtiphy.charts.enc.ChartLocker;
 import org.knowtiphy.charts.enc.ENCChart;
 import org.knowtiphy.charts.settings.UnitProfile;
+import org.knowtiphy.shapemap.renderer.context.SVGCache;
 import org.reactfx.EventSource;
 import org.reactfx.EventStream;
 
@@ -58,26 +59,28 @@ public class ChartView extends Control
 
   private final MapDisplayOptions displayOptions;
 
+  private final SVGCache svgCache;
+
   private final EventModel eventModel;
 
   public ChartView(
     ChartLocker chartLocker, ENCChart chart, AISModel dynamics, UnitProfile unitProfile,
-    MapDisplayOptions displayOptions)
+    MapDisplayOptions displayOptions, SVGCache svgCache)
   {
-    this(chartLocker, chart, dynamics, unitProfile, displayOptions, SkinType.CANVAS);
+    this(chartLocker, chart, dynamics, unitProfile, displayOptions, svgCache, SkinType.CANVAS);
   }
 
   public ChartView(
     ChartLocker chartLocker, ENCChart map, AISModel dynamics, UnitProfile unitProfile,
-    MapDisplayOptions displayOptions, SkinType skinType)
+    MapDisplayOptions displayOptions, SVGCache svgCache, SkinType skinType)
   {
-
     this.chartLocker = chartLocker;
     this.chart = map;
     this.dynamics = dynamics;
     this.unitProfile = unitProfile;
     this.eventModel = new EventModel();
     this.displayOptions = displayOptions;
+    this.svgCache = svgCache;
 
     this.skinType = skinType;
     getStyleClass().add("chartview");
@@ -96,7 +99,7 @@ public class ChartView extends Control
   protected Skin createDefaultSkin()
   {
     return new ChartViewSkin(this, chartLocker, chart, dynamics, eventModel, unitProfile,
-      displayOptions);
+      displayOptions, svgCache);
   }
 
   @Override

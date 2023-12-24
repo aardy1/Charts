@@ -14,6 +14,7 @@ import org.knowtiphy.charts.memstore.MapStats;
 import org.knowtiphy.charts.memstore.MemFeature;
 import org.knowtiphy.charts.memstore.StyleReader;
 import org.knowtiphy.charts.settings.AppSettings;
+import org.knowtiphy.shapemap.renderer.context.SVGCache;
 import org.knowtiphy.shapemap.style.parser.StyleSyntaxException;
 
 import javax.xml.stream.XMLStreamException;
@@ -35,11 +36,11 @@ public class ChartLoader
     this.settings = settings;
   }
 
-  ENCChart loadChart(ENCCell cell, MapDisplayOptions displayOptions)
+  ENCChart loadChart(ENCCell cell, MapDisplayOptions displayOptions, SVGCache svgCache)
     throws IOException, XMLStreamException, TransformException, FactoryException,
            NonInvertibleTransformException, StyleSyntaxException
   {
-    var reader = new ChartBuilder(cell, settings, styleReader, displayOptions).read();
+    var reader = new ChartBuilder(cell, settings, styleReader, displayOptions, svgCache).read();
     var map = reader.getMap();
     map.setViewPortBounds(map.bounds());
 

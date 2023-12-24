@@ -37,6 +37,7 @@ import org.knowtiphy.charts.platform.Platform;
 import org.knowtiphy.charts.settings.AppSettings;
 import org.knowtiphy.charts.utils.FXUtils;
 import org.knowtiphy.charts.utils.ToggleModel;
+import org.knowtiphy.shapemap.renderer.context.SVGCache;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -55,6 +56,9 @@ public class KnowtiphyCharts extends Application
   private static final int WIDTH = 1300;
 
   private static final int HEIGHT = 750;
+
+  private static SVGCache SVG_CACHE = new SVGCache(
+    org.knowtiphy.charts.chartview.markicons.ResourceLoader.class);
 
   private ChartLocker chartLocker;
 
@@ -82,11 +86,11 @@ public class KnowtiphyCharts extends Application
     var cell = chartLocker.getCell("Gulf of Mexico", 2_160_000);
 
     displayOptions = new MapDisplayOptions();
-    chart = chartLocker.getChart(cell, displayOptions);
+    chart = chartLocker.loadChart(cell, displayOptions, SVG_CACHE);
 
-    chart.newMapViewModel()
-         .subscribe(change -> setStageTitle(primaryStage, (ENCChart) change.getNewValue()));
-    appSettings.unitProfile().unitChangeEvents()
+    chartLocker.chartEvents().subscribe(change -> setStageTitle(primaryStage, change.chart()));
+    appSettings.unitProfile()
+               .unitChangeEvents()
                .subscribe(change -> setStageTitle(primaryStage, chart));
 
     var stats = new MapStats(chart, SchemaAdapter.ADAPTER).stats();
@@ -102,8 +106,8 @@ public class KnowtiphyCharts extends Application
     var toggle = new ToggleModel();
     chartSpecificSettings(toggle);
 
-    var infoBar = new InfoBar(toggle, chart, appSettings.unitProfile(), chartLocker,
-      displayOptions);
+    var infoBar = new InfoBar(toggle, chart, appSettings.unitProfile(), chartLocker, displayOptions,
+      SVG_CACHE);
 
     var menuBar = mainMenuBar(primaryStage);
 
@@ -181,7 +185,8 @@ public class KnowtiphyCharts extends Application
   private ChartView makeMap()
   {
     return resizeable(
-      new ChartView(chartLocker, chart, dynamics, appSettings.unitProfile(), displayOptions));
+      new ChartView(chartLocker, chart, dynamics, appSettings.unitProfile(), displayOptions,
+        SVG_CACHE));
   }
 
   private static final int SETTINGS_WIDTH = 700;
@@ -209,9 +214,9 @@ public class KnowtiphyCharts extends Application
 
     var showChartLocker = new MenuItem("Chart Locker");
     items.add(showChartLocker);
-    showChartLocker.setOnAction(x -> new ChartLockerDialog(chartLocker, chart, displayOptions)
-                                       .create(stage, CHART_LOCKER_WIDTH, CHART_LOCKER_HEIGHT)
-                                       .showAndWait());
+    showChartLocker.setOnAction(
+      x -> new ChartLockerDialog(stage, chartLocker, displayOptions, SVG_CACHE).create(
+        CHART_LOCKER_WIDTH, CHART_LOCKER_HEIGHT).showAndWait());
 
     if(platform.isMac())
     {
@@ -242,8 +247,9 @@ public class KnowtiphyCharts extends Application
       new PropertySheet(displayOptions.getProperties()));
     BorderPane.setAlignment(displayProperties, Pos.CENTER);
     displayProperties.setOnMouseExited(evt -> toggle.toggle());
-    toggle.getStateProperty().addListener(
-      cl -> later(() -> overlay.setRight(toggle.isOn() ? displayProperties : null)));
+    toggle.getStateProperty()
+          .addListener(
+            cl -> later(() -> overlay.setRight(toggle.isOn() ? displayProperties : null)));
   }
 
   private void showInitialSetup(IPlatform platform)
@@ -253,9 +259,9 @@ public class KnowtiphyCharts extends Application
     System.err.println("File System root = " + platform.rootDir());
     System.err.println("File System root = " + platform.rootDir().toFile().exists());
     System.err.println("File System root ENC = " + Paths.get(platform.rootDir().toString(), "ENC"));
-    System.err.println(
-      "File System root ENC = " + Paths.get(platform.rootDir().toString(), "ENC").toFile()
-                                       .exists());
+    System.err.println("File System root ENC = " + Paths.get(platform.rootDir().toString(), "ENC")
+                                                        .toFile()
+                                                        .exists());
     System.err.println("Charts  dir = " + platform.chartsDir());
     System.err.println("Charts  dir = " + platform.chartsDir().toFile().exists());
     try(var dave = Files.list(Paths.get(platform.rootDir().toString(), "ENC")))

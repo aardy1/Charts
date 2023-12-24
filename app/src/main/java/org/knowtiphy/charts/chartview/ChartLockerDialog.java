@@ -1,10 +1,14 @@
 package org.knowtiphy.charts.chartview;
 
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TitledPane;
@@ -14,20 +18,23 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.stage.Window;
+import javafx.stage.StageStyle;
+import org.controlsfx.dialog.ProgressDialog;
 import org.controlsfx.glyphfont.Glyph;
 import org.knowtiphy.charts.Fonts;
 import org.knowtiphy.charts.enc.ChartDownloaderNotifier;
 import org.knowtiphy.charts.enc.ChartLocker;
 import org.knowtiphy.charts.enc.ENCCell;
-import org.knowtiphy.charts.enc.ENCChart;
+import org.knowtiphy.shapemap.renderer.context.SVGCache;
 
 import java.io.IOException;
 import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static javafx.application.Platform.runLater;
 import static org.knowtiphy.charts.chartview.AvailableCatalogs.BUILTIN_CATALOGS;
 import static org.knowtiphy.charts.utils.FXUtils.alwaysGrow;
 import static org.knowtiphy.charts.utils.FXUtils.neverGrow;
@@ -37,22 +44,27 @@ public class ChartLockerDialog
   //  can't set the size in CSS :-(
   private static final int BUTTON_SIZE = 16;
 
-  private final ChartLocker chartLocker;
+  private final Stage parent;
 
-  private final ENCChart chart;
+  private final ChartLocker chartLocker;
 
   private final MapDisplayOptions mapDisplayOptions;
 
+  private final SVGCache svgCache;
+
   public ChartLockerDialog(
-    ChartLocker chartLocker, ENCChart chart, MapDisplayOptions mapDisplayOptions)
+    Stage parent, ChartLocker chartLocker, MapDisplayOptions mapDisplayOptions, SVGCache svgCache)
   {
+    this.parent = parent;
     this.chartLocker = chartLocker;
-    this.chart = chart;
     this.mapDisplayOptions = mapDisplayOptions;
+    this.svgCache = svgCache;
   }
 
-  public Stage create(Window parent, int width, int height)
+  public Stage create(int width, int height)
   {
+    var stage = new Stage();
+
     var availableCharts = availableCharts();
     var content = content(availableCharts);
 
@@ -73,7 +85,6 @@ public class ChartLockerDialog
     scene.getStylesheets()
          .add(ResourceLoader.class.getResource("chartlockerdialog.css").toExternalForm());
 
-    var stage = new Stage();
     stage.setScene(scene);
     stage.sizeToScene();
     stage.initOwner(parent);
@@ -180,18 +191,12 @@ public class ChartLockerDialog
   {
     var button = new Button("Load");
     button.setOnAction(event -> {
-      System.err.println("Load this chart");
-
-      try
-      {
-        chartLocker.downloadChart(cell, new ChartDownloaderNotifier());
-        button.setDisable(true);
-        show.setDisable(false);
-      }
-      catch(IOException e)
-      {
-        //  TODO
-      }
+      var notifier = new Notifier();
+      var task = loadTask(cell, notifier);
+      var progressDialog = progressDialog(task, notifier);
+      progressDialog.showAndWait();
+      button.setDisable(true);
+      show.setDisable(false);
     });
 
     return button;
@@ -203,8 +208,7 @@ public class ChartLockerDialog
     button.setOnAction(event -> {
       try
       {
-        var newChart = chartLocker.loadChart(cell, mapDisplayOptions);
-        chart.setNewMapViewModel(newChart);
+        var newChart = chartLocker.loadChart(cell, mapDisplayOptions, svgCache);
       }
       catch(Exception ex)
       {
@@ -227,8 +231,85 @@ public class ChartLockerDialog
     }
   }
 
-}
+  private Task<Boolean> loadTask(ENCCell cell, ChartDownloaderNotifier notifier)
+  {
+    return new Task<>()
+    {
+      @Override
+      protected Boolean call()
+      {
+        try
+        {
+          chartLocker.downloadChart(cell, notifier);
+        }
+        catch(IOException interrupted)
+        {
+          //  do nothing
+        }
 
+        return true;
+      }
+    };
+  }
+
+  private ProgressDialog progressDialog(Task<?> task, Notifier notifier)
+  {
+    var progress = new ProgressDialog(task);
+    progress.initModality(Modality.APPLICATION_MODAL);
+    progress.initStyle(StageStyle.UTILITY);
+    progress.setTitle("Loading");
+    progress.headerTextProperty()
+      .bind(task.titleProperty());
+    progress.contentTextProperty()
+      .bind(notifier.message);
+    DialogPane dialogPane = progress.getDialogPane();
+    //override autosizing which fails for some reason
+    dialogPane.setPrefSize(400, 200);
+
+    progress.setOnShown(evt -> new Thread(task).start());
+    task.setOnCancelled(cancelled -> progress.close());
+    task.setOnSucceeded(succeeded -> progress.close());
+    task.setOnFailed(failed -> progress.close());
+
+    return progress;
+  }
+
+  private static class Notifier extends ChartDownloaderNotifier
+  {
+    public final StringProperty message = new SimpleStringProperty();
+
+    @Override
+    public void start()
+    {
+      runLater(() -> message.set("Starting Download"));
+    }
+
+    @Override
+    public void reading(ENCCell cell)
+    {
+      runLater(() -> message.set("Reading cell " + cell.name()));
+    }
+
+    @Override
+    public void converting(ENCCell cell)
+    {
+      runLater(() -> message.set("Preparing cell " + cell.name()));
+    }
+
+    @Override
+    public void cleaningUp()
+    {
+      runLater(() -> message.set("Cleaning Up"));
+    }
+
+    @Override
+    public void finished()
+    {
+      runLater(() -> message.set("Finished Download"));
+    }
+  }
+
+}
 //var loaded = new CheckBox("")
 //{
 //  @Override

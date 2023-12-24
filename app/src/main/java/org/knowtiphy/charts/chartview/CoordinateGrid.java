@@ -16,7 +16,9 @@ import javafx.scene.shape.Line;
 import org.geotools.api.referencing.operation.TransformException;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.knowtiphy.charts.enc.ChartLocker;
 import org.knowtiphy.charts.enc.ENCChart;
+import org.knowtiphy.charts.enc.event.ChartLockerEvent;
 import org.knowtiphy.charts.settings.UnitProfile;
 import org.knowtiphy.shapemap.renderer.Transformation;
 import org.locationtech.jts.geom.Coordinate;
@@ -40,7 +42,7 @@ public class CoordinateGrid extends Pane
 
   private final Insets LONGITUDE_INSET = new Insets(3, 0, 0, 3);
 
-  public CoordinateGrid(ENCChart chrt, UnitProfile unitProfile)
+  public CoordinateGrid(ChartLocker chartLocker, ENCChart chrt, UnitProfile unitProfile)
   {
     this.chart = chrt;
     this.unitProfile = unitProfile;
@@ -50,18 +52,23 @@ public class CoordinateGrid extends Pane
     widthProperty().addListener(change -> drawGrid());
     heightProperty().addListener(change -> drawGrid());
     unitProfile.unitChangeEvents().subscribe(e -> drawGrid());
+
+    chartLocker.chartEvents().filter(ChartLockerEvent::isUnload).subscribe(event -> {
+      // unsubscribe listeners on the old chart
+      subscriptions.forEach(Subscription::unsubscribe);
+      subscriptions.clear();
+    });
+
+    chartLocker.chartEvents().filter(ChartLockerEvent::isLoad).subscribe(event -> {
+      chart = event.chart();
+      setupListeners();
+      requestLayout();
+    });
   }
 
   private void setupListeners()
   {
-    subscriptions.forEach(Subscription::unsubscribe);
-    subscriptions.clear();
     subscriptions.add(chart.viewPortBoundsEvent().subscribe(extent -> drawGrid()));
-    subscriptions.add(chart.newMapViewModel().subscribe(change -> {
-      chart = (ENCChart) change.getNewValue();
-      setupListeners();
-      requestLayout();
-    }));
   }
 
   private void drawGrid()

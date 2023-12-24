@@ -23,6 +23,7 @@ import org.knowtiphy.charts.Fonts;
 import org.knowtiphy.charts.enc.ChartLocker;
 import org.knowtiphy.charts.enc.ENCCell;
 import org.knowtiphy.charts.enc.ENCChart;
+import org.knowtiphy.shapemap.renderer.context.SVGCache;
 import org.knowtiphy.shapemap.style.parser.StyleSyntaxException;
 
 import java.util.ArrayList;
@@ -44,19 +45,22 @@ public class QuiltingSurface extends StackPane
 
   private final MapDisplayOptions displayOptions;
 
+  private final SVGCache svgCache;
+
   private final BorderPane controlsContainer = new BorderPane();
 
   private final FlowPane controls = new FlowPane();
 
   private final Pane displaySurface = new Pane();
 
-  public QuiltingSurface(ChartLocker chartLocker, ENCChart chart, MapDisplayOptions displayOptions)
+  public QuiltingSurface(
+    ChartLocker chartLocker, ENCChart chart, MapDisplayOptions displayOptions, SVGCache svgCache)
   {
 
     this.chartLocker = chartLocker;
     this.chart = chart;
     this.displayOptions = displayOptions;
-
+    this.svgCache = svgCache;
     controls.setVgap(4);
     controls.setHgap(4);
 
@@ -75,7 +79,7 @@ public class QuiltingSurface extends StackPane
     widthProperty().addListener(cl -> makeQuilting());
     heightProperty().addListener(cl -> makeQuilting());
     chart.viewPortBoundsEvent().subscribe(extent -> makeQuilting());
-    chart.newMapViewModel().subscribe(extent -> makeQuilting());
+    chartLocker.chartEvents().subscribe(extent -> makeQuilting());
   }
 
   private void makeQuilting()
@@ -105,7 +109,7 @@ public class QuiltingSurface extends StackPane
         label.setOnAction(eh -> {
           try
           {
-            chartLocker.loadChart(chartDescription, displayOptions);
+            chartLocker.loadChart(chartDescription, displayOptions, svgCache);
           }
           catch(TransformException | FactoryException | NonInvertibleTransformException |
                 StyleSyntaxException ex)
