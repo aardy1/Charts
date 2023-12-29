@@ -31,8 +31,6 @@ public abstract class MapViewModel<S, F>
 
   private final EventSource<Change<Rectangle2D>> viewPortScreenAreaEvent = new EventSource<>();
 
-  private final EventSource<Change<MapViewModel<S, F>>> newMapViewModel = new EventSource<>();
-
   private final ReferencedEnvelope bounds;
 
   private final Map<String, MapLayer<S, F>> layers = new LinkedHashMap<>();
@@ -159,11 +157,6 @@ public abstract class MapViewModel<S, F>
     return svgProvider;
   }
 
-//  public void setNewMapViewModel(MapViewModel<S, F> map)
-//  {
-//    newMapViewModel.push(new Change<>(this, map));
-//  }
-
   public ReferencedEnvelope bounds()
   {
     return bounds;
@@ -198,10 +191,4 @@ public abstract class MapViewModel<S, F>
   {
     return viewPortScreenAreaEvent;
   }
-
-//  public EventStream<Change<MapViewModel<S, F>>> newMapViewModel()
-//  {
-//    return newMapViewModel;
-//  }
-
 }

@@ -8,6 +8,9 @@ package org.knowtiphy.charts.enc;
 import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.MultiPolygon;
+import org.locationtech.jts.geom.Polygon;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -117,6 +120,17 @@ public class ENCCell
   public boolean intersects(Geometry envelope)
   {
     return panels.stream().anyMatch(p -> p.intersects(envelope));
+  }
+
+  public MultiPolygon geom()
+  {
+    var polygons = new ArrayList<Polygon>();
+    for(var panel : panels)
+    {
+      polygons.add(panel.geom());
+    }
+
+    return new GeometryFactory().createMultiPolygon(polygons.toArray(new Polygon[0]));
   }
 
   public ReferencedEnvelope bounds(CoordinateReferenceSystem crs)

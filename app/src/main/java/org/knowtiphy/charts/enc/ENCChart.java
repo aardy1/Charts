@@ -5,6 +5,7 @@
 
 package org.knowtiphy.charts.enc;
 
+import javafx.geometry.Rectangle2D;
 import javafx.scene.transform.NonInvertibleTransformException;
 import org.geotools.api.feature.simple.SimpleFeatureType;
 import org.geotools.api.referencing.FactoryException;
@@ -45,10 +46,22 @@ public class ENCChart extends MapViewModel<SimpleFeatureType, MemFeature>
     return 1 / (viewPortBounds().getWidth() / bounds().getWidth());
   }
 
-  public int currentScale()
+  public int displayScale()
   {
-    return (int) (cScale() / zoomFactor());
+    return (int) (cScale() * (1 / zoomFactor()));
+  }
+
+  //  TODO -- make the "2" tuneable
+  public int adjustedDisplayScale()
+  {
+    return displayScale() / 2;
   }
 
   public String title(){return cell.lName();}
+
+  public void setViewPortScreenArea(Rectangle2D screenArea)
+    throws TransformException, NonInvertibleTransformException
+  {
+    super.setViewPortScreenArea(screenArea);
+  }
 }

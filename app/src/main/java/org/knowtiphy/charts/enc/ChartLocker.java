@@ -8,6 +8,7 @@ package org.knowtiphy.charts.enc;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.transform.NonInvertibleTransformException;
+import org.apache.commons.lang3.tuple.Pair;
 import org.geotools.api.referencing.FactoryException;
 import org.geotools.api.referencing.operation.TransformException;
 import org.geotools.geometry.jts.JTS;
@@ -16,6 +17,7 @@ import org.knowtiphy.charts.chartview.MapDisplayOptions;
 import org.knowtiphy.charts.enc.event.ChartLockerEvent;
 import org.knowtiphy.shapemap.renderer.context.SVGCache;
 import org.knowtiphy.shapemap.style.parser.StyleSyntaxException;
+import org.locationtech.jts.geom.Geometry;
 import org.reactfx.EventSource;
 import org.reactfx.EventStream;
 
@@ -28,6 +30,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -54,19 +57,16 @@ public class ChartLocker
     this.chartLoader = chartLoader;
 
     //  load cached catalogs
-    System.err.println("available cats = " + readAvailableCatalogs(chartsDir));
     for(var catalogFile : readAvailableCatalogs(chartsDir))
     {
       var catalog = new CatalogReader(chartsDir, catalogFile).read();
       availableCatalogs.add(catalog);
     }
-
-    System.err.println(availableCatalogs);
   }
 
   public EventStream<ChartLockerEvent> chartEvents(){return chartEvents;}
 
-  public Collection<ENCCell> intersections(ReferencedEnvelope envelope)
+  public List<ENCCell> intersections(ReferencedEnvelope envelope)
   {
     var bounds = JTS.toGeometry(envelope);
 
@@ -83,6 +83,35 @@ public class ChartLocker
     }
 
     return result;
+  }
+
+  public List<Pair<ENCCell, Geometry>> computeQuilt(ENCChart chart)
+  {
+    var scale = chart.adjustedDisplayScale();
+    System.err.println("adjusted scale = " + scale);
+
+    var intersections = intersections(chart.viewPortBounds())
+                          .stream()
+                          .filter(cell -> cell.cScale() >= chart.adjustedDisplayScale())
+                          .sorted(Comparator.comparingInt(ENCCell::cScale))
+                          .toList();
+
+    //  toList yields an array list
+    var quilt = new ArrayList<Pair<ENCCell, Geometry>>();
+
+    var cell = intersections.get(0);
+    quilt.add(Pair.of(cell, cell.geom()));
+    Geometry used = cell.geom();
+
+    for(var i = 1; i < intersections.size(); i++)
+    {
+      var ithCell = intersections.get(i);
+      var ithGeom = ithCell.geom();
+      quilt.add(Pair.of(ithCell, ithGeom.difference(used)));
+      used = used.union(ithGeom);
+    }
+
+    return quilt;
   }
 
   public ENCChart loadChart(
@@ -172,8 +201,10 @@ public class ChartLocker
     //  TODO -- fix this
     try(Stream<Path> stream = Files.list(chartDir.resolve("../ENC_Catalogs")))
     {
-      return stream.filter(
-        file -> !Files.isDirectory(file) && !file.toFile().getName().equals(".DS_Store")).toList();
+      return stream
+               .filter(
+                 file -> !Files.isDirectory(file) && !file.toFile().getName().equals(".DS_Store"))
+               .toList();
     }
   }
 }

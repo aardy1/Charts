@@ -29,6 +29,7 @@ import org.knowtiphy.charts.enc.ChartLoader;
 import org.knowtiphy.charts.enc.ChartLocker;
 import org.knowtiphy.charts.enc.ENCChart;
 import org.knowtiphy.charts.enc.SchemaAdapter;
+import org.knowtiphy.charts.enc.event.ChartLockerEvent;
 import org.knowtiphy.charts.memstore.MapStats;
 import org.knowtiphy.charts.memstore.MemFeature;
 import org.knowtiphy.charts.memstore.StyleReader;
@@ -88,7 +89,9 @@ public class KnowtiphyCharts extends Application
     displayOptions = new MapDisplayOptions();
     chart = chartLocker.loadChart(cell, displayOptions, SVG_CACHE);
 
-    chartLocker.chartEvents().subscribe(change -> setStageTitle(primaryStage, change.chart()));
+    chartLocker.chartEvents()
+               .filter(ChartLockerEvent::isLoad)
+               .subscribe(change -> setStageTitle(primaryStage, change.chart()));
     appSettings.unitProfile()
                .unitChangeEvents()
                .subscribe(change -> setStageTitle(primaryStage, chart));

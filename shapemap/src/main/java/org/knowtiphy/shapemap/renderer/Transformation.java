@@ -43,10 +43,37 @@ public class Transformation
     transformation.transform2DPoints(src, 0, dest, 0, 1);
   }
 
+  public void apply(double[] pts)
+  {
+    var size = pts.length / 2;
+    xs = new double[size];
+    ys = new double[size];
+    for(int i = 0; i < pts.length; i += 2)
+    {
+      apply(pts[i], pts[i + 1]);
+      pts[i] = dest[0];
+      pts[i + 1] = dest[1];
+    }
+  }
+
+  public double[] apply(Polygon polygon)
+  {
+    var coords = polygon.getCoordinates();
+    var pts = new double[coords.length * 2];
+    for(int i = 0, j = 0; i < coords.length; i++, j += 2)
+    {
+      var coord = coords[i];
+      apply(coord.x, coord.y);
+      pts[j] = dest[0];
+      pts[j + 1] = dest[1];
+    }
+
+    return pts;
+  }
+
   // TODO -- it would be nice to get rid of this -- maybe when we load the geoms?
   public void copyCoordinatesG(LineString g)
   {
-
     var numPts = g.getNumPoints();
     xs = new double[numPts];
     ys = new double[numPts];

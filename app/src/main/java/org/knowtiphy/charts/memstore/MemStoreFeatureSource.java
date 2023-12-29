@@ -57,7 +57,7 @@ public class MemStoreFeatureSource implements IFeatureSource<SimpleFeatureType, 
 
     var sbounds = System.currentTimeMillis();
 
-    var currentScale = map.currentScale();
+    var currentScale = map.displayScale();
 
     featuresInScale = new ArrayList<>();
     for(var feature : featuresInBounds)
@@ -88,7 +88,7 @@ public class MemStoreFeatureSource implements IFeatureSource<SimpleFeatureType, 
     @SuppressWarnings("unchecked") var featuresInBounds = (List<MemFeature>) featureIndex.query(
       map.bounds());
 
-    var currentScale = map.currentScale();
+    var currentScale = map.displayScale();
 
     featuresInScale = new ArrayList<>();
     for(var feature : featuresInBounds)

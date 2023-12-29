@@ -76,7 +76,7 @@ public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView
 
   // private final Pane iconsSurface;
 
-  // private final Pane quiltingSurface;
+  private final Pane quiltingSurface;
 
   private final Pane coordinateGrid;
 
@@ -105,11 +105,12 @@ public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView
     var surfaceDragEventsPane = new Pane();
     mapSurface = makeMapSurface();
     // iconsSurface = makeIconsSurface();
-    // quiltingSurface = makeQuiltingSurface();
+    quiltingSurface = makeQuiltingSurface();
     coordinateGrid = makeCoordinateGrid(unitProfile);
     // aisPane = makeDynamicsSurface();
 
-    root.getChildren().addAll(surfaceDragEventsPane, mapSurface, coordinateGrid);// ,
+    root.getChildren()
+        .addAll(surfaceDragEventsPane, mapSurface, quiltingSurface, coordinateGrid);// ,
     // iconsSurface,
     // //
     // quiltingSurface,
@@ -193,25 +194,11 @@ public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView
     return theGrid;
   }
 
-  private Pane makeIconsSurface()
-  {
-    return new IconSurface(chartLocker, chart);
-  }
-
   private Pane makeQuiltingSurface()
   {
     var theSurface = new QuiltingSurface(chartLocker, chart, displayOptions, svgCache);
     theSurface.setPickOnBounds(false);
     return theSurface;
-  }
-
-  private Pane makeDynamicsSurface()
-  {
-    var pane = new Pane();
-    pane.setPickOnBounds(false);
-    pane.widthProperty().addListener(cl -> updateBoats());
-    pane.heightProperty().addListener(cl -> updateBoats());
-    return pane;
   }
 
   private ShapeMapView<SimpleFeatureType, MemFeature> makeMapSurface()
@@ -223,14 +210,13 @@ public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView
 
   private void setupListeners()
   {
-    // add listeners on the new chart
     subscriptions.add(DragPanZoomSupport.addPositionAtSupport(eventModel, chart));
     subscriptions.add(DragPanZoomSupport.addDragSupport(eventModel, chart));
     subscriptions.addAll(DragPanZoomSupport.addPanningSupport(eventModel, chart));
     subscriptions.add(DragPanZoomSupport.addZoomSupport(eventModel, chart));
 
-    // subscriptions.add(displayOptions.showGridEvents.subscribe(c ->
-    // gridPane.setVisible(c.getNewValue())));
+    subscriptions.add(
+      displayOptions.showGridEvents.subscribe(c -> coordinateGrid.setVisible(c.getNewValue())));
 
     subscriptions.add(displayOptions.showLightsEvents.subscribe(
       change -> chart.setLayerVisible(S57.OC_LIGHTS, change.getNewValue())));
@@ -243,6 +229,20 @@ public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView
 
     // subscriptions.add(chart.viewPortBoundsEvent.subscribe(change ->
     // updateBoats()));
+  }
+
+  private Pane makeDynamicsSurface()
+  {
+    var pane = new Pane();
+    pane.setPickOnBounds(false);
+    pane.widthProperty().addListener(cl -> updateBoats());
+    pane.heightProperty().addListener(cl -> updateBoats());
+    return pane;
+  }
+
+  private Pane makeIconsSurface()
+  {
+    return new IconSurface(chartLocker, chart);
   }
 
   private void showInfo(MouseEvent event)
@@ -298,26 +298,25 @@ public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView
 
   private void showMaxDetail(MouseEvent event)
   {
-
     var envelope = Queries.tinyPolygon(chart, event.getX(), event.getY());
 
-    ENCCell mostDetailedChart = null;
+    ENCCell mostDetailed = null;
     var smallestScale = Integer.MAX_VALUE;
 
-    for(var chartDescription : chartLocker.intersections(envelope))
+    for(var cell : chartLocker.intersections(envelope))
     {
-      if(chartDescription.cScale() < smallestScale)
+      if(cell.cScale() < smallestScale)
       {
-        smallestScale = chartDescription.cScale();
-        mostDetailedChart = chartDescription;
+        smallestScale = cell.cScale();
+        mostDetailed = cell;
       }
     }
 
-    if(mostDetailedChart != null && mostDetailedChart != chart.cell())
+    if(mostDetailed != null && mostDetailed != chart.cell())
     {
       try
       {
-        chartLocker.loadChart(mostDetailedChart, displayOptions, svgCache);
+        chartLocker.loadChart(mostDetailed, displayOptions, svgCache);
       }
       catch(TransformException | FactoryException | NonInvertibleTransformException |
             StyleSyntaxException ex)

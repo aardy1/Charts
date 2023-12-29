@@ -76,6 +76,7 @@ public class ExpressionParser
           case org.knowtiphy.shapemap.style.parser.XML.EQ,
                  org.knowtiphy.shapemap.style.parser.XML.NE,
                  org.knowtiphy.shapemap.style.parser.XML.LT,
+                 org.knowtiphy.shapemap.style.parser.XML.GE,
                  org.knowtiphy.shapemap.style.parser.XML.GT,
                  org.knowtiphy.shapemap.style.parser.XML.IS_LIKE,
                  org.knowtiphy.shapemap.style.parser.XML.COALESCE ->
@@ -105,6 +106,8 @@ public class ExpressionParser
             mkBop(endFrame(stack), (l, r) -> (feature, geom) -> Operators.ne(l, r, feature, geom)));
           case org.knowtiphy.shapemap.style.parser.XML.LT -> push(stack,
             mkBop(endFrame(stack), (l, r) -> (feature, geom) -> Operators.lt(l, r, feature, geom)));
+          case org.knowtiphy.shapemap.style.parser.XML.GE -> push(stack,
+            mkBop(endFrame(stack), (l, r) -> (feature, geom) -> Operators.ge(l, r, feature, geom)));
           case org.knowtiphy.shapemap.style.parser.XML.GT -> push(stack,
             mkBop(endFrame(stack), (l, r) -> (feature, geom) -> Operators.gt(l, r, feature, geom)));
           case org.knowtiphy.shapemap.style.parser.XML.IS_LIKE -> push(stack, mkBop(endFrame(stack),

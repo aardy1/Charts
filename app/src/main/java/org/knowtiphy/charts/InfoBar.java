@@ -44,13 +44,19 @@ import java.util.logging.Logger;
  */
 public class InfoBar extends StackPane
 {
+  private static double ZOOM_FACTOR = 0.5;
+
   private final Label chartScale = new Label();
 
   private final Label currentExtent = new Label();
 
   private final Label currentMapSpan = new Label();
 
-  private final Label currentZoomLevel = new Label();
+  private final Label displayScale = new Label();
+
+  private final Label adjustedDisplayScale = new Label();
+
+  private final Label zoomLevel = new Label();
 
   private final UnitProfile unitProfile;
 
@@ -78,10 +84,10 @@ public class InfoBar extends StackPane
 
     var zoomIn = new Button("", Fonts.plus());
     zoomIn.setTooltip(new Tooltip("Zoom In"));
-    zoomIn.setOnAction(x -> Coordinates.zoom(chart, 0.4));
+    zoomIn.setOnAction(x -> Coordinates.zoom(chart, ZOOM_FACTOR));
     var zoomOut = new Button("", Fonts.minus());
     zoomOut.setTooltip(new Tooltip("Zoom Out"));
-    zoomOut.setOnAction(x -> Coordinates.zoom(chart, 10 / 4.0));
+    zoomOut.setOnAction(x -> Coordinates.zoom(chart, 1 / ZOOM_FACTOR));
 
     var mapDisplaySettings = new Button("", Fonts.setting());
     mapDisplaySettings.setTooltip(new Tooltip("Configure Map Visuals"));
@@ -123,7 +129,7 @@ public class InfoBar extends StackPane
     StackPane.setAlignment(leftControlsBar, Pos.BOTTOM_LEFT);
 
     var variableLabels = FXUtils.nonResizeable(
-      new HBox(currentExtent, currentMapSpan, currentZoomLevel));
+      new HBox(currentExtent, currentMapSpan, adjustedDisplayScale, displayScale, zoomLevel));
     variableLabels.getStyleClass().add("infobar");
     StackPane.setAlignment(variableLabels, Pos.BOTTOM_RIGHT);
 
@@ -193,7 +199,9 @@ public class InfoBar extends StackPane
     // platform.windowWidthCM(this)))
     // + unitProfile.distanceUnit);
 
-    currentZoomLevel.setText(Coordinates.twoDec(chart.zoomFactor()));
+    adjustedDisplayScale.setText(chart.adjustedDisplayScale() + "");
+    displayScale.setText(chart.displayScale() + "");
+    zoomLevel.setText(Coordinates.twoDec(chart.zoomFactor()));
   }
 
   private void loadChart(ENCCell chartDescription)

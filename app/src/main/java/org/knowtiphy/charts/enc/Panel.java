@@ -8,6 +8,7 @@ package org.knowtiphy.charts.enc;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Polygon;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +27,7 @@ public class Panel
   // the boundary points of the panel
   private final List<Coordinate> vertices = new ArrayList<>();
 
-  private Geometry geom;
+  private Polygon geom;
 
   public int panelNumber()
   {
@@ -59,7 +60,7 @@ public class Panel
     geom = GEOMETRY_FACTORY.createPolygon(pts);
   }
 
-  public Geometry geom()
+  public Polygon geom()
   {
     return geom;
   }
