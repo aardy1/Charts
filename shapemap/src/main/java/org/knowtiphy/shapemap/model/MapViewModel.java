@@ -24,22 +24,15 @@ import java.util.Map;
 
 public abstract class MapViewModel<S, F>
 {
-
   private final EventSource<Change<Boolean>> layerVisibilityEvent = new EventSource<>();
 
   private final EventSource<Change<ReferencedEnvelope>> viewPortBoundsEvent = new EventSource<>();
 
-  private final EventSource<Change<Rectangle2D>> viewPortScreenAreaEvent = new EventSource<>();
-
   private final ReferencedEnvelope bounds;
 
-  private final Map<String, MapLayer<S, F>> layers = new LinkedHashMap<>();
-
-  private final MapViewport viewPort;
+  private final ISchemaAdapter<S, F> schemaAdapter;
 
   private final IFeatureAdapter<F> featureAdapter;
-
-  private final ISchemaAdapter<S, F> schemaAdapter;
 
   private final IRenderablePolygonProvider renderablePolygonProvider;
 
@@ -49,6 +42,10 @@ public abstract class MapViewModel<S, F>
 
   // possibly shouldnt be here -- but it makes for faster rendering
   private int totalRuleCount;
+
+  private final Map<String, MapLayer<S, F>> layers = new LinkedHashMap<>();
+
+  private final MapViewport viewPort;
 
   protected MapViewModel(
     ReferencedEnvelope bounds, ISchemaAdapter<S, F> schemaAdapter,
@@ -64,7 +61,7 @@ public abstract class MapViewModel<S, F>
     this.textSizeProvider = textSizeProvider;
     this.totalRuleCount = 0;
 
-    viewPort = new MapViewport(bounds);
+    viewPort = new MapViewport(bounds, false);
   }
 
   protected MapViewModel(
@@ -76,21 +73,6 @@ public abstract class MapViewModel<S, F>
       svgProvider, textSizeProvider);
   }
 
-  public IFeatureAdapter<F> featureAdapter()
-  {
-    return featureAdapter;
-  }
-
-  public ITextSizeProvider textSizeProvider()
-  {
-    return textSizeProvider;
-  }
-
-  protected MapViewport viewPort()
-  {
-    return viewPort;
-  }
-
   public Collection<MapLayer<S, F>> layers()
   {
     return layers.values();
@@ -98,18 +80,18 @@ public abstract class MapViewModel<S, F>
 
   public void addLayer(MapLayer<S, F> layer)
   {
-    layers.put(schemaAdapter.name(layer.getFeatureSource().getSchema()), layer);
-    totalRuleCount += layer.getStyle().rules().size();
-  }
-
-  public MapLayer<S, F> layer(String type)
-  {
-    return layers.get(type);
+    layers.put(schemaAdapter.name(layer.featureSource().getSchema()), layer);
+    totalRuleCount += layer.style().rules().size();
   }
 
   public int totalRuleCount()
   {
     return totalRuleCount;
+  }
+
+  public MapLayer<S, F> layer(String type)
+  {
+    return layers.get(type);
   }
 
   public void setLayerVisible(String type, boolean visible)
@@ -118,43 +100,6 @@ public abstract class MapViewModel<S, F>
     var oldVisible = layer.isVisible();
     layer.setVisible(visible);
     layerVisibilityEvent.push(new Change<>(oldVisible, visible));
-  }
-
-  public ReferencedEnvelope viewPortBounds()
-  {
-    return viewPort.getBounds();
-  }
-
-  public void setViewPortBounds(ReferencedEnvelope bounds)
-    throws TransformException, NonInvertibleTransformException
-  {
-
-    var oldBounds = viewPort.getBounds();
-    viewPort.setBounds(bounds);
-    viewPortBoundsEvent.push(new Change<>(oldBounds, bounds));
-  }
-
-  public Rectangle2D viewPortScreenArea()
-  {
-    return viewPort().getScreenArea();
-  }
-
-  public void setViewPortScreenArea(Rectangle2D screenArea)
-    throws TransformException, NonInvertibleTransformException
-  {
-    var oldScreenArea = viewPort.getScreenArea();
-    viewPort.setScreenArea(screenArea);
-    viewPortScreenAreaEvent.push(new Change<>(oldScreenArea, screenArea));
-  }
-
-  public IRenderablePolygonProvider renderablePolygonProvider()
-  {
-    return renderablePolygonProvider;
-  }
-
-  public ISVGProvider svgProvider()
-  {
-    return svgProvider;
   }
 
   public ReferencedEnvelope bounds()
@@ -167,15 +112,66 @@ public abstract class MapViewModel<S, F>
     return bounds.getCoordinateReferenceSystem();
   }
 
+  //
+
+  public ReferencedEnvelope viewPortBounds()
+  {
+    return viewPort.bounds();
+  }
+
+  public void setViewPortBounds(ReferencedEnvelope bounds)
+    throws TransformException, NonInvertibleTransformException
+  {
+
+    var oldBounds = viewPort.bounds();
+    viewPort.setBounds(bounds);
+    viewPortBoundsEvent.push(new Change<>(oldBounds, bounds));
+  }
+
+  public Rectangle2D viewPortScreenArea()
+  {
+    return viewPort.screenArea();
+  }
+
+  public void setViewPortScreenArea(Rectangle2D screenArea)
+    throws TransformException, NonInvertibleTransformException
+  {
+    viewPort.setScreenArea(screenArea);
+  }
+
   public Affine viewPortScreenToWorld()
   {
-    return viewPort.getScreenToWorld();
+    return viewPort.screenToWorld();
   }
 
   public Affine viewPortWorldToScreen()
   {
-    return viewPort.getWorldToScreen();
+    return viewPort.worldToScreen();
   }
+
+  //
+
+  public IFeatureAdapter<F> featureAdapter()
+  {
+    return featureAdapter;
+  }
+
+  public IRenderablePolygonProvider renderablePolygonProvider()
+  {
+    return renderablePolygonProvider;
+  }
+
+  public ISVGProvider svgProvider()
+  {
+    return svgProvider;
+  }
+
+  public ITextSizeProvider textSizeProvider()
+  {
+    return textSizeProvider;
+  }
+
+  //
 
   public EventStream<Change<Boolean>> layerVisibilityEvent()
   {
@@ -185,10 +181,5 @@ public abstract class MapViewModel<S, F>
   public EventStream<Change<ReferencedEnvelope>> viewPortBoundsEvent()
   {
     return viewPortBoundsEvent;
-  }
-
-  public EventStream<Change<Rectangle2D>> viewPortScreenAreaEvent()
-  {
-    return viewPortScreenAreaEvent;
   }
 }

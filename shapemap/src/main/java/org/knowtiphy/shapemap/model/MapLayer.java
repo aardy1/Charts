@@ -1,22 +1,17 @@
 package org.knowtiphy.shapemap.model;
 
-import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.knowtiphy.shapemap.api.IFeatureSource;
-import org.knowtiphy.shapemap.api.IFeatureSourceIterator;
 import org.knowtiphy.shapemap.renderer.FeatureTypeStyle;
-
-import java.io.IOException;
 
 public class MapLayer<S, F>
 {
+  private final IFeatureSource<S, F> featureSource;
+
+  private final FeatureTypeStyle<S, F> style;
 
   private boolean visible;
 
   private final boolean scaleLess;
-
-  private final IFeatureSource<S, F> featureSource;
-
-  private final FeatureTypeStyle<S, F> style;
 
   public MapLayer(
     IFeatureSource<S, F> featureSource, FeatureTypeStyle<S, F> style, boolean visible,
@@ -28,7 +23,12 @@ public class MapLayer<S, F>
     this.scaleLess = scaleLess;
   }
 
-  public FeatureTypeStyle<S, F> getStyle()
+  public IFeatureSource<S, F> featureSource()
+  {
+    return featureSource;
+  }
+
+  public FeatureTypeStyle<S, F> style()
   {
     return style;
   }
@@ -47,16 +47,4 @@ public class MapLayer<S, F>
   {
     return scaleLess;
   }
-
-  public IFeatureSource<S, F> getFeatureSource()
-  {
-    return featureSource;
-  }
-
-  public IFeatureSourceIterator<F> getFeatures(ReferencedEnvelope bounds, boolean scaleLess)
-    throws IOException
-  {
-    return getFeatureSource().features(bounds, scaleLess);
-  }
-
 }

@@ -41,12 +41,19 @@ public class MapStats
   private final Map<String, Integer> maxScale = new HashMap<>();
 
   private final Map<String, Integer> pointGeoms = new HashMap<>();
+
   private final Map<String, Integer> multiPointGeoms = new HashMap<>();
+
   private final Map<String, Integer> lineStringGeoms = new HashMap<>();
+
   private final Map<String, Integer> multiLineStringGeoms = new HashMap<>();
+
   private final Map<String, Integer> polygonGeoms = new HashMap<>();
+
   private final Map<String, Integer> multiPolygonGeoms = new HashMap<>();
+
   private final Map<String, Integer> mixedGeoms = new HashMap<>();
+
   private final Map<String, Integer> totGeoms = new HashMap<>();
 
   public MapStats(ENCChart map, ISchemaAdapter<SimpleFeatureType, MemFeature> adapter)
@@ -61,8 +68,8 @@ public class MapStats
     {
       for(var layer : map.layers())
       {
-        var layerSize = ((MemStoreFeatureSource) layer.getFeatureSource()).size();
-        var type = adapter.name(layer.getFeatureSource().getSchema());
+        var layerSize = ((MemStoreFeatureSource) layer.featureSource()).size();
+        var type = adapter.name(layer.featureSource().getSchema());
         counts.put(type, layerSize);
         featureScan(layer, type);
       }
@@ -82,7 +89,7 @@ public class MapStats
       var numFeatures = 0;
       for(var layer : map.layers())
       {
-        var layerSize = ((MemStoreFeatureSource) layer.getFeatureSource()).size();
+        var layerSize = ((MemStoreFeatureSource) layer.featureSource()).size();
         numFeatures += layerSize;
       }
 
@@ -156,7 +163,7 @@ public class MapStats
   private void featureScan(MapLayer<SimpleFeatureType, MemFeature> layer, String type)
     throws Exception
   {
-    try(var features = layer.getFeatureSource().features())
+    try(var features = layer.featureSource().features())
     {
       while(features.hasNext())
       {

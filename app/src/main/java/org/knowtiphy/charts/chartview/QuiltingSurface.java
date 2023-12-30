@@ -145,12 +145,15 @@ public class QuiltingSurface extends StackPane
 
     for(int i = 0; i < mp.getNumGeometries(); i++)
     {
-      //  TODO -- need to clip here
-      var polyGeom = remover.apply((Polygon) mp.getGeometryN(i));
-      var polygon = new javafx.scene.shape.Polygon(tx.apply(polyGeom));
-      polygon.setFill(Color.BROWN);
-      polygon.setOpacity(0.4);
-      displaySurface.getChildren().add(polygon);
+      //  TODO -- what if its not a polygon -- do what?
+      if(mp.getGeometryN(i) instanceof Polygon pl)
+      {
+        var polyGeom = remover.apply(pl);
+        var polygon = new javafx.scene.shape.Polygon(tx.apply(polyGeom));
+        polygon.setFill(Color.BROWN);
+        polygon.setOpacity(0.4);
+        displaySurface.getChildren().add(polygon);
+      }
     }
   }
 

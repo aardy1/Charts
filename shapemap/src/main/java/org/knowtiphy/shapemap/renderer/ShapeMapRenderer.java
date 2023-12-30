@@ -105,9 +105,9 @@ public class ShapeMapRenderer<S, F>
     {
       if(layer.isVisible())
       {
-        var style = layer.getStyle();
+        var style = layer.style();
 
-        try(var iterator = layer.getFeatures(viewPortBounds, layer.isScaleLess()))
+        try(var iterator = layer.featureSource().features(viewPortBounds, layer.isScaleLess()))
         {
           while(iterator.hasNext())
           {
@@ -121,7 +121,7 @@ public class ShapeMapRenderer<S, F>
       }
 
       layerPos++;
-      rulePos += layer.getStyle().rules().size();
+      rulePos += layer.style().rules().size();
     }
   }
 
@@ -140,13 +140,13 @@ public class ShapeMapRenderer<S, F>
     {
       if(layerNeedsTextLayout[layerPos])
       {
-        try(var iterator = layer.getFeatures(viewPortBounds, true))
+        try(var iterator = layer.featureSource().features(viewPortBounds, true))
         {
           while(iterator.hasNext())
           {
             var feature = iterator.next();
             var rp = rulePos;
-            for(var rule : layer.getStyle().rules())
+            for(var rule : layer.style().rules())
             {
               if(appliedRule[rp])
               {
@@ -160,7 +160,7 @@ public class ShapeMapRenderer<S, F>
       }
 
       layerPos++;
-      rulePos += layer.getStyle().rules().size();
+      rulePos += layer.style().rules().size();
     }
 
   }

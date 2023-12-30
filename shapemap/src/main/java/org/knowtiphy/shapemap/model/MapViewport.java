@@ -4,15 +4,15 @@ import javafx.geometry.Point2D;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.transform.Affine;
 import javafx.scene.transform.NonInvertibleTransformException;
-import org.geotools.api.referencing.FactoryException;
-import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.api.referencing.operation.TransformException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.geotools.referencing.CRS;
 import org.knowtiphy.shapemap.renderer.RendererUtilities;
 
 public class MapViewport
 {
+  private ReferencedEnvelope bounds;
+
+  private final boolean matchingAspectRatio;
 
   private Rectangle2D screenArea;
 
@@ -20,100 +20,31 @@ public class MapViewport
 
   private Affine worldToScreen;
 
-  private ReferencedEnvelope bounds;
-
-  private boolean matchingAspectRatio;
-
   private boolean hasCenteringTransforms;
 
-  /**
-   * Determine if the map retains its scale (false) or its bounds (true) when the
-   * MapPane is resized.
-   */
-  private boolean fixedBoundsOnResize = false;
-
   public MapViewport(ReferencedEnvelope bounds, boolean matchAspectRatio)
-    throws TransformException, NonInvertibleTransformException, FactoryException
+    throws TransformException, NonInvertibleTransformException
   {
     this.screenArea = Rectangle2D.EMPTY;
     this.hasCenteringTransforms = false;
     this.matchingAspectRatio = matchAspectRatio;
     this.bounds = bounds;
-    setCoordinateReferenceSystem(bounds.getCoordinateReferenceSystem());
-    copyBounds(bounds);
-    setTransforms(true);
+    setTransforms();
   }
 
-  public MapViewport(ReferencedEnvelope bounds)
-    throws TransformException, NonInvertibleTransformException, FactoryException
-  {
-    this(bounds, false);
-  }
-
-  /**
-   * Sets whether to adjust input world bounds to match the aspect ratio of the screen
-   * area.
-   *
-   * @param enabled whether to enable aspect ratio adjustment
-   */
-  public void setMatchingAspectRatio(boolean enabled)
-    throws TransformException, NonInvertibleTransformException
-  {
-    matchingAspectRatio = enabled;
-    // setTransforms(true);
-  }
-
-  public boolean isMatchingAspectRatio()
-  {
-    return matchingAspectRatio;
-  }
-
-  /**
-   * Checks if the view port bounds are empty (undefined). This will be {@code true} if
-   * either or both of the world bounds and screen bounds are empty.
-   *
-   * @return {@code true} if empty
-   */
-  public boolean isEmpty()
-  {
-    return screenArea.equals(Rectangle2D.EMPTY) || bounds.isEmpty();
-  }
-
-  /**
-   * Gets the display area in world coordinates.
-   *
-   * <p>
-   * Note Well: this only covers spatial extent; you may wish to use the user data map
-   * to record the current viewport time or elevation.
-   *
-   * @return a copy of the current bounds
-   */
-  public ReferencedEnvelope getBounds()
+  public ReferencedEnvelope bounds()
   {
     return bounds;
   }
 
-  public void setBounds(ReferencedEnvelope requestedBounds)
+  public void setBounds(ReferencedEnvelope bounds)
     throws TransformException, NonInvertibleTransformException
   {
-
-    copyBounds(requestedBounds);
-    setTransforms(true);
+    this.bounds = bounds;
+    setTransforms();
   }
 
-  private void copyBounds(ReferencedEnvelope newBounds)
-  {
-    if(newBounds == null || newBounds.isEmpty())
-    {
-      bounds = new ReferencedEnvelope();
-    }
-    else
-    {
-      bounds = newBounds;
-    }
-  }
-
-  public Rectangle2D getScreenArea()
+  public Rectangle2D screenArea()
   {
     return screenArea;
   }
@@ -121,70 +52,26 @@ public class MapViewport
   public void setScreenArea(Rectangle2D screenArea)
     throws TransformException, NonInvertibleTransformException
   {
-    if(screenArea == null || screenArea.equals(Rectangle2D.EMPTY))
-    {
-      this.screenArea = Rectangle2D.EMPTY;
-    }
-    else
-    {
-      this.screenArea = new Rectangle2D(screenArea.getMinY(), screenArea.getMinY(),
-        screenArea.getWidth(), screenArea.getHeight());
-    }
-    
-    setTransforms(fixedBoundsOnResize);
+    //@formatter:off
+    this.screenArea = screenArea.equals(Rectangle2D.EMPTY) ?
+        Rectangle2D.EMPTY :
+        new Rectangle2D(screenArea.getMinY(), screenArea.getMinY(), screenArea.getWidth(), screenArea.getHeight());
+    //@formatter:on
+
+    setTransforms();
   }
 
-  /**
-   * The coordinate reference system used for rendering the map. If not yet set,
-   * {@code null} is returned.
-   *
-   * <p>
-   * The coordinate reference system used for rendering is often considered to be the
-   * "world" coordinate reference system; this is distinct from the coordinate reference
-   * system used for each layer (which is often data dependent).
-   *
-   * @return coordinate reference system used for rendering the map (may be
-   * {@code null}).
-   */
-  public CoordinateReferenceSystem getCoordinateReferenceSystem()
-  {
-    return bounds.getCoordinateReferenceSystem();
-  }
-
-  public void setCoordinateReferenceSystem(CoordinateReferenceSystem crs)
-    throws TransformException, NonInvertibleTransformException, FactoryException
-  {
-
-    if(crs == null)
-    {
-      bounds = new ReferencedEnvelope(bounds, null);
-    }
-    else if(!CRS.equalsIgnoreMetadata(crs, bounds.getCoordinateReferenceSystem()))
-    {
-      if(bounds.isEmpty())
-      {
-        bounds = new ReferencedEnvelope(crs);
-      }
-      else
-      {
-        bounds = bounds.transform(crs, true);
-        setTransforms(true);
-      }
-    }
-  }
-
-  public Affine getScreenToWorld()
+  public Affine screenToWorld()
   {
     return screenToWorld;
   }
 
-  public Affine getWorldToScreen()
+  public Affine worldToScreen()
   {
     return worldToScreen;
   }
 
-  private void setTransforms(boolean newBounds)
-    throws TransformException, NonInvertibleTransformException
+  private void setTransforms() throws TransformException, NonInvertibleTransformException
   {
     if(screenArea.equals(Rectangle2D.EMPTY))
     {
@@ -199,7 +86,7 @@ public class MapViewport
     }
     else if(matchingAspectRatio)
     {
-      if(newBounds || !hasCenteringTransforms)
+      if(!hasCenteringTransforms)
       {
         calculateCenteringTransforms();
       }
@@ -229,23 +116,6 @@ public class MapViewport
     worldToScreen = new Affine(scale, 0, 0, -scale, -xoff, yoff);
     screenToWorld = worldToScreen.createInverse();
     hasCenteringTransforms = true;
-  }
-
-  public boolean isFixedBoundsOnResize()
-  {
-    return fixedBoundsOnResize;
-  }
-
-  /**
-   * Determine if the map retains its scale (false) or its bounds (true) when the
-   * MapPane is resized.
-   *
-   * @param fixedBoundsOnResize - if true retain bounds on resize otherwise retain
-   *                            scale.
-   */
-  public void setFixedBoundsOnResize(boolean fixedBoundsOnResize)
-  {
-    this.fixedBoundsOnResize = fixedBoundsOnResize;
   }
 
   /**
@@ -285,3 +155,50 @@ public class MapViewport
   }
 
 }
+
+///**
+// * Sets whether to adjust input world bounds to match the aspect ratio of the screen
+// * area.
+// *
+// * @param enabled whether to enable aspect ratio adjustment
+// */
+//public void setMatchingAspectRatio(boolean enabled)
+//  throws TransformException, NonInvertibleTransformException
+//{
+//  matchingAspectRatio = enabled;
+//  // setTransforms(true);
+//}
+//
+//  public void setCoordinateReferenceSystem(CoordinateReferenceSystem crs)
+//    throws TransformException, NonInvertibleTransformException, FactoryException
+//  {
+//
+//    if(crs == null)
+//    {
+//      bounds = new ReferencedEnvelope(bounds, null);
+//    }
+//    else if(!CRS.equalsIgnoreMetadata(crs, bounds.getCoordinateReferenceSystem()))
+//    {
+//      if(bounds.isEmpty())
+//      {
+//        bounds = new ReferencedEnvelope(crs);
+//      }
+//      else
+//      {
+//        bounds = bounds.transform(crs, true);
+//        setTransforms(true);
+//      }
+//    }
+//  }
+//
+//  private void copyBounds(ReferencedEnvelope newBounds)
+//  {
+//    if(newBounds == null || newBounds.isEmpty())
+//    {
+//      bounds = new ReferencedEnvelope();
+//    }
+//    else
+//    {
+//      bounds = newBounds;
+//    }
+//  }
