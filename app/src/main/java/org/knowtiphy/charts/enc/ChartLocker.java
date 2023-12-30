@@ -102,17 +102,37 @@ public class ChartLocker
     //  toList yields an array list
     var quilt = new ArrayList<Pair<ENCCell, Geometry>>();
 
+    //  TODO -- this could be smarter, bailing when the extent is covered
+//    var cell = intersections.get(0);
+//    var geom = cell.geom().intersection(extent);
+//    quilt.add(Pair.of(cell, geom));
+//    Geometry used = cell.geom();
+//
+//    //  TODO -- this could be smarter, bailing when the extent is covered
+//    for(var i = 1; i < intersections.size(); i++)
+//    {
+//      var ithCell = intersections.get(i);
+//      var ithGeom = ithCell.geom();
+//      quilt.add(Pair.of(ithCell, ithGeom.difference(used).intersection(extent)));
+//      used = used.union(ithGeom);
+//    }
+
     var cell = intersections.get(0);
     var geom = cell.geom().intersection(extent);
     quilt.add(Pair.of(cell, geom));
-    Geometry used = cell.geom();
+    var remaining = extent.difference(geom);
 
     for(var i = 1; i < intersections.size(); i++)
     {
+      if(remaining.isEmpty())
+      {
+        break;
+      }
+
       var ithCell = intersections.get(i);
-      var ithGeom = ithCell.geom();
-      quilt.add(Pair.of(ithCell, ithGeom.difference(used).intersection(extent)));
-      used = used.union(ithGeom);
+      var ithGeom = ithCell.geom().intersection(extent);
+      quilt.add(Pair.of(ithCell, ithGeom.intersection(remaining)));
+      remaining = remaining.difference(ithGeom);
     }
 
     return quilt;
