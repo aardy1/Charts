@@ -5,6 +5,7 @@ import javafx.css.Styleable;
 import javafx.css.StyleablePropertyFactory;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
+import javafx.scene.paint.Color;
 import org.knowtiphy.shapemap.model.MapViewModel;
 import org.knowtiphy.shapemap.view.canvas.CanvasShapeMapSkin;
 
@@ -38,14 +39,17 @@ public class ShapeMapView<S, F> extends Control
 
   private final MapViewModel<S, F> map;
 
-  public ShapeMapView(MapViewModel<S, F> map)
+  private final Color background;
+
+  public ShapeMapView(MapViewModel<S, F> map, Color background)
   {
-    this(map, SkinType.CANVAS);
+    this(map, background, SkinType.CANVAS);
   }
 
-  public ShapeMapView(MapViewModel<S, F> map, SkinType skinType)
+  public ShapeMapView(MapViewModel<S, F> map, Color background, SkinType skinType)
   {
     this.map = map;
+    this.background = background;
     this.skinType = skinType;
     getStyleClass().add("shapemap-view");
   }
@@ -55,7 +59,7 @@ public class ShapeMapView<S, F> extends Control
   {
     return switch(skinType)
     {
-      default -> new CanvasShapeMapSkin<>(this, map);
+      default -> new CanvasShapeMapSkin<>(this, map, background);
     };
   }
 

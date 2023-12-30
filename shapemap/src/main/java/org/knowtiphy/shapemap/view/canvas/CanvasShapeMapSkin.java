@@ -6,8 +6,6 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
-import javafx.scene.transform.NonInvertibleTransformException;
-import org.geotools.api.referencing.operation.TransformException;
 import org.knowtiphy.shapemap.model.MapViewModel;
 import org.knowtiphy.shapemap.renderer.ShapeMapRenderer;
 import org.knowtiphy.shapemap.renderer.context.RendererContext;
@@ -34,17 +32,21 @@ public class CanvasShapeMapSkin<S, F> extends ShapeMapBaseSkin<S, F>
 
   private MapViewModel<S, F> map;
 
+  private final Color background;
+
   private final Pane root;
 
   private final BorderPane borderPane;
 
   private final List<Subscription> subscriptions = new ArrayList<>();
 
-  public CanvasShapeMapSkin(ShapeMapView<S, F> surface, MapViewModel<S, F> map)
+  public CanvasShapeMapSkin(ShapeMapView<S, F> surface, MapViewModel<S, F> map, Color background)
   {
     super(surface);
 
     this.map = map;
+    this.background = background;
+
     borderPane = new BorderPane();
     root = new Pane(borderPane);
     getChildren().addAll(root);
@@ -97,13 +99,12 @@ public class CanvasShapeMapSkin<S, F> extends ShapeMapBaseSkin<S, F>
 
   private void repaint()
   {
-
     var width = (int) root.getWidth();
     var height = (int) root.getHeight();
 
     var canvas = new Canvas(width, height);
     var graphics = canvas.getGraphicsContext2D();
-    graphics.setFill(Color.LIGHTGREY);
+    graphics.setFill(background);
     graphics.fillRect(0, 0, width, height);
 
     var rendererContext = new RendererContext<>(
@@ -112,6 +113,8 @@ public class CanvasShapeMapSkin<S, F> extends ShapeMapBaseSkin<S, F>
 				map.totalRuleCount(),
 				map.viewPortBounds(),
 				new Rectangle2D(0, 0, width, height),
+        map.viewPortWorldToScreen(),
+        map.viewPortScreenToWorld(),
 				map.featureAdapter(),
 				map.renderablePolygonProvider(),
 				map.svgProvider(),
@@ -119,14 +122,7 @@ public class CanvasShapeMapSkin<S, F> extends ShapeMapBaseSkin<S, F>
 		//@formatter:on
 
     var renderer = new ShapeMapRenderer<>(rendererContext, graphics);
-    try
-    {
-      renderer.paint();
-      borderPane.setCenter(canvas);
-    }
-    catch(NonInvertibleTransformException | TransformException ex)
-    {
-      ex.printStackTrace(System.err);
-    }
+    renderer.paint();
+    borderPane.setCenter(canvas);
   }
 }

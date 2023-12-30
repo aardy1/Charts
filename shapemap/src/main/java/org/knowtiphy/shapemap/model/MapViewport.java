@@ -52,12 +52,7 @@ public class MapViewport
   public void setScreenArea(Rectangle2D screenArea)
     throws TransformException, NonInvertibleTransformException
   {
-    //@formatter:off
-    this.screenArea = screenArea.equals(Rectangle2D.EMPTY) ?
-        Rectangle2D.EMPTY :
-        new Rectangle2D(screenArea.getMinY(), screenArea.getMinY(), screenArea.getWidth(), screenArea.getHeight());
-    //@formatter:on
-
+    this.screenArea = screenArea;
     setTransforms();
   }
 

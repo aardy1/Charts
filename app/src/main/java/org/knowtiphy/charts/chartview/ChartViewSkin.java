@@ -13,6 +13,7 @@ import javafx.scene.input.ZoomEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
 import javafx.scene.transform.NonInvertibleTransformException;
 import org.apache.commons.lang3.tuple.Pair;
 import org.controlsfx.control.PopOver;
@@ -56,8 +57,6 @@ public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView
 
   private static final double PREFERRED_HEIGHT = Region.USE_COMPUTED_SIZE;
 
-  private final StackPane root;
-
   private final ShapeMapView<SimpleFeatureType, MemFeature> mapSurface;
 
   private final ChartLocker chartLocker;
@@ -75,8 +74,6 @@ public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView
   private final List<Subscription> subscriptions = new ArrayList<>();
 
   // private final Pane iconsSurface;
-
-  private final Pane quiltingSurface;
 
   private final Pane coordinateGrid;
 
@@ -99,18 +96,19 @@ public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView
     this.displayOptions = displayOptions;
     this.svgCache = svgCache;
 
-    root = makeRoot();
+    var root = makeRoot();
     getChildren().addAll(root);
 
     var surfaceDragEventsPane = new Pane();
     mapSurface = makeMapSurface();
     // iconsSurface = makeIconsSurface();
-    quiltingSurface = makeQuiltingSurface();
+    var quiltingSurface = makeQuiltingSurface();
     coordinateGrid = makeCoordinateGrid(unitProfile);
     // aisPane = makeDynamicsSurface();
 
-    root.getChildren()
-        .addAll(surfaceDragEventsPane, mapSurface, quiltingSurface, coordinateGrid);// ,
+    root
+      .getChildren()
+      .addAll(surfaceDragEventsPane, mapSurface, quiltingSurface, coordinateGrid);// ,
     // iconsSurface,
     // //
     // quiltingSurface,
@@ -135,14 +133,14 @@ public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView
     eventModel.zoomEvents.feedFrom(EventStreams.eventsOf(root, ZoomEvent.ANY));
 
     // windows on clicked, mac on pressed
-    eventModel.mouseClicked.filter(MouseEvent::isPopupTrigger)
-                           .subscribe(
-                             event -> makeContextMenu(event).show(mapSurface, event.getScreenX(),
-                               event.getScreenY()));
-    eventModel.mousePressed.filter(MouseEvent::isPopupTrigger)
-                           .subscribe(
-                             event -> makeContextMenu(event).show(mapSurface, event.getScreenX(),
-                               event.getScreenY()));
+    eventModel.mouseClicked
+      .filter(MouseEvent::isPopupTrigger)
+      .subscribe(
+        event -> makeContextMenu(event).show(mapSurface, event.getScreenX(), event.getScreenY()));
+    eventModel.mousePressed
+      .filter(MouseEvent::isPopupTrigger)
+      .subscribe(
+        event -> makeContextMenu(event).show(mapSurface, event.getScreenX(), event.getScreenY()));
 
     subscriptions.add(chartLocker.chartEvents().subscribe(change -> updateBoats()));
     // subscriptions.add(dynamics.aisEvents.subscribe(this::updateAISInformation));
@@ -203,7 +201,7 @@ public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView
 
   private ShapeMapView<SimpleFeatureType, MemFeature> makeMapSurface()
   {
-    var theSurface = new ShapeMapView<>(chart);
+    var theSurface = new ShapeMapView<>(chart, Color.LIGHTGREY);
     theSurface.setMouseTransparent(true);
     return theSurface;
   }
@@ -274,11 +272,12 @@ public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView
               var attrVal = feature.getAttribute(attr.getLocalName());
               if(attrVal != null && !(attrVal instanceof String x && x.isEmpty()))
               {
-                textToDisplay.append("\t")
-                             .append(attr.getName())
-                             .append(" = ")
-                             .append(attrVal)
-                             .append("\n");
+                textToDisplay
+                  .append("\t")
+                  .append(attr.getName())
+                  .append(" = ")
+                  .append(attrVal)
+                  .append("\n");
               }
             }
           }

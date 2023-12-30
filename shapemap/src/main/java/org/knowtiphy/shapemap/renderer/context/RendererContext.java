@@ -6,6 +6,7 @@
 package org.knowtiphy.shapemap.renderer.context;
 
 import javafx.geometry.Rectangle2D;
+import javafx.scene.transform.Affine;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.knowtiphy.shapemap.api.IFeatureAdapter;
 import org.knowtiphy.shapemap.api.IRenderablePolygonProvider;
@@ -24,6 +25,8 @@ public record RendererContext<S, F>(
 		int totalRuleCount,
 		ReferencedEnvelope viewPortBounds,
 		Rectangle2D paintArea,
+    Affine worldToScreen,
+    Affine screenToWorld,
 		IFeatureAdapter<F> featureAdapter,
 		IRenderablePolygonProvider renderablePolygonProvider,
 		ISVGProvider svgProvider,

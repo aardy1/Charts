@@ -9,8 +9,6 @@ import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.transform.Affine;
-import javafx.scene.transform.NonInvertibleTransformException;
-import org.geotools.api.referencing.operation.TransformException;
 import org.knowtiphy.shapemap.renderer.context.RendererContext;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.Rule;
 import org.locationtech.jts.index.quadtree.Quadtree;
@@ -20,7 +18,6 @@ import org.locationtech.jts.index.quadtree.Quadtree;
  */
 public class ShapeMapRenderer<S, F>
 {
-
   private final RendererContext<S, F> rendererContext;
 
   private final GraphicsContext graphics;
@@ -33,29 +30,27 @@ public class ShapeMapRenderer<S, F>
     this.graphics = graphics;
   }
 
-  public void paint() throws TransformException, NonInvertibleTransformException
+  public void paint()
   {
-
-    var layers = rendererContext.layers();
-    var viewPortBounds = rendererContext.viewPortBounds();
+    System.err.println("\nRepaint : " + count.get() + " : " + rendererContext.paintArea() + "\n");
 
     // TODO -- get rid of this debugging code
     count.set(count.get() + 1);
 
-    System.err.println("\nRepaint : " + count.get() + " : " + rendererContext.paintArea() + "\n");
-
     var start = System.currentTimeMillis();
 
-    var worldToScreen = RendererUtilities.worldToScreenTransform(viewPortBounds,
-      rendererContext.paintArea(), viewPortBounds.getCoordinateReferenceSystem());
-    var screenToWorld = worldToScreen.createInverse();
-
-    var onePixelX = onePixelX(screenToWorld);
-    var onePixelY = onePixelY(screenToWorld);
-
     var index = new Quadtree();
-    var graphicsRenderingContext = new GraphicsRenderingContext<>(rendererContext, graphics,
-      new Transformation(worldToScreen), onePixelX, onePixelY, index, viewPortBounds);
+
+    //@formatter:off
+    var graphicsRenderingContext = new GraphicsRenderingContext<>(
+      rendererContext,
+      graphics,
+      new Transformation(rendererContext.worldToScreen()),
+      onePixelX(rendererContext.screenToWorld()),
+      onePixelY(rendererContext.screenToWorld()),
+      index,
+      rendererContext.viewPortBounds());
+    //@formatter:off
 
     try
     {
@@ -66,10 +61,10 @@ public class ShapeMapRenderer<S, F>
       // symbolizers
 
       var appliedRule = new boolean[rendererContext.totalRuleCount()];
-      var layerNeedsTextLayout = new boolean[layers.size()];
+      var layerNeedsTextLayout = new boolean[rendererContext.layers().size()];
 
       var gStart = System.currentTimeMillis();
-      graphics.setTransform(worldToScreen);
+      graphics.setTransform(rendererContext.worldToScreen());
       renderGraphics(graphicsRenderingContext, appliedRule, layerNeedsTextLayout);
       System.err.println("Graphics time = " + (System.currentTimeMillis() - gStart));
 
@@ -94,7 +89,6 @@ public class ShapeMapRenderer<S, F>
     GraphicsRenderingContext<S, F> context, boolean[] appliedRule, boolean[] layerNeedsTextLayout)
     throws Exception
   {
-
     var layers = rendererContext.layers();
     var viewPortBounds = rendererContext.viewPortBounds();
 
@@ -129,7 +123,6 @@ public class ShapeMapRenderer<S, F>
     GraphicsRenderingContext<S, F> context, boolean[] appliedRule, boolean[] layerNeedsTextLayout)
     throws Exception
   {
-
     var layers = rendererContext.layers();
     var viewPortBounds = rendererContext.viewPortBounds();
 
@@ -162,44 +155,39 @@ public class ShapeMapRenderer<S, F>
       layerPos++;
       rulePos += layer.style().rules().size();
     }
-
   }
 
   private boolean applyStyle(
     FeatureTypeStyle<S, F> style, GraphicsRenderingContext<S, F> context, F feature,
     boolean[] appliedRule, int startPos)
   {
-
     var appliedSomeRule = false;
     // if (style.applies(feature))
+    var rulePos = startPos;
+    var elsePos = -1;
+
+    for(var rule : style.rules())
     {
-
-      var rulePos = startPos;
-      var elsePos = -1;
-
-      for(var rule : style.rules())
+      if(!rule.elseFilter())
       {
-        if(!rule.elseFilter())
-        {
-          var applied = applyGraphicsRule(rule, context, feature);
-          appliedRule[rulePos] |= applied;
-          appliedSomeRule |= applied;
-        }
-        else
-        {
-          elsePos = rulePos - startPos;
-        }
-
-        rulePos++;
-      }
-
-      if(!appliedSomeRule && elsePos != -1)
-      {
-        var elseRule = style.rules().get(elsePos);
-        var applied = applyGraphicsRule(elseRule, context, feature);
-        appliedRule[elsePos] |= applied;
+        var applied = applyGraphicsRule(rule, context, feature);
+        appliedRule[rulePos] |= applied;
         appliedSomeRule |= applied;
       }
+      else
+      {
+        elsePos = rulePos - startPos;
+      }
+
+      rulePos++;
+    }
+
+    if(!appliedSomeRule && elsePos != -1)
+    {
+      var elseRule = style.rules().get(elsePos);
+      var applied = applyGraphicsRule(elseRule, context, feature);
+      appliedRule[elsePos] |= applied;
+      appliedSomeRule |= applied;
     }
 
     return appliedSomeRule;
@@ -208,7 +196,6 @@ public class ShapeMapRenderer<S, F>
   private boolean applyGraphicsRule(
     Rule<S, F> rule, GraphicsRenderingContext<S, F> context, F feature)
   {
-
     var featureAdapter = context.rendererContext().featureAdapter();
     if(rule.filter() != null)
     {
@@ -228,7 +215,6 @@ public class ShapeMapRenderer<S, F>
 
   private void applyTextRule(Rule<S, F> rule, GraphicsRenderingContext<S, F> context, F feature)
   {
-
     var featureAdapter = context.rendererContext().featureAdapter();
     if(rule.filter().apply(feature, featureAdapter.defaultGeometry(feature)))
     {
@@ -239,14 +225,14 @@ public class ShapeMapRenderer<S, F>
     }
   }
 
-  private double onePixelX(Affine screenToWorld) throws NonInvertibleTransformException
+  private double onePixelX(Affine screenToWorld)
   {
     var pt1 = screenToWorld.transform(0, 0);
     var pt2 = screenToWorld.transform(1, 0);
     return Math.abs(pt2.getX() - pt1.getX());
   }
 
-  private double onePixelY(Affine screenToWorld) throws NonInvertibleTransformException
+  private double onePixelY(Affine screenToWorld)
   {
     var pt1 = screenToWorld.transform(0, 0);
     var pt2 = screenToWorld.transform(0, 1);
