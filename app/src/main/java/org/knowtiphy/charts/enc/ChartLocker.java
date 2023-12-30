@@ -96,18 +96,22 @@ public class ChartLocker
                           .sorted(Comparator.comparingInt(ENCCell::cScale))
                           .toList();
 
+    var extent = JTS.toGeometry(chart.viewPortBounds());
+//    var remaining = extent;
+
     //  toList yields an array list
     var quilt = new ArrayList<Pair<ENCCell, Geometry>>();
 
     var cell = intersections.get(0);
-    quilt.add(Pair.of(cell, cell.geom()));
+    var geom = cell.geom().intersection(extent);
+    quilt.add(Pair.of(cell, geom));
     Geometry used = cell.geom();
 
     for(var i = 1; i < intersections.size(); i++)
     {
       var ithCell = intersections.get(i);
       var ithGeom = ithCell.geom();
-      quilt.add(Pair.of(ithCell, ithGeom.difference(used)));
+      quilt.add(Pair.of(ithCell, ithGeom.difference(used).intersection(extent)));
       used = used.union(ithGeom);
     }
 

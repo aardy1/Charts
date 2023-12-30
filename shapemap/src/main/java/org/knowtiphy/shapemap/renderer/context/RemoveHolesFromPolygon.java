@@ -18,7 +18,6 @@ import java.util.List;
 
 public class RemoveHolesFromPolygon implements IRenderablePolygonProvider
 {
-
   private static final GeometryFactory GF = new GeometryFactory();
 
   private final RenderGeomCache renderGeomCache;
@@ -31,7 +30,6 @@ public class RemoveHolesFromPolygon implements IRenderablePolygonProvider
   @Override
   public Polygon apply(Polygon polygon)
   {
-
     var renderGeom = renderGeomCache.fetch(polygon);
     if(renderGeom == null)
     {
@@ -44,7 +42,6 @@ public class RemoveHolesFromPolygon implements IRenderablePolygonProvider
 
   private Polygon remove(Polygon polygon)
   {
-
     if(polygon.getNumInteriorRing() == 0)
     {
       return polygon;
