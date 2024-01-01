@@ -5,63 +5,60 @@
 
 package org.knowtiphy.charts.enc;
 
-import javafx.geometry.Rectangle2D;
-import javafx.scene.transform.NonInvertibleTransformException;
 import org.geotools.api.feature.simple.SimpleFeatureType;
-import org.geotools.api.referencing.FactoryException;
-import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
-import org.geotools.api.referencing.operation.TransformException;
 import org.knowtiphy.charts.memstore.MemFeature;
+import org.knowtiphy.shapemap.model.MapModel;
 import org.knowtiphy.shapemap.model.MapViewModel;
+import org.knowtiphy.shapemap.model.MapViewport;
+import org.knowtiphy.shapemap.renderer.context.RemoveHolesFromPolygon;
+import org.knowtiphy.shapemap.renderer.context.RenderGeomCache;
 import org.knowtiphy.shapemap.renderer.context.SVGCache;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
- * An ENC chart -- a map view model for an ENC cell
+ * An ENC chart -- a map view model for a collection of ENC cells -- a quilt.
  */
 
 public class ENCChart extends MapViewModel<SimpleFeatureType, MemFeature>
 {
-  private final ENCCell cell;
+  private final List<ENCCell> cells;
 
-  public ENCChart(ENCCell cell, CoordinateReferenceSystem crs, SVGCache svgCache)
-    throws TransformException, FactoryException, NonInvertibleTransformException
+  public ENCChart(
+    ENCCell cell, MapModel<SimpleFeatureType, MemFeature> map, MapViewport viewport,
+    SVGCache svgCache)
   {
-    super(cell.bounds(crs), SchemaAdapter.ADAPTER, FeatureAdapter.ADAPTER, svgCache,
-      TextSizeProvider.PROVIDER);
-    this.cell = cell;
+    super(map, viewport, FeatureAdapter.ADAPTER, new RemoveHolesFromPolygon(new RenderGeomCache()),
+      svgCache, TextSizeProvider.PROVIDER);
+    this.cells = new ArrayList<>();
+    cells.add(cell);
   }
+
+  public boolean isQuilt(){return cells.size() > 1;}
 
   public ENCCell cell()
   {
-    return cell;
+    return cells.get(0);
   }
 
   public int cScale()
   {
-    return cell.cScale();
+    return cells.get(0).cScale();
   }
 
   public double zoomFactor()
   {
-    return 1 / (viewPortBounds().getWidth() / bounds().getWidth());
+    return bounds().getWidth() / (viewPortBounds().getWidth());
   }
 
-  public int displayScale()
+  public double displayScale()
   {
     return (int) (cScale() * (1 / zoomFactor()));
   }
 
-  //  TODO -- make the "2" tuneable
-  public int adjustedDisplayScale()
-  {
-    return displayScale() / 2;
-  }
+  public double adjustedDisplayScale(){return displayScale() / 2.0;}
 
-  public String title(){return cell.lName();}
+  public String title(){return cells.get(0).lName();}
 
-  public void setViewPortScreenArea(Rectangle2D screenArea)
-    throws TransformException, NonInvertibleTransformException
-  {
-    super.setViewPortScreenArea(screenArea);
-  }
 }

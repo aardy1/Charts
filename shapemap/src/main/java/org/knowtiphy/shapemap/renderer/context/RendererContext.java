@@ -19,17 +19,20 @@ import java.util.Collection;
 /**
  * @author graham
  */
-public record RendererContext<S, F>(
 // @formatter:off
+public record RendererContext<S, F>
+(
 		Collection<MapLayer<S, F>> layers,
 		int totalRuleCount,
 		ReferencedEnvelope viewPortBounds,
 		Rectangle2D paintArea,
     Affine worldToScreen,
     Affine screenToWorld,
+    double displayScale,
 		IFeatureAdapter<F> featureAdapter,
 		IRenderablePolygonProvider renderablePolygonProvider,
 		ISVGProvider svgProvider,
-    ITextSizeProvider textSizeProvider)
+    ITextSizeProvider textSizeProvider
+)
 {}
 // @formatter:on

@@ -217,13 +217,13 @@ public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView
       displayOptions.showGridEvents.subscribe(c -> coordinateGrid.setVisible(c.getNewValue())));
 
     subscriptions.add(displayOptions.showLightsEvents.subscribe(
-      change -> chart.setLayerVisible(S57.OC_LIGHTS, change.getNewValue())));
+      change -> chart.layer(S57.OC_LIGHTS).setVisible(change.getNewValue())));
     subscriptions.add(displayOptions.showPlatformEvents.subscribe(
-      change -> chart.setLayerVisible(S57.OC_OFSPLF, change.getNewValue())));
+      change -> chart.layer(S57.OC_OFSPLF).setVisible(change.getNewValue())));
     subscriptions.add(displayOptions.showWreckEvents.subscribe(
-      change -> chart.setLayerVisible(S57.OC_WRECKS, change.getNewValue())));
+      change -> chart.layer(S57.OC_WRECKS).setVisible(change.getNewValue())));
     subscriptions.add(displayOptions.showSoundingsEvents.subscribe(
-      change -> chart.setLayerVisible(S57.OC_SOUNDG, change.getNewValue())));
+      change -> chart.layer(S57.OC_SOUNDG).setVisible(change.getNewValue())));
 
     // subscriptions.add(chart.viewPortBoundsEvent.subscribe(change ->
     // updateBoats()));

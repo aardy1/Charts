@@ -192,15 +192,14 @@ public class InfoBar extends StackPane
   {
     var envelope = chart.viewPortBounds();
     var mapWidth = Coordinates.distanceAcross(envelope);
-    // // currentExtent.setText(unitProfile.envelopeLabel(envelope));
     currentMapSpan.setText(unitProfile.formatDistance(mapWidth, unitProfile::metersToMapUnits));
     // currentScreenToWorld.setText("1" + unitProfile.screenUnit + " : "
     // + Coordinates.twoDec(unitProfile.convertFromScreenUnit(mapWidth /
     // platform.windowWidthCM(this)))
     // + unitProfile.distanceUnit);
 
-    adjustedDisplayScale.setText(chart.adjustedDisplayScale() + "");
     displayScale.setText(chart.displayScale() + "");
+    adjustedDisplayScale.setText(chart.adjustedDisplayScale() + "");
     zoomLevel.setText(Coordinates.twoDec(chart.zoomFactor()));
   }
 

@@ -7,10 +7,10 @@ package org.knowtiphy.charts.memstore;
 
 import org.geotools.api.feature.simple.SimpleFeatureType;
 import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.knowtiphy.charts.enc.ENCChart;
 import org.knowtiphy.charts.ontology.S57;
 import org.knowtiphy.shapemap.api.IFeatureSource;
 import org.knowtiphy.shapemap.api.IFeatureSourceIterator;
+import org.knowtiphy.shapemap.model.MapModel;
 import org.locationtech.jts.index.strtree.STRtree;
 
 import java.util.ArrayList;
@@ -22,17 +22,17 @@ import java.util.List;
  */
 public class MemStoreFeatureSource implements IFeatureSource<SimpleFeatureType, MemFeature>
 {
-
-  private final ENCChart map;
+  private final MapModel<SimpleFeatureType, MemFeature> map;
 
   private final SimpleFeatureType featureType;
 
   private final STRtree featureIndex;
 
   // TODO -- we really shouldn't be passing the map -- should be in the query
-  public MemStoreFeatureSource(ENCChart map, SimpleFeatureType featureType, STRtree featureIndex)
+  public MemStoreFeatureSource(
+    MapModel<SimpleFeatureType, MemFeature> map, SimpleFeatureType featureType,
+    STRtree featureIndex)
   {
-
     this.map = map;
     this.featureType = featureType;
     this.featureIndex = featureIndex;
@@ -46,7 +46,8 @@ public class MemStoreFeatureSource implements IFeatureSource<SimpleFeatureType, 
   }
 
   @Override
-  public IFeatureSourceIterator<MemFeature> features(ReferencedEnvelope bounds, boolean scaleLess)
+  public IFeatureSourceIterator<MemFeature> features(
+    ReferencedEnvelope bounds, double displayScale, boolean scaleLess)
   {
     Collection<MemFeature> featuresInScale;
 
@@ -57,13 +58,11 @@ public class MemStoreFeatureSource implements IFeatureSource<SimpleFeatureType, 
 
     var sbounds = System.currentTimeMillis();
 
-    var currentScale = map.displayScale();
-
     featuresInScale = new ArrayList<>();
     for(var feature : featuresInBounds)
     {
       var featureMinScale = feature.getAttribute(S57.AT_SCAMIN);
-      if(scaleLess || featureMinScale == null || (int) featureMinScale >= currentScale)
+      if(scaleLess || featureMinScale == null || (int) featureMinScale >= displayScale)
       {
         featuresInScale.add(feature);
       }
@@ -80,27 +79,11 @@ public class MemStoreFeatureSource implements IFeatureSource<SimpleFeatureType, 
   }
 
   @Override
+  @SuppressWarnings("unchecked")
   public IFeatureSourceIterator<MemFeature> features()
   {
-
-    Collection<MemFeature> featuresInScale;
-
-    @SuppressWarnings("unchecked") var featuresInBounds = (List<MemFeature>) featureIndex.query(
-      map.bounds());
-
-    var currentScale = map.displayScale();
-
-    featuresInScale = new ArrayList<>();
-    for(var feature : featuresInBounds)
-    {
-      var featureMinScale = feature.getAttribute(S57.AT_SCAMIN);
-      if(featureMinScale == null || (int) featureMinScale >= currentScale)
-      {
-        featuresInScale.add(feature);
-      }
-    }
-
-    return new MemStoreFeatureIterator(featuresInScale.iterator());
+    return new MemStoreFeatureIterator(
+      ((List<MemFeature>) featureIndex.query(map.bounds())).iterator());
   }
 
   public int size()

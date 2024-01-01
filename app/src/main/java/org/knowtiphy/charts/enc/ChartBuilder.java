@@ -7,6 +7,7 @@ import org.geotools.api.referencing.FactoryException;
 import org.geotools.api.referencing.operation.TransformException;
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.data.store.ContentFeatureSource;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.knowtiphy.charts.chartview.MapDisplayOptions;
 import org.knowtiphy.charts.memstore.MemFeature;
 import org.knowtiphy.charts.memstore.MemStore;
@@ -14,6 +15,8 @@ import org.knowtiphy.charts.memstore.StyleReader;
 import org.knowtiphy.charts.ontology.S57;
 import org.knowtiphy.charts.settings.AppSettings;
 import org.knowtiphy.shapemap.model.MapLayer;
+import org.knowtiphy.shapemap.model.MapModel;
+import org.knowtiphy.shapemap.model.MapViewport;
 import org.knowtiphy.shapemap.renderer.context.SVGCache;
 import org.knowtiphy.shapemap.style.parser.StyleSyntaxException;
 import org.locationtech.jts.geom.Geometry;
@@ -43,8 +46,6 @@ public class ChartBuilder
   private final SVGCache svgCache;
 
   private ENCChart chart;
-
-  private MemStore store;
 
   public ChartBuilder(
     ENCCell cell, AppSettings settings, StyleReader<SimpleFeatureType, MemFeature> styleReader,
@@ -138,14 +139,9 @@ public class ChartBuilder
   {
     var fileNames = readShapeFilesInDir(cell.location());
 
-//    var all = new HashSet<String>();
-//
-//    for(var fileName : fileNames)
-//    {
-//      var bits = fileName.split("/");
-//      var type = bits[bits.length - 1].split("\\.")[0];
-//      all.add(type);
-//    }
+    var crs = DefaultGeographicCRS.WGS84;
+    var map = new MapModel<>(cell.bounds(crs), cell.cScale(), SchemaAdapter.ADAPTER);
+    var store = new MemStore(map);
 
     for(var include : LAYER_ORDER)
     {
@@ -162,23 +158,16 @@ public class ChartBuilder
           }
           else
           {
-//            var bits = fileName.split("/");
-//            var type = bits[bits.length - 1].split("\\.")[0];
-//            all.remove(type);
             var fileStore = new ShapefileDataStore(new File(fileName).toURI().toURL());
             var featureSource = fileStore.getFeatureSource();
-
-            if(chart == null)
-            {
-              var crs = featureSource.getBounds().getCoordinateReferenceSystem();
-              chart = new ENCChart(cell, crs, svgCache);
-              store = new MemStore(chart);
-            }
-
-            chart.addLayer(readLayer(featureSource, store));
+            map.addLayer(readLayer(featureSource, store));
           }
         }
       }
+
+      //  TODO -- make the "2" tuneable
+      var viewPort = new MapViewport(cell.bounds(crs), false);
+      chart = new ENCChart(cell, map, viewPort, svgCache);
     }
 
 //    System.err.println("------------------------------------------------------");
@@ -246,6 +235,7 @@ public class ChartBuilder
     };
   }
 }
+
 // private GeometryDescriptor singlePointGeomDescriptor(SimpleFeature feature) {
 //
 // var fGeomDesc = feature.getDefaultGeometryProperty().getDescriptor();

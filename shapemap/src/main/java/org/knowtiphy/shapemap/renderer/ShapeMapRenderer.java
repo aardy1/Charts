@@ -101,7 +101,8 @@ public class ShapeMapRenderer<S, F>
       {
         var style = layer.style();
 
-        try(var iterator = layer.featureSource().features(viewPortBounds, layer.isScaleLess()))
+        try(var iterator = layer.featureSource().features(viewPortBounds,
+          rendererContext.displayScale(), layer.isScaleLess()))
         {
           while(iterator.hasNext())
           {
@@ -133,7 +134,7 @@ public class ShapeMapRenderer<S, F>
     {
       if(layerNeedsTextLayout[layerPos])
       {
-        try(var iterator = layer.featureSource().features(viewPortBounds, true))
+        try(var iterator = layer.featureSource().features(viewPortBounds,rendererContext.displayScale(), true))
         {
           while(iterator.hasNext())
           {

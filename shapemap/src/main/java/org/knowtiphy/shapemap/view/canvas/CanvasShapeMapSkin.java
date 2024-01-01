@@ -30,7 +30,7 @@ public class CanvasShapeMapSkin<S, F> extends ShapeMapBaseSkin<S, F>
 
   private static final double PREFERRED_HEIGHT = Region.USE_COMPUTED_SIZE;
 
-  private MapViewModel<S, F> map;
+  private MapViewModel<S, F> mapViewModel;
 
   private final Color background;
 
@@ -40,11 +40,12 @@ public class CanvasShapeMapSkin<S, F> extends ShapeMapBaseSkin<S, F>
 
   private final List<Subscription> subscriptions = new ArrayList<>();
 
-  public CanvasShapeMapSkin(ShapeMapView<S, F> surface, MapViewModel<S, F> map, Color background)
+  public CanvasShapeMapSkin(
+    ShapeMapView<S, F> surface, MapViewModel<S, F> mapViewModel, Color background)
   {
     super(surface);
 
-    this.map = map;
+    this.mapViewModel = mapViewModel;
     this.background = background;
 
     borderPane = new BorderPane();
@@ -54,13 +55,13 @@ public class CanvasShapeMapSkin<S, F> extends ShapeMapBaseSkin<S, F>
     setupListeners();
   }
 
-  public void setMap(MapViewModel<S, F> newMap)
+  public void setMapViewModel(MapViewModel<S, F> newMapViewModel)
   {
     // unsubscribe listeners on the old map
     subscriptions.forEach(Subscription::unsubscribe);
     subscriptions.clear();
 
-    map = newMap;
+    mapViewModel = newMapViewModel;
 
     setupListeners();
     root.requestLayout();
@@ -68,8 +69,8 @@ public class CanvasShapeMapSkin<S, F> extends ShapeMapBaseSkin<S, F>
 
   private void setupListeners()
   {
-    subscriptions.add(map.layerVisibilityEvent().subscribe(b -> root.requestLayout()));
-    subscriptions.add(map.viewPortBoundsEvent().subscribe(b -> root.requestLayout()));
+    subscriptions.add(mapViewModel.layerVisibilityEvent().subscribe(b -> root.requestLayout()));
+    subscriptions.add(mapViewModel.viewPortBoundsEvent().subscribe(b -> root.requestLayout()));
   }
 
   private void initGraphics()
@@ -107,18 +108,25 @@ public class CanvasShapeMapSkin<S, F> extends ShapeMapBaseSkin<S, F>
     graphics.setFill(background);
     graphics.fillRect(0, 0, width, height);
 
-    var rendererContext = new RendererContext<>(
-      //@formatter:off
-				map.layers(),
-				map.totalRuleCount(),
-				map.viewPortBounds(),
+//    var zoomFactor = mapViewModel.bounds().getWidth() / (mapViewModel.viewPortBounds().getWidth
+//    ());
+//    var displayScale = (int) (mapViewModel.cScale() * (1 / (zoomFactor)));
+
+    //@formatter:off
+    var rendererContext = new RendererContext<>
+    (
+				mapViewModel.layers(),
+				mapViewModel.totalRuleCount(),
+				mapViewModel.viewPortBounds(),
 				new Rectangle2D(0, 0, width, height),
-        map.viewPortWorldToScreen(),
-        map.viewPortScreenToWorld(),
-				map.featureAdapter(),
-				map.renderablePolygonProvider(),
-				map.svgProvider(),
-        map.textSizeProvider());
+        mapViewModel.viewPortWorldToScreen(),
+        mapViewModel.viewPortScreenToWorld(),
+        mapViewModel.adjustedDisplayScale(),
+				mapViewModel.featureAdapter(),
+				mapViewModel.renderablePolygonProvider(),
+				mapViewModel.svgProvider(),
+        mapViewModel.textSizeProvider()
+    );
 		//@formatter:on
 
     var renderer = new ShapeMapRenderer<>(rendererContext, graphics);

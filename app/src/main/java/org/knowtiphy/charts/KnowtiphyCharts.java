@@ -89,12 +89,14 @@ public class KnowtiphyCharts extends Application
     displayOptions = new MapDisplayOptions();
     chart = chartLocker.loadChart(cell, displayOptions, SVG_CACHE);
 
-    chartLocker.chartEvents()
-               .filter(ChartLockerEvent::isLoad)
-               .subscribe(change -> setStageTitle(primaryStage, change.chart()));
-    appSettings.unitProfile()
-               .unitChangeEvents()
-               .subscribe(change -> setStageTitle(primaryStage, chart));
+    chartLocker
+      .chartEvents()
+      .filter(ChartLockerEvent::isLoad)
+      .subscribe(change -> setStageTitle(primaryStage, change.chart()));
+    appSettings
+      .unitProfile()
+      .unitChangeEvents()
+      .subscribe(change -> setStageTitle(primaryStage, chart));
 
     var stats = new MapStats(chart, SchemaAdapter.ADAPTER).stats();
     stats.print();
@@ -211,15 +213,16 @@ public class KnowtiphyCharts extends Application
     var showSettings = new MenuItem("Settings");
     items.add(showSettings);
     showSettings.setAccelerator(new KeyCodeCombination(KeyCode.COMMA, KeyCombination.META_DOWN));
-    showSettings.setOnAction(
-      x -> AppSettingsDialog.create(stage, SETTINGS_WIDTH, SETTINGS_HEIGHT, appSettings)
-                            .showAndWait());
+    showSettings.setOnAction(x -> AppSettingsDialog
+                                    .create(stage, SETTINGS_WIDTH, SETTINGS_HEIGHT, appSettings)
+                                    .showAndWait());
 
     var showChartLocker = new MenuItem("Chart Locker");
     items.add(showChartLocker);
     showChartLocker.setOnAction(
-      x -> new ChartLockerDialog(stage, chartLocker, displayOptions, SVG_CACHE).create(
-        CHART_LOCKER_WIDTH, CHART_LOCKER_HEIGHT).showAndWait());
+      x -> new ChartLockerDialog(stage, chartLocker, displayOptions, SVG_CACHE)
+             .create(CHART_LOCKER_WIDTH, CHART_LOCKER_HEIGHT)
+             .showAndWait());
 
     if(platform.isMac())
     {
@@ -250,9 +253,9 @@ public class KnowtiphyCharts extends Application
       new PropertySheet(displayOptions.getProperties()));
     BorderPane.setAlignment(displayProperties, Pos.CENTER);
     displayProperties.setOnMouseExited(evt -> toggle.toggle());
-    toggle.getStateProperty()
-          .addListener(
-            cl -> later(() -> overlay.setRight(toggle.isOn() ? displayProperties : null)));
+    toggle
+      .getStateProperty()
+      .addListener(cl -> later(() -> overlay.setRight(toggle.isOn() ? displayProperties : null)));
   }
 
   private void showInitialSetup(IPlatform platform)
@@ -262,9 +265,10 @@ public class KnowtiphyCharts extends Application
     System.err.println("File System root = " + platform.rootDir());
     System.err.println("File System root = " + platform.rootDir().toFile().exists());
     System.err.println("File System root ENC = " + Paths.get(platform.rootDir().toString(), "ENC"));
-    System.err.println("File System root ENC = " + Paths.get(platform.rootDir().toString(), "ENC")
-                                                        .toFile()
-                                                        .exists());
+    System.err.println("File System root ENC = " + Paths
+                                                     .get(platform.rootDir().toString(), "ENC")
+                                                     .toFile()
+                                                     .exists());
     System.err.println("Charts  dir = " + platform.chartsDir());
     System.err.println("Charts  dir = " + platform.chartsDir().toFile().exists());
     try(var dave = Files.list(Paths.get(platform.rootDir().toString(), "ENC")))
@@ -287,9 +291,18 @@ public class KnowtiphyCharts extends Application
 
   private void setStageTitle(Stage stage, ENCChart chart)
   {
-    platform.setStageTitle(stage,
-      "%s             1::%d             %s".formatted(chart.title(), chart.cell().cScale(),
-        appSettings.unitProfile().formatEnvelope(chart.bounds())));
+    if(chart.isQuilt())
+    {
+      platform.setStageTitle(stage,
+        "Quilt %s             1::%d             %s".formatted(chart.title(), chart.cell().cScale(),
+          appSettings.unitProfile().formatEnvelope(chart.bounds())));
+    }
+    else
+    {
+      platform.setStageTitle(stage,
+        "%s             1::%d             %s".formatted(chart.title(), chart.cell().cScale(),
+          appSettings.unitProfile().formatEnvelope(chart.bounds())));
+    }
   }
 
   private void shutdown()

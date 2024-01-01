@@ -92,6 +92,6 @@ public class ShapeMapView<S, F> extends Control
 
   public void setMap(MapViewModel<S, F> newMap)
   {
-    ((ShapeMapBaseSkin<S, F>) getSkin()).setMap(newMap);
+    ((ShapeMapBaseSkin<S, F>) getSkin()).setMapViewModel(newMap);
   }
 }

@@ -5,15 +5,11 @@
 
 package org.knowtiphy.charts.geotools;
 
-import org.geotools.data.simple.SimpleFeatureCollection;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.knowtiphy.shapemap.api.IFeatureSourceIterator;
 import org.knowtiphy.shapemap.model.MapViewModel;
 import org.knowtiphy.shapemap.renderer.Transformation;
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.GeometryFactory;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,26 +18,25 @@ import java.util.List;
  */
 public class Queries
 {
-
   private static final double DELTA = 0.1;
 
-  public static <S, F> List<SimpleFeatureCollection> featuresNearXYWorld(
-    MapViewModel<S, F> map, double x, double y) throws IOException
-  {
-
-    var tx = new Transformation(map.viewPortScreenToWorld());
-    tx.apply(x, y);
-    var envelope = new ReferencedEnvelope(tx.getX() - DELTA, tx.getX() + DELTA, tx.getY() - DELTA,
-      tx.getY() + DELTA, map.crs());
-
-    var result = new ArrayList<SimpleFeatureCollection>();
-    for(var layer : map.layers())
-    {
-      result.add((SimpleFeatureCollection) layer.featureSource().features(envelope, true));
-    }
-
-    return result;
-  }
+//  public static <S, F> List<SimpleFeatureCollection> featuresNearXYWorld(
+//    MapViewModel<S, F> map, double x, double y) throws IOException
+//  {
+//
+//    var tx = new Transformation(map.viewPortScreenToWorld());
+//    tx.apply(x, y);
+//    var envelope = new ReferencedEnvelope(tx.getX() - DELTA, tx.getX() + DELTA, tx.getY() - DELTA,
+//      tx.getY() + DELTA, map.crs());
+//
+//    var result = new ArrayList<SimpleFeatureCollection>();
+//    for(var layer : map.layers())
+//    {
+//      result.add((SimpleFeatureCollection) layer.featureSource().features(envelope, true));
+//    }
+//
+//    return result;
+//  }
 
   public static <S, F> List<IFeatureSourceIterator<F>> featuresNearXYWorld(
     MapViewModel<S, F> map, double x, double y, int radius) throws Exception
@@ -50,34 +45,34 @@ public class Queries
     var envelope = tinyPolygon(map, x, y, radius);
 
     var result = new ArrayList<IFeatureSourceIterator<F>>();
-    var foo = new ArrayList<F>();
+//    var foo = new ArrayList<F>();
     for(var layer : map.layers())
     {
-      result.add(layer.featureSource().features(envelope, true));
-      var it = layer.featureSource().features(envelope, true);
-      while(it.hasNext())
-      {
-        foo.add(it.next());
-      }
+      result.add(layer.featureSource().features(envelope, Double.MIN_VALUE, true));
+//      var it = layer.featureSource().features(envelope, Double.MIN_VALUE, true);
+//      while(it.hasNext())
+//      {
+//        foo.add(it.next());
+//      }
     }
 
-    var tx = new Transformation(map.viewPortScreenToWorld());
-    tx.apply(x, y);
-
-    var pt = new GeometryFactory().createPoint(new Coordinate(tx.getX(), tx.getY()));
-    var featureAdapter = map.featureAdapter();
-    for(var f : foo)
-    {
-      var geom = featureAdapter.defaultGeometry(f);
-      for(var i = 0; i < geom.getNumGeometries(); i++)
-      {
-        var g = geom.getGeometryN(i);
-        if(g.contains(pt))
-        {
-          System.err.println("Geom " + g + " : " + g.contains(pt));
-        }
-      }
-    }
+//    var tx = new Transformation(map.viewPortScreenToWorld());
+//    tx.apply(x, y);
+//
+//    var pt = new GeometryFactory().createPoint(new Coordinate(tx.getX(), tx.getY()));
+//    var featureAdapter = map.featureAdapter();
+//    for(var f : foo)
+//    {
+//      var geom = featureAdapter.defaultGeometry(f);
+//      for(var i = 0; i < geom.getNumGeometries(); i++)
+//      {
+//        var g = geom.getGeometryN(i);
+//        if(g.contains(pt))
+//        {
+//          System.err.println("Geom " + g + " : " + g.contains(pt));
+//        }
+//      }
+//    }
 
     return result;
   }

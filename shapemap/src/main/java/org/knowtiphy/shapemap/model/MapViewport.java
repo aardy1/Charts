@@ -8,6 +8,11 @@ import org.geotools.api.referencing.operation.TransformException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.knowtiphy.shapemap.renderer.RendererUtilities;
 
+/**
+ * A map viewport -- the bounds of the viewport in world coordinates, the screen area of the
+ * viewport in pixels, and transforms between the two.
+ */
+
 public class MapViewport
 {
   private ReferencedEnvelope bounds;
@@ -121,14 +126,6 @@ public class MapViewport
   private void calculateSimpleTransforms(ReferencedEnvelope requestedBounds)
     throws TransformException, NonInvertibleTransformException
   {
-
-    // why as it done this way?
-    // double xscale = screenArea.getWidth() / requestedBounds.getWidth();
-    // double yscale = screenArea.getHeight() / requestedBounds.getHeight();
-    // worldToScreen = new Affine(xscale, 0, 0, -yscale, -xscale *
-    // requestedBounds.getMinX(),
-    // yscale * requestedBounds.getMaxY());
-
     worldToScreen = RendererUtilities.worldToScreenTransform(requestedBounds, screenArea,
       requestedBounds.getCoordinateReferenceSystem());
     screenToWorld = worldToScreen.createInverse();
@@ -137,6 +134,7 @@ public class MapViewport
   /**
    * Calculates the world bounds of the current screen area.
    */
+
   private ReferencedEnvelope calculateActualBounds()
   {
     Point2D p0 = new Point2D(screenArea.getMinX(), screenArea.getMinY());
