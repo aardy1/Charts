@@ -82,8 +82,9 @@ public class ChartLockerDialog
     root.getChildren().addAll(buttons, content);
 
     var scene = new Scene(root, width, height);
-    scene.getStylesheets()
-         .add(ResourceLoader.class.getResource("chartlockerdialog.css").toExternalForm());
+    scene
+      .getStylesheets()
+      .add(ResourceLoader.class.getResource("chartlockerdialog.css").toExternalForm());
 
     stage.setScene(scene);
     stage.sizeToScene();
@@ -205,16 +206,16 @@ public class ChartLockerDialog
   private Button showButton(ENCCell cell)
   {
     var button = new Button("Show");
-    button.setOnAction(event -> {
-      try
-      {
-        var newChart = chartLocker.loadChart(cell, mapDisplayOptions, svgCache);
-      }
-      catch(Exception ex)
-      {
-        Logger.getLogger(ChartLockerDialog.class.getName()).log(Level.SEVERE, null, ex);
-      }
-    });
+//    button.setOnAction(event -> {
+//      try
+//      {
+//        var newChart = chartLocker.loadChart(cell, mapDisplayOptions, svgCache);
+//      }
+//      catch(Exception ex)
+//      {
+//        Logger.getLogger(ChartLockerDialog.class.getName()).log(Level.SEVERE, null, ex);
+//      }
+//    });
 
     return button;
   }

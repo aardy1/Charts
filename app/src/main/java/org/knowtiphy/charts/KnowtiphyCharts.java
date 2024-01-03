@@ -43,7 +43,6 @@ import org.knowtiphy.shapemap.renderer.context.SVGCache;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -58,7 +57,15 @@ public class KnowtiphyCharts extends Application
 
   private static final int HEIGHT = 750;
 
-  private static SVGCache SVG_CACHE = new SVGCache(
+  private static final int SETTINGS_WIDTH = 700;
+
+  private static final int SETTINGS_HEIGHT = 400;
+
+  private static final int CHART_LOCKER_WIDTH = 900;
+
+  private static final int CHART_LOCKER_HEIGHT = 400;
+
+  private static final SVGCache SVG_CACHE = new SVGCache(
     org.knowtiphy.charts.chartview.markicons.ResourceLoader.class);
 
   private ChartLocker chartLocker;
@@ -81,13 +88,12 @@ public class KnowtiphyCharts extends Application
     showInitialSetup(platform);
 
     var styleReader = new StyleReader<SimpleFeatureType, MemFeature>(ResourceLoader.class);
-    var chartProvider = new ChartLoader(appSettings, styleReader);
-    chartLocker = new ChartLocker(platform.chartsDir(), chartProvider);
-
-    var cell = chartLocker.getCell("Gulf of Mexico", 2_160_000);
+    var chartLoader = new ChartLoader(appSettings, styleReader);
+    chartLocker = new ChartLocker(platform.catalogsDir(), platform.chartsDir(), chartLoader);
 
     displayOptions = new MapDisplayOptions();
-    chart = chartLocker.loadChart(cell, displayOptions, SVG_CACHE);
+    var cell = chartLocker.getCell("Gulf of Mexico", 2_160_000);
+    chart = chartLocker.loadChart(cell.bounds(), cell.cScale() / 2.0, displayOptions, SVG_CACHE);
 
     chartLocker
       .chartEvents()
@@ -98,7 +104,7 @@ public class KnowtiphyCharts extends Application
       .unitChangeEvents()
       .subscribe(change -> setStageTitle(primaryStage, chart));
 
-    var stats = new MapStats(chart, SchemaAdapter.ADAPTER).stats();
+    var stats = new MapStats(chart.maps(), SchemaAdapter.ADAPTER).stats();
     stats.print();
 
 //    new Dump(chart, reader.getStore()).dump(S57.OC_BUAARE);
@@ -134,57 +140,6 @@ public class KnowtiphyCharts extends Application
     primaryStage.sizeToScene();
     platform.setWindowIcons(primaryStage, ResourceLoader.class);
     primaryStage.show();
-
-//    var gf = new GeometryFactory();
-//    var p1 = gf.createPoint(new Coordinate(100, 100));
-//    var p2 = gf.createPoint(new Coordinate(200, 100));
-//    var p3 = gf.createPoint(new Coordinate(300, 100));
-//    var mp = gf.createMultiPoint(new Point[]{p1, p2, p3});
-//
-//    var pp1 = new Coordinate(50, 50);
-//    var pp2 = new Coordinate(150, 50);
-//    var pp3 = new Coordinate(150, 150);
-//    var pp4 = new Coordinate(50, 150);
-//    var pp5 = new Coordinate(50, 50);
-//
-//    var poly = gf.createPolygon(new Coordinate[]{pp1, pp2, pp3, pp4, pp5});
-//
-//    System.err.println("Poly contains p1 " + poly.contains(p1));
-//    System.err.println("Poly contains p2 " + poly.contains(p2));
-//    System.err.println("Poly contains p3 " + poly.contains(p3));
-//    System.err.println("Poly contains mp " + poly.contains(mp));
-//    System.err.println("Poly intersect mp " + poly.intersection(mp));
-//    System.err.println("MP internal envelope " + mp.getEnvelopeInternal());
-//    System.err.println("Poly internal envelope " + poly.getEnvelopeInternal());
-//
-//    var index = new STRtree();
-//    index.insert(poly.getEnvelopeInternal(), poly);
-//    index.insert(mp.getEnvelopeInternal(), mp);
-//    index.insert(p1.getEnvelopeInternal(), p1);
-//    index.insert(p2.getEnvelopeInternal(), p2);
-//    index.insert(p3.getEnvelopeInternal(), p3);
-//    var env = new ReferencedEnvelope(151, 152, 50, 150, DefaultEngineeringCRS.CARTESIAN_2D);
-//    var res = index.query(env);
-//    System.err.println("Res = " + res);
-
-//    //  test for rendering speed with text on
-//    new Thread(() -> {
-//      try
-//      {
-//        Thread.sleep(35000);
-//      }
-//      catch(InterruptedException e)
-//      {
-//        throw new RuntimeException(e);
-//      }
-//      chart.setLayerVisible("SOUNDG", true);
-//      int n = 1000;
-//      for(int i = 0; i < n; i++)
-//      {
-//        runLater(() -> Coordinates.zoom(chart, 0.5));
-//        runLater(() -> Coordinates.zoom(chart, 2));
-//      }
-//    }).start();
   }
 
   private ChartView makeMap()
@@ -193,14 +148,6 @@ public class KnowtiphyCharts extends Application
       new ChartView(chartLocker, chart, dynamics, appSettings.unitProfile(), displayOptions,
         SVG_CACHE));
   }
-
-  private static final int SETTINGS_WIDTH = 700;
-
-  private static final int SETTINGS_HEIGHT = 400;
-
-  private static final int CHART_LOCKER_WIDTH = 900;
-
-  private static final int CHART_LOCKER_HEIGHT = 400;
 
   private MenuBar mainMenuBar(Stage stage)
   {
@@ -260,18 +207,15 @@ public class KnowtiphyCharts extends Application
 
   private void showInitialSetup(IPlatform platform)
   {
-
     System.err.println("Platform = " + platform.getClass().getCanonicalName());
     System.err.println("File System root = " + platform.rootDir());
-    System.err.println("File System root = " + platform.rootDir().toFile().exists());
-    System.err.println("File System root ENC = " + Paths.get(platform.rootDir().toString(), "ENC"));
-    System.err.println("File System root ENC = " + Paths
-                                                     .get(platform.rootDir().toString(), "ENC")
-                                                     .toFile()
-                                                     .exists());
+    System.err.println("File System root exists = " + platform.rootDir().toFile().exists());
+    System.err.println("Catalogs  dir = " + platform.catalogsDir());
+    System.err.println("Catalogs  dir exists = " + platform.catalogsDir().toFile().exists());
     System.err.println("Charts  dir = " + platform.chartsDir());
-    System.err.println("Charts  dir = " + platform.chartsDir().toFile().exists());
-    try(var dave = Files.list(Paths.get(platform.rootDir().toString(), "ENC")))
+    System.err.println("Charts  dir exists = " + platform.chartsDir().toFile().exists());
+
+    try(var dave = Files.list(platform.chartsDir()))
     {
       var files = dave.map(Path::getFileName).map(Path::toString).toList();
       System.err.println("Files = " + files);
@@ -280,11 +224,13 @@ public class KnowtiphyCharts extends Application
     {
       Logger.getLogger(KnowtiphyCharts.class.getName()).log(Level.SEVERE, null, ex);
     }
+
     System.err.println("Screen dimensions = " + platform.screenDimensions());
     System.err.println("Screen ppi = " + platform.ppi());
     System.err.println("Screen ppcm = " + platform.ppcm());
     System.err.println("Default font = " + Font.getDefault());
     // System.err.println("GPS Position = " + platform.positionProperty());
+
     platform.info();
     System.err.println();
   }
@@ -294,13 +240,13 @@ public class KnowtiphyCharts extends Application
     if(chart.isQuilt())
     {
       platform.setStageTitle(stage,
-        "Quilt %s             1::%d             %s".formatted(chart.title(), chart.cell().cScale(),
+        "Quilt %s             1::%d             %s".formatted(chart.title(), chart.cScale(),
           appSettings.unitProfile().formatEnvelope(chart.bounds())));
     }
     else
     {
       platform.setStageTitle(stage,
-        "%s             1::%d             %s".formatted(chart.title(), chart.cell().cScale(),
+        "%s             1::%d             %s".formatted(chart.title(), chart.cScale(),
           appSettings.unitProfile().formatEnvelope(chart.bounds())));
     }
   }
@@ -317,8 +263,6 @@ public class KnowtiphyCharts extends Application
 
 }
 
-// Setup.setup("/Users/graham/Documents/Charts/ENC/US_REGION08/08Region_ENCProdCat.xml");
-
 // private void fudgeKnowtiphyFunctionFactory() {
 //
 // var existingFactories = CommonFactoryFinder.getFunctionFactories(null);
@@ -331,18 +275,59 @@ public class KnowtiphyCharts extends Application
 // var file = "/Users/graham/Desktop/enc map.txt";
 // var file = "/Users/graham/Desktop/basic map.txt";
 
-// var xxx = getClass().getResourceAsStream("styles/BOYSPP.sld");
-// System.err.println("XXX = " + xxx);
-// var foo = xxx.readNBytes(5);
-// System.err.println("Foo = " + Arrays.toString(foo));
-// var yyy =
-// getClass().getResourceAsStream("/org/knowtiphy/charts/styles//BOYSPP.sld");
-// System.err.println("YYY = " + yyy);
-// var bar = yyy.readNBytes(5);
-// System.err.println("Foo = " + Arrays.toString(bar));
-
 // Set categories = Collections.singleton(FunctionFactory.class);
 // FactoryRegistry registry = new FactoryRegistry(categories);
 // registry.registerFactory(new CRSProvider());
 // ReferencingFactoryFinder.getCRSFactory(new Hints());
 // ReferencingObjectFactory blah = new ReferencingObjectFactory();
+
+//    var gf = new GeometryFactory();
+//    var p1 = gf.createPoint(new Coordinate(100, 100));
+//    var p2 = gf.createPoint(new Coordinate(200, 100));
+//    var p3 = gf.createPoint(new Coordinate(300, 100));
+//    var mp = gf.createMultiPoint(new Point[]{p1, p2, p3});
+//
+//    var pp1 = new Coordinate(50, 50);
+//    var pp2 = new Coordinate(150, 50);
+//    var pp3 = new Coordinate(150, 150);
+//    var pp4 = new Coordinate(50, 150);
+//    var pp5 = new Coordinate(50, 50);
+//
+//    var poly = gf.createPolygon(new Coordinate[]{pp1, pp2, pp3, pp4, pp5});
+//
+//    System.err.println("Poly contains p1 " + poly.contains(p1));
+//    System.err.println("Poly contains p2 " + poly.contains(p2));
+//    System.err.println("Poly contains p3 " + poly.contains(p3));
+//    System.err.println("Poly contains mp " + poly.contains(mp));
+//    System.err.println("Poly intersect mp " + poly.intersection(mp));
+//    System.err.println("MP internal envelope " + mp.getEnvelopeInternal());
+//    System.err.println("Poly internal envelope " + poly.getEnvelopeInternal());
+//
+//    var index = new STRtree();
+//    index.insert(poly.getEnvelopeInternal(), poly);
+//    index.insert(mp.getEnvelopeInternal(), mp);
+//    index.insert(p1.getEnvelopeInternal(), p1);
+//    index.insert(p2.getEnvelopeInternal(), p2);
+//    index.insert(p3.getEnvelopeInternal(), p3);
+//    var env = new ReferencedEnvelope(151, 152, 50, 150, DefaultEngineeringCRS.CARTESIAN_2D);
+//    var res = index.query(env);
+//    System.err.println("Res = " + res);
+
+//    //  test for rendering speed with text on
+//    new Thread(() -> {
+//      try
+//      {
+//        Thread.sleep(35000);
+//      }
+//      catch(InterruptedException e)
+//      {
+//        throw new RuntimeException(e);
+//      }
+//      chart.setLayerVisible("SOUNDG", true);
+//      int n = 1000;
+//      for(int i = 0; i < n; i++)
+//      {
+//        runLater(() -> Coordinates.zoom(chart, 0.5));
+//        runLater(() -> Coordinates.zoom(chart, 2));
+//      }
+//    }).start();

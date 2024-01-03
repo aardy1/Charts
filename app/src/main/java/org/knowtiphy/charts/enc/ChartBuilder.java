@@ -1,13 +1,9 @@
 package org.knowtiphy.charts.enc;
 
-import javafx.scene.transform.NonInvertibleTransformException;
 import org.geotools.api.feature.simple.SimpleFeatureType;
 import org.geotools.api.feature.type.Name;
-import org.geotools.api.referencing.FactoryException;
-import org.geotools.api.referencing.operation.TransformException;
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.data.store.ContentFeatureSource;
-import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.knowtiphy.charts.chartview.MapDisplayOptions;
 import org.knowtiphy.charts.memstore.MemFeature;
 import org.knowtiphy.charts.memstore.MemStore;
@@ -16,8 +12,6 @@ import org.knowtiphy.charts.ontology.S57;
 import org.knowtiphy.charts.settings.AppSettings;
 import org.knowtiphy.shapemap.model.MapLayer;
 import org.knowtiphy.shapemap.model.MapModel;
-import org.knowtiphy.shapemap.model.MapViewport;
-import org.knowtiphy.shapemap.renderer.context.SVGCache;
 import org.knowtiphy.shapemap.style.parser.StyleSyntaxException;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.index.strtree.STRtree;
@@ -43,24 +37,14 @@ public class ChartBuilder
 
   private final MapDisplayOptions displayOptions;
 
-  private final SVGCache svgCache;
-
-  private ENCChart chart;
-
   public ChartBuilder(
     ENCCell cell, AppSettings settings, StyleReader<SimpleFeatureType, MemFeature> styleReader,
-    MapDisplayOptions displayOptions, SVGCache svgCache)
+    MapDisplayOptions displayOptions)
   {
     this.settings = settings;
     this.cell = cell;
     this.styleReader = styleReader;
     this.displayOptions = displayOptions;
-    this.svgCache = svgCache;
-  }
-
-  public ENCChart getMap()
-  {
-    return chart;
   }
 
   // conversion issue SBDAREA is a bunch of points, should be a bunch of polys?
@@ -133,14 +117,12 @@ public class ChartBuilder
     // SCALELESS.add(S57.OC_MIPARE);
   }
 
-  public ChartBuilder read()
-    throws IOException, XMLStreamException, TransformException, FactoryException,
-           NonInvertibleTransformException, StyleSyntaxException
+  public MapModel<SimpleFeatureType, MemFeature> read()
+    throws IOException, XMLStreamException, StyleSyntaxException
   {
     var fileNames = readShapeFilesInDir(cell.location());
 
-    var crs = DefaultGeographicCRS.WGS84;
-    var map = new MapModel<>(cell.bounds(crs), cell.cScale(), SchemaAdapter.ADAPTER);
+    var map = new MapModel<>(cell.bounds(), cell.cScale(), cell.lName(), SchemaAdapter.ADAPTER);
     var store = new MemStore(map);
 
     for(var include : LAYER_ORDER)
@@ -164,10 +146,6 @@ public class ChartBuilder
           }
         }
       }
-
-      //  TODO -- make the "2" tuneable
-      var viewPort = new MapViewport(cell.bounds(crs), false);
-      chart = new ENCChart(cell, map, viewPort, svgCache);
     }
 
 //    System.err.println("------------------------------------------------------");
@@ -177,14 +155,13 @@ public class ChartBuilder
 //    }
 //    System.err.println("------------------------------------------------------");
 
-    return this;
+    return map;
   }
 
   private MapLayer<SimpleFeatureType, MemFeature> readLayer(
     ContentFeatureSource featureSource, MemStore store)
     throws IOException, XMLStreamException, StyleSyntaxException
   {
-
     SimpleFeatureType type = null;
     var hasScale = false;
     var index = new STRtree();

@@ -5,8 +5,8 @@
 
 package org.knowtiphy.charts.enc;
 
-import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.MultiPolygon;
@@ -133,7 +133,7 @@ public class ENCCell
     return new GeometryFactory().createMultiPolygon(polygons.toArray(new Polygon[0]));
   }
 
-  public ReferencedEnvelope bounds(CoordinateReferenceSystem crs)
+  public ReferencedEnvelope bounds()
   {
     var minX = Double.POSITIVE_INFINITY;
     var minY = Double.POSITIVE_INFINITY;
@@ -152,7 +152,7 @@ public class ENCCell
     }
 
     // TODO -- get the CRS from the cell file
-    return new ReferencedEnvelope(minX, maxX, minY, maxY, crs);
+    return new ReferencedEnvelope(minX, maxX, minY, maxY, DefaultGeographicCRS.WGS84);
   }
 
   //  TODO -- how can we tell if two ENCs are the same?

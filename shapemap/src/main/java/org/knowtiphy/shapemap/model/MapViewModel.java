@@ -14,7 +14,7 @@ import org.reactfx.Change;
 import org.reactfx.EventSource;
 import org.reactfx.EventStream;
 
-import java.util.Collection;
+import java.util.List;
 
 /**
  * A map view model -- a map model, a viewport, and some event streams.
@@ -29,7 +29,7 @@ public abstract class MapViewModel<S, F>
 
   private final EventSource<Change<ReferencedEnvelope>> viewPortBoundsEvent = new EventSource<>();
 
-  private final MapModel<S, F> map;
+  private final List<MapModel<S, F>> maps;
 
   private final MapViewport viewPort;
 
@@ -42,23 +42,33 @@ public abstract class MapViewModel<S, F>
   private final ITextSizeProvider textSizeProvider;
 
   protected MapViewModel(
-    MapModel<S, F> map, MapViewport viewPort, IFeatureAdapter<F> featureAdapter,
+    List<MapModel<S, F>> maps, MapViewport viewPort, IFeatureAdapter<F> featureAdapter,
     IRenderablePolygonProvider renderablePolygonProvider, ISVGProvider svgProvider,
     ITextSizeProvider textSizeProvider)
   {
-    this.map = map;
+    this.maps = maps;
     this.viewPort = viewPort;
     this.featureAdapter = featureAdapter;
     this.renderablePolygonProvider = renderablePolygonProvider;
     this.svgProvider = svgProvider;
     this.textSizeProvider = textSizeProvider;
 
-    for(var layer : map.layers())
+    for(MapModel<S, F> map : maps)
     {
-      layer.layerVisibilityEvent().feedTo(layerVisibilityEvent);
+      for(var layer : map.layers())
+      {
+        layer.layerVisibilityEvent().feedTo(layerVisibilityEvent);
+      }
     }
 
     //  TODO -- should also have some way of subscribing to add/remove of layers
+  }
+
+  public abstract double adjustedDisplayScale();
+
+  public List<MapModel<S, F>> maps()
+  {
+    return maps;
   }
 
   public IFeatureAdapter<F> featureAdapter()
@@ -91,34 +101,17 @@ public abstract class MapViewModel<S, F>
     return viewPortBoundsEvent;
   }
 
-  //
-
-  public Collection<MapLayer<S, F>> layers()
-  {
-    return map.layers();
-  }
-
-  public int totalRuleCount()
-  {
-    return map.totalRuleCount();
-  }
-
-  public MapLayer<S, F> layer(String type)
-  {
-    return map.layer(type);
-  }
-
+  //  TODO -- all maps have the same bounds -- os this too strong an assumption?
   public ReferencedEnvelope bounds()
   {
-    return map.bounds();
+    return maps.get(0).bounds();
   }
 
+  //  TODO -- all maps have the same CRS -- os this too strong an assumption?
   public CoordinateReferenceSystem crs()
   {
     return bounds().getCoordinateReferenceSystem();
   }
-
-  public abstract double adjustedDisplayScale();
 
   //
 

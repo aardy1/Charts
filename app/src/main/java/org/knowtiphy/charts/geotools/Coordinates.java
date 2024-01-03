@@ -1,7 +1,6 @@
 package org.knowtiphy.charts.geotools;
 
 import javafx.scene.transform.NonInvertibleTransformException;
-import org.geotools.api.referencing.FactoryException;
 import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.api.referencing.crs.GeographicCRS;
 import org.geotools.api.referencing.operation.TransformException;
@@ -29,13 +28,7 @@ public class Coordinates
     var degreeDiff = referencedEnvelope.getMaxX() - referencedEnvelope.getMinX();
     return toMeters(degreeDiff, referencedEnvelope.getCoordinateReferenceSystem());
   }
-
-  public static <S, F> double distanceAcross(MapViewModel<S, F> map)
-    throws TransformException, FactoryException
-  {
-    return distanceAcross(map.bounds());
-  }
-
+  
   public static ReferencedEnvelope zoom(
     CoordinateReferenceSystem crs, ReferencedEnvelope maxExtent, ReferencedEnvelope envelope,
     double zoomFactor)
@@ -226,8 +219,10 @@ public class Coordinates
     {
       crs = horizontal;
     }
-    @SuppressWarnings("unchecked") Unit<Length> unit = (Unit<Length>) crs.getCoordinateSystem()
-                                                                         .getAxis(0).getUnit();
+    @SuppressWarnings("unchecked") Unit<Length> unit = (Unit<Length>) crs
+                                                                        .getCoordinateSystem()
+                                                                        .getAxis(0)
+                                                                        .getUnit();
     if(unit == null)
     {
       LOGGER.finer(

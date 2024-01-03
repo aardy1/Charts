@@ -3,6 +3,7 @@ package org.knowtiphy.shapemap.model;
 import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.knowtiphy.shapemap.api.ISchemaAdapter;
+import org.locationtech.jts.geom.Geometry;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -19,7 +20,11 @@ public class MapModel<S, F>
 {
   private final ReferencedEnvelope bounds;
 
+  private Geometry geometry;
+
   private final int cScale;
+
+  private final String title;
 
   private final ISchemaAdapter<S, F> schemaAdapter;
 
@@ -28,10 +33,12 @@ public class MapModel<S, F>
   // possibly shouldnt be here -- but it makes for faster rendering
   private int totalRuleCount = 0;
 
-  public MapModel(ReferencedEnvelope bounds, int cScale, ISchemaAdapter<S, F> schemaAdapter)
+  public MapModel(
+    ReferencedEnvelope bounds, int cScale, String title, ISchemaAdapter<S, F> schemaAdapter)
   {
     this.bounds = bounds;
     this.cScale = cScale;
+    this.title = title;
     this.schemaAdapter = schemaAdapter;
   }
 
@@ -43,6 +50,21 @@ public class MapModel<S, F>
   public int cScale()
   {
     return cScale;
+  }
+
+  public String title()
+  {
+    return title;
+  }
+
+  public Geometry geometry()
+  {
+    return geometry;
+  }
+
+  public void setGeometry(Geometry geometry)
+  {
+    this.geometry = geometry;
   }
 
   public Collection<MapLayer<S, F>> layers()

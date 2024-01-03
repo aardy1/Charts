@@ -6,14 +6,15 @@
 package org.knowtiphy.charts.memstore;
 
 import org.geotools.api.feature.simple.SimpleFeatureType;
-import org.knowtiphy.charts.enc.ENCChart;
 import org.knowtiphy.charts.ontology.ENC;
 import org.knowtiphy.shapemap.api.ISchemaAdapter;
 import org.knowtiphy.shapemap.model.MapLayer;
+import org.knowtiphy.shapemap.model.MapModel;
 import org.locationtech.jts.geom.Geometry;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.IntBinaryOperator;
 
@@ -26,7 +27,7 @@ import static org.knowtiphy.charts.ontology.S57.AT_SCAMIN;
  */
 public class MapStats
 {
-  private final ENCChart map;
+  private final List<MapModel<SimpleFeatureType, MemFeature>> maps;
 
   private final ISchemaAdapter<SimpleFeatureType, MemFeature> adapter;
 
@@ -56,9 +57,11 @@ public class MapStats
 
   private final Map<String, Integer> totGeoms = new HashMap<>();
 
-  public MapStats(ENCChart map, ISchemaAdapter<SimpleFeatureType, MemFeature> adapter)
+  public MapStats(
+    List<MapModel<SimpleFeatureType, MemFeature>> maps,
+    ISchemaAdapter<SimpleFeatureType, MemFeature> adapter)
   {
-    this.map = map;
+    this.maps = maps;
     this.adapter = adapter;
   }
 
@@ -66,12 +69,15 @@ public class MapStats
   {
     try
     {
-      for(var layer : map.layers())
+      for(var map : maps)
       {
-        var layerSize = ((MemStoreFeatureSource) layer.featureSource()).size();
-        var type = adapter.name(layer.featureSource().getSchema());
-        counts.put(type, layerSize);
-        featureScan(layer, type);
+        for(var layer : map.layers())
+        {
+          var layerSize = ((MemStoreFeatureSource) layer.featureSource()).size();
+          var type = adapter.name(layer.featureSource().getSchema());
+          counts.put(type, layerSize);
+          featureScan(layer, type);
+        }
       }
     }
     catch(Exception ex)
@@ -87,57 +93,60 @@ public class MapStats
     try
     {
       var numFeatures = 0;
-      for(var layer : map.layers())
+      for(var map : maps)
       {
-        var layerSize = ((MemStoreFeatureSource) layer.featureSource()).size();
-        numFeatures += layerSize;
+        for(var layer : map.layers())
+        {
+          var layerSize = ((MemStoreFeatureSource) layer.featureSource()).size();
+          numFeatures += layerSize;
+        }
+
+        var numGeoms = 0;
+        for(var value : totGeoms.values())
+        {
+          numGeoms += value;
+        }
+
+        var keys = new ArrayList<>(counts.keySet());
+        keys.sort(String::compareTo);
+
+        System.err.println();
+        System.err.println("Scale Summary");
+        System.err.printf("%-8s %-7s %-12s %-12s %-10s %-10s%n", "type", "#", "#N-SCAMIN",
+          "#N-SCAMAX", "SCAMIN", "SCAMAX");
+        for(var key : keys)
+        {
+          System.err.printf("%-8s %-7d %-12s %-12s %-10s %-10s%n", key, counts.get(key),
+            N(nullMinScale.get(key)), N(nullMaxScale.get(key)), N(minScale.get(key)),
+            N(maxScale.get(key)));
+        }
+
+        System.err.println();
+        System.err.println("Geometry Summary");
+        System.err.printf("%-8s  %-7s %-8s %-8s %-8s %-8s %-8s %-8s %-8s %-8s%n", "type", "#",
+          "#Pt", "#Line", "#Poly", "#M-Pt", "#M-Line", "#M-Poly", "#Mixed", "Tot Geoms");
+        for(var key : keys)
+        {
+          System.err.printf("%-8s  %-7d %-8s %-8s %-8s %-8s %-8s %-8s %-8s %-8s%n", key,
+            counts.get(key), pointGeoms.get(key), lineStringGeoms.get(key), polygonGeoms.get(key),
+            multiPointGeoms.get(key), multiLineStringGeoms.get(key), multiPolygonGeoms.get(key),
+            mixedGeoms.get(key), totGeoms.get(key));
+        }
+
+        System.err.println();
+        System.err.println("Total num features = " + numFeatures);
+        System.err.println("Total geoms = " + numGeoms);
+        System.err.println();
+
+        var mapSpans = distanceAcross(map.bounds()) / 1000;
+        System.err.println("Map span = " + mapSpans + " km");
+        System.err.println("Map span = " + ENC.kmToNM(mapSpans) + " nm");
+        System.err.println();
+
+//      System.err.println("Map title " + map.title());
+
+        System.err.println();
       }
-
-      var numGeoms = 0;
-      for(var value : totGeoms.values())
-      {
-        numGeoms += value;
-      }
-
-      var keys = new ArrayList<>(counts.keySet());
-      keys.sort(String::compareTo);
-
-      System.err.println();
-      System.err.println("Scale Summary");
-      System.err.printf("%-8s %-7s %-12s %-12s %-10s %-10s%n", "type", "#", "#N-SCAMIN",
-        "#N-SCAMAX", "SCAMIN", "SCAMAX");
-      for(var key : keys)
-      {
-        System.err.printf("%-8s %-7d %-12s %-12s %-10s %-10s%n", key, counts.get(key),
-          N(nullMinScale.get(key)), N(nullMaxScale.get(key)), N(minScale.get(key)),
-          N(maxScale.get(key)));
-      }
-
-      System.err.println();
-      System.err.println("Geometry Summary");
-      System.err.printf("%-8s  %-7s %-8s %-8s %-8s %-8s %-8s %-8s %-8s %-8s%n", "type", "#", "#Pt",
-        "#Line", "#Poly", "#M-Pt", "#M-Line", "#M-Poly", "#Mixed", "Tot Geoms");
-      for(var key : keys)
-      {
-        System.err.printf("%-8s  %-7d %-8s %-8s %-8s %-8s %-8s %-8s %-8s %-8s%n", key,
-          counts.get(key), pointGeoms.get(key), lineStringGeoms.get(key), polygonGeoms.get(key),
-          multiPointGeoms.get(key), multiLineStringGeoms.get(key), multiPolygonGeoms.get(key),
-          mixedGeoms.get(key), totGeoms.get(key));
-      }
-
-      System.err.println();
-      System.err.println("Total num features = " + numFeatures);
-      System.err.println("Total geoms = " + numGeoms);
-      System.err.println();
-
-      var mapSpans = distanceAcross(map) / 1000;
-      System.err.println("Map span = " + mapSpans + " km");
-      System.err.println("Map span = " + ENC.kmToNM(mapSpans) + " nm");
-      System.err.println();
-
-      System.err.println("Map title " + map.title());
-
-      System.err.println();
     }
     catch(Exception ex)
     {

@@ -24,7 +24,6 @@ import java.util.Set;
  */
 public class Dump<S extends SimpleFeatureType, F>
 {
-
   private final MapViewModel<S, F> mapContent;
 
   private final Set<PropertyDescriptor> descriptors = new HashSet<>();
@@ -43,20 +42,21 @@ public class Dump<S extends SimpleFeatureType, F>
 
   public void dump(String featureType) throws IOException
   {
-    var j = 0;
-    for(var layer : mapContent.layers())
+    for(var map : mapContent.maps())
     {
-      System.err.println("layer = " + layer.featureSource().getSchema().getName().getLocalPart());
-      if(featureType == null || layer
-                                  .featureSource()
-                                  .getSchema()
-                                  .getName()
-                                  .getLocalPart()
-                                  .equals(featureType))
+      for(var layer : map.layers())
       {
-        dumpSchema(layer);
-        dumpAttributeValues(layer);
-        j++;
+        System.err.println("layer = " + layer.featureSource().getSchema().getName().getLocalPart());
+        if(featureType == null || layer
+                                    .featureSource()
+                                    .getSchema()
+                                    .getName()
+                                    .getLocalPart()
+                                    .equals(featureType))
+        {
+          dumpSchema(layer);
+          dumpAttributeValues(layer);
+        }
       }
     }
   }
@@ -115,19 +115,22 @@ public class Dump<S extends SimpleFeatureType, F>
   public void dumpFeatureTypes() throws Exception
   {
     var j = 0;
-    for(var layer : mapContent.layers())
+    for(var map : mapContent.maps())
     {
-      System.err.println("Layer = " + j);
-      try(var features = layer.featureSource().features())
+      for(var layer : map.layers())
       {
-        while(features.hasNext())
+        System.err.println("Layer = " + j);
+        try(var features = layer.featureSource().features())
         {
-          var feature = features.next();
-          // System.err.println("\tFeature Type = " + feature.getType());
-        }
+          while(features.hasNext())
+          {
+            var feature = features.next();
+            // System.err.println("\tFeature Type = " + feature.getType());
+          }
 
+        }
+        j++;
       }
-      j++;
     }
 
   }

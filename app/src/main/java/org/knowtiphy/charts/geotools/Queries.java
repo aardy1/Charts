@@ -39,40 +39,20 @@ public class Queries
 //  }
 
   public static <S, F> List<IFeatureSourceIterator<F>> featuresNearXYWorld(
-    MapViewModel<S, F> map, double x, double y, int radius) throws Exception
+    MapViewModel<S, F> mapViewModel, double x, double y, int radius) throws Exception
   {
 
-    var envelope = tinyPolygon(map, x, y, radius);
+    var envelope = tinyPolygon(mapViewModel, x, y, radius);
 
     var result = new ArrayList<IFeatureSourceIterator<F>>();
-//    var foo = new ArrayList<F>();
-    for(var layer : map.layers())
-    {
-      result.add(layer.featureSource().features(envelope, Double.MIN_VALUE, true));
-//      var it = layer.featureSource().features(envelope, Double.MIN_VALUE, true);
-//      while(it.hasNext())
-//      {
-//        foo.add(it.next());
-//      }
-    }
 
-//    var tx = new Transformation(map.viewPortScreenToWorld());
-//    tx.apply(x, y);
-//
-//    var pt = new GeometryFactory().createPoint(new Coordinate(tx.getX(), tx.getY()));
-//    var featureAdapter = map.featureAdapter();
-//    for(var f : foo)
-//    {
-//      var geom = featureAdapter.defaultGeometry(f);
-//      for(var i = 0; i < geom.getNumGeometries(); i++)
-//      {
-//        var g = geom.getGeometryN(i);
-//        if(g.contains(pt))
-//        {
-//          System.err.println("Geom " + g + " : " + g.contains(pt));
-//        }
-//      }
-//    }
+    for(var map : mapViewModel.maps())
+    {
+      for(var layer : map.layers())
+      {
+        result.add(layer.featureSource().features(envelope, Double.MIN_VALUE, true));
+      }
+    }
 
     return result;
   }

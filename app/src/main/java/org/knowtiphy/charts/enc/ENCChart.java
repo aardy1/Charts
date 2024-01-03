@@ -14,7 +14,6 @@ import org.knowtiphy.shapemap.renderer.context.RemoveHolesFromPolygon;
 import org.knowtiphy.shapemap.renderer.context.RenderGeomCache;
 import org.knowtiphy.shapemap.renderer.context.SVGCache;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -23,28 +22,26 @@ import java.util.List;
 
 public class ENCChart extends MapViewModel<SimpleFeatureType, MemFeature>
 {
-  private final List<ENCCell> cells;
+//  private final List<ENCCell> cells;
 
   public ENCChart(
-    ENCCell cell, MapModel<SimpleFeatureType, MemFeature> map, MapViewport viewport,
-    SVGCache svgCache)
+    List<MapModel<SimpleFeatureType, MemFeature>> maps, MapViewport viewport, SVGCache svgCache)
   {
-    super(map, viewport, FeatureAdapter.ADAPTER, new RemoveHolesFromPolygon(new RenderGeomCache()),
+    super(maps, viewport, FeatureAdapter.ADAPTER, new RemoveHolesFromPolygon(new RenderGeomCache()),
       svgCache, TextSizeProvider.PROVIDER);
-    this.cells = new ArrayList<>();
-    cells.add(cell);
+//    this.cells = new ArrayList<>();
   }
 
-  public boolean isQuilt(){return cells.size() > 1;}
+  public boolean isQuilt(){return maps().size() > 1;}
 
-  public ENCCell cell()
-  {
-    return cells.get(0);
-  }
+//  public ENCCell cell()
+//  {
+//    return cells.get(0);
+//  }
 
   public int cScale()
   {
-    return cells.get(0).cScale();
+    return maps().get(0).cScale();
   }
 
   public double zoomFactor()
@@ -59,6 +56,6 @@ public class ENCChart extends MapViewModel<SimpleFeatureType, MemFeature>
 
   public double adjustedDisplayScale(){return displayScale() / 2.0;}
 
-  public String title(){return cells.get(0).lName();}
+  public String title(){return "";} //return maps().get(0).lName();}
 
 }

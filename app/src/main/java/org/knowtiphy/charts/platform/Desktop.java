@@ -15,7 +15,6 @@ import java.nio.file.Paths;
  */
 public abstract class Desktop extends BasePlatform
 {
-
   Desktop()
   {
     super(Paths.get(System.getProperty("user.home"), "Documents", "Knowtiphy Charts"));
@@ -26,9 +25,8 @@ public abstract class Desktop extends BasePlatform
     stage.setTitle(title);
   }
 
-  public void loadIcons(Stage stage, Class<?> cls)
+  public void setWindowIcons(Stage stage, Class<?> cls)
   {
-
     stage.getIcons().addAll(//
       new Image(cls.getResourceAsStream("knowtiphy_charts_icon_32.png")),
       new Image(cls.getResourceAsStream("knowtiphy_charts_icon_64.png")));

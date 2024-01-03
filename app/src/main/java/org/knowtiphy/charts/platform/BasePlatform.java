@@ -12,11 +12,10 @@ import javafx.stage.Screen;
 import java.nio.file.Path;
 
 /**
- * @author graham
+ * Base class for all platforms
  */
 public abstract class BasePlatform
 {
-
   private final Path root;
 
   // private final DisplayService display;
@@ -45,6 +44,11 @@ public abstract class BasePlatform
   public Path chartsDir()
   {
     return rootDir().resolve(Path.of("ENC"));
+  }
+
+  public Path catalogsDir()
+  {
+    return rootDir().resolve(Path.of("ENC_Catalogs"));
   }
 
   public double ppi()
@@ -95,5 +99,4 @@ public abstract class BasePlatform
   }
 
   public boolean isMac(){return false;}
-
 }

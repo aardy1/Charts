@@ -19,7 +19,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.controlsfx.control.PopOver;
 import org.controlsfx.glyphfont.Glyph;
 import org.geotools.api.feature.simple.SimpleFeatureType;
-import org.geotools.api.referencing.FactoryException;
 import org.geotools.api.referencing.operation.TransformException;
 import org.knowtiphy.charts.Fonts;
 import org.knowtiphy.charts.chartview.ChartView.EventModel;
@@ -34,9 +33,9 @@ import org.knowtiphy.charts.geotools.Queries;
 import org.knowtiphy.charts.memstore.MemFeature;
 import org.knowtiphy.charts.ontology.S57;
 import org.knowtiphy.charts.settings.UnitProfile;
+import org.knowtiphy.shapemap.model.MapModel;
 import org.knowtiphy.shapemap.renderer.Transformation;
 import org.knowtiphy.shapemap.renderer.context.SVGCache;
-import org.knowtiphy.shapemap.style.parser.StyleSyntaxException;
 import org.knowtiphy.shapemap.view.ShapeMapView;
 import org.reactfx.EventStreams;
 import org.reactfx.Subscription;
@@ -216,14 +215,19 @@ public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView
     subscriptions.add(
       displayOptions.showGridEvents.subscribe(c -> coordinateGrid.setVisible(c.getNewValue())));
 
-    subscriptions.add(displayOptions.showLightsEvents.subscribe(
-      change -> chart.layer(S57.OC_LIGHTS).setVisible(change.getNewValue())));
-    subscriptions.add(displayOptions.showPlatformEvents.subscribe(
-      change -> chart.layer(S57.OC_OFSPLF).setVisible(change.getNewValue())));
-    subscriptions.add(displayOptions.showWreckEvents.subscribe(
-      change -> chart.layer(S57.OC_WRECKS).setVisible(change.getNewValue())));
-    subscriptions.add(displayOptions.showSoundingsEvents.subscribe(
-      change -> chart.layer(S57.OC_SOUNDG).setVisible(change.getNewValue())));
+    for(MapModel<?, ?> map : chart.maps())
+    {
+      subscriptions.add(displayOptions.showLightsEvents.subscribe(
+        change -> map.layer(S57.OC_LIGHTS).setVisible(change.getNewValue())));
+      subscriptions.add(displayOptions.showPlatformEvents.subscribe(
+        change -> map.layer(S57.OC_OFSPLF).setVisible(change.getNewValue())));
+      subscriptions.add(displayOptions.showWreckEvents.subscribe(
+        change -> map.layer(S57.OC_WRECKS).setVisible(change.getNewValue())));
+      subscriptions.add(displayOptions.showSoundingsEvents.subscribe(
+        change -> map.layer(S57.OC_SOUNDG).setVisible(change.getNewValue())));
+    }
+    subscriptions.add(chart.viewPortBoundsEvent().subscribe(b -> mapSurface.requestLayout()));
+    subscriptions.add(chart.layerVisibilityEvent().subscribe(b -> mapSurface.requestLayout()));
 
     // subscriptions.add(chart.viewPortBoundsEvent.subscribe(change ->
     // updateBoats()));
@@ -311,18 +315,18 @@ public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView
       }
     }
 
-    if(mostDetailed != null && mostDetailed != chart.cell())
-    {
-      try
-      {
-        chartLocker.loadChart(mostDetailed, displayOptions, svgCache);
-      }
-      catch(TransformException | FactoryException | NonInvertibleTransformException |
-            StyleSyntaxException ex)
-      {
-        Logger.getLogger(ChartViewSkin.class.getName()).log(Level.SEVERE, null, ex);
-      }
-    }
+//    if(mostDetailed != null && mostDetailed != chart.cell())
+//    {
+//      try
+//      {
+//        chartLocker.loadChart(mostDetailed, displayOptions, svgCache);
+//      }
+//      catch(TransformException | FactoryException | NonInvertibleTransformException |
+//            StyleSyntaxException ex)
+//      {
+//        Logger.getLogger(ChartViewSkin.class.getName()).log(Level.SEVERE, null, ex);
+//      }
+//    }
   }
 
   private ContextMenu makeContextMenu(MouseEvent mouseEvent)

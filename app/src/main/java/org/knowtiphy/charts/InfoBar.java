@@ -18,7 +18,6 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.transform.NonInvertibleTransformException;
-import org.geotools.api.referencing.FactoryException;
 import org.geotools.api.referencing.operation.TransformException;
 import org.knowtiphy.charts.chartview.MapDisplayOptions;
 import org.knowtiphy.charts.enc.ChartLocker;
@@ -31,7 +30,6 @@ import org.knowtiphy.charts.utils.FXUtils;
 import org.knowtiphy.charts.utils.ToggleModel;
 import org.knowtiphy.shapemap.renderer.ShapeMapRenderer;
 import org.knowtiphy.shapemap.renderer.context.SVGCache;
-import org.knowtiphy.shapemap.style.parser.StyleSyntaxException;
 import org.reactfx.Subscription;
 
 import java.util.ArrayList;
@@ -205,14 +203,14 @@ public class InfoBar extends StackPane
 
   private void loadChart(ENCCell chartDescription)
   {
-    try
-    {
-      chartLocker.loadChart(chartDescription, displayOptions, svgCache);
-    }
-    catch(TransformException | FactoryException | NonInvertibleTransformException |
-          StyleSyntaxException ex)
-    {
-      Logger.getLogger(InfoBar.class.getName()).log(Level.SEVERE, null, ex);
-    }
+//    try
+//    {
+//      chartLocker.loadChart(chartDescription, displayOptions, svgCache);
+//    }
+//    catch(TransformException | FactoryException | NonInvertibleTransformException |
+//          StyleSyntaxException ex)
+//    {
+//      Logger.getLogger(InfoBar.class.getName()).log(Level.SEVERE, null, ex);
+//    }
   }
 }

@@ -15,9 +15,6 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
-import javafx.scene.transform.NonInvertibleTransformException;
-import org.geotools.api.referencing.FactoryException;
-import org.geotools.api.referencing.operation.TransformException;
 import org.knowtiphy.charts.Fonts;
 import org.knowtiphy.charts.enc.ChartLocker;
 import org.knowtiphy.charts.enc.ENCChart;
@@ -26,16 +23,12 @@ import org.knowtiphy.shapemap.renderer.Transformation;
 import org.knowtiphy.shapemap.renderer.context.RemoveHolesFromPolygon;
 import org.knowtiphy.shapemap.renderer.context.RenderGeomCache;
 import org.knowtiphy.shapemap.renderer.context.SVGCache;
-import org.knowtiphy.shapemap.style.parser.StyleSyntaxException;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Polygon;
 import org.reactfx.Subscription;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * @author graham
@@ -107,28 +100,27 @@ public class QuiltingSurface extends StackPane
     controls.getChildren().clear();
     displaySurface.getChildren().clear();
 
-    var intersecting = chartLocker.computeQuilt(chart);
-    intersecting.sort(Comparator.comparingInt(p -> p.getLeft().cScale()));
+//    var intersecting = chartLocker.computeQuilt(chart);
+//    intersecting.sort(Comparator.comparingInt(p -> p.getLeft().cScale()));
 
-    for(var intersectingCell : intersecting)
+    for(var map : chart.maps())
     {
-      var cell = intersectingCell.getLeft();
-      var label = new Button(cell.cScale() + "");
+      var label = new Button(map.cScale() + "");
       label.setFont(Fonts.DEFAULT_FONT_10);
-      label.setOnAction(eh -> {
-        try
-        {
-          chartLocker.loadChart(cell, displayOptions, svgCache);
-        }
-        catch(TransformException | FactoryException | NonInvertibleTransformException |
-              StyleSyntaxException ex)
-        {
-          Logger.getLogger(QuiltingSurface.class.getName()).log(Level.SEVERE, null, ex);
-        }
-      });
-      label.setOnMouseEntered(evt -> showQuilting(intersectingCell.getRight()));
+//      label.setOnAction(eh -> {
+//        try
+//        {
+//          chartLocker.loadChart(cell, displayOptions, svgCache);
+//        }
+//        catch(TransformException | FactoryException | NonInvertibleTransformException |
+//              StyleSyntaxException ex)
+//        {
+//          Logger.getLogger(QuiltingSurface.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+//      });
+      label.setOnMouseEntered(evt -> showQuilting(map.geometry()));
       label.setOnMouseExited(evt -> displaySurface.getChildren().clear());
-      var color = intersectingCell.getRight().isEmpty() ? Color.LIGHTPINK : Color.LIGHTGREEN;
+      var color = map.geometry().isEmpty() ? Color.LIGHTPINK : Color.LIGHTGREEN;
       label.setBackground(
         new Background(new BackgroundFill(color, CornerRadii.EMPTY, Insets.EMPTY)));
       controls.getChildren().add(label);

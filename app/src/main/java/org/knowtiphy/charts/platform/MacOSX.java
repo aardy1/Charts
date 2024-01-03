@@ -12,7 +12,6 @@ import javafx.stage.Stage;
  */
 public class MacOSX extends Desktop implements IPlatform
 {
-
   @Override
   public void setWindowIcons(Stage stage, Class<?> cls)
   {

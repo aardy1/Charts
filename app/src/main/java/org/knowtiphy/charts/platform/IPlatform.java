@@ -14,13 +14,16 @@ import java.nio.file.Path;
 /**
  * Abstraction of the underlying platform.
  */
+
 public interface IPlatform
 {
   void setStageTitle(Stage stage, String title);
 
   void setWindowIcons(Stage stage, Class<?> cls);
-
+  
   Path rootDir();
+
+  Path catalogsDir();
 
   Path chartsDir();
 
@@ -31,8 +34,6 @@ public interface IPlatform
   double ppi();
 
   double ppcm();
-
-  // ReadOnlyObjectProperty<Position> positionProperty();
 
   boolean isMac();
 

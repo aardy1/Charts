@@ -9,12 +9,15 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.transform.NonInvertibleTransformException;
 import org.apache.commons.lang3.tuple.Pair;
-import org.geotools.api.referencing.FactoryException;
+import org.geotools.api.feature.simple.SimpleFeatureType;
 import org.geotools.api.referencing.operation.TransformException;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.knowtiphy.charts.chartview.MapDisplayOptions;
 import org.knowtiphy.charts.enc.event.ChartLockerEvent;
+import org.knowtiphy.charts.memstore.MemFeature;
+import org.knowtiphy.shapemap.model.MapModel;
+import org.knowtiphy.shapemap.model.MapViewport;
 import org.knowtiphy.shapemap.renderer.context.SVGCache;
 import org.knowtiphy.shapemap.style.parser.StyleSyntaxException;
 import org.locationtech.jts.geom.Geometry;
@@ -41,9 +44,11 @@ import java.util.stream.Stream;
  */
 public class ChartLocker
 {
-  private final ChartLoader chartLoader;
+  private final Path catalogsDir;
 
   private final Path chartsDir;
+
+  private final ChartLoader chartLoader;
 
   private final EventSource<ChartLockerEvent> chartEvents = new EventSource<>();
 
@@ -51,13 +56,15 @@ public class ChartLocker
 
   private final ObservableList<ENCCell> history = FXCollections.observableArrayList();
 
-  public ChartLocker(Path chartsDir, ChartLoader chartLoader) throws IOException, XMLStreamException
+  public ChartLocker(Path catalogsDir, Path chartsDir, ChartLoader chartLoader)
+    throws IOException, XMLStreamException
   {
+    this.catalogsDir = catalogsDir;
     this.chartsDir = chartsDir;
     this.chartLoader = chartLoader;
 
     //  load cached catalogs
-    for(var catalogFile : readAvailableCatalogs(chartsDir))
+    for(var catalogFile : readAvailableCatalogs(catalogsDir))
     {
       var catalog = new CatalogReader(chartsDir, catalogFile).read();
       availableCatalogs.add(catalog);
@@ -85,18 +92,17 @@ public class ChartLocker
     return result;
   }
 
-  public List<Pair<ENCCell, Geometry>> computeQuilt(ENCChart chart)
+  public List<Pair<ENCCell, Geometry>> computeQuilt(ReferencedEnvelope viewPortBounds, double scale)
   {
-    var scale = chart.adjustedDisplayScale();
     System.err.println("adjusted scale = " + scale);
 
-    var intersections = intersections(chart.viewPortBounds())
+    var intersections = intersections(viewPortBounds)
                           .stream()
-                          .filter(cell -> cell.cScale() >= chart.adjustedDisplayScale())
+                          .filter(cell -> cell.cScale() >= scale)
                           .sorted(Comparator.comparingInt(ENCCell::cScale))
                           .toList();
 
-    var extent = JTS.toGeometry(chart.viewPortBounds());
+    var extent = JTS.toGeometry(viewPortBounds);
 //    var remaining = extent;
 
     //  toList yields an array list
@@ -139,28 +145,47 @@ public class ChartLocker
   }
 
   public ENCChart loadChart(
-    ENCCell chartDescription, MapDisplayOptions displayOptions, SVGCache svgCache)
-    throws TransformException, FactoryException, NonInvertibleTransformException,
-           StyleSyntaxException
+    ReferencedEnvelope viewPortBounds, double scale, MapDisplayOptions displayOptions,
+    SVGCache svgCache)
+    throws TransformException, NonInvertibleTransformException, StyleSyntaxException
   {
-    ENCChart newChart;
-    try
+//    ENCChart newChart;
+//    try
+//    {
+//      newChart = chartLoader.loadChart(chartDescription, displayOptions, svgCache);
+//    }
+//    catch(IOException | XMLStreamException ex)
+//    {
+//      Logger.getLogger(ChartLocker.class.getName()).log(Level.SEVERE, null, ex);
+//      return null;
+//    }
+
+    var quilt = computeQuilt(viewPortBounds, scale);
+    var maps = new ArrayList<MapModel<SimpleFeatureType, MemFeature>>();
+    for(var entry : quilt)
     {
-      newChart = chartLoader.loadChart(chartDescription, displayOptions, svgCache);
-    }
-    catch(IOException | XMLStreamException ex)
-    {
-      Logger.getLogger(ChartLocker.class.getName()).log(Level.SEVERE, null, ex);
-      return null;
+      var cell = entry.getKey();
+      try
+      {
+        var map = chartLoader.loadChart(cell, displayOptions);
+        map.setGeometry(entry.getRight());
+        maps.add(map);
+      }
+      catch(IOException | XMLStreamException ex)
+      {
+        Logger.getLogger(ChartLocker.class.getName()).log(Level.SEVERE, null, ex);
+        return null;
+      }
     }
 
-    // newChart.setViewPortScreenArea(screenArea);
-    newChart.setViewPortBounds(newChart.bounds());
-    addChartHistory(chartDescription);
+    var viewPort = new MapViewport(viewPortBounds, false);
+    var chart = new ENCChart(maps, viewPort, svgCache);
+//    addChartHistory(cell);
     //  notify that the old chart is unloaded, and the new chart is available
-    chartEvents.push(new ChartLockerEvent(ChartLockerEvent.Type.UNLOADED, null));
-    chartEvents.push(new ChartLockerEvent(ChartLockerEvent.Type.LOADED, newChart));
-    return newChart;
+//    chartEvents.push(new ChartLockerEvent(ChartLockerEvent.Type.UNLOADED, null));
+//    chartEvents.push(new ChartLockerEvent(ChartLockerEvent.Type.LOADED, newChart));
+
+    return chart;
   }
 
   public ObservableList<ENCCell> history()
@@ -205,7 +230,7 @@ public class ChartLocker
     var catalog = new CatalogReader(chartsDir, url).read();
 
     //  read and place in the catalogs directory
-    var filePath = chartsDir.resolve(Path.of("../ENC_Catalogs", catalog.title() + ".xml"));
+    var filePath = catalogsDir.resolve(Path.of(catalog.title() + ".xml"));
     try(var channel = Channels.newChannel(url.openStream());
       var fileOutputStream = new FileOutputStream(filePath.toFile());
       var fileChannel = fileOutputStream.getChannel())
@@ -220,10 +245,9 @@ public class ChartLocker
     ChartDownloader.downloadCell(cell, chartsDir, notifier);
   }
 
-  private static Collection<Path> readAvailableCatalogs(Path chartDir) throws IOException
+  private static Collection<Path> readAvailableCatalogs(Path catalogsDir) throws IOException
   {
-    //  TODO -- fix this
-    try(Stream<Path> stream = Files.list(chartDir.resolve("../ENC_Catalogs")))
+    try(Stream<Path> stream = Files.list(catalogsDir))
     {
       return stream
                .filter(
