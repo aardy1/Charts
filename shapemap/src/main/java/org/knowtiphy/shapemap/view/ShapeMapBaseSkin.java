@@ -2,7 +2,6 @@ package org.knowtiphy.shapemap.view;
 
 import javafx.scene.control.Skin;
 import javafx.scene.control.SkinBase;
-import org.knowtiphy.shapemap.model.MapViewModel;
 
 public abstract class ShapeMapBaseSkin<S, F> extends SkinBase<ShapeMapView<S, F>>
   implements Skin<ShapeMapView<S, F>>
@@ -58,5 +57,5 @@ public abstract class ShapeMapBaseSkin<S, F> extends SkinBase<ShapeMapView<S, F>
     return getSkinnable();
   }
 
-  protected abstract void setMapViewModel(MapViewModel<S, F> newMap);
+//  protected abstract void setMapViewModel(SingleMapViewModel<S, F> newMap);
 }

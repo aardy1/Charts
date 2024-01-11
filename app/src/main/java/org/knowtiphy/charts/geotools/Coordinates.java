@@ -6,6 +6,7 @@ import org.geotools.api.referencing.crs.GeographicCRS;
 import org.geotools.api.referencing.operation.TransformException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
+import org.knowtiphy.shapemap.model.BaseMapViewModel;
 import org.knowtiphy.shapemap.model.MapViewModel;
 import org.knowtiphy.shapemap.renderer.Transformation;
 import si.uom.SI;
@@ -28,12 +29,11 @@ public class Coordinates
     var degreeDiff = referencedEnvelope.getMaxX() - referencedEnvelope.getMinX();
     return toMeters(degreeDiff, referencedEnvelope.getCoordinateReferenceSystem());
   }
-  
+
   public static ReferencedEnvelope zoom(
     CoordinateReferenceSystem crs, ReferencedEnvelope maxExtent, ReferencedEnvelope envelope,
     double zoomFactor)
   {
-
     var newWidth = envelope.getWidth() * zoomFactor;
     var newHeight = envelope.getHeight() * zoomFactor;
     // expanding mutates the envelope so copy it
@@ -42,7 +42,7 @@ public class Coordinates
     return clip(maxExtent, copy, crs);
   }
 
-  public static <S, F> void zoom(MapViewModel<S, F> map, double zoomFactor)
+  public static <S, F> void zoom(BaseMapViewModel<S, F> map, double zoomFactor)
   {
 
     try
@@ -65,8 +65,8 @@ public class Coordinates
   private static final double DEFAULT_HEIGHT = 3;
 
   // need to make this adaptive -- like 1/2 the maxX
-  public static <S, F> void positionAt(MapViewModel<S, F> map, double x, double y)
-    throws TransformException, NonInvertibleTransformException, TransformException
+  public static <S, F> void positionAt(BaseMapViewModel<S, F> map, double x, double y)
+    throws NonInvertibleTransformException, TransformException
   {
 
     var world = map.viewPortBounds();
@@ -85,7 +85,8 @@ public class Coordinates
     map.setViewPortBounds(newExtent);
   }
 
-  public static <S, F> ReferencedEnvelope clip(MapViewModel<S, F> map, ReferencedEnvelope envelope)
+  public static <S, F> ReferencedEnvelope clip(
+    BaseMapViewModel<S, F> map, ReferencedEnvelope envelope)
   {
     return clip(map.viewPortBounds(), envelope, map.crs());
   }
@@ -93,6 +94,10 @@ public class Coordinates
   public static ReferencedEnvelope clip(
     ReferencedEnvelope maxExtent, ReferencedEnvelope envelope, CoordinateReferenceSystem crs)
   {
+    if(true)
+    {
+      return envelope;
+    }
     var width = Math.min(envelope.getWidth(), maxExtent.getWidth());
     var height = Math.min(envelope.getHeight(), maxExtent.getHeight());
 

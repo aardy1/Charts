@@ -7,7 +7,7 @@ package org.knowtiphy.charts.geotools;
 
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.knowtiphy.shapemap.api.IFeatureSourceIterator;
-import org.knowtiphy.shapemap.model.MapViewModel;
+import org.knowtiphy.shapemap.model.BaseMapViewModel;
 import org.knowtiphy.shapemap.renderer.Transformation;
 
 import java.util.ArrayList;
@@ -39,7 +39,7 @@ public class Queries
 //  }
 
   public static <S, F> List<IFeatureSourceIterator<F>> featuresNearXYWorld(
-    MapViewModel<S, F> mapViewModel, double x, double y, int radius) throws Exception
+    BaseMapViewModel<S, F> mapViewModel, double x, double y, int radius) throws Exception
   {
 
     var envelope = tinyPolygon(mapViewModel, x, y, radius);
@@ -58,7 +58,7 @@ public class Queries
   }
 
   public static <S, F> ReferencedEnvelope tinyPolygon(
-    MapViewModel<S, F> map, double x, double y, int radius)
+    BaseMapViewModel<S, F> map, double x, double y, int radius)
   {
     int screenMinX = (int) x - radius;
     int screenMinY = (int) y - radius;
@@ -82,7 +82,8 @@ public class Queries
     return new ReferencedEnvelope(minX, minX + width, minY, minY + height, map.crs());
   }
 
-  public static <S, F> ReferencedEnvelope tinyPolygon(MapViewModel<S, F> map, double x, double y)
+  public static <S, F> ReferencedEnvelope tinyPolygon(
+    BaseMapViewModel<S, F> map, double x, double y)
   {
     return tinyPolygon(map, x, y, 1);
   }

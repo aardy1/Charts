@@ -89,11 +89,13 @@ public class KnowtiphyCharts extends Application
 
     var styleReader = new StyleReader<SimpleFeatureType, MemFeature>(ResourceLoader.class);
     var chartLoader = new ChartLoader(appSettings, styleReader);
-    chartLocker = new ChartLocker(platform.catalogsDir(), platform.chartsDir(), chartLoader);
-
     displayOptions = new MapDisplayOptions();
+
+    chartLocker = new ChartLocker(platform.catalogsDir(), platform.chartsDir(), chartLoader,
+      displayOptions);
+
     var cell = chartLocker.getCell("Gulf of Mexico", 2_160_000);
-    chart = chartLocker.loadChart(cell.bounds(), cell.cScale() / 2.0, displayOptions, SVG_CACHE);
+    chart = chartLocker.loadChart(cell.bounds(), cell.cScale() / 2.0, SVG_CACHE);
 
     chartLocker
       .chartEvents()

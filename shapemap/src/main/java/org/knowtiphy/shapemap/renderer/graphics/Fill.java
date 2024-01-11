@@ -5,7 +5,6 @@
 
 package org.knowtiphy.shapemap.renderer.graphics;
 
-import org.geotools.geometry.jts.JTS;
 import org.knowtiphy.shapemap.api.GeomType;
 import org.knowtiphy.shapemap.renderer.GraphicsRenderingContext;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.FillInfo;
@@ -122,8 +121,9 @@ public class Fill
 
   private static void fillPoint(GraphicsRenderingContext<?, ?> context, Point point)
   {
-    context.graphicsContext()
-           .fillRect(point.getX(), point.getY(), context.onePixelX(), context.onePixelY());
+    context
+      .graphicsContext()
+      .fillRect(point.getX(), point.getY(), context.onePixelX(), context.onePixelY());
   }
 
   private static void fillLineString(GraphicsRenderingContext<?, ?> context, LineString lineString)
@@ -137,11 +137,11 @@ public class Fill
   {
 
     // TODO -- sort this out -- finding stuff not in the bounding box
-    if(!polygon.intersects(JTS.toGeometry(context.bounds())))
-    {
-      System.err.println("DUMB POLY");
-      return;
-    }
+//    if(!polygon.intersects(JTS.toGeometry(context.bounds())))
+//    {
+////      System.err.println("DUMB POLY");
+//      return;
+//    }
 
     var tx = context.worldToScreen();
     var gc = context.graphicsContext();

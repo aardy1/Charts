@@ -90,9 +90,18 @@ public class MapStats
 
   public void print()
   {
+    var numFeatures = 0;
+    var numGeoms = 0;
+
+    System.err.println("----------------------------------------");
+    System.err.println("Quilt size = " + maps.size());
+    for(var map : maps)
+    {
+      System.err.println("\t" + map.title());
+    }
+
     try
     {
-      var numFeatures = 0;
       for(var map : maps)
       {
         for(var layer : map.layers())
@@ -101,57 +110,55 @@ public class MapStats
           numFeatures += layerSize;
         }
 
-        var numGeoms = 0;
+        System.err.println("NF = " + map.title() + " " + numFeatures);
+
         for(var value : totGeoms.values())
         {
           numGeoms += value;
         }
-
-        var keys = new ArrayList<>(counts.keySet());
-        keys.sort(String::compareTo);
-
-        System.err.println();
-        System.err.println("Scale Summary");
-        System.err.printf("%-8s %-7s %-12s %-12s %-10s %-10s%n", "type", "#", "#N-SCAMIN",
-          "#N-SCAMAX", "SCAMIN", "SCAMAX");
-        for(var key : keys)
-        {
-          System.err.printf("%-8s %-7d %-12s %-12s %-10s %-10s%n", key, counts.get(key),
-            N(nullMinScale.get(key)), N(nullMaxScale.get(key)), N(minScale.get(key)),
-            N(maxScale.get(key)));
-        }
-
-        System.err.println();
-        System.err.println("Geometry Summary");
-        System.err.printf("%-8s  %-7s %-8s %-8s %-8s %-8s %-8s %-8s %-8s %-8s%n", "type", "#",
-          "#Pt", "#Line", "#Poly", "#M-Pt", "#M-Line", "#M-Poly", "#Mixed", "Tot Geoms");
-        for(var key : keys)
-        {
-          System.err.printf("%-8s  %-7d %-8s %-8s %-8s %-8s %-8s %-8s %-8s %-8s%n", key,
-            counts.get(key), pointGeoms.get(key), lineStringGeoms.get(key), polygonGeoms.get(key),
-            multiPointGeoms.get(key), multiLineStringGeoms.get(key), multiPolygonGeoms.get(key),
-            mixedGeoms.get(key), totGeoms.get(key));
-        }
-
-        System.err.println();
-        System.err.println("Total num features = " + numFeatures);
-        System.err.println("Total geoms = " + numGeoms);
-        System.err.println();
-
-        var mapSpans = distanceAcross(map.bounds()) / 1000;
-        System.err.println("Map span = " + mapSpans + " km");
-        System.err.println("Map span = " + ENC.kmToNM(mapSpans) + " nm");
-        System.err.println();
-
-//      System.err.println("Map title " + map.title());
-
-        System.err.println();
       }
     }
     catch(Exception ex)
     {
       //  ignore
     }
+
+    var keys = new ArrayList<>(counts.keySet());
+    keys.sort(String::compareTo);
+
+    System.err.println();
+    System.err.println("Scale Summary");
+    System.err.printf("%-8s %-7s %-12s %-12s %-10s %-10s%n", "type", "#", "#N-SCAMIN", "#N-SCAMAX",
+      "SCAMIN", "SCAMAX");
+    for(var key : keys)
+    {
+      System.err.printf("%-8s %-7d %-12s %-12s %-10s %-10s%n", key, counts.get(key),
+        N(nullMinScale.get(key)), N(nullMaxScale.get(key)), N(minScale.get(key)),
+        N(maxScale.get(key)));
+    }
+
+    System.err.println();
+    System.err.println("Geometry Summary");
+    System.err.printf("%-8s  %-7s %-8s %-8s %-8s %-8s %-8s %-8s %-8s %-8s%n", "type", "#", "#Pt",
+      "#Line", "#Poly", "#M-Pt", "#M-Line", "#M-Poly", "#Mixed", "Tot Geoms");
+    for(var key : keys)
+    {
+      System.err.printf("%-8s  %-7d %-8s %-8s %-8s %-8s %-8s %-8s %-8s %-8s%n", key,
+        counts.get(key), pointGeoms.get(key), lineStringGeoms.get(key), polygonGeoms.get(key),
+        multiPointGeoms.get(key), multiLineStringGeoms.get(key), multiPolygonGeoms.get(key),
+        mixedGeoms.get(key), totGeoms.get(key));
+    }
+
+    System.err.println();
+    System.err.println("Total num features = " + numFeatures);
+    System.err.println("Total geoms = " + numGeoms);
+    System.err.println();
+
+    var mapSpans = distanceAcross(maps.get(0).bounds()) / 1000;
+    System.err.println("Map span = " + mapSpans + " km");
+    System.err.println("Map span = " + ENC.kmToNM(mapSpans) + " nm");
+    System.err.println("----------------------------------------");
+    System.err.println();
   }
 
   public Map<String, Integer> getMinScale()

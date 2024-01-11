@@ -11,77 +11,100 @@ import org.knowtiphy.shapemap.api.ISVGProvider;
 import org.knowtiphy.shapemap.api.ITextSizeProvider;
 import org.reactfx.Change;
 
+import java.util.List;
+
 /**
- * A map view model for a single map -- a map model, a viewport, and some event streams.
+ * A map view model for a collection of map views quilted together
  *
  * @param <S> the type of the schema in the map model
  * @param <F> the type of the features in the map model
  */
 
-public abstract class MapViewModel<S, F> extends BaseMapViewModel<S, F>
+public class Quilt<S, F> extends BaseMapViewModel<S, F>
 {
-  private final MapModel<S, F> map;
+  private List<MapModel<S, F>> maps;
 
   private final MapViewport viewPort;
 
-  protected MapViewModel(
-    MapModel<S, F> map, MapViewport viewPort, IFeatureAdapter<F> featureAdapter,
+  protected Quilt(
+    List<MapModel<S, F>> maps, MapViewport viewPort, IFeatureAdapter<F> featureAdapter,
     IRenderablePolygonProvider renderablePolygonProvider, ISVGProvider svgProvider,
     ITextSizeProvider textSizeProvider)
   {
     super(featureAdapter, renderablePolygonProvider, svgProvider, textSizeProvider);
-    this.map = map;
     this.viewPort = viewPort;
+    this.maps = maps;
 
-    for(var layer : map.layers())
+    for(var map : maps)
     {
-      layer.layerVisibilityEvent().feedTo(layerVisibilityEvent);
+      for(var layer : map.layers())
+      {
+        layer.layerVisibilityEvent().feedTo(layerVisibilityEvent);
+      }
     }
 
     //  TODO -- should also have some way of subscribing to add/remove of layers
   }
 
-  public MapModel<S, F> map()
+  public List<MapModel<S, F>> maps()
   {
-    return map;
+    return maps;
   }
 
-  public ReferencedEnvelope bounds()
+  public void setMaps(List<MapModel<S, F>> maps)
   {
-    return map.bounds();
-  }
-
-  public ReferencedEnvelope viewPortBounds()
-  {
-    return viewPort.bounds();
+    this.maps = maps;
   }
 
   public void setViewPortBounds(ReferencedEnvelope bounds)
     throws TransformException, NonInvertibleTransformException
   {
+    System.err.println("Set view port bounds = " + bounds);
     var oldBounds = viewPort.bounds();
     viewPort.setBounds(bounds);
     viewPortBoundsEvent.push(new Change<>(oldBounds, bounds));
   }
 
-  public Rectangle2D viewPortScreenArea()
-  {
-    return viewPort.screenArea();
-  }
-
-  public void setViewPortScreenArea(Rectangle2D screenArea)
+  @Override
+  public void setViewPortScreenArea(Rectangle2D bounds)
     throws TransformException, NonInvertibleTransformException
   {
-    viewPort.setScreenArea(screenArea);
+    viewPort.setScreenArea(bounds);
   }
 
+  @Override
   public Affine viewPortScreenToWorld()
   {
     return viewPort.screenToWorld();
   }
 
+  @Override
   public Affine viewPortWorldToScreen()
   {
     return viewPort.worldToScreen();
+  }
+
+  @Override
+  public double displayScale()
+  {
+    return maps().get(0).cScale();
+  }
+
+  @Override
+  public ReferencedEnvelope bounds()
+  {
+    return viewPort.bounds();
+  }
+
+  @Override
+  public ReferencedEnvelope viewPortBounds()
+  {
+    return viewPort.bounds();
+  }
+
+  @Override
+  public Rectangle2D viewPortScreenArea()
+  {
+    return viewPort.screenArea();
   }
 }

@@ -8,7 +8,7 @@ import org.geotools.api.referencing.operation.TransformException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.knowtiphy.charts.chartview.ChartView.EventModel;
 import org.knowtiphy.charts.geotools.Coordinates;
-import org.knowtiphy.shapemap.model.MapViewModel;
+import org.knowtiphy.shapemap.model.BaseMapViewModel;
 import org.reactfx.Subscription;
 
 import java.util.ArrayList;
@@ -25,7 +25,8 @@ import static org.knowtiphy.charts.geotools.Coordinates.clip;
 public class DragPanZoomSupport
 {
 
-  public static <S, F> Subscription addDragSupport(EventModel eventModel, MapViewModel<S, F> map)
+  public static <S, F> Subscription addDragSupport(
+    EventModel eventModel, BaseMapViewModel<S, F> map)
   {
 
     var dragState = new DragPanZoomSupport.DragState();
@@ -39,18 +40,18 @@ public class DragPanZoomSupport
   }
 
   public static <S, F> List<Subscription> addPanningSupport(
-    EventModel eventModel, MapViewModel<S, F> map)
+    EventModel eventModel, BaseMapViewModel<S, F> map)
   {
     var scrollState = new DragPanZoomSupport.ScrollState();
 
     var subscriptions = new ArrayList<Subscription>();
 
-    subscriptions.add(
-      eventModel.scrollEvents.filter(evt -> evt.getEventType().equals(ScrollEvent.SCROLL_STARTED))
-                             .subscribe(evt -> scrollState.isTouchpad = true));
-    subscriptions.add(
-      eventModel.scrollEvents.filter(evt -> evt.getEventType().equals(ScrollEvent.SCROLL_FINISHED))
-                             .subscribe(evt -> scrollState.isTouchpad = false));
+    subscriptions.add(eventModel.scrollEvents
+                        .filter(evt -> evt.getEventType().equals(ScrollEvent.SCROLL_STARTED))
+                        .subscribe(evt -> scrollState.isTouchpad = true));
+    subscriptions.add(eventModel.scrollEvents
+                        .filter(evt -> evt.getEventType().equals(ScrollEvent.SCROLL_FINISHED))
+                        .subscribe(evt -> scrollState.isTouchpad = false));
 
     //@formatter:off
     subscriptions.add(
@@ -92,7 +93,7 @@ public class DragPanZoomSupport
     return subscriptions;
   }
 
-  public static <S, F> Subscription addZoomSupport(EventModel surface, MapViewModel<S, F> map)
+  public static <S, F> Subscription addZoomSupport(EventModel surface, BaseMapViewModel<S, F> map)
   {
     return surface.zoomEvents.subscribe(event -> {
       // not sure what NaN means, but it can happen
@@ -106,7 +107,8 @@ public class DragPanZoomSupport
   }
 
   // need to check for no modifiers at all
-  public static <S, F> Subscription addPositionAtSupport(EventModel surface, MapViewModel<S, F> map)
+  public static <S, F> Subscription addPositionAtSupport(
+    EventModel surface, BaseMapViewModel<S, F> map)
   {
     return surface.mouseDoubleClicked.subscribe(event -> {
       try
@@ -136,9 +138,9 @@ public class DragPanZoomSupport
 
   }
 
-  private static <S, F> void doDrag(MapViewModel<S, F> map, MouseEvent event, DragState dragState)
+  private static <S, F> void doDrag(
+    BaseMapViewModel<S, F> map, MouseEvent event, DragState dragState)
   {
-
     var difX = event.getX() - dragState.startX;
     var difY = event.getY() - dragState.startY;
     dragState.startX = event.getX();

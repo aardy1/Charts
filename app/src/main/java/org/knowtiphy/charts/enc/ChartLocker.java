@@ -7,6 +7,7 @@ package org.knowtiphy.charts.enc;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.SortedList;
 import javafx.scene.transform.NonInvertibleTransformException;
 import org.apache.commons.lang3.tuple.Pair;
 import org.geotools.api.feature.simple.SimpleFeatureType;
@@ -21,6 +22,7 @@ import org.knowtiphy.shapemap.model.MapViewport;
 import org.knowtiphy.shapemap.renderer.context.SVGCache;
 import org.knowtiphy.shapemap.style.parser.StyleSyntaxException;
 import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.TopologyException;
 import org.reactfx.EventSource;
 import org.reactfx.EventStream;
 
@@ -34,6 +36,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -50,19 +53,25 @@ public class ChartLocker
 
   private final ChartLoader chartLoader;
 
+  private final MapDisplayOptions mapDisplayOptions;
+
   private final EventSource<ChartLockerEvent> chartEvents = new EventSource<>();
 
   private final List<Catalog> availableCatalogs = new ArrayList<>();
 
-  private final ObservableList<ENCCell> history = FXCollections.observableArrayList();
+  private final ObservableList<ENCCell> unsortedHistory = FXCollections.observableArrayList();
 
-  public ChartLocker(Path catalogsDir, Path chartsDir, ChartLoader chartLoader)
+  private final ObservableList<ENCCell> history = new SortedList<>(unsortedHistory,
+    Comparator.comparingInt(ENCCell::cScale));
+
+  public ChartLocker(
+    Path catalogsDir, Path chartsDir, ChartLoader chartLoader, MapDisplayOptions mapDisplayOptions)
     throws IOException, XMLStreamException
   {
     this.catalogsDir = catalogsDir;
     this.chartsDir = chartsDir;
     this.chartLoader = chartLoader;
-
+    this.mapDisplayOptions = mapDisplayOptions;
     //  load cached catalogs
     for(var catalogFile : readAvailableCatalogs(catalogsDir))
     {
@@ -92,100 +101,44 @@ public class ChartLocker
     return result;
   }
 
-  public List<Pair<ENCCell, Geometry>> computeQuilt(ReferencedEnvelope viewPortBounds, double scale)
+  List<MapModel<SimpleFeatureType, MemFeature>> loadQuilt(
+    ReferencedEnvelope bounds, double adjustedDisplayScale)
   {
-    System.err.println("adjusted scale = " + scale);
+    System.err.println("recompute the quilt ");
+    var quilt = computeQuilt(bounds, adjustedDisplayScale);
 
-    var intersections = intersections(viewPortBounds)
-                          .stream()
-                          .filter(cell -> cell.cScale() >= scale)
-                          .sorted(Comparator.comparingInt(ENCCell::cScale))
-                          .toList();
-
-    var extent = JTS.toGeometry(viewPortBounds);
-//    var remaining = extent;
-
-    //  toList yields an array list
-    var quilt = new ArrayList<Pair<ENCCell, Geometry>>();
-
-    //  TODO -- this could be smarter, bailing when the extent is covered
-//    var cell = intersections.get(0);
-//    var geom = cell.geom().intersection(extent);
-//    quilt.add(Pair.of(cell, geom));
-//    Geometry used = cell.geom();
-//
-//    //  TODO -- this could be smarter, bailing when the extent is covered
-//    for(var i = 1; i < intersections.size(); i++)
-//    {
-//      var ithCell = intersections.get(i);
-//      var ithGeom = ithCell.geom();
-//      quilt.add(Pair.of(ithCell, ithGeom.difference(used).intersection(extent)));
-//      used = used.union(ithGeom);
-//    }
-
-    var cell = intersections.get(0);
-    var geom = cell.geom().intersection(extent);
-    quilt.add(Pair.of(cell, geom));
-    var remaining = extent.difference(geom);
-
-    for(var i = 1; i < intersections.size(); i++)
-    {
-      if(remaining.isEmpty())
-      {
-        break;
-      }
-
-      var ithCell = intersections.get(i);
-      var ithGeom = ithCell.geom().intersection(extent);
-      quilt.add(Pair.of(ithCell, ithGeom.intersection(remaining)));
-      remaining = remaining.difference(ithGeom);
-    }
-
-    return quilt;
-  }
-
-  public ENCChart loadChart(
-    ReferencedEnvelope viewPortBounds, double scale, MapDisplayOptions displayOptions,
-    SVGCache svgCache)
-    throws TransformException, NonInvertibleTransformException, StyleSyntaxException
-  {
-//    ENCChart newChart;
-//    try
-//    {
-//      newChart = chartLoader.loadChart(chartDescription, displayOptions, svgCache);
-//    }
-//    catch(IOException | XMLStreamException ex)
-//    {
-//      Logger.getLogger(ChartLocker.class.getName()).log(Level.SEVERE, null, ex);
-//      return null;
-//    }
-
-    var quilt = computeQuilt(viewPortBounds, scale);
-    var maps = new ArrayList<MapModel<SimpleFeatureType, MemFeature>>();
+    var maps = new LinkedList<MapModel<SimpleFeatureType, MemFeature>>();
     for(var entry : quilt)
     {
       var cell = entry.getKey();
+      addChartHistory(cell);
       try
       {
-        var map = chartLoader.loadChart(cell, displayOptions);
+        var map = chartLoader.loadMap(cell, mapDisplayOptions);
+        //  TODO -- need a delegate if we have more than one chart window
         map.setGeometry(entry.getRight());
-        maps.add(map);
+        maps.addFirst(map);
       }
-      catch(IOException | XMLStreamException ex)
+      catch(IOException | XMLStreamException | StyleSyntaxException ex)
       {
         Logger.getLogger(ChartLocker.class.getName()).log(Level.SEVERE, null, ex);
-        return null;
       }
     }
 
+    return maps;
+  }
+
+  //  only loads a top level chart from Knowtiphy charts
+  public ENCChart loadChart(ReferencedEnvelope viewPortBounds, double scale, SVGCache svgCache)
+    throws TransformException, NonInvertibleTransformException
+  {
+    var maps = loadQuilt(viewPortBounds, scale);
     var viewPort = new MapViewport(viewPortBounds, false);
-    var chart = new ENCChart(maps, viewPort, svgCache);
-//    addChartHistory(cell);
     //  notify that the old chart is unloaded, and the new chart is available
 //    chartEvents.push(new ChartLockerEvent(ChartLockerEvent.Type.UNLOADED, null));
 //    chartEvents.push(new ChartLockerEvent(ChartLockerEvent.Type.LOADED, newChart));
 
-    return chart;
+    return new ENCChart(maps, viewPort, this, svgCache);
   }
 
   public ObservableList<ENCCell> history()
@@ -197,7 +150,7 @@ public class ChartLocker
   {
     if(!history.contains(cell))
     {
-      history.add(cell);
+      unsortedHistory.add(cell);
     }
   }
 
@@ -243,6 +196,66 @@ public class ChartLocker
   public void downloadChart(ENCCell cell, ChartDownloaderNotifier notifier) throws IOException
   {
     ChartDownloader.downloadCell(cell, chartsDir, notifier);
+  }
+
+  private List<Pair<ENCCell, Geometry>> computeQuilt(
+    ReferencedEnvelope viewPortBounds, double scale)
+  {
+    System.err.println("adjusted scale = " + scale);
+
+    var intersections = intersections(viewPortBounds)
+                          .stream()
+                          .filter(cell -> cell.cScale() >= scale)
+                          .sorted(Comparator.comparingInt(ENCCell::cScale))
+                          .toList();
+
+    var extent = JTS.toGeometry(viewPortBounds);
+//    var remaining = extent;
+
+    //  toList yields an array list
+    var quilt = new ArrayList<Pair<ENCCell, Geometry>>();
+
+    //  TODO -- this could be smarter, bailing when the extent is covered
+//    var cell = intersections.get(0);
+//    var geom = cell.geom().intersection(extent);
+//    quilt.add(Pair.of(cell, geom));
+//    Geometry used = cell.geom();
+//
+//    //  TODO -- this could be smarter, bailing when the extent is covered
+//    for(var i = 1; i < intersections.size(); i++)
+//    {
+//      var ithCell = intersections.get(i);
+//      var ithGeom = ithCell.geom();
+//      quilt.add(Pair.of(ithCell, ithGeom.difference(used).intersection(extent)));
+//      used = used.union(ithGeom);
+//    }
+
+    var cell = intersections.get(0);
+    var geom = cell.geom().intersection(extent);
+    quilt.add(Pair.of(cell, geom));
+    var remaining = extent.difference(geom);
+
+    for(var i = 1; i < intersections.size(); i++)
+    {
+      if(remaining.isEmpty())
+      {
+        break;
+      }
+
+      var ithCell = intersections.get(i);
+      var ithGeom = ithCell.geom().intersection(extent);
+      quilt.add(Pair.of(ithCell, ithGeom.intersection(remaining)));
+      try
+      {
+        remaining = remaining.difference(ithGeom);
+      }
+      catch(TopologyException | IllegalArgumentException ex)
+      {
+        System.err.println("ith geom = " + ithCell.geom().intersection(extent));
+      }
+    }
+
+    return quilt;
   }
 
   private static Collection<Path> readAvailableCatalogs(Path catalogsDir) throws IOException

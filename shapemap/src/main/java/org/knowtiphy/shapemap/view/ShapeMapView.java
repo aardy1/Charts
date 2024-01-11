@@ -6,7 +6,7 @@ import javafx.css.StyleablePropertyFactory;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 import javafx.scene.paint.Color;
-import org.knowtiphy.shapemap.model.MapViewModel;
+import org.knowtiphy.shapemap.model.Quilt;
 import org.knowtiphy.shapemap.view.canvas.CanvasShapeMapSkin;
 
 import java.util.List;
@@ -23,9 +23,7 @@ public class ShapeMapView<S, F> extends Control
 {
   public enum SkinType
   {
-
     CANVAS
-
   }
 
   // CSS styling
@@ -35,22 +33,17 @@ public class ShapeMapView<S, F> extends Control
 
   private static String DEFAULT_STYLE_SHEET;
 
-  private final SkinType skinType;
+  private SkinType skinType;
 
-  private final MapViewModel<S, F> map;
+  private final Quilt<S, F> map;
 
   private final Color background;
 
-  public ShapeMapView(MapViewModel<S, F> map, Color background)
-  {
-    this(map, background, SkinType.CANVAS);
-  }
-
-  public ShapeMapView(MapViewModel<S, F> map, Color background, SkinType skinType)
+  public ShapeMapView(Quilt<S, F> map, Color background)//, SkinType skinType)
   {
     this.map = map;
     this.background = background;
-    this.skinType = skinType;
+    this.skinType = SkinType.CANVAS;
     getStyleClass().add("shapemap-view");
   }
 
@@ -90,8 +83,8 @@ public class ShapeMapView<S, F> extends Control
     return FACTORY.getCssMetaData();
   }
 
-  public void setMap(MapViewModel<S, F> newMap)
-  {
-    ((ShapeMapBaseSkin<S, F>) getSkin()).setMapViewModel(newMap);
-  }
+//  public void setMap(SingleMapViewModel<S, F> newMap)
+//  {
+//    ((ShapeMapBaseSkin<S, F>) getSkin()).setMapViewModel(newMap);
+//  }
 }

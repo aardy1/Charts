@@ -14,7 +14,8 @@ import java.io.InputStream;
  */
 public class StyleReader<S, F>
 {
-
+  //  TODO -- need to cache style sheets for re-use?
+  
   private static final String SLD = ".sld";
 
   private final Class<?> resourceLoader;

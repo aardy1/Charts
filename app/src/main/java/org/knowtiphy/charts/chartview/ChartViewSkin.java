@@ -33,7 +33,6 @@ import org.knowtiphy.charts.geotools.Queries;
 import org.knowtiphy.charts.memstore.MemFeature;
 import org.knowtiphy.charts.ontology.S57;
 import org.knowtiphy.charts.settings.UnitProfile;
-import org.knowtiphy.shapemap.model.MapModel;
 import org.knowtiphy.shapemap.renderer.Transformation;
 import org.knowtiphy.shapemap.renderer.context.SVGCache;
 import org.knowtiphy.shapemap.view.ShapeMapView;
@@ -152,7 +151,7 @@ public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView
 
     chartLocker.chartEvents().filter(ChartLockerEvent::isLoad).subscribe(event -> {
       chart = event.chart();
-      mapSurface.setMap(chart);
+//      mapSurface.setMap(chart);
       setupListeners();
     });
 
@@ -215,7 +214,7 @@ public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView
     subscriptions.add(
       displayOptions.showGridEvents.subscribe(c -> coordinateGrid.setVisible(c.getNewValue())));
 
-    for(MapModel<?, ?> map : chart.maps())
+    for(var map : chart.maps())
     {
       subscriptions.add(displayOptions.showLightsEvents.subscribe(
         change -> map.layer(S57.OC_LIGHTS).setVisible(change.getNewValue())));
