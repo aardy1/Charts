@@ -59,9 +59,13 @@ public abstract class MapViewModel<S, F> extends BaseMapViewModel<S, F>
   public void setViewPortBounds(ReferencedEnvelope bounds)
     throws TransformException, NonInvertibleTransformException
   {
-    var oldBounds = viewPort.bounds();
-    viewPort.setBounds(bounds);
-    viewPortBoundsEvent.push(new Change<>(oldBounds, bounds));
+    var newExtent = clip(bounds);
+    if(!newExtent.equals(viewPortBounds()))
+    {
+      var oldBounds = viewPort.bounds();
+      viewPort.setBounds(newExtent);
+      viewPortBoundsEvent.push(new Change<>(oldBounds, newExtent));
+    }
   }
 
   public Rectangle2D viewPortScreenArea()
@@ -83,5 +87,57 @@ public abstract class MapViewModel<S, F> extends BaseMapViewModel<S, F>
   public Affine viewPortWorldToScreen()
   {
     return viewPort.worldToScreen();
+  }
+
+  private ReferencedEnvelope clip(ReferencedEnvelope envelope)
+  {
+    var maxExtent = map.bounds();
+
+    var width = Math.min(envelope.getWidth(), maxExtent.getWidth());
+    var height = Math.min(envelope.getHeight(), maxExtent.getHeight());
+
+    var minX = envelope.getMinX();
+    var maxX = envelope.getMaxX();
+    var minY = envelope.getMinY();
+    var maxY = envelope.getMaxY();
+
+    if(maxX > maxExtent.getMaxX())
+    {
+      maxX = maxExtent.getMaxX();
+      minX = Math.max(maxExtent.getMinX(), maxX - width);
+    }
+    else if(minX < maxExtent.getMinX())
+    {
+      minX = maxExtent.getMinX();
+      maxX = Math.min(maxExtent.getMaxX(), minX + width);
+    }
+
+    if(maxY > maxExtent.getMaxY())
+    {
+      maxY = maxExtent.getMaxY();
+      minY = Math.max(maxExtent.getMinY(), maxY - height);
+    }
+    else if(minY < maxExtent.getMinY())
+    {
+      minY = maxExtent.getMinY();
+      maxY = Math.min(maxExtent.getMaxY(), minY + height);
+    }
+
+    assert width >= 0;
+    assert width <= maxExtent.getWidth();
+    assert height >= 0;
+    assert height <= maxExtent.getHeight();
+
+    assert minX <= maxExtent.getMaxX() : minX + "::" + maxExtent.getMaxX();
+    assert minX >= maxExtent.getMinX() : minX;
+    assert maxX <= maxExtent.getMaxX() : maxX;
+    assert maxX >= maxExtent.getMinX() : maxX;
+
+    assert minY <= maxExtent.getMaxY() : minY + "::" + maxExtent.getMaxY();
+    assert minY >= maxExtent.getMinY() : minY + "::" + maxExtent.getMinY();
+    assert maxY <= maxExtent.getMaxY() : maxY + "::" + maxExtent.getMaxY();
+    assert maxY >= maxExtent.getMinY() : maxY + "::" + maxExtent.getMaxY();
+
+    return new ReferencedEnvelope(minX, maxX, minY, maxY, map.crs());
   }
 }

@@ -21,7 +21,6 @@ import java.util.Map;
  */
 public class SVGCache implements ISVGProvider
 {
-
   private static final SnapshotParameters SVG_RENDERING_PARAMETERS = new SnapshotParameters();
 
   static
@@ -36,10 +35,9 @@ public class SVGCache implements ISVGProvider
     this.resourceLoader = resourceLoader;
   }
 
-  //@formatter:on
   private final Map<Triple<String, Integer, Double>, Image> cache = new HashMap<>();
 
-  public void cache(String name, int size, double rotation, Image image)
+  public void put(String name, int size, double rotation, Image image)
   {
     cache.put(Triple.of(name, size, rotation), image);
   }
@@ -56,7 +54,7 @@ public class SVGCache implements ISVGProvider
       // for some reason SVGLoader loads the images upside down ...
       SVG_RENDERING_PARAMETERS.setTransform(new Rotate(180 - rotation));
       image = svgImage.toImage(SVG_RENDERING_PARAMETERS);
-      cache(name, size, rotation, image);
+      put(name, size, rotation, image);
     }
 
     return image;

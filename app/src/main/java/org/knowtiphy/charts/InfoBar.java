@@ -42,7 +42,7 @@ import java.util.logging.Logger;
  */
 public class InfoBar extends StackPane
 {
-  private static double ZOOM_FACTOR = 0.5;
+  private static double ZOOM_FACTOR = 2;
 
   private final Label chartScale = new Label();
 
@@ -82,10 +82,10 @@ public class InfoBar extends StackPane
 
     var zoomIn = new Button("", Fonts.plus());
     zoomIn.setTooltip(new Tooltip("Zoom In"));
-    zoomIn.setOnAction(x -> Coordinates.zoom(chart, ZOOM_FACTOR));
+    zoomIn.setOnAction(x -> chrt.setZoom(chrt.zoom() + 1));//* ZOOM_FACTOR));
     var zoomOut = new Button("", Fonts.minus());
     zoomOut.setTooltip(new Tooltip("Zoom Out"));
-    zoomOut.setOnAction(x -> Coordinates.zoom(chart, 1 / ZOOM_FACTOR));
+    zoomOut.setOnAction(x -> chrt.setZoom(chrt.zoom() - 1));//* (1 / ZOOM_FACTOR)));
 
     var mapDisplaySettings = new Button("", Fonts.setting());
     mapDisplaySettings.setTooltip(new Tooltip("Configure Map Visuals"));
@@ -198,7 +198,7 @@ public class InfoBar extends StackPane
 
     displayScale.setText(chart.displayScale() + "");
     adjustedDisplayScale.setText(chart.adjustedDisplayScale() + "");
-    zoomLevel.setText(Coordinates.twoDec(chart.zoomFactor()));
+    zoomLevel.setText(Coordinates.twoDec(chart.zoom()));
   }
 
   private void loadChart(ENCCell chartDescription)

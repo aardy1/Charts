@@ -50,6 +50,10 @@ import java.util.logging.Logger;
 import static org.knowtiphy.charts.utils.FXUtils.later;
 import static org.knowtiphy.charts.utils.FXUtils.resizeable;
 
+/**
+ * Knowtiphy Charts application.
+ */
+
 public class KnowtiphyCharts extends Application
 {
   // need to work these out from screen dimensions
@@ -76,11 +80,11 @@ public class KnowtiphyCharts extends Application
 
   private ENCChart chart;
 
-  private final BorderPane overlay = new BorderPane();
-
   private final AppSettings appSettings = new AppSettings();
 
   private final IPlatform platform = Platform.getPlatform();
+
+  private final BorderPane overlay = new BorderPane();
 
   @Override
   public void start(Stage primaryStage) throws Exception
@@ -88,6 +92,7 @@ public class KnowtiphyCharts extends Application
     showInitialSetup(platform);
 
     var styleReader = new StyleReader<SimpleFeatureType, MemFeature>(ResourceLoader.class);
+
     var chartLoader = new ChartLoader(appSettings, styleReader);
     displayOptions = new MapDisplayOptions();
 
@@ -264,72 +269,3 @@ public class KnowtiphyCharts extends Application
   }
 
 }
-
-// private void fudgeKnowtiphyFunctionFactory() {
-//
-// var existingFactories = CommonFactoryFinder.getFunctionFactories(null);
-// existingFactories.forEach(f -> {
-// if (f instanceof KnowtiphyStyleFunctionsFactory ff) {
-// ff.setDefautStyle(visuals);
-// }
-// });
-// }
-// var file = "/Users/graham/Desktop/enc map.txt";
-// var file = "/Users/graham/Desktop/basic map.txt";
-
-// Set categories = Collections.singleton(FunctionFactory.class);
-// FactoryRegistry registry = new FactoryRegistry(categories);
-// registry.registerFactory(new CRSProvider());
-// ReferencingFactoryFinder.getCRSFactory(new Hints());
-// ReferencingObjectFactory blah = new ReferencingObjectFactory();
-
-//    var gf = new GeometryFactory();
-//    var p1 = gf.createPoint(new Coordinate(100, 100));
-//    var p2 = gf.createPoint(new Coordinate(200, 100));
-//    var p3 = gf.createPoint(new Coordinate(300, 100));
-//    var mp = gf.createMultiPoint(new Point[]{p1, p2, p3});
-//
-//    var pp1 = new Coordinate(50, 50);
-//    var pp2 = new Coordinate(150, 50);
-//    var pp3 = new Coordinate(150, 150);
-//    var pp4 = new Coordinate(50, 150);
-//    var pp5 = new Coordinate(50, 50);
-//
-//    var poly = gf.createPolygon(new Coordinate[]{pp1, pp2, pp3, pp4, pp5});
-//
-//    System.err.println("Poly contains p1 " + poly.contains(p1));
-//    System.err.println("Poly contains p2 " + poly.contains(p2));
-//    System.err.println("Poly contains p3 " + poly.contains(p3));
-//    System.err.println("Poly contains mp " + poly.contains(mp));
-//    System.err.println("Poly intersect mp " + poly.intersection(mp));
-//    System.err.println("MP internal envelope " + mp.getEnvelopeInternal());
-//    System.err.println("Poly internal envelope " + poly.getEnvelopeInternal());
-//
-//    var index = new STRtree();
-//    index.insert(poly.getEnvelopeInternal(), poly);
-//    index.insert(mp.getEnvelopeInternal(), mp);
-//    index.insert(p1.getEnvelopeInternal(), p1);
-//    index.insert(p2.getEnvelopeInternal(), p2);
-//    index.insert(p3.getEnvelopeInternal(), p3);
-//    var env = new ReferencedEnvelope(151, 152, 50, 150, DefaultEngineeringCRS.CARTESIAN_2D);
-//    var res = index.query(env);
-//    System.err.println("Res = " + res);
-
-//    //  test for rendering speed with text on
-//    new Thread(() -> {
-//      try
-//      {
-//        Thread.sleep(35000);
-//      }
-//      catch(InterruptedException e)
-//      {
-//        throw new RuntimeException(e);
-//      }
-//      chart.setLayerVisible("SOUNDG", true);
-//      int n = 1000;
-//      for(int i = 0; i < n; i++)
-//      {
-//        runLater(() -> Coordinates.zoom(chart, 0.5));
-//        runLater(() -> Coordinates.zoom(chart, 2));
-//      }
-//    }).start();

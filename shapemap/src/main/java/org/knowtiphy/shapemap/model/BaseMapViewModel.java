@@ -10,11 +10,14 @@ import org.knowtiphy.shapemap.api.IFeatureAdapter;
 import org.knowtiphy.shapemap.api.IRenderablePolygonProvider;
 import org.knowtiphy.shapemap.api.ISVGProvider;
 import org.knowtiphy.shapemap.api.ITextSizeProvider;
+import org.locationtech.jts.geom.Coordinates;
 import org.reactfx.Change;
 import org.reactfx.EventSource;
 import org.reactfx.EventStream;
 
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * A map view model -- a map model, a viewport, and some event streams.
@@ -36,6 +39,8 @@ public abstract class BaseMapViewModel<S, F>
   private final ISVGProvider svgProvider;
 
   private final ITextSizeProvider textSizeProvider;
+
+  private double zoom = 1;
 
   protected BaseMapViewModel(
     IFeatureAdapter<F> featureAdapter, IRenderablePolygonProvider renderablePolygonProvider,
@@ -88,6 +93,32 @@ public abstract class BaseMapViewModel<S, F>
   public ITextSizeProvider textSizeProvider()
   {
     return textSizeProvider;
+  }
+
+  public double zoom()
+  {
+    return zoom;
+  }
+
+  public void setZoom(double zoom)
+  {
+    this.zoom = zoom;
+
+    var width = bounds().getWidth();
+    var height = bounds().getHeight();
+    var newWidth = width / zoom();
+    var newHeight = height / zoom();
+    // expanding/shrinking mutates the envelope so copy it
+    var newBounds = new ReferencedEnvelope(bounds());
+    newBounds.expandBy((newWidth - width) / 2, (newHeight - height) / 2);
+    try
+    {
+      setViewPortBounds(newBounds);
+    }
+    catch(TransformException | NonInvertibleTransformException ex)
+    {
+      Logger.getLogger(Coordinates.class.getName()).log(Level.SEVERE, null, ex);
+    }
   }
 
   public EventStream<Change<Boolean>> layerVisibilityEvent()

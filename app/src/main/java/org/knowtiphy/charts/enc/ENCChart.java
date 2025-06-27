@@ -20,7 +20,7 @@ import org.knowtiphy.shapemap.renderer.context.SVGCache;
 import java.util.List;
 
 /**
- * An ENC chart -- a map view model for a collection of ENC cells -- a quilt.
+ * An ENC chart -- a map view model for a quilt of ENC cells.
  */
 
 public class ENCChart extends Quilt<SimpleFeatureType, MemFeature>
@@ -43,18 +43,17 @@ public class ENCChart extends Quilt<SimpleFeatureType, MemFeature>
     return maps().get(0).cScale();
   }
 
-  public double zoomFactor()
-  {
-    return bounds().getWidth() / (viewPortBounds().getWidth());
-  }
+//  public double zoomFactor()
+//  {
+//    return bounds().getWidth() / (viewPortBounds().getWidth());
+//  }
 
   public double displayScale()
   {
-    return (int) (cScale() * (1 / zoomFactor()));
+    return (int) (cScale() * (1 / zoom()));
   }
 
-  public double adjustedDisplayScale(){return displayScale() / 2.0;}
-
+  //  TODO
   public String title(){return "";} //return maps().get(0).lName();}
 
   @Override
@@ -63,7 +62,9 @@ public class ENCChart extends Quilt<SimpleFeatureType, MemFeature>
   {
     var quilt = chartLocker.loadQuilt(bounds, adjustedDisplayScale());
     System.err.println("--------------------");
-    System.err.println("VP bounds change :: quilt size = " + quilt.size());
+    System.err.println("VP bounds change");
+    System.err.println("quilt size = " + quilt.size());
+    System.err.println("adjusted display scale = " + adjustedDisplayScale());
     for(var map : quilt)
     {
       System.err.println("\tmap " + map.title() + " scale " + map.cScale());

@@ -10,17 +10,18 @@ import org.knowtiphy.shapemap.model.Quilt;
 import org.knowtiphy.shapemap.view.canvas.CanvasShapeMapSkin;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
- * A shape map view -- a control that shows an ESRI shape map of layers of features of
- * some schema type.
+ * A shape map view -- a control that shows an ESRI shape map of layers of
+ * features of some schema type.
  *
  * @param <S> the type of the schema
  * @param <F> the type of the features
  */
-
 public class ShapeMapView<S, F> extends Control
 {
+
   public enum SkinType
   {
     CANVAS
@@ -33,13 +34,13 @@ public class ShapeMapView<S, F> extends Control
 
   private static String DEFAULT_STYLE_SHEET;
 
-  private SkinType skinType;
+  private final SkinType skinType;
 
   private final Quilt<S, F> map;
 
   private final Color background;
 
-  public ShapeMapView(Quilt<S, F> map, Color background)//, SkinType skinType)
+  public ShapeMapView(Quilt<S, F> map, Color background)
   {
     this.map = map;
     this.background = background;
@@ -66,15 +67,12 @@ public class ShapeMapView<S, F> extends Control
       default:
         if(DEFAULT_STYLE_SHEET == null)
         {
-          DEFAULT_STYLE_SHEET = ShapeMapView.class.getResource("canvas.css").toExternalForm();
+          DEFAULT_STYLE_SHEET = Objects
+                                  .requireNonNull(ShapeMapView.class.getResource("canvas.css"))
+                                  .toExternalForm();
         }
         return DEFAULT_STYLE_SHEET;
     }
-  }
-
-  public static List<CssMetaData<? extends Styleable, ?>> getClassCssMetaData()
-  {
-    return FACTORY.getCssMetaData();
   }
 
   @Override
@@ -82,9 +80,9 @@ public class ShapeMapView<S, F> extends Control
   {
     return FACTORY.getCssMetaData();
   }
-
-//  public void setMap(SingleMapViewModel<S, F> newMap)
-//  {
-//    ((ShapeMapBaseSkin<S, F>) getSkin()).setMapViewModel(newMap);
-//  }
 }
+
+//    public static List<CssMetaData<? extends Styleable, ?>> getClassCssMetaData()
+//    {
+//        return FACTORY.getCssMetaData();
+//    }

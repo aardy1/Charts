@@ -12,8 +12,9 @@ import javafx.stage.Screen;
 import java.nio.file.Path;
 
 /**
- * Base class for all platforms
+ * Base class for all abstractions of the underlying platform
  */
+
 public abstract class BasePlatform
 {
   private final Path root;

@@ -6,9 +6,9 @@
 package org.knowtiphy.charts;
 
 /**
- * @author graham
+ * An interface to use as a shared resource loader.
  */
-public class ResourceLoader
+public interface ResourceLoader
 {
 
 }

@@ -209,6 +209,11 @@ public class ChartLocker
                           .sorted(Comparator.comparingInt(ENCCell::cScale))
                           .toList();
 
+    if(intersections.isEmpty())
+    {
+      return new ArrayList<>();
+    }
+
     var extent = JTS.toGeometry(viewPortBounds);
 //    var remaining = extent;
 

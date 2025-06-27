@@ -16,19 +16,16 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static org.knowtiphy.charts.geotools.Coordinates.clip;
-
 /**
  * Support for dragging, panning, and zooming a map, plus positioning a map at some screen
  * coordinates.
  */
+
 public class DragPanZoomSupport
 {
-
   public static <S, F> Subscription addDragSupport(
     EventModel eventModel, BaseMapViewModel<S, F> map)
   {
-
     var dragState = new DragPanZoomSupport.DragState();
 
     eventModel.mousePressed.subscribe(event -> {
@@ -69,11 +66,12 @@ public class DragPanZoomSupport
 
           try
           {
-            var newExtent = clip(map.bounds(), newVPBounds, map.crs());
-            if(!newExtent.equals(map.viewPortBounds()))
-            {
-              map.setViewPortBounds(newExtent);
-            }
+//            var newExtent = clip(map.bounds(), newVPBounds, map.crs());
+//            if(!newExtent.equals(map.viewPortBounds()))
+//            {
+//              map.setViewPortBounds(newExtent);
+//            }
+            map.setViewPortBounds(newVPBounds);
           }
           catch(TransformException | NonInvertibleTransformException ex)
           {
@@ -84,7 +82,9 @@ public class DragPanZoomSupport
         {
           //  TODO -- this is a bit hacky
           var zoomFactor = event.getDeltaY() > 0 ? 1.05 : 0.95;
-           Coordinates.zoom(map, zoomFactor);
+          map.setZoom(map.zoom() * zoomFactor);
+
+//          Coordinates.zoom(map, zoomFactor);
         }
       }));
 
@@ -102,7 +102,8 @@ public class DragPanZoomSupport
         return;
       }
 
-      Coordinates.zoom(map, event.getZoomFactor());
+      map.setZoom(map.zoom() * event.getZoomFactor());
+//      Coordinates.zoom(map, event.getZoomFactor());
     });
   }
 
@@ -154,11 +155,12 @@ public class DragPanZoomSupport
 
     try
     {
-      var newExtent = clip(map.bounds(), newVPBounds, map.crs());
-      if(!newExtent.equals(map.viewPortBounds()))
-      {
-        map.setViewPortBounds(newExtent);
-      }
+//      var newExtent = clip(map.bounds(), newVPBounds, map.crs());
+//      if(!newExtent.equals(map.viewPortBounds()))
+//      {
+//        map.setViewPortBounds(newExtent);
+//      }
+      map.setViewPortBounds(newVPBounds);
     }
     catch(TransformException | NonInvertibleTransformException ex)
     {

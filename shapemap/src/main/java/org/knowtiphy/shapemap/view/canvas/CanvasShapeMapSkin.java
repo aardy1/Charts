@@ -7,6 +7,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import org.geotools.geometry.jts.JTS;
+import org.knowtiphy.shapemap.model.MapModel;
 import org.knowtiphy.shapemap.model.Quilt;
 import org.knowtiphy.shapemap.renderer.RendererUtilities;
 import org.knowtiphy.shapemap.renderer.ShapeMapRenderer;
@@ -14,18 +15,17 @@ import org.knowtiphy.shapemap.renderer.Transformation;
 import org.knowtiphy.shapemap.renderer.context.RendererContext;
 import org.knowtiphy.shapemap.view.ShapeMapBaseSkin;
 import org.knowtiphy.shapemap.view.ShapeMapView;
-import org.locationtech.jts.geom.Envelope;
 
 /**
- * A skin for a shape map view that uses a JavaFX canvas to show an ESRI shape map of layers
- * of features of some schema type.
+ * A skin for a shape map view that uses a JavaFX canvas to show an ESRI shape
+ * map of layers of features of some schema type.
  *
  * @param <S> the type of the schema
  * @param <F> the type of the features
  */
-
 public class CanvasShapeMapSkin<S, F> extends ShapeMapBaseSkin<S, F>
 {
+
   private static final double PREFERRED_WIDTH = Region.USE_COMPUTED_SIZE;
 
   private static final double PREFERRED_HEIGHT = Region.USE_COMPUTED_SIZE;
@@ -36,15 +36,14 @@ public class CanvasShapeMapSkin<S, F> extends ShapeMapBaseSkin<S, F>
 
   private final StackPane root = new StackPane();
 
-  public CanvasShapeMapSkin(
-    ShapeMapView<S, F> surface, Quilt<S, F> viewModel, Color background)
+  public CanvasShapeMapSkin(ShapeMapView<S, F> surface, Quilt<S, F> viewModel, Color background)
   {
     super(surface);
 
     this.viewModel = viewModel;
     this.background = background;
 
-    for(var i = 0; i < viewModel.maps().size(); i++)
+    for(MapModel<S, F> map : viewModel.maps())
     {
       root.getChildren().add(new BorderPane());
     }
@@ -72,7 +71,8 @@ public class CanvasShapeMapSkin<S, F> extends ShapeMapBaseSkin<S, F>
 
   @Override
   public void layoutChildren(
-    final double x, final double y, final double width, final double height)
+    final double x, final double y, final double width,
+    final double height)
   {
     System.err.println("layout children");
     super.layoutChildren(x, y, width, height);
@@ -83,6 +83,17 @@ public class CanvasShapeMapSkin<S, F> extends ShapeMapBaseSkin<S, F>
   {
     var width = (int) root.getWidth();
     var height = (int) root.getHeight();
+
+    if(viewModel.maps().isEmpty())
+    {
+      //  TODO -- this makes no sense, why create a canvas at all?
+      var canvas = new Canvas(width, height);
+      var graphics = canvas.getGraphicsContext2D();
+      graphics.setFill(background);
+      graphics.fillRect(0, 0, width, height);
+      root.getChildren().add(new BorderPane());
+      return;
+    }
 
 //    var removeAdd = viewModel.maps().size() - root.getChildren().size();
 //    System.err.println("Pane calculation ");
@@ -102,17 +113,17 @@ public class CanvasShapeMapSkin<S, F> extends ShapeMapBaseSkin<S, F>
 //      System.err.println("Removing panes " + removeAdd);
 //      root.getChildren().remove(root.getChildren().size() + removeAdd, root.getChildren().size());
 //    }
-
     root.getChildren().clear();
     int which = 0;
 //    assert root.getChildren().size() == viewModel.maps().size();
     try
     {
-      var overallWts = new Transformation(
-        RendererUtilities.worldToScreenTransform(viewModel.bounds(),
-          new Rectangle2D(0, 0, width, height), viewModel.crs()));
+      var foo = RendererUtilities.worldToScreenTransform(viewModel.bounds(),
+        new Rectangle2D(0, 0, width, height), viewModel.crs());
+      var overallWts = new Transformation(foo);
       overallWts.apply(viewModel.bounds().getMinX(), viewModel.bounds().getMaxY());
       System.err.println(overallWts.getX() + " , " + overallWts.getY());
+
       for(var model : viewModel.maps())
       {
         System.err.println("which = " + which);
@@ -124,9 +135,10 @@ public class CanvasShapeMapSkin<S, F> extends ShapeMapBaseSkin<S, F>
 
         try
         {
-          var envelope = model.geometry().getEnvelopeInternal();
-          var screenArea = screenArea(overallWts, envelope);
-          var wts = RendererUtilities.worldToScreenTransform(envelope, screenArea, viewModel.crs());
+//          var envelope = model.geometry().getEnvelopeInternal();
+//          var screenArea = screenArea(overallWts, envelope);
+//          var wts = RendererUtilities.worldToScreenTransform(envelope, screenArea, viewModel
+//          .crs());
 
           var canvas = new Canvas(width, height);
           var graphics = canvas.getGraphicsContext2D();
@@ -136,22 +148,23 @@ public class CanvasShapeMapSkin<S, F> extends ShapeMapBaseSkin<S, F>
           root.getChildren().add(b);
 
           //@formatter:off
-      var rendererContext = new RendererContext<>
-      (
-        model.layers(),
-        model.totalRuleCount(),
-        JTS.toEnvelope( model.geometry() ),
-        //  TODO -- shouldn't this be in the viewport?
-				new Rectangle2D(0, 0, width, height),
-        wts,
-      wts.createInverse(),
-        viewModel.adjustedDisplayScale() ,
-        viewModel.featureAdapter(),
-        viewModel.renderablePolygonProvider(),
-        viewModel.svgProvider(),
-        viewModel.textSizeProvider()
-      );
-		  //@formatter:on
+                    var rendererContext = new RendererContext<>(
+                        model.layers(),
+                        model.totalRuleCount(),
+                        JTS.toEnvelope(model.geometry()),
+                        //  TODO -- shouldn't this be in the viewport?
+                        new Rectangle2D(0, 0, width, height),
+                        foo,
+                        foo.createInverse(),
+                        //        wts,
+                        //      wts.createInverse(),
+                        viewModel.adjustedDisplayScale(),
+                        viewModel.featureAdapter(),
+                        viewModel.renderablePolygonProvider(),
+                        viewModel.svgProvider(),
+                        viewModel.textSizeProvider()
+                    );
+                    //@formatter:on
 
           var renderer = new ShapeMapRenderer<>(rendererContext, graphics);
           renderer.paint();
@@ -172,12 +185,12 @@ public class CanvasShapeMapSkin<S, F> extends ShapeMapBaseSkin<S, F>
     }
   }
 
-  private Rectangle2D screenArea(Transformation tx, Envelope envelope)
-  {
-    tx.apply(envelope.getMinX(), envelope.getMaxY());
-    var minX = tx.getX();
-    var minY = tx.getY();
-    tx.apply(envelope.getMaxX(), envelope.getMinY());
-    return new Rectangle2D(minX, minY, tx.getX() - minX, tx.getY() - minY);
-  }
+//    private Rectangle2D screenArea(Transformation tx, Envelope envelope)
+//    {
+//        tx.apply(envelope.getMinX(), envelope.getMaxY());
+//        var minX = tx.getX();
+//        var minY = tx.getY();
+//        tx.apply(envelope.getMaxX(), envelope.getMinY());
+//        return new Rectangle2D(minX, minY, tx.getX() - minX, tx.getY() - minY);
+//    }
 }

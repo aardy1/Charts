@@ -56,6 +56,4 @@ public abstract class ShapeMapBaseSkin<S, F> extends SkinBase<ShapeMapView<S, F>
   {
     return getSkinnable();
   }
-
-//  protected abstract void setMapViewModel(SingleMapViewModel<S, F> newMap);
 }

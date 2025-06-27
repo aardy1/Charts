@@ -22,8 +22,10 @@ public class FileUtils
 
     try(var stream = Files.newDirectoryStream(dir, "*.shp"))
     {
-      return StreamSupport.stream(stream.spliterator(), false)
-                          .map(x -> x.toFile().getAbsolutePath()).toList();
+      return StreamSupport
+               .stream(stream.spliterator(), false)
+               .map(x -> x.toFile().getAbsolutePath())
+               .toList();
     }
     catch(IOException x)
     {

@@ -5,17 +5,19 @@
 
 package org.knowtiphy.shapemap.api;
 
-import java.util.function.BiFunction;
 import org.locationtech.jts.geom.Geometry;
 
+import java.util.function.BiFunction;
+
 /**
- * A function from a feature to a value -- the functions are used in filtering (values are
- * booleans), styling (values are colors, sizes, rotations, etc), etc.
+ * A function from a feature of type F to a value of type T.
+ * e.g. when filtering T will be boolean, when styling  will be colors, sizes, rotations, etc.
  *
  * @param <F> the type of the features
  * @param <T> the return type of the feature function
  */
 
-public interface IFeatureFunction<F, T> extends BiFunction<F, Geometry, T> {
+public interface IFeatureFunction<F, T> extends BiFunction<F, Geometry, T>
+{
 
 }

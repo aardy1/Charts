@@ -348,7 +348,7 @@ public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView
 
   private void updateAISInformation(AISEvent event)
   {
-    var asInfo = event.getAisInformation();
+    var asInfo = event.aisInformation();
     var id = asInfo.getId();
     if(!boats.containsKey(id))
     {

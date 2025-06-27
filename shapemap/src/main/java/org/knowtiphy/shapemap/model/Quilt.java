@@ -87,7 +87,7 @@ public class Quilt<S, F> extends BaseMapViewModel<S, F>
   @Override
   public double displayScale()
   {
-    return maps().get(0).cScale();
+    return maps().get(0).cScale() / zoom();
   }
 
   @Override

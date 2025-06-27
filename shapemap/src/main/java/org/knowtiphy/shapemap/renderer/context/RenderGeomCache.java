@@ -5,23 +5,27 @@
 
 package org.knowtiphy.shapemap.renderer.context;
 
+import org.locationtech.jts.geom.Geometry;
+
 import java.util.HashMap;
 import java.util.Map;
-import org.locationtech.jts.geom.Geometry;
 
 /**
  * @author graham
  */
-public class RenderGeomCache {
+public class RenderGeomCache
+{
 
-	private final Map<Geometry, Geometry> cache = new HashMap<>();
+  private final Map<Geometry, Geometry> cache = new HashMap<>();
 
-	public void cache(Geometry key, Geometry value) {
-		cache.put(key, value);
-	}
+  public void put(Geometry key, Geometry value)
+  {
+    cache.put(key, value);
+  }
 
-	public Geometry fetch(Geometry key) {
-		return cache.get(key);
-	}
+  public Geometry get(Geometry key)
+  {
+    return cache.get(key);
+  }
 
 }

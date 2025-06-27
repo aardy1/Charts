@@ -30,25 +30,23 @@ public class Coordinates
     return toMeters(degreeDiff, referencedEnvelope.getCoordinateReferenceSystem());
   }
 
-  public static ReferencedEnvelope zoom(
-    CoordinateReferenceSystem crs, ReferencedEnvelope maxExtent, ReferencedEnvelope envelope,
-    double zoomFactor)
+  public static ReferencedEnvelope zoom(ReferencedEnvelope envelope, double zoomFactor)
   {
     var newWidth = envelope.getWidth() * zoomFactor;
     var newHeight = envelope.getHeight() * zoomFactor;
     // expanding mutates the envelope so copy it
     var copy = new ReferencedEnvelope(envelope);
     copy.expandBy((newWidth - envelope.getWidth()) / 2, (newHeight - envelope.getHeight()) / 2);
-    return clip(maxExtent, copy, crs);
+    return copy;
+//    clip(maxExtent, copy, crs);
   }
 
   public static <S, F> void zoom(BaseMapViewModel<S, F> map, double zoomFactor)
   {
-
     try
     {
       var vpBounds = map.viewPortBounds();
-      var newExtent = zoom(map.crs(), map.bounds(), vpBounds, zoomFactor);
+      var newExtent = zoom(vpBounds, zoomFactor);
       if(!newExtent.equals(vpBounds))
       {
         map.setViewPortBounds(newExtent);
@@ -81,70 +79,70 @@ public class Coordinates
 
     var envelope = new ReferencedEnvelope(tx.getX() - defaultWidth, tx.getX() + defaultWidth,
       tx.getY() - defaultHeight, tx.getY() + defaultHeight, map.crs());
-    var newExtent = clip(map, envelope);
-    map.setViewPortBounds(newExtent);
+//    var newExtent = clip(map, envelope);
+    map.setViewPortBounds(envelope);
   }
 
-  public static <S, F> ReferencedEnvelope clip(
-    BaseMapViewModel<S, F> map, ReferencedEnvelope envelope)
-  {
-    return clip(map.viewPortBounds(), envelope, map.crs());
-  }
+//  public static <S, F> ReferencedEnvelope clip(
+//    BaseMapViewModel<S, F> map, ReferencedEnvelope envelope)
+//  {
+//    return clip(map.viewPortBounds(), envelope, map.crs());
+//  }
 
-  public static ReferencedEnvelope clip(
-    ReferencedEnvelope maxExtent, ReferencedEnvelope envelope, CoordinateReferenceSystem crs)
-  {
-    if(true)
-    {
-      return envelope;
-    }
-    var width = Math.min(envelope.getWidth(), maxExtent.getWidth());
-    var height = Math.min(envelope.getHeight(), maxExtent.getHeight());
-
-    var minX = envelope.getMinX();
-    var maxX = envelope.getMaxX();
-    var minY = envelope.getMinY();
-    var maxY = envelope.getMaxY();
-
-    if(maxX > maxExtent.getMaxX())
-    {
-      maxX = maxExtent.getMaxX();
-      minX = Math.max(maxExtent.getMinX(), maxX - width);
-    }
-    else if(minX < maxExtent.getMinX())
-    {
-      minX = maxExtent.getMinX();
-      maxX = Math.min(maxExtent.getMaxX(), minX + width);
-    }
-
-    if(maxY > maxExtent.getMaxY())
-    {
-      maxY = maxExtent.getMaxY();
-      minY = Math.max(maxExtent.getMinY(), maxY - height);
-    }
-    else if(minY < maxExtent.getMinY())
-    {
-      minY = maxExtent.getMinY();
-      maxY = Math.min(maxExtent.getMaxY(), minY + height);
-    }
-
-    assert width >= 0;
-    assert width <= maxExtent.getWidth();
-    assert height >= 0;
-    assert height <= maxExtent.getHeight();
-
-    assert minX <= maxExtent.getMaxX() : minX + "::" + maxExtent.getMaxX();
-    assert minX >= maxExtent.getMinX() : minX;
-    assert maxX <= maxExtent.getMaxX() : maxX;
-    assert maxX >= maxExtent.getMinX() : maxX;
-
-    assert minY <= maxExtent.getMaxY() : minY + "::" + maxExtent.getMaxY();
-    assert minY >= maxExtent.getMinY() : minY + "::" + maxExtent.getMinY();
-    assert maxY <= maxExtent.getMaxY() : maxY + "::" + maxExtent.getMaxY();
-    assert maxY >= maxExtent.getMinY() : maxY + "::" + maxExtent.getMaxY();
-
-    return new ReferencedEnvelope(minX, maxX, minY, maxY, crs);
-  }
+//  public static ReferencedEnvelope clip(
+//    ReferencedEnvelope maxExtent, ReferencedEnvelope envelope, CoordinateReferenceSystem crs)
+//  {
+//    if(true)
+//    {
+//      return envelope;
+//    }
+//    var width = Math.min(envelope.getWidth(), maxExtent.getWidth());
+//    var height = Math.min(envelope.getHeight(), maxExtent.getHeight());
+//
+//    var minX = envelope.getMinX();
+//    var maxX = envelope.getMaxX();
+//    var minY = envelope.getMinY();
+//    var maxY = envelope.getMaxY();
+//
+//    if(maxX > maxExtent.getMaxX())
+//    {
+//      maxX = maxExtent.getMaxX();
+//      minX = Math.max(maxExtent.getMinX(), maxX - width);
+//    }
+//    else if(minX < maxExtent.getMinX())
+//    {
+//      minX = maxExtent.getMinX();
+//      maxX = Math.min(maxExtent.getMaxX(), minX + width);
+//    }
+//
+//    if(maxY > maxExtent.getMaxY())
+//    {
+//      maxY = maxExtent.getMaxY();
+//      minY = Math.max(maxExtent.getMinY(), maxY - height);
+//    }
+//    else if(minY < maxExtent.getMinY())
+//    {
+//      minY = maxExtent.getMinY();
+//      maxY = Math.min(maxExtent.getMaxY(), minY + height);
+//    }
+//
+//    assert width >= 0;
+//    assert width <= maxExtent.getWidth();
+//    assert height >= 0;
+//    assert height <= maxExtent.getHeight();
+//
+//    assert minX <= maxExtent.getMaxX() : minX + "::" + maxExtent.getMaxX();
+//    assert minX >= maxExtent.getMinX() : minX;
+//    assert maxX <= maxExtent.getMaxX() : maxX;
+//    assert maxX >= maxExtent.getMinX() : maxX;
+//
+//    assert minY <= maxExtent.getMaxY() : minY + "::" + maxExtent.getMaxY();
+//    assert minY >= maxExtent.getMinY() : minY + "::" + maxExtent.getMinY();
+//    assert maxY <= maxExtent.getMaxY() : maxY + "::" + maxExtent.getMaxY();
+//    assert maxY >= maxExtent.getMinY() : maxY + "::" + maxExtent.getMaxY();
+//
+//    return new ReferencedEnvelope(minX, maxX, minY, maxY, crs);
+//  }
 
   public static <S, F> double getMapScale(MapViewModel<S, F> map, int screenWidth, double dpi)
   {
