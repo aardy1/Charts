@@ -16,23 +16,25 @@ import java.util.stream.StreamSupport;
  */
 public class FileUtils
 {
+    /**
+     * Get a list of paths to the shape files in a directory.
+     *
+     * @param dir the directory
+     * @return the list of paths
+     */
 
-  public static List<String> readShapeFilesInDir(Path dir)
-  {
-
-    try(var stream = Files.newDirectoryStream(dir, "*.shp"))
+    public static List<String> listShapeFilePaths(Path dir)
     {
-      return StreamSupport
-               .stream(stream.spliterator(), false)
-               .map(x -> x.toFile().getAbsolutePath())
-               .toList();
+        try(var stream = Files.newDirectoryStream(dir, "*.shp"))
+        {
+            return StreamSupport
+                       .stream(stream.spliterator(), false)
+                       .map(x -> x.toFile().getAbsolutePath())
+                       .toList();
+        }
+        catch(IOException x)
+        {
+            return List.of();
+        }
     }
-    catch(IOException x)
-    {
-      return List.of();
-      // IOException can never be thrown by the iteration.
-      // In this snippet, it can // only be thrown by newDirectoryStream.
-    }
-  }
-
 }

@@ -6,10 +6,12 @@
 package org.knowtiphy.shapemap.api;
 
 /**
- * A feature geometry type -- used for fast switching on geometry types.
+ * A feature geometry type -- used for fast switching on geometry types (rather than using string
+ * names and hence compares for geometry types).
  */
-public enum GeomType {
 
+public enum FeatureGeomType
+{
     // @formatter:off
     POINT,
     MULTI_POINT,
@@ -20,5 +22,4 @@ public enum GeomType {
     MULTI_POLYGON,
     GEOMETRY_COLLECTION
     // @formatter:on
-
 }

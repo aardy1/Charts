@@ -38,11 +38,14 @@ public class SVGMarkSymbolizer<S, F> extends BaseMarkSymbolizer<S, F>
       return;
     }
 
-    var rotationO = pointSymbolizer.rotation() == null ? null : pointSymbolizer.rotation()
-                                                                               .apply(feature, pt);
+    var rotationO = pointSymbolizer.rotation() == null ? null : pointSymbolizer
+                                                                  .rotation()
+                                                                  .apply(feature, pt);
     var rotation = rotationO == null ? 0 : rotationO.doubleValue();
-    var image = context.rendererContext().svgProvider()
-                       .get(pathInfo.name(), szo.intValue(), rotation);
+    var image = context
+                  .renderingContext()
+                  .svgProvider()
+                  .get(pathInfo.name(), szo.intValue(), rotation);
 
     var x = pt.getX();
     var y = pt.getY();

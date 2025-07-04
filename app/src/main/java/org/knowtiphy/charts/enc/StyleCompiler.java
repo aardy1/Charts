@@ -9,7 +9,7 @@ import org.geotools.api.feature.simple.SimpleFeatureType;
 import org.knowtiphy.charts.memstore.MemFeature;
 import org.knowtiphy.charts.settings.AppSettings;
 import org.knowtiphy.shapemap.api.IFeatureFunction;
-import org.knowtiphy.shapemap.api.IStyleCompilerAdapter;
+import org.knowtiphy.shapemap.api.IStyleCompiler;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -19,7 +19,7 @@ import java.util.function.BiFunction;
 /**
  * @author graham
  */
-public class StyleCompilerAdapter implements IStyleCompilerAdapter<MemFeature>
+public class StyleCompiler implements IStyleCompiler<MemFeature>
 {
 
   private static final Map<String, BiFunction<AppSettings, IFeatureFunction<MemFeature, Object>,
@@ -28,30 +28,31 @@ public class StyleCompilerAdapter implements IStyleCompilerAdapter<MemFeature>
 
   static
   {
-    UNIT_MAP.put("knotsToMapUnits", StyleCompilerAdapter::knotsToMapUnits);
-    UNIT_MAP.put("depthToMapUnits", StyleCompilerAdapter::depthToMapUnits);
+    UNIT_MAP.put("knotsToMapUnits", StyleCompiler::knotsToMapUnits);
+    UNIT_MAP.put("depthToMapUnits", StyleCompiler::depthToMapUnits);
   }
 
   private final SimpleFeatureType featureType;
 
   private final AppSettings settings;
 
-  public StyleCompilerAdapter(SimpleFeatureType featureType, AppSettings settings)
+  public StyleCompiler(SimpleFeatureType featureType, AppSettings settings)
   {
     this.featureType = featureType;
     this.settings = settings;
   }
 
   @Override
-  public IFeatureFunction<MemFeature, Object> compilePropertyAccess(String name)
+  public IFeatureFunction<MemFeature, Object> compilePropertyAccess(String propertyName)
   {
-    var index1 = featureType.indexOf(name);
+    var index1 = featureType.indexOf(propertyName);
     return (f, g) -> f.getAttribute(index1);
   }
 
   @Override
   public IFeatureFunction<MemFeature, Object> compileFunctionCall(
-    String name, Collection<IFeatureFunction<MemFeature, Object>> args)
+    String name,
+    Collection<IFeatureFunction<MemFeature, Object>> args)
   {
     var function = UNIT_MAP.get(name);
     return function.apply(settings, args.iterator().next());
@@ -62,9 +63,10 @@ public class StyleCompilerAdapter implements IStyleCompilerAdapter<MemFeature>
   {
     return (f, g) -> {
       var value = quantity.apply(f, g);
-      return value == null ? null : settings.unitProfile()
-                                            .formatSpeed((Number) quantity.apply(f, g),
-                                              settings.unitProfile()::knotsToMapUnits);
+      return value == null ? null : settings
+                                      .unitProfile()
+                                      .formatSpeed((Number) quantity.apply(f, g),
+                                        settings.unitProfile()::knotsToMapUnits);
     };
   }
 
@@ -73,9 +75,10 @@ public class StyleCompilerAdapter implements IStyleCompilerAdapter<MemFeature>
   {
     return (f, g) -> {
       var value = quantity.apply(f, g);
-      return value == null ? null : settings.unitProfile()
-                                            .formatDepth((Number) quantity.apply(f, g),
-                                              settings.unitProfile()::depthToMapUnits);
+      return value == null ? null : settings
+                                      .unitProfile()
+                                      .formatDepth((Number) quantity.apply(f, g),
+                                        settings.unitProfile()::depthToMapUnits);
     };
   }
 }

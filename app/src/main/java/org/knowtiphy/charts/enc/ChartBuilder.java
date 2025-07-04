@@ -22,16 +22,60 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.knowtiphy.charts.geotools.FileUtils.readShapeFilesInDir;
+import static org.knowtiphy.charts.geotools.FileUtils.listShapeFilePaths;
 
 /**
  * @author graham
  */
 public class ChartBuilder
 {
+  public static final String[] LAYER_ORDER = new String[]{ //
+
+    //	general land outline
+    S57.OC_LNDARE,
+
+    // sea areas
+    S57.OC_SEAARE, S57.OC_DEPARE, S57.OC_CTNARE, S57.OC_UNSARE, S57.OC_DMPGRD, S57.OC_RESARE,
+    S57.OC_MIPARE,
+
+    // land areas
+    S57.OC_ICEARE,
+
+    //  land features
+    S57.OC_BUAARE, S57.OC_RIVERS, S57.OC_LAKARE, S57.OC_CANALS,
+
+    // possibly poly styled sea features
+    S57.OC_FAIRWY,
+
+    // line styled sea features
+    S57.OC_DEPCNT, S57.OC_SOUNDG, S57.OC_BRIDGE, S57.OC_CAUSWY, S57.OC_DYKCON,
+
+    // point styled land features
+    S57.OC_LNDMRK,
+
+    // point styled sea features
+    S57.OC_ACHARE, S57.OC_ACHBRT, S57.OC_BCNLAT, S57.OC_BCNSAW, S57.OC_BCNSPP, S57.OC_BERTHS,
+    S57.OC_BOYLAT, S57.OC_BOYSPP, S57.OC_BOYSAW, S57.OC_LIGHTS, S57.OC_CURENT, S57.OC_OBSTRN,
+    S57.OC_OFSPLF, S57.OC_WRECKS, S57.OC_RTPBCN, S57.OC_UWTROC
+    //
+  };
+
+  private static final Set<String> SCALELESS = new HashSet<>();
+
+  static
+  {
+    // SCALELESS.add(S57.OC_SEAARE);
+    // SCALELESS.add(S57.OC_CANALS);
+    // SCALELESS.add(S57.OC_BRIDGE);
+    // SCALELESS.add(S57.OC_RESARE);
+    // SCALELESS.add(S57.OC_MIPARE);
+  }
+
   private final ENCCell cell;
 
   private final AppSettings settings;
+
+  // conversion issue SBDAREA is a bunch of points, should be a bunch of polys?
 
   private final StyleReader<SimpleFeatureType, MemFeature> styleReader;
 
@@ -47,89 +91,20 @@ public class ChartBuilder
     this.displayOptions = displayOptions;
   }
 
-  // conversion issue SBDAREA is a bunch of points, should be a bunch of polys?
-
-  // @formatter:off
-    public static final String[] LAYER_ORDER = new String[] { //
-
-        //	general land outline
-        S57.OC_LNDARE,
-
-        // sea areas
-        S57.OC_SEAARE,
-        S57.OC_DEPARE,
-        S57.OC_CTNARE,
-        S57.OC_UNSARE,
-        S57.OC_DMPGRD,
-        S57.OC_RESARE,
-        S57.OC_MIPARE,
-
-        // land areas
-        S57.OC_ICEARE,
-
-        //  land features
-        S57.OC_BUAARE,
-        S57.OC_RIVERS,
-        S57.OC_LAKARE,
-        S57.OC_CANALS,
-
-        // possibly poly styled sea features
-        S57.OC_FAIRWY,
-
-        // line styled sea features
-        S57.OC_DEPCNT,
-        S57.OC_SOUNDG,
-        S57.OC_BRIDGE,
-        S57.OC_CAUSWY,
-        S57.OC_DYKCON,
-
-        // point styled land features
-        S57.OC_LNDMRK,
-
-        // point styled sea features
-        S57.OC_ACHARE,
-        S57.OC_ACHBRT,
-        S57.OC_BCNLAT,
-        S57.OC_BCNSAW,
-        S57.OC_BCNSPP,
-        S57.OC_BERTHS,
-        S57.OC_BOYLAT,
-        S57.OC_BOYSPP,
-        S57.OC_BOYSAW,
-        S57.OC_LIGHTS,
-        S57.OC_CURENT,
-        S57.OC_OBSTRN,
-        S57.OC_OFSPLF,
-        S57.OC_WRECKS,
-        S57.OC_RTPBCN,
-        S57.OC_UWTROC
-    };
-    // @formatter:on
-
-  private static final Set<String> SCALELESS = new HashSet<>();
-
-  static
-  {
-    // SCALELESS.add(S57.OC_SEAARE);
-    // SCALELESS.add(S57.OC_CANALS);
-    // SCALELESS.add(S57.OC_BRIDGE);
-    // SCALELESS.add(S57.OC_RESARE);
-    // SCALELESS.add(S57.OC_MIPARE);
-  }
-
-  public MapModel<SimpleFeatureType, MemFeature> read()
+  public MapModel<SimpleFeatureType, MemFeature> build()
     throws IOException, XMLStreamException, StyleSyntaxException
   {
-    var fileNames = readShapeFilesInDir(cell.location());
+    var fileNames = listShapeFilePaths(cell.location());
 
-    var map = new MapModel<>(cell.bounds(), cell.cScale(), cell.lName(), SchemaAdapter.ADAPTER);
+    var map = new MapModel<SimpleFeatureType, MemFeature>(cell.bounds(), cell.cScale(),
+      cell.lName());//, SchemaAdapter.ADAPTER);
     var store = new MemStore(map);
 
-    for(var include : LAYER_ORDER)
+    for(var featureTypeName : LAYER_ORDER)
     {
       for(var fileName : fileNames)
       {
-        if(fileName.contains(include))
+        if(fileName.contains(featureTypeName))
         {
 //          System.err.println(fileName);
           // if the file doesn't exist, is empty, or has no .shx file, ignore it
@@ -142,18 +117,11 @@ public class ChartBuilder
           {
             var fileStore = new ShapefileDataStore(new File(fileName).toURI().toURL());
             var featureSource = fileStore.getFeatureSource();
-            map.addLayer(readLayer(featureSource, store));
+            map.addLayer(featureTypeName, readLayer(featureSource, store));
           }
         }
       }
     }
-
-//    System.err.println("------------------------------------------------------");
-//    for(var type : all)
-//    {
-//      System.err.println(type);
-//    }
-//    System.err.println("------------------------------------------------------");
 
     return map;
   }
@@ -193,7 +161,7 @@ public class ChartBuilder
     var typeName = type.getName();
     var scaleLess = SCALELESS.contains(type.getTypeName()) || !hasScale;
     store.addSource(type, index);
-    var parsingContext = new StyleCompilerAdapter(type, settings);
+    var parsingContext = new StyleCompiler(type, settings);
     var style = styleReader.createStyle(typeName.getLocalPart(), parsingContext);
     var memSource = store.featureSource(type);
 

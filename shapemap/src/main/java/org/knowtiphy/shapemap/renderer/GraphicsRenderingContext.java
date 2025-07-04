@@ -7,7 +7,7 @@ package org.knowtiphy.shapemap.renderer;
 
 import javafx.scene.canvas.GraphicsContext;
 import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.knowtiphy.shapemap.renderer.context.RendererContext;
+import org.knowtiphy.shapemap.renderer.context.RenderingContext;
 import org.locationtech.jts.index.quadtree.Quadtree;
 
 /**
@@ -15,7 +15,7 @@ import org.locationtech.jts.index.quadtree.Quadtree;
  */
 //@formatter:off
 public record GraphicsRenderingContext<S, F>(
-	RendererContext<S, F> rendererContext,
+	RenderingContext<S, F> renderingContext,
 	GraphicsContext graphicsContext,			// the canvas being drawn to
 	Transformation worldToScreen,				  // world to screen transformation
 	double onePixelX,								      // one pixel width in x direction in world coordinates

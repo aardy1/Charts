@@ -5,7 +5,7 @@
 
 package org.knowtiphy.shapemap.style.parser;
 
-import org.knowtiphy.shapemap.api.IStyleCompilerAdapter;
+import org.knowtiphy.shapemap.api.IStyleCompiler;
 import org.knowtiphy.shapemap.renderer.FeatureTypeStyle;
 import org.knowtiphy.shapemap.style.builder.FeatureTypeStyleBuilder;
 
@@ -24,9 +24,9 @@ public class StyledLayerDescriptorParser<S, F>
 
   private final InputStream input;
 
-  private final IStyleCompilerAdapter<F> parsingContext;
+  private final IStyleCompiler<F> parsingContext;
 
-  public StyledLayerDescriptorParser(InputStream input, IStyleCompilerAdapter<F> parsingContext)
+  public StyledLayerDescriptorParser(InputStream input, IStyleCompiler<F> parsingContext)
   {
     this.input = input;
     this.parsingContext = parsingContext;
@@ -52,7 +52,7 @@ public class StyledLayerDescriptorParser<S, F>
         switch(normalize(startElement))
         {
           case XML.STYLED_LAYER_DESCRIPTOR, XML.USER_STYLE, XML.NAMED_LAYER,
-                 XML.FEATURE_TYPE_STYLE ->
+               XML.FEATURE_TYPE_STYLE ->
           {
             // ignore
           }

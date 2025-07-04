@@ -13,11 +13,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * An in memory feature store for an ENC.
+ * An in memory feature store storing features from an ENC.
  */
-public class MemStore
-{
 
+public final class MemStore
+{
   private final MapModel<SimpleFeatureType, MemFeature> map;
 
   private final Map<String, STRtree> featureSets = new HashMap<>();

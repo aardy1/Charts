@@ -28,7 +28,6 @@ import org.knowtiphy.charts.geotools.Coordinates;
 import org.knowtiphy.charts.settings.UnitProfile;
 import org.knowtiphy.charts.utils.FXUtils;
 import org.knowtiphy.charts.utils.ToggleModel;
-import org.knowtiphy.shapemap.renderer.ShapeMapRenderer;
 import org.knowtiphy.shapemap.renderer.context.SVGCache;
 import org.reactfx.Subscription;
 
@@ -168,7 +167,7 @@ public class InfoBar extends StackPane
 
     setupListeners();
 
-    ShapeMapRenderer.count.addListener(x -> showFixedChartInfo());
+//    ShapeMapRenderer.count.addListener(x -> showFixedChartInfo());
   }
 
   private void setupListeners()
@@ -180,7 +179,7 @@ public class InfoBar extends StackPane
   private void showFixedChartInfo()
   {
 //    chartName.setText(chart.title());
-    chartScale.setText(ShapeMapRenderer.count.get() + ""); // chart.currentScale() +
+//    chartScale.setText(ShapeMapRenderer.count.get() + ""); // chart.currentScale() +
     // "");
     // chartScale.setText(chart.currentScale() + "");
 //    extentLabel.setText(unitProfile.formatEnvelope(chart.bounds()));

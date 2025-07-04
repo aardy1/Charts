@@ -1,6 +1,6 @@
 package org.knowtiphy.charts.memstore;
 
-import org.knowtiphy.shapemap.api.IStyleCompilerAdapter;
+import org.knowtiphy.shapemap.api.IStyleCompiler;
 import org.knowtiphy.shapemap.renderer.FeatureTypeStyle;
 import org.knowtiphy.shapemap.style.parser.StyleSyntaxException;
 import org.knowtiphy.shapemap.style.parser.StyledLayerDescriptorParser;
@@ -15,7 +15,7 @@ import java.io.InputStream;
 public class StyleReader<S, F>
 {
   //  TODO -- need to cache style sheets for re-use?
-  
+
   private static final String SLD = ".sld";
 
   private final Class<?> resourceLoader;
@@ -25,8 +25,7 @@ public class StyleReader<S, F>
     this.resourceLoader = resourceLoader;
   }
 
-  public FeatureTypeStyle<S, F> createStyle(
-    String fileName, IStyleCompilerAdapter<F> parsingContext)
+  public FeatureTypeStyle<S, F> createStyle(String fileName, IStyleCompiler<F> parsingContext)
     throws IOException, XMLStreamException, StyleSyntaxException
   {
     var styleSheet = toSLDFile(fileName);
@@ -34,8 +33,7 @@ public class StyleReader<S, F>
     return createFromSLD(styleSheet, parsingContext);
   }
 
-  private FeatureTypeStyle<S, F> createFromSLD(
-    InputStream stream, IStyleCompilerAdapter<F> parsingContext)
+  private FeatureTypeStyle<S, F> createFromSLD(InputStream stream, IStyleCompiler<F> parsingContext)
     throws IOException, XMLStreamException, StyleSyntaxException
   {
     return new StyledLayerDescriptorParser<S, F>(stream, parsingContext).read();

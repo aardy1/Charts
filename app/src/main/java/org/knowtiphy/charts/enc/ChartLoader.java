@@ -19,34 +19,34 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * A loader of maps from the local ENC chart cache.
+ * A loader of maps from a local ENC chart cache.
  */
 
 public class ChartLoader
 {
-  private final AppSettings settings;
+    private final AppSettings settings;
 
-  private final StyleReader<SimpleFeatureType, MemFeature> styleReader;
+    private final StyleReader<SimpleFeatureType, MemFeature> styleReader;
 
-  private final Map<ENCCell, MapModel<SimpleFeatureType, MemFeature>> loaded = new HashMap<>();
+    private final Map<ENCCell, MapModel<SimpleFeatureType, MemFeature>> loaded = new HashMap<>();
 
-  public ChartLoader(AppSettings settings, StyleReader<SimpleFeatureType, MemFeature> styleReader)
-  {
-    this.styleReader = styleReader;
-    this.settings = settings;
-  }
-
-  MapModel<SimpleFeatureType, MemFeature> loadMap(ENCCell cell, MapDisplayOptions displayOptions)
-    throws IOException, XMLStreamException, StyleSyntaxException
-  {
-    var map = loaded.get(cell);
-    System.err.println("cached " + cell.lName() + " = " + (map != null));
-    if(map == null)
+    public ChartLoader(AppSettings settings, StyleReader<SimpleFeatureType, MemFeature> styleReader)
     {
-      map = new ChartBuilder(cell, settings, styleReader, displayOptions).read();
-      loaded.put(cell, map);
+        this.styleReader = styleReader;
+        this.settings = settings;
     }
 
-    return map;
-  }
+    MapModel<SimpleFeatureType, MemFeature> loadMap(ENCCell cell, MapDisplayOptions displayOptions)
+        throws IOException, XMLStreamException, StyleSyntaxException
+    {
+        var map = loaded.get(cell);
+        System.err.println("cached " + cell.lName() + " = " + (map != null));
+        if(map == null)
+        {
+            map = new ChartBuilder(cell, settings, styleReader, displayOptions).build();
+            loaded.put(cell, map);
+        }
+
+        return map;
+    }
 }

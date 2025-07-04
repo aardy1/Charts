@@ -18,7 +18,10 @@ import java.util.Collection;
 /**
  * @author graham
  */
-public record RendererContext<S, F>(
+
+//@formatter:off
+public record RenderingContext<S, F>
+(
     Collection<MapLayer<S, F>> layers,
     int totalRuleCount,
     ReferencedEnvelope viewPortBounds,
@@ -30,7 +33,5 @@ public record RendererContext<S, F>(
     IRenderablePolygonProvider renderablePolygonProvider,
     ISVGProvider svgProvider,
     ITextSizeProvider textSizeProvider
-    )
-    {
-
-}
+) {}
+//@formatter:on

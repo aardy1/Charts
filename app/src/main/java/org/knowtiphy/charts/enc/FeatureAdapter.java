@@ -6,28 +6,32 @@
 package org.knowtiphy.charts.enc;
 
 import org.knowtiphy.charts.memstore.MemFeature;
-import org.knowtiphy.shapemap.api.GeomType;
+import org.knowtiphy.shapemap.api.FeatureGeomType;
 import org.knowtiphy.shapemap.api.IFeatureAdapter;
 import org.locationtech.jts.geom.Geometry;
 
 /**
  * @author graham
  */
-public class FeatureAdapter implements IFeatureAdapter<MemFeature> {
+public class FeatureAdapter implements IFeatureAdapter<MemFeature>
+{
 
-	public static final FeatureAdapter ADAPTER = new FeatureAdapter();
+    public static final FeatureAdapter ADAPTER = new FeatureAdapter();
 
-	private FeatureAdapter() {
-	}
+    private FeatureAdapter()
+    {
+    }
 
-	@Override
-	public Geometry defaultGeometry(MemFeature feature) {
-		return feature.defaultGeometry();
-	}
+    @Override
+    public Geometry defaultGeometry(MemFeature feature)
+    {
+        return feature.defaultGeometry();
+    }
 
-	@Override
-	public GeomType geomType(MemFeature feature) {
-		return feature.geomType();
-	}
+    @Override
+    public FeatureGeomType geomType(MemFeature feature)
+    {
+        return feature.geomType();
+    }
 
 }

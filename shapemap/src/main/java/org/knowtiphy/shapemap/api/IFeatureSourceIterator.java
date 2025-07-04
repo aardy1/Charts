@@ -5,15 +5,12 @@
 
 package org.knowtiphy.shapemap.api;
 
+import java.util.Iterator;
+
 /**
- * An iterator over some collection of features (of a given schema type).
+ * An iterator over a "collection" of features of type F.
  *
- * @param <F> the type of the features
+ * @param <F> the type of the features provvided by the iterator.
  */
-public interface IFeatureSourceIterator<F> extends AutoCloseable {
 
-	boolean hasNext() throws Exception;
-
-	F next() throws Exception;
-
-}
+public interface IFeatureSourceIterator<F> extends Iterator<F>, AutoCloseable{}

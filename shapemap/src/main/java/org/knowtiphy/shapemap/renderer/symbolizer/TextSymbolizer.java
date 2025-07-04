@@ -68,7 +68,7 @@ public class TextSymbolizer<S, F>
       context.graphicsContext().setFont(font);
     }
 
-    text(context, feature, context.rendererContext().featureAdapter().defaultGeometry(feature));
+    text(context, feature, context.renderingContext().featureAdapter().defaultGeometry(feature));
   }
 
   private void text(GraphicsRenderingContext<S, F> context, F feature, Geometry geom)
@@ -82,8 +82,7 @@ public class TextSymbolizer<S, F>
         textPoint(context, feature, ((LineString) geom).getStartPoint());
       case Geometry.TYPENAME_POLYGON -> textPoint(context, feature, geom.getCentroid());
       case Geometry.TYPENAME_MULTIPOINT, Geometry.TYPENAME_MULTILINESTRING,
-             Geometry.TYPENAME_MULTIPOLYGON ->
-        recurse(context, feature, geom);
+           Geometry.TYPENAME_MULTIPOLYGON -> recurse(context, feature, geom);
       default -> throw new IllegalArgumentException(geom.getGeometryType());
     }
   }
@@ -114,7 +113,7 @@ public class TextSymbolizer<S, F>
                                                                                                        .pointPlacement()
                                                                                                        .getDisplacementY());
 
-        var textDimensions = context.rendererContext().textSizeProvider().apply(font, text);
+        var textDimensions = context.renderingContext().textSizeProvider().apply(font, text);
         var textBounds = new ReferencedEnvelope(x, x + textDimensions.getWidth(), y,
           y + textDimensions.getHeight(), DefaultEngineeringCRS.CARTESIAN_2D);
 
@@ -197,8 +196,8 @@ public class TextSymbolizer<S, F>
 // if (!overlaps(textBounds, blocked)) {
 //
 // if (fillInfo != null) {
-//// Fill.setup(context, fillInfo);
-//// graphicsContext.setFont(font);
+/// / Fill.setup(context, fillInfo);
+/// / graphicsContext.setFont(font);
 // graphicsContext.fillText(textString, tx.getX(), tx.getY());
 // }
 //

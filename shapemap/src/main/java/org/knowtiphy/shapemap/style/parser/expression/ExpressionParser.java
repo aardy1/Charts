@@ -6,7 +6,7 @@
 package org.knowtiphy.shapemap.style.parser.expression;
 
 import org.knowtiphy.shapemap.api.IFeatureFunction;
-import org.knowtiphy.shapemap.api.IStyleCompilerAdapter;
+import org.knowtiphy.shapemap.api.IStyleCompiler;
 import org.knowtiphy.shapemap.renderer.Functions;
 import org.knowtiphy.shapemap.renderer.Operators;
 import org.knowtiphy.shapemap.style.parser.Utils;
@@ -30,7 +30,7 @@ public class ExpressionParser
 {
 
   public static <F> IFeatureFunction<F, ?> parse(
-    IStyleCompilerAdapter<F> parsingContext, XMLEventReader reader, String finishTag)
+    IStyleCompiler<F> parsingContext, XMLEventReader reader, String finishTag)
     throws XMLStreamException
   {
 
@@ -74,13 +74,12 @@ public class ExpressionParser
             push(stack, (feature, geom) -> fName);
           }
           case org.knowtiphy.shapemap.style.parser.XML.EQ,
-                 org.knowtiphy.shapemap.style.parser.XML.NE,
-                 org.knowtiphy.shapemap.style.parser.XML.LT,
-                 org.knowtiphy.shapemap.style.parser.XML.GE,
-                 org.knowtiphy.shapemap.style.parser.XML.GT,
-                 org.knowtiphy.shapemap.style.parser.XML.IS_LIKE,
-                 org.knowtiphy.shapemap.style.parser.XML.COALESCE ->
-            startFrame(stack);
+               org.knowtiphy.shapemap.style.parser.XML.NE,
+               org.knowtiphy.shapemap.style.parser.XML.LT,
+               org.knowtiphy.shapemap.style.parser.XML.GE,
+               org.knowtiphy.shapemap.style.parser.XML.GT,
+               org.knowtiphy.shapemap.style.parser.XML.IS_LIKE,
+               org.knowtiphy.shapemap.style.parser.XML.COALESCE -> startFrame(stack);
         }
       }
 
@@ -92,7 +91,7 @@ public class ExpressionParser
         {
 
           case org.knowtiphy.shapemap.style.parser.XML.LITERAL,
-                 org.knowtiphy.shapemap.style.parser.XML.PROPERTY_NAME ->
+               org.knowtiphy.shapemap.style.parser.XML.PROPERTY_NAME ->
           {
             // do nothing
           }
@@ -137,8 +136,11 @@ public class ExpressionParser
   }
 
   public static <F, T> IFeatureFunction<F, T> parseOrLiteral(
-    IStyleCompilerAdapter<F> parsingContext, XMLEventReader reader, String finishTag,
-    Function<XMLEvent, T> literalParser) throws XMLStreamException
+    IStyleCompiler<F> parsingContext,
+    XMLEventReader reader,
+    String finishTag,
+    Function<XMLEvent, T> literalParser)
+    throws XMLStreamException
   {
 
     // this is a bit hacky
@@ -155,7 +157,7 @@ public class ExpressionParser
   }
 
   public static <F> IFeatureFunction<F, Boolean> predicate(
-    IStyleCompilerAdapter<F> parsingContext, XMLEventReader reader, String finishTag)
+    IStyleCompiler<F> parsingContext, XMLEventReader reader, String finishTag)
     throws XMLStreamException
   {
 
@@ -204,7 +206,7 @@ public class ExpressionParser
   }
 
   private static <F> IFeatureFunction<F, Object> makeFunctionCall(
-    IStyleCompilerAdapter<F> parsingContext, LinkedList<IFeatureFunction<F, Object>> frame)
+    IStyleCompiler<F> parsingContext, LinkedList<IFeatureFunction<F, Object>> frame)
     throws XMLStreamException
   {
 

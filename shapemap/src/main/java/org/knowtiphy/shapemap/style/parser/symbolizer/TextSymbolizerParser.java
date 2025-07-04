@@ -5,7 +5,7 @@
 
 package org.knowtiphy.shapemap.style.parser.symbolizer;
 
-import org.knowtiphy.shapemap.api.IStyleCompilerAdapter;
+import org.knowtiphy.shapemap.api.IStyleCompiler;
 import org.knowtiphy.shapemap.renderer.Operators;
 import org.knowtiphy.shapemap.renderer.symbolizer.TextSymbolizer;
 import org.knowtiphy.shapemap.style.builder.TextSymbolizerBuilder;
@@ -31,7 +31,7 @@ public class TextSymbolizerParser
 {
 
   public static <S, F> TextSymbolizer<S, F> parse(
-    IStyleCompilerAdapter<F> parsingContext, XMLEventReader reader)
+    IStyleCompiler<F> parsingContext, XMLEventReader reader)
     throws XMLStreamException, StyleSyntaxException
   {
 

@@ -7,7 +7,6 @@ package org.knowtiphy.charts.memstore;
 
 import org.geotools.api.feature.simple.SimpleFeatureType;
 import org.knowtiphy.charts.ontology.ENC;
-import org.knowtiphy.shapemap.api.ISchemaAdapter;
 import org.knowtiphy.shapemap.model.MapLayer;
 import org.knowtiphy.shapemap.model.MapModel;
 import org.locationtech.jts.geom.Geometry;
@@ -28,8 +27,6 @@ import static org.knowtiphy.charts.ontology.S57.AT_SCAMIN;
 public class MapStats
 {
   private final List<MapModel<SimpleFeatureType, MemFeature>> maps;
-
-  private final ISchemaAdapter<SimpleFeatureType, MemFeature> adapter;
 
   private final Map<String, Integer> counts = new HashMap<>();
 
@@ -57,12 +54,9 @@ public class MapStats
 
   private final Map<String, Integer> totGeoms = new HashMap<>();
 
-  public MapStats(
-    List<MapModel<SimpleFeatureType, MemFeature>> maps,
-    ISchemaAdapter<SimpleFeatureType, MemFeature> adapter)
+  public MapStats(List<MapModel<SimpleFeatureType, MemFeature>> maps)
   {
     this.maps = maps;
-    this.adapter = adapter;
   }
 
   public MapStats stats()
@@ -73,10 +67,10 @@ public class MapStats
       {
         for(var layer : map.layers())
         {
-          var layerSize = ((MemStoreFeatureSource) layer.featureSource()).size();
-          var type = adapter.name(layer.featureSource().getSchema());
-          counts.put(type, layerSize);
-          featureScan(layer, type);
+//                    var layerSize = ((MemStoreFeatureSource) layer.featureSource()).size();
+//                    var type = adapter.name(layer.featureSource().getSchema());
+//                    counts.put(type, layerSize);
+          featureScan(layer);
         }
       }
     }
@@ -176,25 +170,25 @@ public class MapStats
     return value == null ? "N/A" : (value + "");
   }
 
-  private void featureScan(MapLayer<SimpleFeatureType, MemFeature> layer, String type)
-    throws Exception
+  private void featureScan(MapLayer<SimpleFeatureType, MemFeature> layer) throws Exception
   {
     try(var features = layer.featureSource().features())
     {
       while(features.hasNext())
       {
         var feature = features.next();
+        var type = feature.getType().getTypeName();
+        counts.put(type, counts.get(type) + 1);
         updateNilCount(type, feature, AT_SCAMIN, nullMinScale);
         updateNilCount(type, feature, AT_SCAMAX, nullMaxScale);
         updateMinMaxes(type, feature, AT_SCAMIN, minScale, Integer.MAX_VALUE, Math::min);
         updateMinMaxes(type, feature, AT_SCAMAX, maxScale, Integer.MIN_VALUE, Math::max);
-        updateGeomCounts(type, feature);
+        updateGeomCounts(feature);
       }
     }
   }
 
-  private void ensureInitialized(
-    Map<String, Integer> map, String property, int initialValue)
+  private void ensureInitialized(Map<String, Integer> map, String property, int initialValue)
   {
     map.computeIfAbsent(property, k -> initialValue);
   }
@@ -222,9 +216,10 @@ public class MapStats
     }
   }
 
-  private void updateGeomCounts(String type, MemFeature feature)
+  private void updateGeomCounts(MemFeature feature)
   {
     var prop = feature.getDefaultGeometryProperty().getType();
+    var type = feature.getType().getTypeName();
 
     pointGeoms.computeIfAbsent(type, k -> 0);
     multiPointGeoms.computeIfAbsent(type, k -> 0);

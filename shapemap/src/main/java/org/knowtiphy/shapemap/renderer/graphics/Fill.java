@@ -5,7 +5,7 @@
 
 package org.knowtiphy.shapemap.renderer.graphics;
 
-import org.knowtiphy.shapemap.api.GeomType;
+import org.knowtiphy.shapemap.api.FeatureGeomType;
 import org.knowtiphy.shapemap.renderer.GraphicsRenderingContext;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.FillInfo;
 import org.locationtech.jts.geom.Geometry;
@@ -79,10 +79,11 @@ public class Fill
     }
   }
 
-  public static void fill(GraphicsRenderingContext<?, ?> context, Geometry geom, GeomType geomType)
+  public static void fill(
+    GraphicsRenderingContext<?, ?> context, Geometry geom, FeatureGeomType featureGeomType)
   {
 
-    switch(geomType)
+    switch(featureGeomType)
     {
       case POINT -> fillPoint(context, (Point) geom);
       case LINE_STRING, LINEAR_RING -> fillLineString(context, (LineString) geom);
@@ -145,7 +146,7 @@ public class Fill
 
     var tx = context.worldToScreen();
     var gc = context.graphicsContext();
-    var renderGeom = context.rendererContext().renderablePolygonProvider().apply(polygon);
+    var renderGeom = context.renderingContext().renderablePolygonProvider().apply(polygon);
     tx.copyCoordinatesG(renderGeom);
     gc.fillPolygon(tx.getXs(), tx.getYs(), tx.getXs().length);
   }

@@ -1,258 +1,247 @@
-/*
- * Copyright Knowtiphy
- * All rights reserved.
- */
+    /*
+     * Copyright Knowtiphy
+     * All rights reserved.
+     */
 
-package org.knowtiphy.shapemap.renderer;
+    package org.knowtiphy.shapemap.renderer;
 
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.transform.Affine;
-import org.knowtiphy.shapemap.renderer.context.RendererContext;
-import org.knowtiphy.shapemap.renderer.symbolizer.basic.Rule;
-import org.locationtech.jts.index.quadtree.Quadtree;
+    import javafx.scene.canvas.GraphicsContext;
+    import javafx.scene.transform.Affine;
+    import org.knowtiphy.shapemap.renderer.context.RenderingContext;
+    import org.knowtiphy.shapemap.renderer.symbolizer.basic.Rule;
+    import org.locationtech.jts.index.quadtree.Quadtree;
 
-/**
- * @author graham
- */
-public class ShapeMapRenderer<S, F>
-{
-  private final RendererContext<S, F> rendererContext;
-
-  private final GraphicsContext graphics;
-
-  public static IntegerProperty count = new SimpleIntegerProperty(0);
-
-  public ShapeMapRenderer(RendererContext<S, F> rendererContext, GraphicsContext graphics)
-  {
-    this.rendererContext = rendererContext;
-    this.graphics = graphics;
-  }
-
-  public void paint()
-  {
-    System.err.println("\nRepaint : " + count.get() + " : " + rendererContext.paintArea() + "\n");
-
-    // TODO -- get rid of this debugging code
-    count.set(count.get() + 1);
-
-    var start = System.currentTimeMillis();
-
-    var index = new Quadtree();
-
-    //@formatter:off
-    var graphicsRenderingContext = new GraphicsRenderingContext<>(
-      rendererContext,
-      graphics,
-      new Transformation(rendererContext.worldToScreen()),
-      onePixelX(rendererContext.screenToWorld()),
-      onePixelY(rendererContext.screenToWorld()),
-      index,
-      rendererContext.viewPortBounds());
-    //@formatter:off
-
-    try
+    /**
+     * @author graham
+     */
+    public class ShapeMapRenderer<S, F>
     {
-      // pass 1 -- do graphics -- point, line and polygon symbolizers
-      // We keep track of:
-      // a) which rules were applied
-      // b) which layers need text layout (had rules that were applied and have text
-      // symbolizers
+      private final RenderingContext<S, F> renderingContext;
 
-      var appliedRule = new boolean[rendererContext.totalRuleCount()];
-      var layerNeedsTextLayout = new boolean[rendererContext.layers().size()];
+      private final GraphicsContext graphics;
 
-      var gStart = System.currentTimeMillis();
-      graphics.setTransform(rendererContext.worldToScreen());
-      renderGraphics(graphicsRenderingContext, appliedRule, layerNeedsTextLayout);
-      System.err.println("Graphics time = " + (System.currentTimeMillis() - gStart));
-
-      // pass 2 -- render text using the information computed in pass 1
-
-      var tStart = System.currentTimeMillis();
-      graphics.setTransform(Transformation.IDENTITY);
-      renderText(graphicsRenderingContext, appliedRule, layerNeedsTextLayout);
-      System.err.println("Text time = " + (System.currentTimeMillis() - tStart));
-
-      System.err.println("Rendering time " + (System.currentTimeMillis() - start));
-      System.err.println("\n\n\n");
-    }
-    catch(Exception ex)
-    {
-      System.err.println("Rendering exception");
-      ex.printStackTrace(System.err);
-    }
-  }
-
-  private void renderGraphics(
-    GraphicsRenderingContext<S, F> context, boolean[] appliedRule, boolean[] layerNeedsTextLayout)
-    throws Exception
-  {
-    var layers = rendererContext.layers();
-    var viewPortBounds = rendererContext.viewPortBounds();
-
-    var layerPos = 0;
-    var rulePos = 0;
-
-    for(var layer : layers)
-    {
-      if(layer.isVisible())
+      public ShapeMapRenderer(RenderingContext<S, F> renderingContext, GraphicsContext graphics)
       {
-        var style = layer.style();
-
-        try(var iterator = layer.featureSource().features(viewPortBounds,
-          rendererContext.displayScale(), layer.isScaleLess()))
-        {
-          while(iterator.hasNext())
-          {
-            var feature = iterator.next();
-            layerNeedsTextLayout[layerPos] |= applyStyle(style, context, feature, appliedRule,
-              rulePos);
-          }
-        }
-
-        layerNeedsTextLayout[layerPos] &= style.hasTextSymbolizers();
+        this.renderingContext = renderingContext;
+        this.graphics = graphics;
       }
 
-      layerPos++;
-      rulePos += layer.style().rules().size();
-    }
-  }
-
-  private void renderText(
-    GraphicsRenderingContext<S, F> context, boolean[] appliedRule, boolean[] layerNeedsTextLayout)
-    throws Exception
-  {
-    var layers = rendererContext.layers();
-    var viewPortBounds = rendererContext.viewPortBounds();
-
-    var layerPos = 0;
-    var rulePos = 0;
-
-    for(var layer : layers)
-    {
-      if(layerNeedsTextLayout[layerPos])
+      public void paint()
       {
-        try(var iterator = layer.featureSource().features(viewPortBounds,rendererContext.displayScale(), true))
-        {
-          while(iterator.hasNext())
-          {
-            var feature = iterator.next();
-            var rp = rulePos;
-            for(var rule : layer.style().rules())
-            {
-              if(appliedRule[rp])
-              {
-                applyTextRule(rule, context, feature);
-              }
+        var start = System.currentTimeMillis();
 
-              rp++;
+        var index = new Quadtree();
+
+        //@formatter:off
+        var graphicsRenderingContext = new GraphicsRenderingContext<>(
+          renderingContext,
+          graphics,
+          new Transformation(renderingContext.worldToScreen()),
+          onePixelX(renderingContext.screenToWorld()),
+          onePixelY(renderingContext.screenToWorld()),
+          index,
+          renderingContext.viewPortBounds());
+        //@formatter:off
+
+        try
+        {
+          // pass 1 -- do graphics -- point, line and polygon symbolizers
+          // We keep track of:
+          // a) which rules were applied
+          // b) which layers need text layout (had rules that were applied and have text
+          // symbolizers
+
+          var appliedRule = new boolean[renderingContext.totalRuleCount()];
+          var layerNeedsTextLayout = new boolean[renderingContext.layers().size()];
+
+          var gStart = System.currentTimeMillis();
+          graphics.setTransform(renderingContext.worldToScreen());
+          renderGraphics(graphicsRenderingContext, appliedRule, layerNeedsTextLayout);
+          System.err.println("Graphics time = " + (System.currentTimeMillis() - gStart));
+
+          // pass 2 -- render text using the information computed in pass 1
+
+          var tStart = System.currentTimeMillis();
+          graphics.setTransform(Transformation.IDENTITY);
+          renderText(graphicsRenderingContext, appliedRule, layerNeedsTextLayout);
+          System.err.println("Text time = " + (System.currentTimeMillis() - tStart));
+
+          System.err.println("Rendering time " + (System.currentTimeMillis() - start));
+          System.err.println("\n\n\n");
+        }
+        catch(Exception ex)
+        {
+          System.err.println("Rendering exception");
+          ex.printStackTrace(System.err);
+        }
+      }
+
+      private void renderGraphics(
+        GraphicsRenderingContext<S, F> context, boolean[] appliedRule, boolean[] layerNeedsTextLayout)
+        throws Exception
+      {
+          var layers = renderingContext.layers();
+        var viewPortBounds = renderingContext.viewPortBounds();
+
+        var layerPos = 0;
+        var rulePos = 0;
+
+        for(var layer : layers)
+        {
+          if(layer.isVisible())
+          {
+            var style = layer.style();
+
+            try(var iterator = layer.featureSource().features(viewPortBounds,
+              renderingContext.displayScale(), layer.isScaleLess()))
+            {
+              while(iterator.hasNext())
+              {
+                var feature = iterator.next();
+                layerNeedsTextLayout[layerPos] |= applyStyle(style, context, feature, appliedRule,
+                  rulePos);
+              }
+            }
+
+            layerNeedsTextLayout[layerPos] &= style.hasTextSymbolizers();
+          }
+
+          layerPos++;
+          rulePos += layer.style().rules().size();
+        }
+      }
+
+      private void renderText(
+        GraphicsRenderingContext<S, F> context, boolean[] appliedRule, boolean[] layerNeedsTextLayout)
+        throws Exception
+      {
+        var layers = renderingContext.layers();
+        var viewPortBounds = renderingContext.viewPortBounds();
+
+        var layerPos = 0;
+        var rulePos = 0;
+
+        for(var layer : layers)
+        {
+          if(layerNeedsTextLayout[layerPos])
+          {
+            try(var iterator = layer.featureSource().features(viewPortBounds,renderingContext.displayScale(), true))
+            {
+              while(iterator.hasNext())
+              {
+                var feature = iterator.next();
+                var rp = rulePos;
+                for(var rule : layer.style().rules())
+                {
+                  if(appliedRule[rp])
+                  {
+                    applyTextRule(rule, context, feature);
+                  }
+
+                  rp++;
+                }
+              }
             }
           }
+
+          layerPos++;
+          rulePos += layer.style().rules().size();
         }
       }
 
-      layerPos++;
-      rulePos += layer.style().rules().size();
-    }
-  }
-
-  private boolean applyStyle(
-    FeatureTypeStyle<S, F> style, GraphicsRenderingContext<S, F> context, F feature,
-    boolean[] appliedRule, int startPos)
-  {
-    var appliedSomeRule = false;
-    // if (style.applies(feature))
-    var rulePos = startPos;
-    var elsePos = -1;
-
-    for(var rule : style.rules())
-    {
-      if(!rule.elseFilter())
+      private boolean applyStyle(
+        FeatureTypeStyle<S, F> style, GraphicsRenderingContext<S, F> context, F feature,
+        boolean[] appliedRule, int startPos)
       {
-        var applied = applyGraphicsRule(rule, context, feature);
-        appliedRule[rulePos] |= applied;
-        appliedSomeRule |= applied;
-      }
-      else
-      {
-        elsePos = rulePos - startPos;
-      }
+        var appliedSomeRule = false;
+        // if (style.applies(feature))
+        var rulePos = startPos;
+        var elsePos = -1;
 
-      rulePos++;
-    }
-
-    if(!appliedSomeRule && elsePos != -1)
-    {
-      var elseRule = style.rules().get(elsePos);
-      var applied = applyGraphicsRule(elseRule, context, feature);
-      appliedRule[elsePos] |= applied;
-      appliedSomeRule |= applied;
-    }
-
-    return appliedSomeRule;
-  }
-
-  private boolean applyGraphicsRule(
-    Rule<S, F> rule, GraphicsRenderingContext<S, F> context, F feature)
-  {
-    var featureAdapter = context.rendererContext().featureAdapter();
-    if(rule.filter() != null)
-    {
-      if(rule.filter().apply(feature, featureAdapter.defaultGeometry(feature)))
-      {
-        for(var symbolizer : rule.graphicSymbolizers())
+        for(var rule : style.rules())
         {
-          symbolizer.render(context, feature);
+          if(!rule.elseFilter())
+          {
+            var applied = applyGraphicsRule(rule, context, feature);
+            appliedRule[rulePos] |= applied;
+            appliedSomeRule |= applied;
+          }
+          else
+          {
+            elsePos = rulePos - startPos;
+          }
+
+          rulePos++;
         }
 
-        return true;
+        if(!appliedSomeRule && elsePos != -1)
+        {
+          var elseRule = style.rules().get(elsePos);
+          var applied = applyGraphicsRule(elseRule, context, feature);
+          appliedRule[elsePos] |= applied;
+          appliedSomeRule = applied;
+        }
+
+        return appliedSomeRule;
       }
-    }
 
-    return false;
-  }
-
-  private void applyTextRule(Rule<S, F> rule, GraphicsRenderingContext<S, F> context, F feature)
-  {
-    var featureAdapter = context.rendererContext().featureAdapter();
-    if(rule.filter().apply(feature, featureAdapter.defaultGeometry(feature)))
-    {
-      for(var symbolizer : rule.textSymbolizers())
+      private boolean applyGraphicsRule(
+        Rule<S, F> rule, GraphicsRenderingContext<S, F> context, F feature)
       {
-        symbolizer.render(context, feature);
+        var featureAdapter = context.renderingContext().featureAdapter();
+        if(rule.filter() != null && rule.filter().apply(feature, featureAdapter.defaultGeometry(feature)))
+          {
+            for(var symbolizer : rule.graphicSymbolizers())
+            {
+              symbolizer.render(context, feature);
+            }
+
+            return true;
+          }
+
+
+        return false;
       }
+
+      private void applyTextRule(Rule<S, F> rule, GraphicsRenderingContext<S, F> context, F feature)
+      {
+        var featureAdapter = context.renderingContext().featureAdapter();
+        if(rule.filter().apply(feature, featureAdapter.defaultGeometry(feature)))
+        {
+          for(var symbolizer : rule.textSymbolizers())
+          {
+            symbolizer.render(context, feature);
+          }
+        }
+      }
+
+      private double onePixelX(Affine screenToWorld)
+      {
+        var pt1 = screenToWorld.transform(0, 0);
+        var pt2 = screenToWorld.transform(1, 0);
+        return Math.abs(pt2.getX() - pt1.getX());
+      }
+
+      private double onePixelY(Affine screenToWorld)
+      {
+        var pt1 = screenToWorld.transform(0, 0);
+        var pt2 = screenToWorld.transform(0, 1);
+        return Math.abs(pt2.getY() - pt1.getY());
+      }
+
     }
-  }
 
-  private double onePixelX(Affine screenToWorld)
-  {
-    var pt1 = screenToWorld.transform(0, 0);
-    var pt2 = screenToWorld.transform(1, 0);
-    return Math.abs(pt2.getX() - pt1.getX());
-  }
-
-  private double onePixelY(Affine screenToWorld)
-  {
-    var pt1 = screenToWorld.transform(0, 0);
-    var pt2 = screenToWorld.transform(0, 1);
-    return Math.abs(pt2.getY() - pt1.getY());
-  }
-
-}
-
-// System.err.println("Num text rules = " + textRules.size());
-// for (var entry : textRules.entrySet()) {
-// try (var iterator = entry.getKey().getFeatureSource().getFeatures().features())
-// {
-// while (iterator.hasNext()) {
-// var feature = (SimpleFeature) iterator.next();
-// for (var rule : entry.getValue()) {
-// // System.err.println(rule + " : " + entry.getValue().size());
-// for (var symbolizer : rule.getTextSymbolizers())
-// symbolizer.render(context, feature);
-// }
-// }
-// }
-// }
+    // System.err.println("Num text rules = " + textRules.size());
+    // for (var entry : textRules.entrySet()) {
+    // try (var iterator = entry.getKey().getFeatureSource().getFeatures().features())
+    // {
+    // while (iterator.hasNext()) {
+    // var feature = (SimpleFeature) iterator.next();
+    // for (var rule : entry.getValue()) {
+    // // System.err.println(rule + " : " + entry.getValue().size());
+    // for (var symbolizer : rule.getTextSymbolizers())
+    // symbolizer.render(context, feature);
+    // }
+    // }
+    // }
+    // }

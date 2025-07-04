@@ -5,15 +5,13 @@
 
 package org.knowtiphy.shapemap.renderer;
 
-import java.util.List;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.Rule;
+
+import java.util.List;
 
 /**
  * @author graham
  */
-public record FeatureTypeStyle<S, F> (String featureType, boolean hasTextSymbolizers, List<Rule<S, F>> rules) {
-
-	// public boolean applies(F feature) {
-	// return feature.getTypeName().equals(featureType);
-	// }
-}
+public record FeatureTypeStyle<S, F>(String featureType, boolean hasTextSymbolizers,
+    List<Rule<S, F>> rules)
+{}

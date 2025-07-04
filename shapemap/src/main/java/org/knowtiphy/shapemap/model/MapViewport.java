@@ -15,141 +15,143 @@ import org.knowtiphy.shapemap.renderer.RendererUtilities;
 
 public class MapViewport
 {
-  private ReferencedEnvelope bounds;
+    private ReferencedEnvelope bounds;
 
-  private final boolean matchingAspectRatio;
+    private final boolean matchingAspectRatio;
 
-  private Rectangle2D screenArea;
+    private Rectangle2D screenArea;
 
-  private Affine screenToWorld;
+    private Affine screenToWorld;
 
-  private Affine worldToScreen;
+    private Affine worldToScreen;
 
-  private boolean hasCenteringTransforms;
+    private boolean hasCenteringTransforms;
 
-  public MapViewport(ReferencedEnvelope bounds, boolean matchAspectRatio)
-    throws TransformException, NonInvertibleTransformException
-  {
-    this.screenArea = Rectangle2D.EMPTY;
-    this.hasCenteringTransforms = false;
-    this.matchingAspectRatio = matchAspectRatio;
-    this.bounds = bounds;
-    setTransforms();
-  }
-
-  public ReferencedEnvelope bounds()
-  {
-    return bounds;
-  }
-
-  public void setBounds(ReferencedEnvelope bounds)
-    throws TransformException, NonInvertibleTransformException
-  {
-    this.bounds = bounds;
-    setTransforms();
-  }
-
-  public Rectangle2D screenArea()
-  {
-    return screenArea;
-  }
-
-  public void setScreenArea(Rectangle2D screenArea)
-    throws TransformException, NonInvertibleTransformException
-  {
-    this.screenArea = screenArea;
-    setTransforms();
-  }
-
-  public Affine screenToWorld()
-  {
-    return screenToWorld;
-  }
-
-  public Affine worldToScreen()
-  {
-    return worldToScreen;
-  }
-
-  private void setTransforms() throws TransformException, NonInvertibleTransformException
-  {
-    if(screenArea.equals(Rectangle2D.EMPTY))
+    public MapViewport(ReferencedEnvelope bounds, boolean matchAspectRatio)
+        throws TransformException, NonInvertibleTransformException
     {
-      screenToWorld = worldToScreen = null;
-      hasCenteringTransforms = false;
+        this.screenArea = Rectangle2D.EMPTY;
+        this.hasCenteringTransforms = false;
+        this.matchingAspectRatio = matchAspectRatio;
+        this.bounds = bounds;
+        setTransforms();
     }
-    else if(bounds.isEmpty())
+
+    public ReferencedEnvelope bounds()
     {
-      screenToWorld = new Affine();
-      worldToScreen = new Affine();
-      hasCenteringTransforms = false;
+        return bounds;
     }
-    else if(matchingAspectRatio)
+
+    public void setBounds(ReferencedEnvelope bounds)
+        throws TransformException, NonInvertibleTransformException
     {
-      if(!hasCenteringTransforms)
-      {
-        calculateCenteringTransforms();
-      }
-      bounds = calculateActualBounds();
+        this.bounds = bounds;
+        setTransforms();
     }
-    else
+
+    public Rectangle2D screenArea()
     {
-      calculateSimpleTransforms(bounds);
-      hasCenteringTransforms = false;
+        return screenArea;
     }
-  }
 
-  /**
-   * Calculates transforms suitable for aspect ratio matching. The world bounds will be
-   * centred in the screen area.
-   */
-  private void calculateCenteringTransforms() throws NonInvertibleTransformException
-  {
-    double xscale = screenArea.getWidth() / bounds.getWidth();
-    double yscale = screenArea.getHeight() / bounds.getHeight();
+    public void setScreenArea(Rectangle2D screenArea)
+        throws TransformException, NonInvertibleTransformException
+    {
+        this.screenArea = screenArea;
+        setTransforms();
+    }
 
-    double scale = Math.min(xscale, yscale);
+    public Affine screenToWorld()
+    {
+        return screenToWorld;
+    }
 
-    double xoff = bounds.getMedian(0) * scale - (screenArea.getMinX() + screenArea.getWidth() / 2);
-    double yoff = bounds.getMedian(1) * scale + (screenArea.getMinY() + screenArea.getHeight() / 2);
+    public Affine worldToScreen()
+    {
+        return worldToScreen;
+    }
 
-    worldToScreen = new Affine(scale, 0, 0, -scale, -xoff, yoff);
-    screenToWorld = worldToScreen.createInverse();
-    hasCenteringTransforms = true;
-  }
+    private void setTransforms() throws TransformException, NonInvertibleTransformException
+    {
+        if(screenArea.equals(Rectangle2D.EMPTY))
+        {
+            screenToWorld = worldToScreen = null;
+            hasCenteringTransforms = false;
+        }
+        else if(bounds.isEmpty())
+        {
+            screenToWorld = new Affine();
+            worldToScreen = new Affine();
+            hasCenteringTransforms = false;
+        }
+        else if(matchingAspectRatio)
+        {
+            if(!hasCenteringTransforms)
+            {
+                calculateCenteringTransforms();
+            }
+            bounds = calculateActualBounds();
+        }
+        else
+        {
+            calculateSimpleTransforms(bounds);
+            hasCenteringTransforms = false;
+        }
+    }
 
-  /**
-   * Calculates transforms suitable for no aspect ratio matching.
-   *
-   * @param requestedBounds requested display area in world coordinates
-   */
-  private void calculateSimpleTransforms(ReferencedEnvelope requestedBounds)
-    throws TransformException, NonInvertibleTransformException
-  {
-    worldToScreen = RendererUtilities.worldToScreenTransform(requestedBounds, screenArea,
-      requestedBounds.getCoordinateReferenceSystem());
-    screenToWorld = worldToScreen.createInverse();
-  }
+    /**
+     * Calculates transforms suitable for aspect ratio matching. The world bounds will be
+     * centred in the screen area.
+     */
+    private void calculateCenteringTransforms() throws NonInvertibleTransformException
+    {
+        double xscale = screenArea.getWidth() / bounds.getWidth();
+        double yscale = screenArea.getHeight() / bounds.getHeight();
 
-  /**
-   * Calculates the world bounds of the current screen area.
-   */
+        double scale = Math.min(xscale, yscale);
 
-  private ReferencedEnvelope calculateActualBounds()
-  {
-    Point2D p0 = new Point2D(screenArea.getMinX(), screenArea.getMinY());
-    Point2D p1 = new Point2D(screenArea.getMaxX(), screenArea.getMaxY());
-    p0 = screenToWorld.transform(p0);
-    p1 = screenToWorld.transform(p1);
+        double xoff = bounds.getMedian(
+            0) * scale - (screenArea.getMinX() + screenArea.getWidth() / 2);
+        double yoff = bounds.getMedian(
+            1) * scale + (screenArea.getMinY() + screenArea.getHeight() / 2);
 
-    return new ReferencedEnvelope(Math.min(p0.getX(), p1.getX()), Math.max(p0.getX(), p1.getX()),
-      Math.min(p0.getY(), p1.getY()), Math.max(p0.getY(), p1.getY()),
-      bounds.getCoordinateReferenceSystem());
-  }
+        worldToScreen = new Affine(scale, 0, 0, -scale, -xoff, yoff);
+        screenToWorld = worldToScreen.createInverse();
+        hasCenteringTransforms = true;
+    }
+
+    /**
+     * Calculates transforms suitable for no aspect ratio matching.
+     *
+     * @param requestedBounds requested display area in world coordinates
+     */
+    private void calculateSimpleTransforms(ReferencedEnvelope requestedBounds)
+        throws TransformException, NonInvertibleTransformException
+    {
+        worldToScreen = RendererUtilities.worldToScreenTransform(requestedBounds, screenArea,
+            requestedBounds.getCoordinateReferenceSystem());
+        screenToWorld = worldToScreen.createInverse();
+    }
+
+    /**
+     * Calculates the world bounds of the current screen area.
+     */
+
+    private ReferencedEnvelope calculateActualBounds()
+    {
+        Point2D p0 = new Point2D(screenArea.getMinX(), screenArea.getMinY());
+        Point2D p1 = new Point2D(screenArea.getMaxX(), screenArea.getMaxY());
+        p0 = screenToWorld.transform(p0);
+        p1 = screenToWorld.transform(p1);
+
+        return new ReferencedEnvelope(Math.min(p0.getX(), p1.getX()),
+            Math.max(p0.getX(), p1.getX()), Math.min(p0.getY(), p1.getY()),
+            Math.max(p0.getY(), p1.getY()), bounds.getCoordinateReferenceSystem());
+    }
 
 }
 
-///**
+/// **
 // * Sets whether to adjust input world bounds to match the aspect ratio of the screen
 // * area.
 // *
@@ -184,14 +186,3 @@ public class MapViewport
 //    }
 //  }
 //
-//  private void copyBounds(ReferencedEnvelope newBounds)
-//  {
-//    if(newBounds == null || newBounds.isEmpty())
-//    {
-//      bounds = new ReferencedEnvelope();
-//    }
-//    else
-//    {
-//      bounds = newBounds;
-//    }
-//  }

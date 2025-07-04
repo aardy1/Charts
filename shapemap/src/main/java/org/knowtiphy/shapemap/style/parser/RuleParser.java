@@ -5,7 +5,7 @@
 
 package org.knowtiphy.shapemap.style.parser;
 
-import org.knowtiphy.shapemap.api.IStyleCompilerAdapter;
+import org.knowtiphy.shapemap.api.IStyleCompiler;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.Rule;
 import org.knowtiphy.shapemap.style.builder.RuleBuilder;
 import org.knowtiphy.shapemap.style.parser.expression.ExpressionParser;
@@ -26,8 +26,7 @@ import static org.knowtiphy.shapemap.style.parser.Utils.normalize;
 public class RuleParser
 {
 
-  public static <S, F> Rule<S, F> parse(
-    IStyleCompilerAdapter<F> parsingContext, XMLEventReader reader)
+  public static <S, F> Rule<S, F> parse(IStyleCompiler<F> parsingContext, XMLEventReader reader)
     throws FileNotFoundException, XMLStreamException, StyleSyntaxException
   {
 

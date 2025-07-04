@@ -15,9 +15,9 @@ import java.io.InputStream;
 /**
  * Collection of utility classes for Fx.
  */
+
 public class FXUtils
 {
-
   public static void later(Runnable r)
   {
     Platform.runLater(r);
@@ -66,5 +66,4 @@ public class FXUtils
     constraint.setFillWidth(true);
     return constraint;
   }
-
 }

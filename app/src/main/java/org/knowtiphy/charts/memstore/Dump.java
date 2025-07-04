@@ -42,30 +42,31 @@ public class Dump<S extends SimpleFeatureType, F>
 
   public void dump(String featureType) throws IOException
   {
-    for(var map : mapContent.maps())
-    {
-      for(var layer : map.layers())
-      {
-        System.err.println("layer = " + layer.featureSource().getSchema().getName().getLocalPart());
-        if(featureType == null || layer
-                                    .featureSource()
-                                    .getSchema()
-                                    .getName()
-                                    .getLocalPart()
-                                    .equals(featureType))
-        {
-          dumpSchema(layer);
-          dumpAttributeValues(layer);
-        }
-      }
-    }
+//    for(var map : mapContent.maps())
+//    {
+//      for(var layer : map.layers())
+//      {
+//        System.err.println("layer = " + layer.featureSource().getSchema().getName()
+//        .getLocalPart());
+//        if(featureType == null || layer
+//                                    .featureSource()
+//                                    .getSchema()
+//                                    .getName()
+//                                    .getLocalPart()
+//                                    .equals(featureType))
+//        {
+//          dumpSchema(layer);
+//          dumpAttributeValues(layer);
+//        }
+//      }
+//    }
   }
 
   public void dumpSchema(MapLayer<S, F> layer) throws IOException
   {
-
-    var schema = layer.featureSource().getSchema();
-    descriptors.addAll(schema.getDescriptors());
+//
+//    var schema = layer.featureSource().getSchema();
+//    descriptors.addAll(schema.getDescriptors());
   }
 
   public void dumpAttributeValues(MapLayer<S, F> layer) throws IOException

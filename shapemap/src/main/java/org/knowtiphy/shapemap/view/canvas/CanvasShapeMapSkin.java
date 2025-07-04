@@ -12,7 +12,7 @@ import org.knowtiphy.shapemap.model.Quilt;
 import org.knowtiphy.shapemap.renderer.RendererUtilities;
 import org.knowtiphy.shapemap.renderer.ShapeMapRenderer;
 import org.knowtiphy.shapemap.renderer.Transformation;
-import org.knowtiphy.shapemap.renderer.context.RendererContext;
+import org.knowtiphy.shapemap.renderer.context.RenderingContext;
 import org.knowtiphy.shapemap.view.ShapeMapBaseSkin;
 import org.knowtiphy.shapemap.view.ShapeMapView;
 
@@ -148,7 +148,7 @@ public class CanvasShapeMapSkin<S, F> extends ShapeMapBaseSkin<S, F>
           root.getChildren().add(b);
 
           //@formatter:off
-                    var rendererContext = new RendererContext<>(
+                    var rendererContext = new RenderingContext<>(
                         model.layers(),
                         model.totalRuleCount(),
                         JTS.toEnvelope(model.geometry()),
