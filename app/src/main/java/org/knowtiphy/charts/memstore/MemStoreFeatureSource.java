@@ -57,11 +57,11 @@ public record MemStoreFeatureSource(MapModel<SimpleFeatureType, MemFeature> map,
 
     sbounds = System.currentTimeMillis() - sbounds;
 
-    System.err.println(
-      "map = " + map.title() + " " + map.cScale() + " :: " + featureType.getTypeName());
-    System.err.println("\tcurrent scale = " + displayScale + ", scaleLess = " + scaleLess);
-    System.err.println("\t\t#In Bounds = " + featuresInBounds.size() + " : time = " + ebounds);
-    System.err.println("\t\t#In Scale = " + featuresInScale.size() + " : time = " + sbounds);
+//    System.err.println(
+//      "map = " + map.title() + " " + map.cScale() + " :: " + featureType.getTypeName());
+//    System.err.println("\tcurrent scale = " + displayScale + ", scaleLess = " + scaleLess);
+//    System.err.println("\t\t#In Bounds = " + featuresInBounds.size() + " : time = " + ebounds);
+//    System.err.println("\t\t#In Scale = " + featuresInScale.size() + " : time = " + sbounds);
 
     return new MemStoreFeatureIterator(featuresInScale.iterator());
   }
