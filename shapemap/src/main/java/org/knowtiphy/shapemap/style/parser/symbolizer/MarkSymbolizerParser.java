@@ -34,99 +34,101 @@ import static org.knowtiphy.shapemap.style.parser.Utils.normalize;
  */
 
 // TODO -- this class is a mess
-public class MarkSymbolizerParser<S, F>
-{
+public class MarkSymbolizerParser<S, F> {
 
-  private final Map<String, BiFunction<FillInfo, StrokeInfo, IMarkSymbolizer<S, F>>> WKN = Map.of(
-    //@formatter:off
-			"circle", CircleMarkSymbolizer::new,
-			"square", SquareMarkSymbolizer::new,
-			"triangle", TriangleMarkSymbolizer::new,
-			"cross", CrossMarkSymbolizer::new,
-			"x", XMarkSymbolizer::new
-	//  star
-	);
-	//@formatter:on
+    private final Map<String, BiFunction<FillInfo, StrokeInfo, IMarkSymbolizer<S, F>>> WKN =
+            Map.of(
+                    // @formatter:off
+                    "circle", CircleMarkSymbolizer::new,
+                    "square", SquareMarkSymbolizer::new,
+                    "triangle", TriangleMarkSymbolizer::new,
+                    "cross", CrossMarkSymbolizer::new,
+                    "x", XMarkSymbolizer::new
+                    //  star
+                    );
+    // @formatter:on
 
-  public final Map<String, BiFunction<FillInfo, StrokeInfo, IMarkSymbolizer<S, F>>> S52 = Map.of(
-    //@formatter:off
-      "Hazard-Lighthouse",
-        (f, s) -> new SVGMarkSymbolizer<>(new PathInfo("Hazard-Lighthouse.svg"), f, s),
-    "Hazard-Oil-Platform",
-      (f, s) -> new SVGMarkSymbolizer<>(new PathInfo("Hazard-Oil-Platform.svg"), f, s),
-    "Hazard-Wreck", (f, s) -> new SVGMarkSymbolizer<>(new PathInfo("Hazard-Wreck2.svg"), f, s),
-    "Arrow", (f, s) -> new SVGMarkSymbolizer<>(new PathInfo("Arrow.svg"), f, s),
-    "Buoy", (f, s) -> new SVGMarkSymbolizer<>(new PathInfo("Buoy.svg"), f, s),
-    "Beacon", (f, s) -> new SVGMarkSymbolizer<>(new PathInfo("Beacon.svg"), f, s),
-    "Obstruction", (f, s) -> new SVGMarkSymbolizer<>(new PathInfo("Obstruction.svg"), f, s),
-    "Rock", (f, s) -> new SVGMarkSymbolizer<>(new PathInfo("Rock.svg"), f, s),
-    "Anchorage", (f, s) -> new SVGMarkSymbolizer<>(new PathInfo("Anchorage.svg"), f, s),
-    "Radar-Beacon", (f, s) -> new SVGMarkSymbolizer<>(new PathInfo("Radar-Beacon.svg"), f, s));
+    public final Map<String, BiFunction<FillInfo, StrokeInfo, IMarkSymbolizer<S, F>>> S52 =
+            Map.of(
+                    // @formatter:off
+                    "Hazard-Lighthouse",
+                    (f, s) -> new SVGMarkSymbolizer<>(new PathInfo("Hazard-Lighthouse.svg"), f, s),
+                    "Hazard-Oil-Platform",
+                    (f, s) ->
+                            new SVGMarkSymbolizer<>(new PathInfo("Hazard-Oil-Platform.svg"), f, s),
+                    "Hazard-Wreck",
+                    (f, s) -> new SVGMarkSymbolizer<>(new PathInfo("Hazard-Wreck2.svg"), f, s),
+                    "Arrow",
+                    (f, s) -> new SVGMarkSymbolizer<>(new PathInfo("Arrow.svg"), f, s),
+                    "Buoy",
+                    (f, s) -> new SVGMarkSymbolizer<>(new PathInfo("Buoy.svg"), f, s),
+                    "Beacon",
+                    (f, s) -> new SVGMarkSymbolizer<>(new PathInfo("Beacon.svg"), f, s),
+                    "Obstruction",
+                    (f, s) -> new SVGMarkSymbolizer<>(new PathInfo("Obstruction.svg"), f, s),
+                    "Rock",
+                    (f, s) -> new SVGMarkSymbolizer<>(new PathInfo("Rock.svg"), f, s),
+                    "Anchorage",
+                    (f, s) -> new SVGMarkSymbolizer<>(new PathInfo("Anchorage.svg"), f, s),
+                    "Radar-Beacon",
+                    (f, s) -> new SVGMarkSymbolizer<>(new PathInfo("Radar-Beacon.svg"), f, s));
 
-  //@formatter:on
+    // @formatter:on
 
-  public IMarkSymbolizer<S, F> parse(XMLEventReader reader)
-    throws XMLStreamException, StyleSyntaxException
-  {
+    public IMarkSymbolizer<S, F> parse(XMLEventReader reader)
+            throws XMLStreamException, StyleSyntaxException {
 
-    var builder = new MarkSymbolizerBuilder<S, F>();
+        var builder = new MarkSymbolizerBuilder<S, F>();
 
-    var done = false;
-    while(!done && reader.hasNext())
-    {
-      var nextEvent = reader.nextTag();
+        var done = false;
+        while (!done && reader.hasNext()) {
+            var nextEvent = reader.nextTag();
 
-      if(nextEvent.isStartElement())
-      {
-        var startElement = nextEvent.asStartElement();
+            if (nextEvent.isStartElement()) {
+                var startElement = nextEvent.asStartElement();
 
-        switch(normalize(startElement))
-        {
-          case XML.WELL_KNOWN_NAME -> builder.symbolizerBuilder(
-            getMarkSymbolizer(Utils.parseString(reader.nextEvent()).trim()));
-          case XML.FILL -> builder.fillInfo(FillParser.parse(reader));
-          case XML.STROKE -> builder.strokeInfo(StrokeParser.parse(reader));
-          default -> throw new IllegalArgumentException(startElement.toString());
+                switch (normalize(startElement)) {
+                    case XML.WELL_KNOWN_NAME ->
+                            builder.symbolizerBuilder(
+                                    getMarkSymbolizer(
+                                            Utils.parseString(reader.nextEvent()).trim()));
+                    case XML.FILL -> builder.fillInfo(FillParser.parse(reader));
+                    case XML.STROKE -> builder.strokeInfo(StrokeParser.parse(reader));
+                    default -> throw new IllegalArgumentException(startElement.toString());
+                }
+            }
+
+            done = Utils.checkDone(nextEvent, XML.MARK);
         }
-      }
 
-      done = Utils.checkDone(nextEvent, XML.MARK);
+        return builder.build();
     }
 
-    return builder.build();
-  }
+    private BiFunction<FillInfo, StrokeInfo, IMarkSymbolizer<S, F>> getMarkSymbolizer(String name)
+            throws StyleSyntaxException {
 
-  private BiFunction<FillInfo, StrokeInfo, IMarkSymbolizer<S, F>> getMarkSymbolizer(String name)
-    throws StyleSyntaxException
-  {
+        var parts = name.split(":");
 
-    var parts = name.split(":");
+        if (parts.length == 1 || parts[0].equals("wkn")) {
+            var markName = parts[parts.length - 1];
+            var markSymbolizer = WKN.get(markName);
+            if (markSymbolizer == null) {
+                throw new IllegalArgumentException(name);
+            }
 
-    if(parts.length == 1 || parts[0].equals("wkn"))
-    {
-      var markName = parts[parts.length - 1];
-      var markSymbolizer = WKN.get(markName);
-      if(markSymbolizer == null)
-      {
-        throw new IllegalArgumentException(name);
-      }
+            return markSymbolizer;
+        }
 
-      return markSymbolizer;
+        if (parts[0].equals("s52")) {
+            var markName = parts[parts.length - 1];
+            var markSymbolizer = S52.get(markName);
+            if (markSymbolizer == null) {
+                throw new IllegalArgumentException(name);
+            }
+
+            return markSymbolizer;
+        }
+
+        throw new StyleSyntaxException("Don't recognize mark name : " + name);
     }
-
-    if(parts[0].equals("s52"))
-    {
-      var markName = parts[parts.length - 1];
-      var markSymbolizer = S52.get(markName);
-      if(markSymbolizer == null)
-      {
-        throw new IllegalArgumentException(name);
-      }
-
-      return markSymbolizer;
-    }
-
-    throw new StyleSyntaxException("Don't recognize mark name : " + name);
-  }
-
 }

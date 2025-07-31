@@ -14,23 +14,18 @@ import java.util.function.Function;
 /**
  * @author graham
  */
-public class RenderGeomCache
-{
+public class RenderGeomCache {
     private final HashMap<Polygon, Polygon> cache = new HashMap<>();
 
-    public void put(Polygon key, Polygon value)
-    {
+    public void put(Polygon key, Polygon value) {
         cache.put(key, value);
     }
 
-    public Polygon computeIfAbsent(Polygon key, Function<Polygon, Polygon> func)
-    {
+    public Polygon computeIfAbsent(Polygon key, Function<Polygon, Polygon> func) {
         return cache.computeIfAbsent(key, func);
     }
 
-    public Geometry get(Geometry key)
-    {
+    public Geometry get(Geometry key) {
         return cache.get(key);
     }
-
 }

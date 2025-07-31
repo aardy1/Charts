@@ -8,5 +8,4 @@ package org.knowtiphy.shapemap.renderer.symbolizer.basic;
 /**
  * @author graham
  */
-public record Displacement(double displacementX, double displacementY) {
-}
+public record Displacement(double displacementX, double displacementY) {}

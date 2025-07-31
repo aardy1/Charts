@@ -18,38 +18,39 @@ import org.locationtech.jts.geom.Point;
  */
 public class SquareMarkSymbolizer<S, F> extends BaseMarkSymbolizer<S, F> {
 
-	public SquareMarkSymbolizer(FillInfo fillInfo, StrokeInfo strokeInfo) {
-		super(fillInfo, strokeInfo);
-	}
+    public SquareMarkSymbolizer(FillInfo fillInfo, StrokeInfo strokeInfo) {
+        super(fillInfo, strokeInfo);
+    }
 
-	@Override
-	public void render(GraphicsRenderingContext<S, F> context, F feature, Point pt,
-			PointSymbolizer<S, F> pointSymbolizer) {
+    @Override
+    public void render(
+            GraphicsRenderingContext<S, F> context,
+            F feature,
+            Point pt,
+            PointSymbolizer<S, F> pointSymbolizer) {
 
-		var szo = pointSymbolizer.size().apply(feature, pt);
-		if (szo == null)
-			return;
+        var szo = pointSymbolizer.size().apply(feature, pt);
+        if (szo == null) return;
 
-		var x = pt.getX();
-		var y = pt.getY();
-		var sz = szo.doubleValue();
+        var x = pt.getX();
+        var y = pt.getY();
+        var sz = szo.doubleValue();
 
-		var sizeX = sz * context.onePixelX();
-		var sizeY = sz * context.onePixelY();
-		var halfSizeX = sizeX / 2;
-		var halfSizeY = sizeY / 2;
+        var sizeX = sz * context.onePixelX();
+        var sizeY = sz * context.onePixelY();
+        var halfSizeX = sizeX / 2;
+        var halfSizeY = sizeY / 2;
 
-		var gc = context.graphicsContext();
+        var gc = context.graphicsContext();
 
-		if (fillInfo != null) {
-			Fill.setup(context, fillInfo);
-			gc.fillRect(x - halfSizeX, y - halfSizeY, sizeX, sizeY);
-		}
+        if (fillInfo != null) {
+            Fill.setup(context, fillInfo);
+            gc.fillRect(x - halfSizeX, y - halfSizeY, sizeX, sizeY);
+        }
 
-		if (strokeInfo != null) {
-			Stroke.setup(context, strokeInfo);
-			gc.strokeRect(x - halfSizeY, y - halfSizeY, sizeX, sizeY);
-		}
-	}
-
+        if (strokeInfo != null) {
+            Stroke.setup(context, strokeInfo);
+            gc.strokeRect(x - halfSizeY, y - halfSizeY, sizeX, sizeY);
+        }
+    }
 }

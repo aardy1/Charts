@@ -16,40 +16,33 @@ import java.util.List;
 /**
  * @author graham
  */
-public class RuleBuilder<S, F>
-{
+public class RuleBuilder<S, F> {
 
-  private IFeatureFunction<F, Boolean> filter = (f, g) -> true;
+    private IFeatureFunction<F, Boolean> filter = (f, g) -> true;
 
-  private final List<ISymbolizer<S, F>> graphicSymbolizers = new ArrayList<>();
+    private final List<ISymbolizer<S, F>> graphicSymbolizers = new ArrayList<>();
 
-  private final List<TextSymbolizer<S, F>> textSymbolizers = new ArrayList<>();
+    private final List<TextSymbolizer<S, F>> textSymbolizers = new ArrayList<>();
 
-  private boolean elseFilter = false;
+    private boolean elseFilter = false;
 
-  public void filter(IFeatureFunction<F, Boolean> filter)
-  {
-    this.filter = filter;
-  }
+    public void filter(IFeatureFunction<F, Boolean> filter) {
+        this.filter = filter;
+    }
 
-  public void graphicSymbolizer(ISymbolizer<S, F> symbolizer)
-  {
-    graphicSymbolizers.add(symbolizer);
-  }
+    public void graphicSymbolizer(ISymbolizer<S, F> symbolizer) {
+        graphicSymbolizers.add(symbolizer);
+    }
 
-  public void textSymbolizer(TextSymbolizer<S, F> symbolizer)
-  {
-    textSymbolizers.add(symbolizer);
-  }
+    public void textSymbolizer(TextSymbolizer<S, F> symbolizer) {
+        textSymbolizers.add(symbolizer);
+    }
 
-  public void elseFilter()
-  {
-    this.elseFilter = true;
-  }
+    public void elseFilter() {
+        this.elseFilter = true;
+    }
 
-  public Rule<S, F> build()
-  {
-    return new Rule<>(filter, graphicSymbolizers, textSymbolizers, elseFilter);
-  }
-
+    public Rule<S, F> build() {
+        return new Rule<>(filter, graphicSymbolizers, textSymbolizers, elseFilter);
+    }
 }

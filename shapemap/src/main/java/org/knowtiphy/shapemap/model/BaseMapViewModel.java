@@ -25,115 +25,105 @@ import java.util.logging.Logger;
  * @param <S> the type of the schema in the map model
  * @param <F> the type of the features in the map model
  */
+public abstract class BaseMapViewModel<S, F> {
+    protected final EventSource<Change<Boolean>> layerVisibilityEvent = new EventSource<>();
 
-public abstract class BaseMapViewModel<S, F>
-{
-  protected final EventSource<Change<Boolean>> layerVisibilityEvent = new EventSource<>();
+    protected final EventSource<Change<ReferencedEnvelope>> viewPortBoundsEvent =
+            new EventSource<>();
 
-  protected final EventSource<Change<ReferencedEnvelope>> viewPortBoundsEvent = new EventSource<>();
+    private final IFeatureAdapter<F> featureAdapter;
 
-  private final IFeatureAdapter<F> featureAdapter;
+    private final IRenderablePolygonProvider renderablePolygonProvider;
 
-  private final IRenderablePolygonProvider renderablePolygonProvider;
+    private final ISVGProvider svgProvider;
 
-  private final ISVGProvider svgProvider;
+    private final ITextSizeProvider textSizeProvider;
 
-  private final ITextSizeProvider textSizeProvider;
+    private double zoom = 1;
 
-  private double zoom = 1;
-
-  protected BaseMapViewModel(
-    IFeatureAdapter<F> featureAdapter, IRenderablePolygonProvider renderablePolygonProvider,
-    ISVGProvider svgProvider, ITextSizeProvider textSizeProvider)
-  {
-    this.featureAdapter = featureAdapter;
-    this.renderablePolygonProvider = renderablePolygonProvider;
-    this.svgProvider = svgProvider;
-    this.textSizeProvider = textSizeProvider;
-    //  TODO -- should also have some way of subscribing to add/remove of layers
-  }
-
-  public abstract List<MapModel<S, F>> maps();
-
-  public abstract double displayScale();
-
-  public double adjustedDisplayScale(){return displayScale() / 2.0;}
-
-  public abstract ReferencedEnvelope bounds();
-
-  public abstract ReferencedEnvelope viewPortBounds();
-
-  public abstract void setViewPortBounds(ReferencedEnvelope bounds)
-    throws TransformException, NonInvertibleTransformException;
-
-  public abstract Rectangle2D viewPortScreenArea();
-
-  public abstract void setViewPortScreenArea(Rectangle2D bounds)
-    throws TransformException, NonInvertibleTransformException;
-
-  public abstract Affine viewPortScreenToWorld();
-
-  public abstract Affine viewPortWorldToScreen();
-
-  public IFeatureAdapter<F> featureAdapter()
-  {
-    return featureAdapter;
-  }
-
-  public IRenderablePolygonProvider renderablePolygonProvider()
-  {
-    return renderablePolygonProvider;
-  }
-
-  public ISVGProvider svgProvider()
-  {
-    return svgProvider;
-  }
-
-  public ITextSizeProvider textSizeProvider()
-  {
-    return textSizeProvider;
-  }
-
-  public double zoom()
-  {
-    return zoom;
-  }
-
-  public void setZoom(double zoom)
-  {
-    this.zoom = zoom;
-
-    var width = bounds().getWidth();
-    var height = bounds().getHeight();
-    var newWidth = width / zoom();
-    var newHeight = height / zoom();
-    // expanding/shrinking mutates the envelope so copy it
-    var newBounds = new ReferencedEnvelope(bounds());
-    newBounds.expandBy((newWidth - width) / 2, (newHeight - height) / 2);
-    try
-    {
-      setViewPortBounds(newBounds);
+    protected BaseMapViewModel(
+            IFeatureAdapter<F> featureAdapter,
+            IRenderablePolygonProvider renderablePolygonProvider,
+            ISVGProvider svgProvider,
+            ITextSizeProvider textSizeProvider) {
+        this.featureAdapter = featureAdapter;
+        this.renderablePolygonProvider = renderablePolygonProvider;
+        this.svgProvider = svgProvider;
+        this.textSizeProvider = textSizeProvider;
+        //  TODO -- should also have some way of subscribing to add/remove of layers
     }
-    catch(TransformException | NonInvertibleTransformException ex)
-    {
-      Logger.getLogger(Coordinates.class.getName()).log(Level.SEVERE, null, ex);
+
+    public abstract List<MapModel<S, F>> maps();
+
+    public abstract double displayScale();
+
+    public double adjustedDisplayScale() {
+        return displayScale() / 2.0;
     }
-  }
 
-  public EventStream<Change<Boolean>> layerVisibilityEvent()
-  {
-    return layerVisibilityEvent;
-  }
+    public abstract ReferencedEnvelope bounds();
 
-  public EventStream<Change<ReferencedEnvelope>> viewPortBoundsEvent()
-  {
-    return viewPortBoundsEvent;
-  }
+    public abstract ReferencedEnvelope viewPortBounds();
 
-  //  TODO -- all maps have the same CRS -- os this too strong an assumption?
-  public CoordinateReferenceSystem crs()
-  {
-    return bounds().getCoordinateReferenceSystem();
-  }
+    public abstract void setViewPortBounds(ReferencedEnvelope bounds)
+            throws TransformException, NonInvertibleTransformException;
+
+    public abstract Rectangle2D viewPortScreenArea();
+
+    public abstract void setViewPortScreenArea(Rectangle2D bounds)
+            throws TransformException, NonInvertibleTransformException;
+
+    public abstract Affine viewPortScreenToWorld();
+
+    public abstract Affine viewPortWorldToScreen();
+
+    public IFeatureAdapter<F> featureAdapter() {
+        return featureAdapter;
+    }
+
+    public IRenderablePolygonProvider renderablePolygonProvider() {
+        return renderablePolygonProvider;
+    }
+
+    public ISVGProvider svgProvider() {
+        return svgProvider;
+    }
+
+    public ITextSizeProvider textSizeProvider() {
+        return textSizeProvider;
+    }
+
+    public double zoom() {
+        return zoom;
+    }
+
+    public void setZoom(double zoom) {
+        this.zoom = zoom;
+
+        var width = bounds().getWidth();
+        var height = bounds().getHeight();
+        var newWidth = width / zoom();
+        var newHeight = height / zoom();
+        // expanding/shrinking mutates the envelope so copy it
+        var newBounds = new ReferencedEnvelope(bounds());
+        newBounds.expandBy((newWidth - width) / 2, (newHeight - height) / 2);
+        try {
+            setViewPortBounds(newBounds);
+        } catch (TransformException | NonInvertibleTransformException ex) {
+            Logger.getLogger(Coordinates.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public EventStream<Change<Boolean>> layerVisibilityEvent() {
+        return layerVisibilityEvent;
+    }
+
+    public EventStream<Change<ReferencedEnvelope>> viewPortBoundsEvent() {
+        return viewPortBoundsEvent;
+    }
+
+    //  TODO -- all maps have the same CRS -- os this too strong an assumption?
+    public CoordinateReferenceSystem crs() {
+        return bounds().getCoordinateReferenceSystem();
+    }
 }

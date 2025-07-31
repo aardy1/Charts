@@ -18,23 +18,22 @@ import static org.knowtiphy.shapemap.style.parser.StyleSyntaxException.expectEle
  */
 public class PointPlacementBuilder {
 
-	private AnchorPoint anchorPoint;
+    private AnchorPoint anchorPoint;
 
-	private Displacement displacement;
+    private Displacement displacement;
 
-	public PointPlacementBuilder anchorPoint(AnchorPoint anchorPoint) {
-		this.anchorPoint = anchorPoint;
-		return this;
-	}
+    public PointPlacementBuilder anchorPoint(AnchorPoint anchorPoint) {
+        this.anchorPoint = anchorPoint;
+        return this;
+    }
 
-	public PointPlacementBuilder displacement(Displacement displacement) {
-		this.displacement = displacement;
-		return this;
-	}
+    public PointPlacementBuilder displacement(Displacement displacement) {
+        this.displacement = displacement;
+        return this;
+    }
 
-	public PointPlacement build() throws StyleSyntaxException {
-		expectElement(anchorPoint, displacement, XML.ANCHOR_POINT, XML.DISPLACEMENT);
-		return new PointPlacement(anchorPoint, displacement);
-	}
-
+    public PointPlacement build() throws StyleSyntaxException {
+        expectElement(anchorPoint, displacement, XML.ANCHOR_POINT, XML.DISPLACEMENT);
+        return new PointPlacement(anchorPoint, displacement);
+    }
 }

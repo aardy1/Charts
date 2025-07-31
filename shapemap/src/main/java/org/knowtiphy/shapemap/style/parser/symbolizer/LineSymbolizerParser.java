@@ -22,29 +22,28 @@ import static org.knowtiphy.shapemap.style.parser.Utils.normalize;
  */
 public class LineSymbolizerParser {
 
-	public static <S, F> ISymbolizer<S, F> parse(XMLEventReader reader)
-			throws XMLStreamException, StyleSyntaxException {
+    public static <S, F> ISymbolizer<S, F> parse(XMLEventReader reader)
+            throws XMLStreamException, StyleSyntaxException {
 
-		var builder = new LineSymbolizerBuilder<S, F>();
+        var builder = new LineSymbolizerBuilder<S, F>();
 
-		var done = false;
-		while (!done && reader.hasNext()) {
-			var nextEvent = reader.nextTag();
+        var done = false;
+        while (!done && reader.hasNext()) {
+            var nextEvent = reader.nextTag();
 
-			if (nextEvent.isStartElement()) {
-				var startElement = nextEvent.asStartElement();
-				// TODO -- perpindicular offset
-				switch (normalize(startElement)) {
-					case XML.STROKE -> builder.strokeInfo(StrokeParser.parse(reader));
-					case XML.VENDOR_OPTION -> VendorOptionParser.parse(reader);
-					default -> throw new IllegalArgumentException(startElement.toString());
-				}
-			}
+            if (nextEvent.isStartElement()) {
+                var startElement = nextEvent.asStartElement();
+                // TODO -- perpindicular offset
+                switch (normalize(startElement)) {
+                    case XML.STROKE -> builder.strokeInfo(StrokeParser.parse(reader));
+                    case XML.VENDOR_OPTION -> VendorOptionParser.parse(reader);
+                    default -> throw new IllegalArgumentException(startElement.toString());
+                }
+            }
 
-			done = Utils.checkDone(nextEvent, XML.LINE_SYMBOLIZER);
-		}
+            done = Utils.checkDone(nextEvent, XML.LINE_SYMBOLIZER);
+        }
 
-		return builder.build();
-	}
-
+        return builder.build();
+    }
 }

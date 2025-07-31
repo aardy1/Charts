@@ -13,11 +13,10 @@ import org.geotools.geometry.jts.ReferencedEnvelope;
  * @param <S> the type of the feature schema
  * @param <F> the type of the features conforming to the schema
  */
+public interface IFeatureSource<S, F> {
 
-public interface IFeatureSource<S, F>
-{
-  IFeatureSourceIterator<F> features();
+    IFeatureSourceIterator<F> features();
 
-  IFeatureSourceIterator<F> features(
-    ReferencedEnvelope bounds, double displayScale, boolean scaleLess);
+    IFeatureSourceIterator<F> features(
+            ReferencedEnvelope bounds, double displayScale, boolean scaleLess);
 }

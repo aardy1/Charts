@@ -16,9 +16,7 @@ import java.util.Map;
  * @param <S> the type of the schema for the map layers
  * @param <F> the type of the features for the map layers
  */
-
-public class MapModel<S, F>
-{
+public class MapModel<S, F> {
     private final ReferencedEnvelope bounds;
 
     private final int cScale;
@@ -34,63 +32,52 @@ public class MapModel<S, F>
     // possibly shouldnt be here -- but it makes for faster rendering
     private int totalRuleCount = 0;
 
-    public MapModel(ReferencedEnvelope bounds, int cScale, String title)
-    {
+    public MapModel(ReferencedEnvelope bounds, int cScale, String title) {
         this.bounds = bounds;
         this.cScale = cScale;
         this.title = title;
     }
 
-    public ReferencedEnvelope bounds()
-    {
+    public ReferencedEnvelope bounds() {
         return bounds;
     }
 
-    public int cScale()
-    {
+    public int cScale() {
         return cScale;
     }
 
-    public String title()
-    {
+    public String title() {
         return title;
     }
 
-    public Geometry geometry()
-    {
+    public Geometry geometry() {
         return geometry;
     }
 
-    public void setGeometry(Geometry geometry)
-    {
+    public void setGeometry(Geometry geometry) {
         this.geometry = geometry;
     }
 
-    public Collection<MapLayer<S, F>> layers()
-    {
+    public Collection<MapLayer<S, F>> layers() {
         return layers;
     }
 
-    public void addLayer(String layerName, MapLayer<S, F> layer)
-    {
+    public void addLayer(String layerName, MapLayer<S, F> layer) {
         layers.add(layer);
         nameToLayer.put(layerName, layer);
         totalRuleCount += layer.style().rules().size();
         //  TODO -- publish an add layer event
     }
 
-    public MapLayer<S, F> layer(String type)
-    {
+    public MapLayer<S, F> layer(String type) {
         return nameToLayer.get(type);
     }
 
-    public int totalRuleCount()
-    {
+    public int totalRuleCount() {
         return totalRuleCount;
     }
 
-    public CoordinateReferenceSystem crs()
-    {
+    public CoordinateReferenceSystem crs() {
         return bounds.getCoordinateReferenceSystem();
     }
 }

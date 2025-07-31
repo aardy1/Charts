@@ -10,5 +10,4 @@ import javafx.scene.paint.Color;
 /**
  * @author graham
  */
-public record StrokeInfo(Color stroke, int strokeWidth, double opacity) {
-}
+public record StrokeInfo(Color stroke, int strokeWidth, double opacity) {}

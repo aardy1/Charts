@@ -19,27 +19,28 @@ import static org.knowtiphy.shapemap.style.parser.Utils.normalize;
  */
 public class AnchorPointParser {
 
-	public static AnchorPoint parse(XMLEventReader reader) throws XMLStreamException {
+    public static AnchorPoint parse(XMLEventReader reader) throws XMLStreamException {
 
-		var builder = new AnchorPointBuilder();
+        var builder = new AnchorPointBuilder();
 
-		var done = false;
-		while (!done && reader.hasNext()) {
-			var nextEvent = reader.nextTag();
+        var done = false;
+        while (!done && reader.hasNext()) {
+            var nextEvent = reader.nextTag();
 
-			if (nextEvent.isStartElement()) {
-				var startElement = nextEvent.asStartElement();
-				switch (normalize(startElement)) {
-					case XML.ANCHOR_POINTX -> builder.anchorX(Utils.parseDouble(reader.nextEvent()));
-					case XML.ANCHOR_POINTY -> builder.anchorY(Utils.parseDouble(reader.nextEvent()));
-					default -> throw new IllegalArgumentException(startElement.toString());
-				}
-			}
+            if (nextEvent.isStartElement()) {
+                var startElement = nextEvent.asStartElement();
+                switch (normalize(startElement)) {
+                    case XML.ANCHOR_POINTX ->
+                            builder.anchorX(Utils.parseDouble(reader.nextEvent()));
+                    case XML.ANCHOR_POINTY ->
+                            builder.anchorY(Utils.parseDouble(reader.nextEvent()));
+                    default -> throw new IllegalArgumentException(startElement.toString());
+                }
+            }
 
-			done = Utils.checkDone(nextEvent, XML.ANCHOR_POINT);
-		}
+            done = Utils.checkDone(nextEvent, XML.ANCHOR_POINT);
+        }
 
-		return builder.build();
-	}
-
+        return builder.build();
+    }
 }

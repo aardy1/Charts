@@ -13,13 +13,12 @@ import org.knowtiphy.shapemap.renderer.symbolizer.basic.StrokeInfo;
  */
 public abstract class BaseMarkSymbolizer<S, F> implements IMarkSymbolizer<S, F> {
 
-	protected final FillInfo fillInfo;
+    protected final FillInfo fillInfo;
 
-	protected final StrokeInfo strokeInfo;
+    protected final StrokeInfo strokeInfo;
 
-	protected BaseMarkSymbolizer(FillInfo fillInfo, StrokeInfo strokeInfo) {
-		this.fillInfo = fillInfo;
-		this.strokeInfo = strokeInfo;
-	}
-
+    protected BaseMarkSymbolizer(FillInfo fillInfo, StrokeInfo strokeInfo) {
+        this.fillInfo = fillInfo;
+        this.strokeInfo = strokeInfo;
+    }
 }

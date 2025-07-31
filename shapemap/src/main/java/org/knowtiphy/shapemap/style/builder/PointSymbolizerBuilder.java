@@ -18,39 +18,38 @@ import static org.knowtiphy.shapemap.style.parser.StyleSyntaxException.expect;
  */
 public class PointSymbolizerBuilder<S, F> {
 
-	private IMarkSymbolizer<S, F> markSymbolizer;
+    private IMarkSymbolizer<S, F> markSymbolizer;
 
-	// TODO -- spec says the default is the "native symbol size" ...?
-	private IFeatureFunction<F, Number> size = (f, g) -> 8.0;
+    // TODO -- spec says the default is the "native symbol size" ...?
+    private IFeatureFunction<F, Number> size = (f, g) -> 8.0;
 
-	private IFeatureFunction<F, Number> rotation;
+    private IFeatureFunction<F, Number> rotation;
 
-	private double opacity = 1;
+    private double opacity = 1;
 
-	public PointSymbolizerBuilder<S, F> markSymbolizer(IMarkSymbolizer<S, F> markSymbolizer) {
-		this.markSymbolizer = markSymbolizer;
-		return this;
-	}
+    public PointSymbolizerBuilder<S, F> markSymbolizer(IMarkSymbolizer<S, F> markSymbolizer) {
+        this.markSymbolizer = markSymbolizer;
+        return this;
+    }
 
-	public PointSymbolizerBuilder<S, F> size(IFeatureFunction<F, Number> size) {
-		this.size = size;
-		return this;
-	}
+    public PointSymbolizerBuilder<S, F> size(IFeatureFunction<F, Number> size) {
+        this.size = size;
+        return this;
+    }
 
-	public PointSymbolizerBuilder<S, F> opacity(double opacity) {
-		this.opacity = opacity;
-		return this;
-	}
+    public PointSymbolizerBuilder<S, F> opacity(double opacity) {
+        this.opacity = opacity;
+        return this;
+    }
 
-	public PointSymbolizerBuilder<S, F> rotation(IFeatureFunction<F, Number> rotation) {
-		this.rotation = rotation;
-		return this;
-	}
+    public PointSymbolizerBuilder<S, F> rotation(IFeatureFunction<F, Number> rotation) {
+        this.rotation = rotation;
+        return this;
+    }
 
-	public ISymbolizer<S, F> build() throws StyleSyntaxException {
+    public ISymbolizer<S, F> build() throws StyleSyntaxException {
 
-		expect(markSymbolizer, "Expected a mark symbolizer");
-		return new PointSymbolizer<>(markSymbolizer, size, opacity, rotation);
-	}
-
+        expect(markSymbolizer, "Expected a mark symbolizer");
+        return new PointSymbolizer<>(markSymbolizer, size, opacity, rotation);
+    }
 }

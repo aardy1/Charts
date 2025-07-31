@@ -5,5 +5,4 @@
 
 package org.knowtiphy.shapemap.renderer.symbolizer.basic;
 
-public record PathInfo(String name) {
-}
+public record PathInfo(String name) {}

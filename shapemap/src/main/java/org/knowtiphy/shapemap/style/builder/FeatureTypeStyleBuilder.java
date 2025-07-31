@@ -15,25 +15,24 @@ import org.knowtiphy.shapemap.renderer.symbolizer.basic.Rule;
  */
 public class FeatureTypeStyleBuilder<S, F> {
 
-	private String featureType;
+    private String featureType;
 
-	private final List<Rule<S, F>> rules = new ArrayList<>();
+    private final List<Rule<S, F>> rules = new ArrayList<>();
 
-	private boolean hasTextSymbolizers = false;
+    private boolean hasTextSymbolizers = false;
 
-	public FeatureTypeStyleBuilder<S, F> rule(Rule<S, F> rule) {
-		rules.add(rule);
-		hasTextSymbolizers |= !rule.textSymbolizers().isEmpty();
-		return this;
-	}
+    public FeatureTypeStyleBuilder<S, F> rule(Rule<S, F> rule) {
+        rules.add(rule);
+        hasTextSymbolizers |= !rule.textSymbolizers().isEmpty();
+        return this;
+    }
 
-	public FeatureTypeStyleBuilder<S, F> featureType(String featureType) {
-		this.featureType = featureType;
-		return this;
-	}
+    public FeatureTypeStyleBuilder<S, F> featureType(String featureType) {
+        this.featureType = featureType;
+        return this;
+    }
 
-	public FeatureTypeStyle<S, F> build() {
-		return new FeatureTypeStyle<>(featureType, hasTextSymbolizers, rules);
-	}
-
+    public FeatureTypeStyle<S, F> build() {
+        return new FeatureTypeStyle<>(featureType, hasTextSymbolizers, rules);
+    }
 }

@@ -20,25 +20,26 @@ import static org.knowtiphy.shapemap.style.parser.Utils.normalize;
  */
 public class LabelPlacementParser {
 
-	public static LabelPlacement parse(XMLEventReader reader) throws XMLStreamException, StyleSyntaxException {
+    public static LabelPlacement parse(XMLEventReader reader)
+            throws XMLStreamException, StyleSyntaxException {
 
-		var builder = new LabelPlacementBuilder();
+        var builder = new LabelPlacementBuilder();
 
-		var done = false;
-		while (!done && reader.hasNext()) {
-			var nextEvent = reader.nextTag();
-			if (nextEvent.isStartElement()) {
-				var startElement = nextEvent.asStartElement();
-				switch (normalize(startElement)) {
-					case XML.POINT_PLACEMENT -> builder.pointPlacement(PointPlacementParser.parse(reader));
-					default -> throw new IllegalArgumentException(startElement.toString());
-				}
-			}
+        var done = false;
+        while (!done && reader.hasNext()) {
+            var nextEvent = reader.nextTag();
+            if (nextEvent.isStartElement()) {
+                var startElement = nextEvent.asStartElement();
+                switch (normalize(startElement)) {
+                    case XML.POINT_PLACEMENT ->
+                            builder.pointPlacement(PointPlacementParser.parse(reader));
+                    default -> throw new IllegalArgumentException(startElement.toString());
+                }
+            }
 
-			done = Utils.checkDone(nextEvent, XML.LABEL_PLACEMENT);
-		}
+            done = Utils.checkDone(nextEvent, XML.LABEL_PLACEMENT);
+        }
 
-		return builder.build();
-	}
-
+        return builder.build();
+    }
 }

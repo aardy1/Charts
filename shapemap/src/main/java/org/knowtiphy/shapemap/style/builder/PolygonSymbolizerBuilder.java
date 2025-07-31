@@ -19,23 +19,22 @@ import static org.knowtiphy.shapemap.style.parser.StyleSyntaxException.expectEle
  */
 public class PolygonSymbolizerBuilder<S, F> {
 
-	private FillInfo fillInfo;
+    private FillInfo fillInfo;
 
-	private StrokeInfo strokeInfo;
+    private StrokeInfo strokeInfo;
 
-	public PolygonSymbolizerBuilder<S, F> fillInfo(FillInfo fillInfo) {
-		this.fillInfo = fillInfo;
-		return this;
-	}
+    public PolygonSymbolizerBuilder<S, F> fillInfo(FillInfo fillInfo) {
+        this.fillInfo = fillInfo;
+        return this;
+    }
 
-	public PolygonSymbolizerBuilder<S, F> strokeInfo(StrokeInfo strokeInfo) {
-		this.strokeInfo = strokeInfo;
-		return this;
-	}
+    public PolygonSymbolizerBuilder<S, F> strokeInfo(StrokeInfo strokeInfo) {
+        this.strokeInfo = strokeInfo;
+        return this;
+    }
 
-	public ISymbolizer<S, F> build() throws StyleSyntaxException {
-		expectElement(fillInfo, strokeInfo, XML.FILL, XML.STROKE);
-		return new PolygonSymbolizer<>(fillInfo, strokeInfo);
-	}
-
+    public ISymbolizer<S, F> build() throws StyleSyntaxException {
+        expectElement(fillInfo, strokeInfo, XML.FILL, XML.STROKE);
+        return new PolygonSymbolizer<>(fillInfo, strokeInfo);
+    }
 }

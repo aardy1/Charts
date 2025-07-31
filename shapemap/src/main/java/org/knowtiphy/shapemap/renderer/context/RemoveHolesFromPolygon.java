@@ -16,45 +16,36 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class RemoveHolesFromPolygon implements IRenderablePolygonProvider
-{
+public class RemoveHolesFromPolygon implements IRenderablePolygonProvider {
     private static final GeometryFactory GF = new GeometryFactory();
 
     private final RenderGeomCache renderGeomCache;
 
-    public RemoveHolesFromPolygon(RenderGeomCache renderGeomCache)
-    {
+    public RemoveHolesFromPolygon(RenderGeomCache renderGeomCache) {
         this.renderGeomCache = renderGeomCache;
     }
 
     @Override
-    public Polygon apply(Polygon polygon)
-    {
+    public Polygon apply(Polygon polygon) {
         return renderGeomCache.computeIfAbsent(polygon, poly -> remove(polygon));
     }
 
-    private Polygon remove(Polygon polygon)
-    {
-        if(polygon.getNumInteriorRing() == 0)
-        {
+    private Polygon remove(Polygon polygon) {
+        if (polygon.getNumInteriorRing() == 0) {
             return polygon;
-        }
-        else
-        {
+        } else {
             // get the holes in the polygon
             var holes = holes(polygon);
 
             // copy the boundary of the polygon
             List<Coordinate> newBoundary = new ArrayList<>();
             var extRing = polygon.getExteriorRing();
-            for(int i = 0; i < extRing.getNumPoints(); i++)
-            {
+            for (int i = 0; i < extRing.getNumPoints(); i++) {
                 newBoundary.add(extRing.getCoordinateN(i));
             }
 
             // remove each hole in order, building a new polygon boundary each time
-            for(var hole : holes)
-            {
+            for (var hole : holes) {
                 newBoundary = removeHole(hole, newBoundary);
             }
 
@@ -63,28 +54,23 @@ public class RemoveHolesFromPolygon implements IRenderablePolygonProvider
     }
 
     /**
-     * Get a list of pairs of a hole, and the "top most" coordinate in the hole, ordered
-     * by the y part of that coordinate (top most y-coordinate first)
+     * Get a list of pairs of a hole, and the "top most" coordinate in the hole, ordered by the y
+     * part of that coordinate (top most y-coordinate first)
      *
      * @param polygon the polygon
      * @return the list of pairs of a hole and the "top most" coordinate
      */
-
-    private List<Pair<LinearRing, Integer>> holes(Polygon polygon)
-    {
+    private List<Pair<LinearRing, Integer>> holes(Polygon polygon) {
 
         var map = new HashMap<LinearRing, Integer>();
         var result = new ArrayList<LinearRing>();
 
-        for(var i = 0; i < polygon.getNumInteriorRing(); i++)
-        {
+        for (var i = 0; i < polygon.getNumInteriorRing(); i++) {
             var ring = polygon.getInteriorRingN(i);
             result.add(ring);
             var minPos = -1;
-            for(var j = 0; j < ring.getNumPoints(); j++)
-            {
-                if(minPos == -1 || northOf(ring.getCoordinateN(j), ring.getCoordinateN(minPos)))
-                {
+            for (var j = 0; j < ring.getNumPoints(); j++) {
+                if (minPos == -1 || northOf(ring.getCoordinateN(j), ring.getCoordinateN(minPos))) {
                     minPos = j;
                 }
             }
@@ -93,22 +79,20 @@ public class RemoveHolesFromPolygon implements IRenderablePolygonProvider
         }
 
         result.sort(
-            (h1, h2) -> compareY(h1.getCoordinateN(map.get(h1)), h2.getCoordinateN(map.get(h2))));
+                (h1, h2) ->
+                        compareY(h1.getCoordinateN(map.get(h1)), h2.getCoordinateN(map.get(h2))));
         return result.stream().map(ring -> Pair.of(ring, map.get(ring))).toList();
     }
 
-    private int compareY(Coordinate a, Coordinate b)
-    {
+    private int compareY(Coordinate a, Coordinate b) {
         return -Double.compare(a.y, b.y);
     }
 
-    private boolean northOf(Coordinate a, Coordinate b)
-    {
+    private boolean northOf(Coordinate a, Coordinate b) {
         return compareY(a, b) < 0;
     }
 
-    private List<Coordinate> removeHole(Pair<LinearRing, Integer> hole, List<Coordinate> polygon)
-    {
+    private List<Coordinate> removeHole(Pair<LinearRing, Integer> hole, List<Coordinate> polygon) {
 
         var ring = hole.getLeft();
         var holeTop = ring.getCoordinateN(hole.getRight());
@@ -122,8 +106,7 @@ public class RemoveHolesFromPolygon implements IRenderablePolygonProvider
         var newBoundary = new ArrayList<Coordinate>();
 
         // copy v_i (i <= b) from the old boundary to the new boundary
-        for(int i = 0; i <= b; i++)
-        {
+        for (int i = 0; i <= b; i++) {
             newBoundary.add(polygon.get(i));
         }
 
@@ -131,13 +114,11 @@ public class RemoveHolesFromPolygon implements IRenderablePolygonProvider
         Coordinate bridgePt;
 
         // if the intersection point is at v_b
-        if(vb.x == holeTop.x)
-        {
+        if (vb.x == holeTop.x) {
             bridgePt = vb;
         }
         // else, the intersection point is somewhere on (v_b, v_(b+1))
-        else
-        {
+        else {
             // TODO -- is this correct if we use long/lat?
             var vb1 = polygon.get(b + 1);
             var slope = (vb1.y - vb.y) / (vb1.x - vb.x);
@@ -150,13 +131,11 @@ public class RemoveHolesFromPolygon implements IRenderablePolygonProvider
 
         // add the hole boundary to the new boundary, maintaining counter-clockwise
         // orientation of the hole
-        for(int i = hole.getRight(); i < ring.getNumPoints() - 1; i++)
-        {
+        for (int i = hole.getRight(); i < ring.getNumPoints() - 1; i++) {
             newBoundary.add(ring.getCoordinateN(i));
         }
 
-        for(int i = 0; i < hole.getRight(); i++)
-        {
+        for (int i = 0; i < hole.getRight(); i++) {
             newBoundary.add(ring.getCoordinateN(i));
         }
 
@@ -166,8 +145,7 @@ public class RemoveHolesFromPolygon implements IRenderablePolygonProvider
         newBoundary.add(bridgePt);
 
         // add the remainder of the old boundary to the new boundary
-        for(int i = b + 1; i < polygon.size(); i++)
-        {
+        for (int i = b + 1; i < polygon.size(); i++) {
             newBoundary.add(polygon.get(i));
         }
 
@@ -175,42 +153,33 @@ public class RemoveHolesFromPolygon implements IRenderablePolygonProvider
     }
 
     /**
-     * Given a coordinate point, p, and a polygon, P, find where the line, L, drawn
-     * directly upwards from c.y "first" intersects the boundary of P.
+     * Given a coordinate point, p, and a polygon, P, find where the line, L, drawn directly upwards
+     * from c.y "first" intersects the boundary of P.
      *
-     * @param pt   the coordinate point p
+     * @param pt the coordinate point p
      * @param poly the polygon P
      * @return the index, i, of a segment (v_i, v_(i+1)) of the boundary of P, st:
-     * <p>
-     * a) v_i <= c.x < v_(i+1)
-     * <p>
-     * b) the line drawn directly upwards from c.y intersects (v_i, v_(i+1))
-     * <p>
-     * c) the y-coordinate of the intersection point on (v_i, v_(i+1)) is minimal among
-     * all possible choices for i
+     *     <p>a) v_i <= c.x < v_(i+1)
+     *     <p>b) the line drawn directly upwards from c.y intersects (v_i, v_(i+1))
+     *     <p>c) the y-coordinate of the intersection point on (v_i, v_(i+1)) is minimal among all
+     *     possible choices for i
      */
-
-    private int boundaryIntersection(Coordinate pt, List<Coordinate> poly)
-    {
+    private int boundaryIntersection(Coordinate pt, List<Coordinate> poly) {
 
         var res = -1;
 
-        for(var i = 0; i < poly.size() - 1; i++)
-        {
+        for (var i = 0; i < poly.size() - 1; i++) {
             var vi = poly.get(i);
             var vi1 = poly.get(i + 1);
-            if(vi.x <= pt.x && pt.x < vi1.x && (res == -1 || northOf(poly.get(res), vi)))
-            {
+            if (vi.x <= pt.x && pt.x < vi1.x && (res == -1 || northOf(poly.get(res), vi))) {
                 res = i;
             }
         }
 
-        if(res == -1)
-        {
+        if (res == -1) {
             throw new IllegalArgumentException();
         }
 
         return res;
     }
-
 }

@@ -20,26 +20,26 @@ import static org.knowtiphy.shapemap.style.parser.Utils.normalize;
  */
 public class PointPlacementParser {
 
-	public static PointPlacement parse(XMLEventReader reader) throws XMLStreamException, StyleSyntaxException {
+    public static PointPlacement parse(XMLEventReader reader)
+            throws XMLStreamException, StyleSyntaxException {
 
-		var builder = new PointPlacementBuilder();
+        var builder = new PointPlacementBuilder();
 
-		var done = false;
-		while (!done && reader.hasNext()) {
-			var nextEvent = reader.nextTag();
-			if (nextEvent.isStartElement()) {
-				var startElement = nextEvent.asStartElement();
-				switch (normalize(startElement)) {
-					case XML.ANCHOR_POINT -> builder.anchorPoint(AnchorPointParser.parse(reader));
-					case XML.DISPLACEMENT -> builder.displacement(DisplacementParser.parse(reader));
-					default -> throw new IllegalArgumentException(startElement.toString());
-				}
-			}
+        var done = false;
+        while (!done && reader.hasNext()) {
+            var nextEvent = reader.nextTag();
+            if (nextEvent.isStartElement()) {
+                var startElement = nextEvent.asStartElement();
+                switch (normalize(startElement)) {
+                    case XML.ANCHOR_POINT -> builder.anchorPoint(AnchorPointParser.parse(reader));
+                    case XML.DISPLACEMENT -> builder.displacement(DisplacementParser.parse(reader));
+                    default -> throw new IllegalArgumentException(startElement.toString());
+                }
+            }
 
-			done = Utils.checkDone(nextEvent, XML.POINT_PLACEMENT);
-		}
+            done = Utils.checkDone(nextEvent, XML.POINT_PLACEMENT);
+        }
 
-		return builder.build();
-	}
-
+        return builder.build();
+    }
 }

@@ -19,39 +19,41 @@ import static org.knowtiphy.shapemap.style.parser.Utils.normalize;
  */
 public class StrokeParser {
 
-	public static StrokeInfo parse(XMLEventReader reader) throws XMLStreamException {
+    public static StrokeInfo parse(XMLEventReader reader) throws XMLStreamException {
 
-		var builder = new StrokeInfoBuilder();
+        var builder = new StrokeInfoBuilder();
 
-		var done = false;
-		while (!done && reader.hasNext()) {
-			var nextEvent = reader.nextTag();
+        var done = false;
+        while (!done && reader.hasNext()) {
+            var nextEvent = reader.nextTag();
 
-			if (nextEvent.isStartElement()) {
-				var startElement = nextEvent.asStartElement();
-				// TODO -- GraphicFill, GraphicStroke
-				switch (normalize(startElement)) {
-					case XML.CSS_PARAMETER -> {
-						var iterator = startElement.getAttributes();
-						while (iterator.hasNext()) {
-							var attr = normalize(iterator.next());
-							// TODO -- line joins and caps, dashes
-							switch (attr) {
-								case XML.CSS_STROKE -> builder.color(Utils.parseColor(reader.nextEvent()));
-								case XML.CSS_STROKE_WIDTH -> builder.width(Utils.parseInt(reader.nextEvent()));
-								case XML.CSS_STROKE_OPACITY -> builder.opacity(Utils.parseDouble(reader.nextEvent()));
-								default -> throw new IllegalArgumentException(attr);
-							}
-						}
-					}
-					default -> throw new IllegalArgumentException(startElement.toString());
-				}
-			}
+            if (nextEvent.isStartElement()) {
+                var startElement = nextEvent.asStartElement();
+                // TODO -- GraphicFill, GraphicStroke
+                switch (normalize(startElement)) {
+                    case XML.CSS_PARAMETER -> {
+                        var iterator = startElement.getAttributes();
+                        while (iterator.hasNext()) {
+                            var attr = normalize(iterator.next());
+                            // TODO -- line joins and caps, dashes
+                            switch (attr) {
+                                case XML.CSS_STROKE ->
+                                        builder.color(Utils.parseColor(reader.nextEvent()));
+                                case XML.CSS_STROKE_WIDTH ->
+                                        builder.width(Utils.parseInt(reader.nextEvent()));
+                                case XML.CSS_STROKE_OPACITY ->
+                                        builder.opacity(Utils.parseDouble(reader.nextEvent()));
+                                default -> throw new IllegalArgumentException(attr);
+                            }
+                        }
+                    }
+                    default -> throw new IllegalArgumentException(startElement.toString());
+                }
+            }
 
-			done = Utils.checkDone(nextEvent, XML.STROKE);
-		}
+            done = Utils.checkDone(nextEvent, XML.STROKE);
+        }
 
-		return builder.build();
-	}
-
+        return builder.build();
+    }
 }

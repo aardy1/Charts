@@ -13,9 +13,7 @@ import org.reactfx.EventStreams;
  * @param <S> the type of the schema for the feature source
  * @param <F> the type of the features provded by the feature source
  */
-
-public class MapLayer<S, F>
-{
+public class MapLayer<S, F> {
     private final IFeatureSource<S, F> featureSource;
 
     private final FeatureTypeStyle<S, F> style;
@@ -24,46 +22,41 @@ public class MapLayer<S, F>
 
     private final boolean scaleLess;
 
-    private final EventStream<Change<Boolean>> layerVisibilityEvent = EventStreams.changesOf(
-        visible);
+    private final EventStream<Change<Boolean>> layerVisibilityEvent =
+            EventStreams.changesOf(visible);
 
     public MapLayer(
-        IFeatureSource<S, F> featureSource, FeatureTypeStyle<S, F> style, boolean visible,
-        boolean scaleLess)
-    {
+            IFeatureSource<S, F> featureSource,
+            FeatureTypeStyle<S, F> style,
+            boolean visible,
+            boolean scaleLess) {
         this.featureSource = featureSource;
         this.style = style;
         this.visible.set(visible);
         this.scaleLess = scaleLess;
     }
 
-    public IFeatureSource<S, F> featureSource()
-    {
+    public IFeatureSource<S, F> featureSource() {
         return featureSource;
     }
 
-    public FeatureTypeStyle<S, F> style()
-    {
+    public FeatureTypeStyle<S, F> style() {
         return style;
     }
 
-    public boolean isVisible()
-    {
+    public boolean isVisible() {
         return visible.get();
     }
 
-    public void setVisible(boolean visible)
-    {
+    public void setVisible(boolean visible) {
         this.visible.set(visible);
     }
 
-    public boolean isScaleLess()
-    {
+    public boolean isScaleLess() {
         return scaleLess;
     }
 
-    public EventStream<Change<Boolean>> layerVisibilityEvent()
-    {
+    public EventStream<Change<Boolean>> layerVisibilityEvent() {
         return layerVisibilityEvent;
     }
 }

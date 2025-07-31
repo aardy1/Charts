@@ -7,13 +7,8 @@ package org.knowtiphy.shapemap.api;
 
 import javafx.scene.image.Image;
 
-/**
- * A provider of JavaFX image objects from a string name.
- */
+/** A provider of JavaFX image objects from a string name. */
+public interface ISVGProvider {
 
-public interface ISVGProvider
-{
-
-  Image get(String name, int size, double rotation);
-
+    Image get(String name, int size, double rotation);
 }

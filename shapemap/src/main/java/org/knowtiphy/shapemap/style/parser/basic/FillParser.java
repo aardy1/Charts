@@ -19,38 +19,39 @@ import static org.knowtiphy.shapemap.style.parser.Utils.normalize;
  */
 public class FillParser {
 
-	public static FillInfo parse(XMLEventReader reader) throws XMLStreamException {
+    public static FillInfo parse(XMLEventReader reader) throws XMLStreamException {
 
-		var builder = new FillInfoBuilder();
+        var builder = new FillInfoBuilder();
 
-		var done = false;
-		while (!done && reader.hasNext()) {
+        var done = false;
+        while (!done && reader.hasNext()) {
 
-			var nextEvent = reader.nextTag();
+            var nextEvent = reader.nextTag();
 
-			if (nextEvent.isStartElement()) {
-				var startElement = nextEvent.asStartElement();
-				// TODO -- GraphicFill
-				switch (normalize(startElement)) {
-					case XML.CSS_PARAMETER -> {
-						var iterator = startElement.getAttributes();
-						while (iterator.hasNext()) {
-							var attr = normalize(iterator.next());
-							switch (attr) {
-								case XML.CSS_FILL -> builder.fill(Utils.parseColor(reader.nextEvent()));
-								case XML.CSS_FILL_OPACITY -> builder.opacity(Utils.parseDouble(reader.nextEvent()));
-								default -> throw new IllegalArgumentException(attr);
-							}
-						}
-					}
-					default -> throw new IllegalArgumentException(startElement.toString());
-				}
-			}
+            if (nextEvent.isStartElement()) {
+                var startElement = nextEvent.asStartElement();
+                // TODO -- GraphicFill
+                switch (normalize(startElement)) {
+                    case XML.CSS_PARAMETER -> {
+                        var iterator = startElement.getAttributes();
+                        while (iterator.hasNext()) {
+                            var attr = normalize(iterator.next());
+                            switch (attr) {
+                                case XML.CSS_FILL ->
+                                        builder.fill(Utils.parseColor(reader.nextEvent()));
+                                case XML.CSS_FILL_OPACITY ->
+                                        builder.opacity(Utils.parseDouble(reader.nextEvent()));
+                                default -> throw new IllegalArgumentException(attr);
+                            }
+                        }
+                    }
+                    default -> throw new IllegalArgumentException(startElement.toString());
+                }
+            }
 
-			done = Utils.checkDone(nextEvent, XML.FILL);
-		}
+            done = Utils.checkDone(nextEvent, XML.FILL);
+        }
 
-		return builder.build();
-	}
-
+        return builder.build();
+    }
 }

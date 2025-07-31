@@ -10,32 +10,27 @@ import org.knowtiphy.shapemap.renderer.symbolizer.basic.FillInfo;
 
 /**
  * A builder of fill information used in styling.
- * <p>
- * The default fill color is white, and fill opacity is 1.
+ *
+ * <p>The default fill color is white, and fill opacity is 1.
  */
-public class FillInfoBuilder
-{
+public class FillInfoBuilder {
 
-  private Color fill = Color.WHITE;
+    private Color fill = Color.WHITE;
 
-  private double opacity = 1;
+    private double opacity = 1;
 
-  public FillInfoBuilder fill(Color fill)
-  {
-    this.fill = fill;
-    return this;
-  }
+    public FillInfoBuilder fill(Color fill) {
+        this.fill = fill;
+        return this;
+    }
 
-  public FillInfoBuilder opacity(double opacity)
-  {
-    this.opacity = opacity;
-    return this;
-  }
+    public FillInfoBuilder opacity(double opacity) {
+        this.opacity = opacity;
+        return this;
+    }
 
-  public FillInfo build()
-  {
+    public FillInfo build() {
 
-    return new FillInfo(fill, opacity);
-  }
-
+        return new FillInfo(fill, opacity);
+    }
 }

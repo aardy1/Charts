@@ -23,29 +23,28 @@ import static org.knowtiphy.shapemap.style.parser.Utils.normalize;
  */
 public class PolygonSymbolizerParser {
 
-	public static <S, F> ISymbolizer<S, F> parse(XMLEventReader reader)
-			throws XMLStreamException, StyleSyntaxException {
+    public static <S, F> ISymbolizer<S, F> parse(XMLEventReader reader)
+            throws XMLStreamException, StyleSyntaxException {
 
-		var builder = new PolygonSymbolizerBuilder<S, F>();
+        var builder = new PolygonSymbolizerBuilder<S, F>();
 
-		var done = false;
-		while (!done && reader.hasNext()) {
-			var nextEvent = reader.nextTag();
+        var done = false;
+        while (!done && reader.hasNext()) {
+            var nextEvent = reader.nextTag();
 
-			if (nextEvent.isStartElement()) {
-				var startElement = nextEvent.asStartElement();
-				switch (normalize(startElement)) {
-					case XML.FILL -> builder.fillInfo(FillParser.parse(reader));
-					case XML.STROKE -> builder.strokeInfo(StrokeParser.parse(reader));
-					case XML.VENDOR_OPTION -> VendorOptionParser.parse(reader);
-					default -> throw new IllegalArgumentException(startElement.toString());
-				}
-			}
+            if (nextEvent.isStartElement()) {
+                var startElement = nextEvent.asStartElement();
+                switch (normalize(startElement)) {
+                    case XML.FILL -> builder.fillInfo(FillParser.parse(reader));
+                    case XML.STROKE -> builder.strokeInfo(StrokeParser.parse(reader));
+                    case XML.VENDOR_OPTION -> VendorOptionParser.parse(reader);
+                    default -> throw new IllegalArgumentException(startElement.toString());
+                }
+            }
 
-			done = Utils.checkDone(nextEvent, XML.POLYGON_SYMBOLIZER);
-		}
+            done = Utils.checkDone(nextEvent, XML.POLYGON_SYMBOLIZER);
+        }
 
-		return builder.build();
-	}
-
+        return builder.build();
+    }
 }

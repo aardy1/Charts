@@ -10,12 +10,11 @@ package org.knowtiphy.shapemap.renderer.symbolizer.basic;
  */
 public record PointPlacement(AnchorPoint anchorPoint, Displacement displacement) {
 
-	public double getDisplacementX() {
-		return displacement == null ? 0 : displacement.displacementX();
-	}
+    public double getDisplacementX() {
+        return displacement == null ? 0 : displacement.displacementX();
+    }
 
-	public double getDisplacementY() {
-		return displacement == null ? 0 : displacement.displacementY();
-	}
-
+    public double getDisplacementY() {
+        return displacement == null ? 0 : displacement.displacementY();
+    }
 }

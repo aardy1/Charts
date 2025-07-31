@@ -12,22 +12,21 @@ import org.knowtiphy.shapemap.renderer.symbolizer.basic.AnchorPoint;
  */
 public class AnchorPointBuilder {
 
-	private Double anchorX;
+    private Double anchorX;
 
-	private Double anchorY;
+    private Double anchorY;
 
-	public AnchorPointBuilder anchorX(Double anchorX) {
-		this.anchorX = anchorX;
-		return this;
-	}
+    public AnchorPointBuilder anchorX(Double anchorX) {
+        this.anchorX = anchorX;
+        return this;
+    }
 
-	public AnchorPointBuilder anchorY(Double anchorY) {
-		this.anchorY = anchorY;
-		return this;
-	}
+    public AnchorPointBuilder anchorY(Double anchorY) {
+        this.anchorY = anchorY;
+        return this;
+    }
 
-	public AnchorPoint build() {
-		return new AnchorPoint(anchorX, anchorY);
-	}
-
+    public AnchorPoint build() {
+        return new AnchorPoint(anchorX, anchorY);
+    }
 }

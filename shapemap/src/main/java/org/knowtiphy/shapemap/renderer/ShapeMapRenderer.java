@@ -1,6 +1,6 @@
 /*
-     * Copyright Knowtiphy
-     * All rights reserved.
+ * Copyright Knowtiphy
+ * All rights reserved.
  */
 package org.knowtiphy.shapemap.renderer;
 
@@ -13,38 +13,35 @@ import org.locationtech.jts.index.quadtree.Quadtree;
 /**
  * @author graham
  */
-public class ShapeMapRenderer<S, F>
-{
+public class ShapeMapRenderer<S, F> {
 
     private final RenderingContext<S, F> renderingContext;
 
     private final GraphicsContext graphics;
 
-    public ShapeMapRenderer(RenderingContext<S, F> renderingContext, GraphicsContext graphics)
-    {
+    public ShapeMapRenderer(RenderingContext<S, F> renderingContext, GraphicsContext graphics) {
         this.renderingContext = renderingContext;
         this.graphics = graphics;
     }
 
-    public void paint()
-    {
+    public void paint() {
         var start = System.currentTimeMillis();
 
         var index = new Quadtree();
 
-        //@formatter:off
-        var graphicsRenderingContext = new GraphicsRenderingContext<>(
-            renderingContext,
-            graphics,
-            new Transformation(renderingContext.worldToScreen()),
-            onePixelX(renderingContext.screenToWorld()),
-            onePixelY(renderingContext.screenToWorld()),
-            index,
-            renderingContext.viewPortBounds());
-        //@formatter:off
+        // @formatter:off
+        var graphicsRenderingContext =
+                new GraphicsRenderingContext<>(
+                        renderingContext,
+                        graphics,
+                        new Transformation(renderingContext.worldToScreen()),
+                        onePixelX(renderingContext.screenToWorld()),
+                        onePixelY(renderingContext.screenToWorld()),
+                        index,
+                        renderingContext.viewPortBounds());
+        // @formatter:off
 
-        try
-        {
+        try {
             // pass 1 -- do graphics -- point, line and polygon symbolizers
             // We keep track of:
             // a) which rules were applied
@@ -67,38 +64,38 @@ public class ShapeMapRenderer<S, F>
 
             System.err.println("Rendering time " + (System.currentTimeMillis() - start));
             System.err.println("\n\n\n");
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
             System.err.println("Rendering exception");
             ex.printStackTrace(System.err);
         }
     }
 
     private void renderGraphics(
-        GraphicsRenderingContext<S, F> context, boolean[] appliedRule, boolean[] layerNeedsTextLayout)
-        throws Exception
-    {
+            GraphicsRenderingContext<S, F> context,
+            boolean[] appliedRule,
+            boolean[] layerNeedsTextLayout)
+            throws Exception {
+
         var layers = renderingContext.layers();
         var viewPortBounds = renderingContext.viewPortBounds();
 
         var layerPos = 0;
         var rulePos = 0;
 
-        for (var layer : layers)
-        {
-            if (layer.isVisible())
-            {
+        for (var layer : layers) {
+            if (layer.isVisible()) {
                 var style = layer.style();
 
-                try (var iterator = layer.featureSource().features(viewPortBounds,
-                    renderingContext.displayScale(), layer.isScaleLess()))
-                {
-                    while (iterator.hasNext())
-                    {
-                        var feature = iterator.next();
-                        layerNeedsTextLayout[layerPos] |= applyStyle(style, context, feature, appliedRule,
-                            rulePos);
+                try (var iterator =
+                        layer.featureSource()
+                                .features(
+                                        viewPortBounds,
+                                        renderingContext.displayScale(),
+                                        layer.isScaleLess())) {
+                    for (var feature : iterator) {
+                        //                        var feature = iterator.next();
+                        layerNeedsTextLayout[layerPos] |=
+                                applyStyle(style, context, feature, appliedRule, rulePos);
                     }
                 }
 
@@ -111,29 +108,26 @@ public class ShapeMapRenderer<S, F>
     }
 
     private void renderText(
-        GraphicsRenderingContext<S, F> context, boolean[] appliedRule, boolean[] layerNeedsTextLayout)
-        throws Exception
-    {
+            GraphicsRenderingContext<S, F> context,
+            boolean[] appliedRule,
+            boolean[] layerNeedsTextLayout)
+            throws Exception {
+
         var layers = renderingContext.layers();
         var viewPortBounds = renderingContext.viewPortBounds();
 
         var layerPos = 0;
         var rulePos = 0;
 
-        for (var layer : layers)
-        {
-            if (layerNeedsTextLayout[layerPos])
-            {
-                try (var iterator = layer.featureSource().features(viewPortBounds, renderingContext.displayScale(), true))
-                {
-                    while (iterator.hasNext())
-                    {
-                        var feature = iterator.next();
+        for (var layer : layers) {
+            if (layerNeedsTextLayout[layerPos]) {
+                try (var iterator =
+                        layer.featureSource()
+                                .features(viewPortBounds, renderingContext.displayScale(), true)) {
+                    for (var feature : iterator) {
                         var rp = rulePos;
-                        for (var rule : layer.style().rules())
-                        {
-                            if (appliedRule[rp])
-                            {
+                        for (var rule : layer.style().rules()) {
+                            if (appliedRule[rp]) {
                                 applyTextRule(rule, context, feature);
                             }
 
@@ -149,32 +143,30 @@ public class ShapeMapRenderer<S, F>
     }
 
     private boolean applyStyle(
-        FeatureTypeStyle<S, F> style, GraphicsRenderingContext<S, F> context, F feature,
-        boolean[] appliedRule, int startPos)
-    {
+            FeatureTypeStyle<S, F> style,
+            GraphicsRenderingContext<S, F> context,
+            F feature,
+            boolean[] appliedRule,
+            int startPos) {
+
         var appliedSomeRule = false;
         // if (style.applies(feature))
         var rulePos = startPos;
         var elsePos = -1;
 
-        for (var rule : style.rules())
-        {
-            if (!rule.elseFilter())
-            {
+        for (var rule : style.rules()) {
+            if (!rule.elseFilter()) {
                 var applied = applyGraphicsRule(rule, context, feature);
                 appliedRule[rulePos] |= applied;
                 appliedSomeRule |= applied;
-            }
-            else
-            {
+            } else {
                 elsePos = rulePos - startPos;
             }
 
             rulePos++;
         }
 
-        if (!appliedSomeRule && elsePos != -1)
-        {
+        if (!appliedSomeRule && elsePos != -1) {
             var elseRule = style.rules().get(elsePos);
             var applied = applyGraphicsRule(elseRule, context, feature);
             appliedRule[elsePos] |= applied;
@@ -185,13 +177,11 @@ public class ShapeMapRenderer<S, F>
     }
 
     private boolean applyGraphicsRule(
-        Rule<S, F> rule, GraphicsRenderingContext<S, F> context, F feature)
-    {
+            Rule<S, F> rule, GraphicsRenderingContext<S, F> context, F feature) {
         var featureAdapter = context.renderingContext().featureAdapter();
-        if (rule.filter() != null && rule.filter().apply(feature, featureAdapter.defaultGeometry(feature)))
-        {
-            for (var symbolizer : rule.graphicSymbolizers())
-            {
+        if (rule.filter() != null
+                && rule.filter().apply(feature, featureAdapter.defaultGeometry(feature))) {
+            for (var symbolizer : rule.graphicSymbolizers()) {
                 symbolizer.render(context, feature);
             }
 
@@ -201,32 +191,26 @@ public class ShapeMapRenderer<S, F>
         return false;
     }
 
-    private void applyTextRule(Rule<S, F> rule, GraphicsRenderingContext<S, F> context, F feature)
-    {
+    private void applyTextRule(Rule<S, F> rule, GraphicsRenderingContext<S, F> context, F feature) {
         var featureAdapter = context.renderingContext().featureAdapter();
-        if (rule.filter().apply(feature, featureAdapter.defaultGeometry(feature)))
-        {
-            for (var symbolizer : rule.textSymbolizers())
-            {
+        if (rule.filter().apply(feature, featureAdapter.defaultGeometry(feature))) {
+            for (var symbolizer : rule.textSymbolizers()) {
                 symbolizer.render(context, feature);
             }
         }
     }
 
-    private double onePixelX(Affine screenToWorld)
-    {
+    private double onePixelX(Affine screenToWorld) {
         var pt1 = screenToWorld.transform(0, 0);
         var pt2 = screenToWorld.transform(1, 0);
         return Math.abs(pt2.getX() - pt1.getX());
     }
 
-    private double onePixelY(Affine screenToWorld)
-    {
+    private double onePixelY(Affine screenToWorld) {
         var pt1 = screenToWorld.transform(0, 0);
         var pt2 = screenToWorld.transform(0, 1);
         return Math.abs(pt2.getY() - pt1.getY());
     }
-
 }
 
 // System.err.println("Num text rules = " + textRules.size());

@@ -18,16 +18,15 @@ import static org.knowtiphy.shapemap.style.parser.StyleSyntaxException.expectEle
  */
 public class LineSymbolizerBuilder<S, F> {
 
-	private StrokeInfo strokeInfo;
+    private StrokeInfo strokeInfo;
 
-	public LineSymbolizerBuilder<S, F> strokeInfo(StrokeInfo strokeInfo) {
-		this.strokeInfo = strokeInfo;
-		return this;
-	}
+    public LineSymbolizerBuilder<S, F> strokeInfo(StrokeInfo strokeInfo) {
+        this.strokeInfo = strokeInfo;
+        return this;
+    }
 
-	public ISymbolizer<S, F> build() throws StyleSyntaxException {
-		expectElement(strokeInfo, XML.STROKE);
-		return new LineSymbolizer<>(strokeInfo);
-	}
-
+    public ISymbolizer<S, F> build() throws StyleSyntaxException {
+        expectElement(strokeInfo, XML.STROKE);
+        return new LineSymbolizer<>(strokeInfo);
+    }
 }

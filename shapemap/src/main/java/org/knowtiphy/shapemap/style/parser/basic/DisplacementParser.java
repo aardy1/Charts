@@ -19,26 +19,27 @@ import static org.knowtiphy.shapemap.style.parser.Utils.normalize;
  */
 public class DisplacementParser {
 
-	public static Displacement parse(XMLEventReader reader) throws XMLStreamException {
+    public static Displacement parse(XMLEventReader reader) throws XMLStreamException {
 
-		var builder = new DisplacementBuilder();
+        var builder = new DisplacementBuilder();
 
-		var done = false;
-		while (!done && reader.hasNext()) {
-			var nextEvent = reader.nextTag();
-			if (nextEvent.isStartElement()) {
-				var startElement = nextEvent.asStartElement();
-				switch (normalize(startElement)) {
-					case XML.DISPLACEMENTX -> builder.displacementX(Utils.parseDouble(reader.nextEvent()));
-					case XML.DISPLACEMENTY -> builder.displacementY(Utils.parseDouble(reader.nextEvent()));
-					default -> throw new IllegalArgumentException(startElement.toString());
-				}
-			}
+        var done = false;
+        while (!done && reader.hasNext()) {
+            var nextEvent = reader.nextTag();
+            if (nextEvent.isStartElement()) {
+                var startElement = nextEvent.asStartElement();
+                switch (normalize(startElement)) {
+                    case XML.DISPLACEMENTX ->
+                            builder.displacementX(Utils.parseDouble(reader.nextEvent()));
+                    case XML.DISPLACEMENTY ->
+                            builder.displacementY(Utils.parseDouble(reader.nextEvent()));
+                    default -> throw new IllegalArgumentException(startElement.toString());
+                }
+            }
 
-			done = Utils.checkDone(nextEvent, XML.DISPLACEMENT);
-		}
+            done = Utils.checkDone(nextEvent, XML.DISPLACEMENT);
+        }
 
-		return builder.build();
-	}
-
+        return builder.build();
+    }
 }

@@ -17,16 +17,15 @@ import static org.knowtiphy.shapemap.style.parser.StyleSyntaxException.expectEle
  */
 public class LabelPlacementBuilder {
 
-	private PointPlacement pointPlacement;
+    private PointPlacement pointPlacement;
 
-	public LabelPlacementBuilder pointPlacement(PointPlacement pointPlacement) {
-		this.pointPlacement = pointPlacement;
-		return this;
-	}
+    public LabelPlacementBuilder pointPlacement(PointPlacement pointPlacement) {
+        this.pointPlacement = pointPlacement;
+        return this;
+    }
 
-	public LabelPlacement build() throws StyleSyntaxException {
-		expectElement(pointPlacement, XML.POINT_PLACEMENT);
-		return new LabelPlacement(pointPlacement);
-	}
-
+    public LabelPlacement build() throws StyleSyntaxException {
+        expectElement(pointPlacement, XML.POINT_PLACEMENT);
+        return new LabelPlacement(pointPlacement);
+    }
 }

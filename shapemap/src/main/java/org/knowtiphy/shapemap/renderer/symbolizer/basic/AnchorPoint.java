@@ -10,12 +10,11 @@ package org.knowtiphy.shapemap.renderer.symbolizer.basic;
  */
 public record AnchorPoint(Double anchorX, Double anchorY) {
 
-	public Double getAnchorX() {
-		return anchorX == null ? 0 : anchorX;
-	}
+    public Double getAnchorX() {
+        return anchorX == null ? 0 : anchorX;
+    }
 
-	public Double getAnchorY() {
-		return anchorY == null ? 0 : anchorY;
-	}
-
+    public Double getAnchorY() {
+        return anchorY == null ? 0 : anchorY;
+    }
 }

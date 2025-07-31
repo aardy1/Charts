@@ -9,9 +9,7 @@ package org.knowtiphy.shapemap.api;
  * A feature geometry type -- used for fast switching on geometry types (rather than using string
  * names and hence compares for geometry types).
  */
-
-public enum FeatureGeomType
-{
+public enum FeatureGeomType {
     // @formatter:off
     POINT,
     MULTI_POINT,

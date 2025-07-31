@@ -13,7 +13,8 @@ import org.knowtiphy.shapemap.renderer.symbolizer.TextSymbolizer;
 /**
  * @author graham
  */
-public record Rule<S, F> (IFeatureFunction<F, Boolean> filter, List<ISymbolizer<S, F>> graphicSymbolizers,
-		List<TextSymbolizer<S, F>> textSymbolizers, boolean elseFilter) {
-
-}
+public record Rule<S, F>(
+        IFeatureFunction<F, Boolean> filter,
+        List<ISymbolizer<S, F>> graphicSymbolizers,
+        List<TextSymbolizer<S, F>> textSymbolizers,
+        boolean elseFilter) {}
