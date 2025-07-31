@@ -1,72 +1,72 @@
 [
-  {
-    "name": "org.geotools.referencing.factory.epsg.ThreadedEpsgFactory",
-    "methods": [
-      {
-        "name": "<init>",
-        "parameterTypes": [
-          "org.geotools.util.factory.Hints"
+    {
+        "name": "org.geotools.referencing.factory.epsg.ThreadedEpsgFactory",
+        "methods": [
+            {
+                "name": "<init>",
+                "parameterTypes": [
+                    "org.geotools.util.factory.Hints"
+                ]
+            }
         ]
-      }
-    ]
-  },
-  {
-    "name": "org.knowtiphy.charts.chartview.MapDisplayOptions",
-    "queryAllPublicMethods": true,
-    "methods": [
-      {
-        "name": "getShowGrid",
-        "parameterTypes": []
-      },
-      {
-        "name": "getShowLights",
-        "parameterTypes": []
-      },
-      {
-        "name": "getShowPlatforms",
-        "parameterTypes": []
-      },
-      {
-        "name": "getShowSoundings",
-        "parameterTypes": []
-      },
-      {
-        "name": "getShowWrecks",
-        "parameterTypes": []
-      },
-      {
-        "name": "setShowGrid",
-        "parameterTypes": [
-          "boolean"
+    },
+    {
+        "name": "org.knowtiphy.charts.chartview.MapDisplayOptions",
+        "queryAllPublicMethods": true,
+        "methods": [
+            {
+                "name": "getShowGrid",
+                "parameterTypes": []
+            },
+            {
+                "name": "getShowLights",
+                "parameterTypes": []
+            },
+            {
+                "name": "getShowPlatforms",
+                "parameterTypes": []
+            },
+            {
+                "name": "getShowSoundings",
+                "parameterTypes": []
+            },
+            {
+                "name": "getShowWrecks",
+                "parameterTypes": []
+            },
+            {
+                "name": "setShowGrid",
+                "parameterTypes": [
+                    "boolean"
+                ]
+            },
+            {
+                "name": "setShowLights",
+                "parameterTypes": [
+                    "boolean"
+                ]
+            },
+            {
+                "name": "setShowPlatforms",
+                "parameterTypes": [
+                    "boolean"
+                ]
+            },
+            {
+                "name": "setShowSoundings",
+                "parameterTypes": [
+                    "boolean"
+                ]
+            },
+            {
+                "name": "setShowWrecks",
+                "parameterTypes": [
+                    "boolean"
+                ]
+            }
         ]
-      },
-      {
-        "name": "setShowLights",
-        "parameterTypes": [
-          "boolean"
-        ]
-      },
-      {
-        "name": "setShowPlatforms",
-        "parameterTypes": [
-          "boolean"
-        ]
-      },
-      {
-        "name": "setShowSoundings",
-        "parameterTypes": [
-          "boolean"
-        ]
-      },
-      {
-        "name": "setShowWrecks",
-        "parameterTypes": [
-          "boolean"
-        ]
-      }
-    ]
-  },
-  {
-    "name": "javafx.scene.shape.Polyline"
-  }
+    },
+    {
+        "name": "javafx.scene.shape.Polyline"
+    }
 ]

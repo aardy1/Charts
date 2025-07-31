@@ -1,16 +1,17 @@
 package org.knowtiphy.charts.settings;
 
-public enum TemperatureUnit
-{
-  C("C"), F("F");
+public enum TemperatureUnit {
+    C("C"),
+    F("F");
 
-  final String name;
+    final String name;
 
-  TemperatureUnit(String name)
-  {
-    this.name = name;
-  }
+    TemperatureUnit(String name) {
+        this.name = name;
+    }
 
-  @Override
-  public String toString(){return name;}
+    @Override
+    public String toString() {
+        return name;
+    }
 }

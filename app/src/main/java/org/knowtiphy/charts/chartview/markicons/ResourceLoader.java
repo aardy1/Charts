@@ -8,6 +8,4 @@ package org.knowtiphy.charts.chartview.markicons;
 /**
  * @author graham
  */
-public class ResourceLoader {
-
-}
+public class ResourceLoader {}

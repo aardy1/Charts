@@ -13,18 +13,17 @@ import javafx.beans.property.SimpleBooleanProperty;
  */
 public class ToggleModel {
 
-	private final BooleanProperty stateProperty = new SimpleBooleanProperty(false);
+    private final BooleanProperty stateProperty = new SimpleBooleanProperty(false);
 
-	public boolean isOn() {
-		return stateProperty.get();
-	}
+    public boolean isOn() {
+        return stateProperty.get();
+    }
 
-	public void toggle() {
-		stateProperty.set(!stateProperty.get());
-	}
+    public void toggle() {
+        stateProperty.set(!stateProperty.get());
+    }
 
-	public BooleanProperty getStateProperty() {
-		return stateProperty;
-	}
-
+    public BooleanProperty getStateProperty() {
+        return stateProperty;
+    }
 }

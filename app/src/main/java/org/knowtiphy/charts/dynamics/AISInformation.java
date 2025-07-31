@@ -11,21 +11,20 @@ import org.geotools.geometry.Position2D;
  */
 public class AISInformation {
 
-	private final long id;
+    private final long id;
 
-	private final Position2D position;
+    private final Position2D position;
 
-	public AISInformation(long id, Position2D position) {
-		this.id = id;
-		this.position = position;
-	}
+    public AISInformation(long id, Position2D position) {
+        this.id = id;
+        this.position = position;
+    }
 
-	public long getId() {
-		return id;
-	}
+    public long getId() {
+        return id;
+    }
 
-	public Position2D getPosition() {
-		return position;
-	}
-
+    public Position2D getPosition() {
+        return position;
+    }
 }

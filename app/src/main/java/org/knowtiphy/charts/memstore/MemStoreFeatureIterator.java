@@ -11,28 +11,22 @@ import java.util.Iterator;
 
 /**
  * @author graham
- *
- * An iterator for a "collection" of MemFeatures
+ *     <p>An iterator for a "collection" of MemFeatures
  */
-
 public record MemStoreFeatureIterator(Iterator<MemFeature> iterator)
-  implements IFeatureSourceIterator<MemFeature>
-{
-  @Override
-  public synchronized boolean hasNext()
-  {
-    return iterator.hasNext();
-  }
+        implements IFeatureSourceIterator<MemFeature> {
+    @Override
+    public synchronized boolean hasNext() {
+        return iterator.hasNext();
+    }
 
-  @Override
-  public MemFeature next()
-  {
-    return iterator.next();
-  }
+    @Override
+    public MemFeature next() {
+        return iterator.next();
+    }
 
-  @Override
-  public void close()
-  {
-    // do nothing
-  }
+    @Override
+    public void close() {
+        // do nothing
+    }
 }

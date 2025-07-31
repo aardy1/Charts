@@ -11,32 +11,27 @@ import javafx.stage.Stage;
 
 import java.nio.file.Path;
 
-/**
- * Abstraction of the underlying platform.
- */
+/** Abstraction of the underlying platform. */
+public interface IPlatform {
+    void setStageTitle(Stage stage, String title);
 
-public interface IPlatform
-{
-  void setStageTitle(Stage stage, String title);
+    void setWindowIcons(Stage stage, Class<?> cls);
 
-  void setWindowIcons(Stage stage, Class<?> cls);
-  
-  Path rootDir();
+    Path rootDir();
 
-  Path catalogsDir();
+    Path catalogsDir();
 
-  Path chartsDir();
+    Path chartsDir();
 
-  Rectangle2D screenDimensions();
+    Rectangle2D screenDimensions();
 
-  double windowWidthCM(Region region);
+    double windowWidthCM(Region region);
 
-  double ppi();
+    double ppi();
 
-  double ppcm();
+    double ppcm();
 
-  boolean isMac();
+    boolean isMac();
 
-  void info();
-
+    void info();
 }

@@ -12,36 +12,31 @@ import java.io.InputStream;
 /**
  * @author graham
  */
-public class StyleReader<S, F>
-{
-  //  TODO -- need to cache style sheets for re-use?
+public class StyleReader<S, F> {
+    //  TODO -- need to cache style sheets for re-use?
 
-  private static final String SLD = ".sld";
+    private static final String SLD = ".sld";
 
-  private final Class<?> resourceLoader;
+    private final Class<?> resourceLoader;
 
-  public StyleReader(Class<?> resourceLoader)
-  {
-    this.resourceLoader = resourceLoader;
-  }
+    public StyleReader(Class<?> resourceLoader) {
+        this.resourceLoader = resourceLoader;
+    }
 
-  public FeatureTypeStyle<S, F> createStyle(String fileName, IStyleCompiler<F> parsingContext)
-    throws IOException, XMLStreamException, StyleSyntaxException
-  {
-    var styleSheet = toSLDFile(fileName);
-    assert styleSheet != null;
-    return createFromSLD(styleSheet, parsingContext);
-  }
+    public FeatureTypeStyle<S, F> createStyle(String fileName, IStyleCompiler<F> parsingContext)
+            throws IOException, XMLStreamException, StyleSyntaxException {
+        var styleSheet = toSLDFile(fileName);
+        assert styleSheet != null;
+        return createFromSLD(styleSheet, parsingContext);
+    }
 
-  private FeatureTypeStyle<S, F> createFromSLD(InputStream stream, IStyleCompiler<F> parsingContext)
-    throws IOException, XMLStreamException, StyleSyntaxException
-  {
-    return new StyledLayerDescriptorParser<S, F>(stream, parsingContext).read();
-  }
+    private FeatureTypeStyle<S, F> createFromSLD(
+            InputStream stream, IStyleCompiler<F> parsingContext)
+            throws IOException, XMLStreamException, StyleSyntaxException {
+        return new StyledLayerDescriptorParser<S, F>(stream, parsingContext).read();
+    }
 
-  private InputStream toSLDFile(String featureName)
-  {
-    return resourceLoader.getResourceAsStream("styles/" + featureName + SLD);
-  }
-
+    private InputStream toSLDFile(String featureName) {
+        return resourceLoader.getResourceAsStream("styles/" + featureName + SLD);
+    }
 }

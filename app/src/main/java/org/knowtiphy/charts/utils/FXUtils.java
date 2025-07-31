@@ -12,58 +12,47 @@ import javafx.util.Duration;
 
 import java.io.InputStream;
 
-/**
- * Collection of utility classes for Fx.
- */
+/** Collection of utility classes for Fx. */
+public class FXUtils {
+    public static void later(Runnable r) {
+        Platform.runLater(r);
+    }
 
-public class FXUtils
-{
-  public static void later(Runnable r)
-  {
-    Platform.runLater(r);
-  }
+    public static void setDockIcon(Stage stage, InputStream stream) {
+        stage.getIcons().add(new Image(stream));
+    }
 
-  public static void setDockIcon(Stage stage, InputStream stream)
-  {
-    stage.getIcons().add(new Image(stream));
-  }
+    public static <T extends Region> T resizeable(T region) {
+        region.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+        return region;
+    }
 
-  public static <T extends Region> T resizeable(T region)
-  {
-    region.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-    return region;
-  }
+    public static <T extends Region> T nonResizeable(T region) {
+        region.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
+        return region;
+    }
 
-  public static <T extends Region> T nonResizeable(T region)
-  {
-    region.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
-    return region;
-  }
+    // this is still a bit hacky
+    public static Tooltip tooltip(String text, Font font, int fontWidth, int width) {
+        var prefWidth = Math.min((text.length() + 2) * fontWidth, width);
+        var tooltip = new Tooltip(text);
+        tooltip.setFont(font);
+        tooltip.setShowDelay(Duration.millis(3));
+        tooltip.setPrefWidth(prefWidth);
+        tooltip.setWrapText(true);
+        return tooltip;
+    }
 
-  // this is still a bit hacky
-  public static Tooltip tooltip(String text, Font font, int fontWidth, int width)
-  {
-    var prefWidth = Math.min((text.length() + 2) * fontWidth, width);
-    var tooltip = new Tooltip(text);
-    tooltip.setFont(font);
-    tooltip.setShowDelay(Duration.millis(3));
-    tooltip.setPrefWidth(prefWidth);
-    tooltip.setWrapText(true);
-    return tooltip;
-  }
+    public static ColumnConstraints neverGrow() {
+        var constraint = new ColumnConstraints();
+        constraint.setHgrow(Priority.NEVER);
+        return constraint;
+    }
 
-  public static ColumnConstraints neverGrow()
-  {
-    var constraint = new ColumnConstraints();
-    constraint.setHgrow(Priority.NEVER);
-    return constraint;
-  }
-
-  public static ColumnConstraints alwaysGrow()
-  {
-    var constraint = new ColumnConstraints();
-    constraint.setHgrow(Priority.ALWAYS);
-    constraint.setFillWidth(true);
-    return constraint;
-  }
+    public static ColumnConstraints alwaysGrow() {
+        var constraint = new ColumnConstraints();
+        constraint.setHgrow(Priority.ALWAYS);
+        constraint.setFillWidth(true);
+        return constraint;
+    }
 }

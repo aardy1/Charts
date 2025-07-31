@@ -13,18 +13,13 @@ import org.knowtiphy.shapemap.api.ITextSizeProvider;
 /**
  * @author graham
  */
+public class TextSizeProvider implements ITextSizeProvider {
+    public static final TextSizeProvider PROVIDER = new TextSizeProvider();
 
-public class TextSizeProvider implements ITextSizeProvider
-{
-  public static final TextSizeProvider PROVIDER = new TextSizeProvider();
+    private TextSizeProvider() {}
 
-  private TextSizeProvider()
-  {
-  }
-
-  @Override
-  public Bounds apply(Font font, String s)
-  {
-    return Fonts.textSizeFast(font, s);
-  }
+    @Override
+    public Bounds apply(Font font, String s) {
+        return Fonts.textSizeFast(font, s);
+    }
 }

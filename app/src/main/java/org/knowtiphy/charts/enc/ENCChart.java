@@ -19,59 +19,60 @@ import org.knowtiphy.shapemap.renderer.context.SVGCache;
 
 import java.util.List;
 
-/**
- * An ENC chart -- a map view model for a quilt of ENC cells.
- */
+/** An ENC chart -- a map view model for a quilt of ENC cells. */
+public class ENCChart extends Quilt<SimpleFeatureType, MemFeature> {
+    private final ChartLocker chartLocker;
 
-public class ENCChart extends Quilt<SimpleFeatureType, MemFeature>
-{
-  private final ChartLocker chartLocker;
-
-  public ENCChart(
-    List<MapModel<SimpleFeatureType, MemFeature>> maps, MapViewport viewport,
-    ChartLocker chartLocker, SVGCache svgCache)
-  {
-    super(maps, viewport, FeatureAdapter.ADAPTER, new RemoveHolesFromPolygon(new RenderGeomCache()),
-      svgCache, TextSizeProvider.PROVIDER);
-    this.chartLocker = chartLocker;
-  }
-
-  public boolean isQuilt(){return maps().size() > 1;}
-
-  public int cScale()
-  {
-    return maps().get(0).cScale();
-  }
-
-//  public double zoomFactor()
-//  {
-//    return bounds().getWidth() / (viewPortBounds().getWidth());
-//  }
-
-  public double displayScale()
-  {
-    return (int) (cScale() * (1 / zoom()));
-  }
-
-  //  TODO
-  public String title(){return "";} //return maps().get(0).lName();}
-
-  @Override
-  public void setViewPortBounds(ReferencedEnvelope bounds)
-    throws TransformException, NonInvertibleTransformException
-  {
-    var quilt = chartLocker.loadQuilt(bounds, adjustedDisplayScale());
-    System.err.println("--------------------");
-    System.err.println("VP bounds change");
-    System.err.println("quilt size = " + quilt.size());
-    System.err.println("adjusted display scale = " + adjustedDisplayScale());
-    for(var map : quilt)
-    {
-      System.err.println("\tmap " + map.title() + " scale " + map.cScale());
+    public ENCChart(
+            List<MapModel<SimpleFeatureType, MemFeature>> maps,
+            MapViewport viewport,
+            ChartLocker chartLocker,
+            SVGCache svgCache) {
+        super(
+                maps,
+                viewport,
+                FeatureAdapter.ADAPTER,
+                new RemoveHolesFromPolygon(new RenderGeomCache()),
+                svgCache,
+                TextSizeProvider.PROVIDER);
+        this.chartLocker = chartLocker;
     }
 
-    setMaps(quilt);
-    super.setViewPortBounds(bounds);
-  }
+    public boolean isQuilt() {
+        return maps().size() > 1;
+    }
 
+    public int cScale() {
+        return maps().get(0).cScale();
+    }
+
+    //  public double zoomFactor()
+    //  {
+    //    return bounds().getWidth() / (viewPortBounds().getWidth());
+    //  }
+
+    public double displayScale() {
+        return (int) (cScale() * (1 / zoom()));
+    }
+
+    //  TODO
+    public String title() {
+        return "";
+    } // return maps().get(0).lName();}
+
+    @Override
+    public void setViewPortBounds(ReferencedEnvelope bounds)
+            throws TransformException, NonInvertibleTransformException {
+        var quilt = chartLocker.loadQuilt(bounds, adjustedDisplayScale());
+        System.err.println("--------------------");
+        System.err.println("VP bounds change");
+        System.err.println("quilt size = " + quilt.size());
+        System.err.println("adjusted display scale = " + adjustedDisplayScale());
+        for (var map : quilt) {
+            System.err.println("\tmap " + map.title() + " scale " + map.cScale());
+        }
+
+        setMaps(quilt);
+        super.setViewPortBounds(bounds);
+    }
 }

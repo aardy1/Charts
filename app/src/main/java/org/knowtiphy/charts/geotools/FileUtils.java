@@ -14,26 +14,19 @@ import java.util.stream.StreamSupport;
 /**
  * @author graham
  */
-public class FileUtils
-{
+public class FileUtils {
     /**
      * Get a list of paths to the shape files in a directory.
      *
      * @param dir the directory
      * @return the list of paths
      */
-
-    public static List<String> listShapeFilePaths(Path dir)
-    {
-        try(var stream = Files.newDirectoryStream(dir, "*.shp"))
-        {
-            return StreamSupport
-                       .stream(stream.spliterator(), false)
-                       .map(x -> x.toFile().getAbsolutePath())
-                       .toList();
-        }
-        catch(IOException x)
-        {
+    public static List<String> listShapeFilePaths(Path dir) {
+        try (var stream = Files.newDirectoryStream(dir, "*.shp")) {
+            return StreamSupport.stream(stream.spliterator(), false)
+                    .map(x -> x.toFile().getAbsolutePath())
+                    .toList();
+        } catch (IOException x) {
             return List.of();
         }
     }

@@ -22,141 +22,143 @@ import org.reactfx.EventStream;
 
 import java.util.List;
 
-/**
- * A control to show maps.
- */
-public class ChartView extends Control
-{
+/** A control to show maps. */
+public class ChartView extends Control {
 
-  public enum SkinType
-  {
-
-    CANVAS
-
-  }
-
-  // CSS stuff
-  private static final StyleablePropertyFactory<ChartView> FACTORY = new StyleablePropertyFactory<>(
-    Control.getClassCssMetaData());
-
-  private static final CssMetaData<ChartView, Color> COLOR_META = FACTORY.createColorCssMetaData(
-    "-color", s -> s.color, Color.RED, false);
-
-  private StyleableProperty<Color> color = new SimpleStyleableObjectProperty<>(COLOR_META, this,
-    "color");
-
-  private static String DEFAULT_STYLE_SHEET;
-
-  private SkinType skinType;
-
-  private final ChartLocker chartLocker;
-
-  private final ENCChart chart;
-
-  private final AISModel dynamics;
-
-  private final UnitProfile unitProfile;
-
-  private final MapDisplayOptions displayOptions;
-
-  private final SVGCache svgCache;
-
-  private final EventModel eventModel;
-
-  public ChartView(
-    ChartLocker chartLocker, ENCChart chart, AISModel dynamics, UnitProfile unitProfile,
-    MapDisplayOptions displayOptions, SVGCache svgCache)
-  {
-    this(chartLocker, chart, dynamics, unitProfile, displayOptions, svgCache, SkinType.CANVAS);
-  }
-
-  public ChartView(
-    ChartLocker chartLocker, ENCChart map, AISModel dynamics, UnitProfile unitProfile,
-    MapDisplayOptions displayOptions, SVGCache svgCache, SkinType skinType)
-  {
-    this.chartLocker = chartLocker;
-    this.chart = map;
-    this.dynamics = dynamics;
-    this.unitProfile = unitProfile;
-    this.eventModel = new EventModel();
-    this.displayOptions = displayOptions;
-    this.svgCache = svgCache;
-
-    this.skinType = skinType;
-    getStyleClass().add("chartview");
-
-    // publish events for changes in the dynamics
-    eventModel.boatUpdates.feedFrom(dynamics.aisEvents);
-  }
-
-  @Override
-  public boolean isResizable()
-  {
-    return true;
-  }
-
-  @Override
-  protected Skin createDefaultSkin()
-  {
-    return new ChartViewSkin(this, chartLocker, chart, dynamics, eventModel, unitProfile,
-      displayOptions, svgCache);
-  }
-
-  @Override
-  public synchronized String getUserAgentStylesheet()
-  {
-    switch(skinType)
-    {
-      case CANVAS:
-      default:
-        if(DEFAULT_STYLE_SHEET == null)
-        {
-          DEFAULT_STYLE_SHEET = ResourceLoader.class.getResource("chartview.css").toExternalForm();
-        }
-        return DEFAULT_STYLE_SHEET;
+    public enum SkinType {
+        CANVAS
     }
-  }
 
-  public static List<CssMetaData<? extends Styleable, ?>> getClassCssMetaData()
-  {
-    return FACTORY.getCssMetaData();
-  }
+    // CSS stuff
+    private static final StyleablePropertyFactory<ChartView> FACTORY =
+            new StyleablePropertyFactory<>(Control.getClassCssMetaData());
 
-  @Override
-  public List<CssMetaData<? extends Styleable, ?>> getControlCssMetaData()
-  {
-    return FACTORY.getCssMetaData();
-  }
+    private static final CssMetaData<ChartView, Color> COLOR_META =
+            FACTORY.createColorCssMetaData("-color", s -> s.color, Color.RED, false);
 
-  public class EventModel
-  {
+    private StyleableProperty<Color> color =
+            new SimpleStyleableObjectProperty<>(COLOR_META, this, "color");
 
-    public final EventSource<MouseEvent> mouseEvents = new EventSource<>();
+    private static String DEFAULT_STYLE_SHEET;
 
-    public final EventStream<MouseEvent> mousePressed = mouseEvents.filter(
-      event -> event.getEventType() == MouseEvent.MOUSE_PRESSED);
+    private SkinType skinType;
 
-    public final EventStream<MouseEvent> mouseReleased = mouseEvents.filter(
-      event -> event.getEventType() == MouseEvent.MOUSE_RELEASED);
+    private final ChartLocker chartLocker;
 
-    public final EventStream<MouseEvent> mouseClicked = mouseEvents.filter(
-      event -> event.getEventType() == MouseEvent.MOUSE_CLICKED);
+    private final ENCChart chart;
 
-    public final EventStream<MouseEvent> mouseDoubleClicked = mouseEvents.filter(
-      event -> event.getEventType() == MouseEvent.MOUSE_CLICKED && event.getClickCount() > 1);
+    private final AISModel dynamics;
 
-    public final EventStream<MouseEvent> mouseDragStarted = mouseEvents.filter(
-      event -> event.getEventType() == MouseEvent.DRAG_DETECTED);
+    private final UnitProfile unitProfile;
 
-    public final EventStream<MouseEvent> mouseDragged = mouseEvents.filter(
-      event -> event.getEventType() == MouseEvent.MOUSE_DRAGGED);
+    private final MapDisplayOptions displayOptions;
 
-    public final EventSource<ScrollEvent> scrollEvents = new EventSource<>();
+    private final SVGCache svgCache;
 
-    public final EventSource<ZoomEvent> zoomEvents = new EventSource<>();
+    private final EventModel eventModel;
 
-    public final EventSource<AISEvent> boatUpdates = new EventSource<>();
+    public ChartView(
+            ChartLocker chartLocker,
+            ENCChart chart,
+            AISModel dynamics,
+            UnitProfile unitProfile,
+            MapDisplayOptions displayOptions,
+            SVGCache svgCache) {
+        this(chartLocker, chart, dynamics, unitProfile, displayOptions, svgCache, SkinType.CANVAS);
+    }
 
-  }
+    public ChartView(
+            ChartLocker chartLocker,
+            ENCChart map,
+            AISModel dynamics,
+            UnitProfile unitProfile,
+            MapDisplayOptions displayOptions,
+            SVGCache svgCache,
+            SkinType skinType) {
+        this.chartLocker = chartLocker;
+        this.chart = map;
+        this.dynamics = dynamics;
+        this.unitProfile = unitProfile;
+        this.eventModel = new EventModel();
+        this.displayOptions = displayOptions;
+        this.svgCache = svgCache;
 
+        this.skinType = skinType;
+        getStyleClass().add("chartview");
+
+        // publish events for changes in the dynamics
+        eventModel.boatUpdates.feedFrom(dynamics.aisEvents);
+    }
+
+    @Override
+    public boolean isResizable() {
+        return true;
+    }
+
+    @Override
+    protected Skin createDefaultSkin() {
+        return new ChartViewSkin(
+                this,
+                chartLocker,
+                chart,
+                dynamics,
+                eventModel,
+                unitProfile,
+                displayOptions,
+                svgCache);
+    }
+
+    @Override
+    public synchronized String getUserAgentStylesheet() {
+        switch (skinType) {
+            case CANVAS:
+            default:
+                if (DEFAULT_STYLE_SHEET == null) {
+                    DEFAULT_STYLE_SHEET =
+                            ResourceLoader.class.getResource("chartview.css").toExternalForm();
+                }
+                return DEFAULT_STYLE_SHEET;
+        }
+    }
+
+    public static List<CssMetaData<? extends Styleable, ?>> getClassCssMetaData() {
+        return FACTORY.getCssMetaData();
+    }
+
+    @Override
+    public List<CssMetaData<? extends Styleable, ?>> getControlCssMetaData() {
+        return FACTORY.getCssMetaData();
+    }
+
+    public class EventModel {
+
+        public final EventSource<MouseEvent> mouseEvents = new EventSource<>();
+
+        public final EventStream<MouseEvent> mousePressed =
+                mouseEvents.filter(event -> event.getEventType() == MouseEvent.MOUSE_PRESSED);
+
+        public final EventStream<MouseEvent> mouseReleased =
+                mouseEvents.filter(event -> event.getEventType() == MouseEvent.MOUSE_RELEASED);
+
+        public final EventStream<MouseEvent> mouseClicked =
+                mouseEvents.filter(event -> event.getEventType() == MouseEvent.MOUSE_CLICKED);
+
+        public final EventStream<MouseEvent> mouseDoubleClicked =
+                mouseEvents.filter(
+                        event ->
+                                event.getEventType() == MouseEvent.MOUSE_CLICKED
+                                        && event.getClickCount() > 1);
+
+        public final EventStream<MouseEvent> mouseDragStarted =
+                mouseEvents.filter(event -> event.getEventType() == MouseEvent.DRAG_DETECTED);
+
+        public final EventStream<MouseEvent> mouseDragged =
+                mouseEvents.filter(event -> event.getEventType() == MouseEvent.MOUSE_DRAGGED);
+
+        public final EventSource<ScrollEvent> scrollEvents = new EventSource<>();
+
+        public final EventSource<ZoomEvent> zoomEvents = new EventSource<>();
+
+        public final EventSource<AISEvent> boatUpdates = new EventSource<>();
+    }
 }
