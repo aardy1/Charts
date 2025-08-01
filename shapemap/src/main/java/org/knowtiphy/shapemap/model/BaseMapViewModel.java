@@ -1,5 +1,8 @@
 package org.knowtiphy.shapemap.model;
 
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.transform.Affine;
 import javafx.scene.transform.NonInvertibleTransformException;
@@ -9,27 +12,26 @@ import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.knowtiphy.shapemap.api.IFeatureAdapter;
 import org.knowtiphy.shapemap.api.IRenderablePolygonProvider;
 import org.knowtiphy.shapemap.api.ISVGProvider;
-import org.knowtiphy.shapemap.api.ITextSizeProvider;
+import org.knowtiphy.shapemap.api.ITextBoundsFunction;
 import org.locationtech.jts.geom.Coordinates;
 import org.reactfx.Change;
 import org.reactfx.EventSource;
 import org.reactfx.EventStream;
 
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 /**
- * A map view model -- a map model, a viewport, and some event streams.
+ * A map view model -- a map model, a viewport, some event streams, SVG provider, etc.
  *
  * @param <S> the type of the schema in the map model
  * @param <F> the type of the features in the map model
  */
 public abstract class BaseMapViewModel<S, F> {
+
     protected final EventSource<Change<Boolean>> layerVisibilityEvent = new EventSource<>();
 
     protected final EventSource<Change<ReferencedEnvelope>> viewPortBoundsEvent =
             new EventSource<>();
+
+    private final MapViewport viewPort;
 
     private final IFeatureAdapter<F> featureAdapter;
 
@@ -37,15 +39,17 @@ public abstract class BaseMapViewModel<S, F> {
 
     private final ISVGProvider svgProvider;
 
-    private final ITextSizeProvider textSizeProvider;
+    private final ITextBoundsFunction textSizeProvider;
 
     private double zoom = 1;
 
     protected BaseMapViewModel(
+            MapViewport viewPort,
             IFeatureAdapter<F> featureAdapter,
             IRenderablePolygonProvider renderablePolygonProvider,
             ISVGProvider svgProvider,
-            ITextSizeProvider textSizeProvider) {
+            ITextBoundsFunction textSizeProvider) {
+        this.viewPort = viewPort;
         this.featureAdapter = featureAdapter;
         this.renderablePolygonProvider = renderablePolygonProvider;
         this.svgProvider = svgProvider;
@@ -63,19 +67,12 @@ public abstract class BaseMapViewModel<S, F> {
 
     public abstract ReferencedEnvelope bounds();
 
-    public abstract ReferencedEnvelope viewPortBounds();
-
     public abstract void setViewPortBounds(ReferencedEnvelope bounds)
             throws TransformException, NonInvertibleTransformException;
 
-    public abstract Rectangle2D viewPortScreenArea();
-
-    public abstract void setViewPortScreenArea(Rectangle2D bounds)
-            throws TransformException, NonInvertibleTransformException;
-
-    public abstract Affine viewPortScreenToWorld();
-
-    public abstract Affine viewPortWorldToScreen();
+    public MapViewport viewPort() {
+        return viewPort;
+    }
 
     public IFeatureAdapter<F> featureAdapter() {
         return featureAdapter;
@@ -89,7 +86,7 @@ public abstract class BaseMapViewModel<S, F> {
         return svgProvider;
     }
 
-    public ITextSizeProvider textSizeProvider() {
+    public ITextBoundsFunction textSizeProvider() {
         return textSizeProvider;
     }
 
@@ -114,6 +111,27 @@ public abstract class BaseMapViewModel<S, F> {
         }
     }
 
+    public ReferencedEnvelope viewPortBounds() {
+        return viewPort.bounds();
+    }
+
+    public Rectangle2D viewPortScreenArea() {
+        return viewPort.screenArea();
+    }
+
+    public void setViewPortScreenArea(Rectangle2D screenArea)
+            throws TransformException, NonInvertibleTransformException {
+        viewPort.setScreenArea(screenArea);
+    }
+
+    public Affine viewPortScreenToWorld() {
+        return viewPort.screenToWorld();
+    }
+
+    public Affine viewPortWorldToScreen() {
+        return viewPort.worldToScreen();
+    }
+
     public EventStream<Change<Boolean>> layerVisibilityEvent() {
         return layerVisibilityEvent;
     }
@@ -122,7 +140,7 @@ public abstract class BaseMapViewModel<S, F> {
         return viewPortBoundsEvent;
     }
 
-    //  TODO -- all maps have the same CRS -- os this too strong an assumption?
+    //  TODO -- all maps have the same CRS -- is this too strong an assumption?
     public CoordinateReferenceSystem crs() {
         return bounds().getCoordinateReferenceSystem();
     }

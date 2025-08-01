@@ -5,9 +5,8 @@
 
 package org.knowtiphy.shapemap.api;
 
-import org.locationtech.jts.geom.Geometry;
-
 import java.util.function.BiFunction;
+import org.locationtech.jts.geom.Geometry;
 
 /**
  * A function from a feature of type F to a value of type T. e.g. when filtering T will be boolean,

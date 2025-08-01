@@ -2,9 +2,9 @@
  * Copyright Knowtiphy
  * All rights reserved.
  */
+package org.knowtiphy.charts.chart;
 
-package org.knowtiphy.charts.enc;
-
+import java.util.List;
 import javafx.scene.transform.NonInvertibleTransformException;
 import org.geotools.api.feature.simple.SimpleFeatureType;
 import org.geotools.api.referencing.operation.TransformException;
@@ -17,10 +17,12 @@ import org.knowtiphy.shapemap.renderer.context.RemoveHolesFromPolygon;
 import org.knowtiphy.shapemap.renderer.context.RenderGeomCache;
 import org.knowtiphy.shapemap.renderer.context.SVGCache;
 
-import java.util.List;
-
-/** An ENC chart -- a map view model for a quilt of ENC cells. */
+/**
+ * An ENC chart -- a map view model that maintains a quilt of ENC cells (loaded from a chart locker)
+ * as the viewport bounds changes.
+ */
 public class ENCChart extends Quilt<SimpleFeatureType, MemFeature> {
+
     private final ChartLocker chartLocker;
 
     public ENCChart(
@@ -34,7 +36,8 @@ public class ENCChart extends Quilt<SimpleFeatureType, MemFeature> {
                 FeatureAdapter.ADAPTER,
                 new RemoveHolesFromPolygon(new RenderGeomCache()),
                 svgCache,
-                TextSizeProvider.PROVIDER);
+                DefaultTextBoundsFunction.FUNCTION);
+
         this.chartLocker = chartLocker;
     }
 
@@ -50,7 +53,6 @@ public class ENCChart extends Quilt<SimpleFeatureType, MemFeature> {
     //  {
     //    return bounds().getWidth() / (viewPortBounds().getWidth());
     //  }
-
     public double displayScale() {
         return (int) (cScale() * (1 / zoom()));
     }
@@ -63,6 +65,7 @@ public class ENCChart extends Quilt<SimpleFeatureType, MemFeature> {
     @Override
     public void setViewPortBounds(ReferencedEnvelope bounds)
             throws TransformException, NonInvertibleTransformException {
+        //  when the viewport bounds change we have to recompute the quilt
         var quilt = chartLocker.loadQuilt(bounds, adjustedDisplayScale());
         System.err.println("--------------------");
         System.err.println("VP bounds change");

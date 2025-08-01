@@ -10,10 +10,10 @@ import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.knowtiphy.shapemap.api.IFeatureAdapter;
 import org.knowtiphy.shapemap.api.IRenderablePolygonProvider;
 import org.knowtiphy.shapemap.api.ISVGProvider;
-import org.knowtiphy.shapemap.api.ITextSizeProvider;
 import org.knowtiphy.shapemap.model.MapLayer;
 
 import java.util.Collection;
+import org.knowtiphy.shapemap.api.ITextBoundsFunction;
 
 /**
  * @author graham
@@ -32,6 +32,6 @@ public record RenderingContext<S, F>
     IFeatureAdapter<F> featureAdapter,
     IRenderablePolygonProvider renderablePolygonProvider,
     ISVGProvider svgProvider,
-    ITextSizeProvider textSizeProvider
+    ITextBoundsFunction textSizeProvider
 ) {}
 //@formatter:on

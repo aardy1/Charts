@@ -1,5 +1,11 @@
 package org.knowtiphy.charts;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -20,15 +26,15 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import org.controlsfx.control.PropertySheet;
 import org.geotools.api.feature.simple.SimpleFeatureType;
+import org.knowtiphy.charts.chart.ChartLoader;
+import org.knowtiphy.charts.chart.ChartLocker;
+import org.knowtiphy.charts.chart.ENCChart;
+import org.knowtiphy.charts.chart.event.ChartLockerEvent;
 import org.knowtiphy.charts.chartview.ChartLockerDialog;
 import org.knowtiphy.charts.chartview.ChartView;
 import org.knowtiphy.charts.chartview.MapDisplayOptions;
 import org.knowtiphy.charts.desktop.AppSettingsDialog;
 import org.knowtiphy.charts.dynamics.AISModel;
-import org.knowtiphy.charts.enc.ChartLoader;
-import org.knowtiphy.charts.enc.ChartLocker;
-import org.knowtiphy.charts.enc.ENCChart;
-import org.knowtiphy.charts.enc.event.ChartLockerEvent;
 import org.knowtiphy.charts.memstore.MapStats;
 import org.knowtiphy.charts.memstore.MemFeature;
 import org.knowtiphy.charts.memstore.StyleReader;
@@ -36,18 +42,10 @@ import org.knowtiphy.charts.platform.IPlatform;
 import org.knowtiphy.charts.platform.Platform;
 import org.knowtiphy.charts.settings.AppSettings;
 import org.knowtiphy.charts.utils.FXUtils;
-import org.knowtiphy.charts.utils.ToggleModel;
-import org.knowtiphy.shapemap.renderer.context.SVGCache;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import static org.knowtiphy.charts.utils.FXUtils.later;
 import static org.knowtiphy.charts.utils.FXUtils.resizeable;
+import org.knowtiphy.charts.utils.ToggleModel;
+import org.knowtiphy.shapemap.renderer.context.SVGCache;
 
 /** Knowtiphy Charts application. */
 public class KnowtiphyCharts extends Application {
@@ -64,8 +62,7 @@ public class KnowtiphyCharts extends Application {
 
     private static final int CHART_LOCKER_HEIGHT = 400;
 
-    private static final SVGCache SVG_CACHE =
-            new SVGCache(org.knowtiphy.charts.chartview.markicons.ResourceLoader.class);
+    private static final SVGCache SVG_CACHE = new SVGCache(ResourceLoader.class);
 
     private ChartLocker chartLocker;
 

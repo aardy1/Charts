@@ -1,25 +1,23 @@
 package org.knowtiphy.shapemap.model;
 
-import javafx.geometry.Rectangle2D;
-import javafx.scene.transform.Affine;
+import java.util.List;
 import javafx.scene.transform.NonInvertibleTransformException;
 import org.geotools.api.referencing.operation.TransformException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.knowtiphy.shapemap.api.IFeatureAdapter;
 import org.knowtiphy.shapemap.api.IRenderablePolygonProvider;
 import org.knowtiphy.shapemap.api.ISVGProvider;
-import org.knowtiphy.shapemap.api.ITextSizeProvider;
+import org.knowtiphy.shapemap.api.ITextBoundsFunction;
 import org.reactfx.Change;
 
-import java.util.List;
-
 /**
- * A map view model for a collection of map views quilted together
+ * A map view model for a collection of map models quilted together.
  *
  * @param <S> the type of the schema in the map model
  * @param <F> the type of the features in the map model
  */
 public class Quilt<S, F> extends BaseMapViewModel<S, F> {
+
     private List<MapModel<S, F>> maps;
 
     private final MapViewport viewPort;
@@ -30,8 +28,8 @@ public class Quilt<S, F> extends BaseMapViewModel<S, F> {
             IFeatureAdapter<F> featureAdapter,
             IRenderablePolygonProvider renderablePolygonProvider,
             ISVGProvider svgProvider,
-            ITextSizeProvider textSizeProvider) {
-        super(featureAdapter, renderablePolygonProvider, svgProvider, textSizeProvider);
+            ITextBoundsFunction textSizeProvider) {
+        super(viewPort, featureAdapter, renderablePolygonProvider, svgProvider, textSizeProvider);
         this.viewPort = viewPort;
         this.maps = maps;
 
@@ -60,21 +58,25 @@ public class Quilt<S, F> extends BaseMapViewModel<S, F> {
         viewPortBoundsEvent.push(new Change<>(oldBounds, bounds));
     }
 
-    @Override
-    public void setViewPortScreenArea(Rectangle2D bounds)
-            throws TransformException, NonInvertibleTransformException {
-        viewPort.setScreenArea(bounds);
-    }
-
-    @Override
-    public Affine viewPortScreenToWorld() {
-        return viewPort.screenToWorld();
-    }
-
-    @Override
-    public Affine viewPortWorldToScreen() {
-        return viewPort.worldToScreen();
-    }
+    //
+    //    @Override
+    //    public void setViewPortScreenArea(Rectangle2D bounds)
+    //        throws TransformException, NonInvertibleTransformException
+    //    {
+    //        viewPort.setScreenArea(bounds);
+    //    }
+    //
+    //    @Override
+    //    public Affine viewPortScreenToWorld()
+    //    {
+    //        return viewPort.screenToWorld();
+    //    }
+    //
+    //    @Override
+    //    public Affine viewPortWorldToScreen()
+    //    {
+    //        return viewPort.worldToScreen();
+    //    }
 
     @Override
     public double displayScale() {
@@ -86,13 +88,14 @@ public class Quilt<S, F> extends BaseMapViewModel<S, F> {
         return viewPort.bounds();
     }
 
-    @Override
-    public ReferencedEnvelope viewPortBounds() {
-        return viewPort.bounds();
-    }
-
-    @Override
-    public Rectangle2D viewPortScreenArea() {
-        return viewPort.screenArea();
-    }
+    //    @Override
+    //    public ReferencedEnvelope viewPortBounds()
+    //    {
+    //        return viewPort.bounds();
+    //    }
+    //    @Override
+    //    public Rectangle2D viewPortScreenArea()
+    //    {
+    //        return viewPort.screenArea();
+    //    }
 }

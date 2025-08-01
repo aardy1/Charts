@@ -24,8 +24,8 @@ import javafx.stage.StageStyle;
 import org.controlsfx.dialog.ProgressDialog;
 import org.controlsfx.glyphfont.Glyph;
 import org.knowtiphy.charts.Fonts;
-import org.knowtiphy.charts.enc.ChartDownloaderNotifier;
-import org.knowtiphy.charts.enc.ChartLocker;
+import org.knowtiphy.charts.chart.ChartDownloaderNotifier;
+import org.knowtiphy.charts.chart.ChartLocker;
 import org.knowtiphy.charts.enc.ENCCell;
 import org.knowtiphy.shapemap.renderer.context.SVGCache;
 
@@ -162,7 +162,7 @@ public class ChartLockerDialog {
             grid.getColumnConstraints().addAll(neverGrow(), neverGrow(), neverGrow());
 
             var row = 0;
-            for (var cell : catalog.activeCells()) {
+            for (var cell : catalog.cells()) {
                 var name = new Label(cell.lName());
                 var scale = new Label(" 1:" + cell.cScale());
                 var show = showButton(cell);

@@ -2,7 +2,6 @@
  * Copyright Knowtiphy
  * All rights reserved.
  */
-
 package org.knowtiphy.shapemap.api;
 
 import org.geotools.geometry.jts.ReferencedEnvelope;

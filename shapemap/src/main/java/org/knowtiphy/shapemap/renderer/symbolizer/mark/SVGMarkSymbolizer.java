@@ -2,7 +2,6 @@
  * Copyright Knowtiphy
  * All rights reserved.
  */
-
 package org.knowtiphy.shapemap.renderer.symbolizer.mark;
 
 import org.knowtiphy.shapemap.renderer.GraphicsRenderingContext;
@@ -14,6 +13,8 @@ import org.locationtech.jts.geom.Point;
 
 /**
  * @author graham
+ * @param <S> the type of the feature schema
+ * @param <F> the type of the features conforming to the schema
  */
 public class SVGMarkSymbolizer<S, F> extends BaseMarkSymbolizer<S, F> {
 

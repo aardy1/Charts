@@ -1,10 +1,17 @@
-package org.knowtiphy.charts.enc;
+package org.knowtiphy.charts.chart;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
+import javax.xml.stream.XMLStreamException;
 import org.geotools.api.feature.simple.SimpleFeatureType;
 import org.geotools.api.feature.type.Name;
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.data.store.ContentFeatureSource;
 import org.knowtiphy.charts.chartview.MapDisplayOptions;
+import org.knowtiphy.charts.enc.ENCCell;
+import static org.knowtiphy.charts.geotools.FileUtils.listShapeFilePaths;
 import org.knowtiphy.charts.memstore.MemFeature;
 import org.knowtiphy.charts.memstore.MemStore;
 import org.knowtiphy.charts.memstore.StyleReader;
@@ -16,24 +23,16 @@ import org.knowtiphy.shapemap.style.parser.StyleSyntaxException;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.index.strtree.STRtree;
 
-import javax.xml.stream.XMLStreamException;
-import java.io.File;
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
-
-import static org.knowtiphy.charts.geotools.FileUtils.listShapeFilePaths;
-
 /**
  * @author graham
  */
 public class ChartBuilder {
+
     public static final String[] LAYER_ORDER =
             new String[] { //
 
                 //	general land outline
                 S57.OC_LNDARE,
-
                 // sea areas
                 S57.OC_SEAARE,
                 S57.OC_DEPARE,
@@ -42,29 +41,23 @@ public class ChartBuilder {
                 S57.OC_DMPGRD,
                 S57.OC_RESARE,
                 S57.OC_MIPARE,
-
                 // land areas
                 S57.OC_ICEARE,
-
                 //  land features
                 S57.OC_BUAARE,
                 S57.OC_RIVERS,
                 S57.OC_LAKARE,
                 S57.OC_CANALS,
-
                 // possibly poly styled sea features
                 S57.OC_FAIRWY,
-
                 // line styled sea features
                 S57.OC_DEPCNT,
                 S57.OC_SOUNDG,
                 S57.OC_BRIDGE,
                 S57.OC_CAUSWY,
                 S57.OC_DYKCON,
-
                 // point styled land features
                 S57.OC_LNDMRK,
-
                 // point styled sea features
                 S57.OC_ACHARE,
                 S57.OC_ACHBRT,
@@ -100,7 +93,6 @@ public class ChartBuilder {
     private final AppSettings settings;
 
     // conversion issue SBDAREA is a bunch of points, should be a bunch of polys?
-
     private final StyleReader<SimpleFeatureType, MemFeature> styleReader;
 
     private final MapDisplayOptions displayOptions;
@@ -110,6 +102,7 @@ public class ChartBuilder {
             AppSettings settings,
             StyleReader<SimpleFeatureType, MemFeature> styleReader,
             MapDisplayOptions displayOptions) {
+
         this.settings = settings;
         this.cell = cell;
         this.styleReader = styleReader;
@@ -122,7 +115,7 @@ public class ChartBuilder {
 
         var map =
                 new MapModel<SimpleFeatureType, MemFeature>(
-                        cell.bounds(), cell.cScale(), cell.lName()); // , SchemaAdapter.ADAPTER);
+                        cell.bounds(), cell.cScale(), cell.lName());
         var store = new MemStore(map);
 
         for (var featureTypeName : LAYER_ORDER) {
@@ -207,7 +200,6 @@ public class ChartBuilder {
 // fGeomDesc.getMinOccurs(),
 // fGeomDesc.getMaxOccurs(), fGeomDesc.isNillable(), null);
 // }
-
 // switch (geomType) {
 // case "MultiPoint" -> {
 // var newGeomDescriptor = singlePointGeomDescriptor(feature);

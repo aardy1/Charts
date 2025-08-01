@@ -2,19 +2,17 @@
  * Copyright Knowtiphy
  * All rights reserved.
  */
-
-package org.knowtiphy.charts.enc;
-
-import org.geotools.api.feature.simple.SimpleFeatureType;
-import org.knowtiphy.charts.memstore.MemFeature;
-import org.knowtiphy.charts.settings.AppSettings;
-import org.knowtiphy.shapemap.api.IFeatureFunction;
-import org.knowtiphy.shapemap.api.IStyleCompiler;
+package org.knowtiphy.charts.chart;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiFunction;
+import org.geotools.api.feature.simple.SimpleFeatureType;
+import org.knowtiphy.charts.memstore.MemFeature;
+import org.knowtiphy.charts.settings.AppSettings;
+import org.knowtiphy.shapemap.api.IFeatureFunction;
+import org.knowtiphy.shapemap.api.IStyleCompiler;
 
 /**
  * @author graham

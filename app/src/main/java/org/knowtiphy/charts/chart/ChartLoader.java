@@ -3,7 +3,7 @@
  * All rights reserved.
  */
 
-package org.knowtiphy.charts.enc;
+package org.knowtiphy.charts.chart;
 
 import org.geotools.api.feature.simple.SimpleFeatureType;
 import org.knowtiphy.charts.chartview.MapDisplayOptions;
@@ -17,6 +17,7 @@ import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import org.knowtiphy.charts.enc.ENCCell;
 
 /** A loader of maps from a local ENC chart cache. */
 public class ChartLoader {

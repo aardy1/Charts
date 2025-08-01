@@ -2,25 +2,20 @@
  * Copyright Knowtiphy
  * All rights reserved.
  */
-
 package org.knowtiphy.charts.enc;
 
-import org.locationtech.jts.geom.Coordinate;
-
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.nio.file.Path;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.nio.file.Path;
+import org.locationtech.jts.geom.Coordinate;
 
-/**
- * @author graham
- */
-public class CatalogReader {
+/** A reader of ENC Catalogs (in XML format) from a path. */
+public class ENCCatalogReader {
+
     private static final String TITLE = "title";
 
     private static final String CELL = "cell";
@@ -47,18 +42,13 @@ public class CatalogReader {
 
     private final Path chartsDir;
 
-    private Catalog catalog;
+    private ENCProductCatalog catalog;
 
     private final InputStream stream;
 
-    public CatalogReader(Path chartsDir, Path catalogFile) throws FileNotFoundException {
+    public ENCCatalogReader(Path chartsDir, Path catalogFile) throws FileNotFoundException {
         this.chartsDir = chartsDir;
         stream = new FileInputStream(catalogFile.toFile());
-    }
-
-    public CatalogReader(Path chartsDir, URL catalogFile) throws IOException {
-        this.chartsDir = chartsDir;
-        stream = catalogFile.openStream();
     }
 
     /**
@@ -68,12 +58,14 @@ public class CatalogReader {
      * @throws XMLStreamException on a malformed catalog file
      */
     @SuppressWarnings("null")
-    public Catalog read() throws XMLStreamException {
+    public ENCProductCatalog read() throws XMLStreamException {
         XMLEventReader reader = XMLInputFactory.newInstance().createXMLEventReader(stream);
 
         ENCCell cell = null;
-        Panel panel = null;
+        ENCPanel panel = null;
         Coordinate coordinate = null;
+
+        catalog = new ENCProductCatalog();
 
         while (reader.hasNext()) {
             var nextEvent = reader.nextEvent();
@@ -82,12 +74,11 @@ public class CatalogReader {
                 var startElement = nextEvent.asStartElement();
                 switch (startElement.getName().getLocalPart()) {
                     case TITLE -> {
-                        catalog = new Catalog();
                         catalog.setTitle(reader.nextEvent().asCharacters().getData());
                     }
                     case CELL -> {
                         assert catalog != null;
-                        cell = new ENCCell(catalog);
+                        cell = new ENCCell(Naming.regionName(catalog));
                     }
                     case CELL_NAME -> {
                         assert cell != null;
@@ -115,12 +106,14 @@ public class CatalogReader {
                         assert cell != null;
                         cell.setZipFileLocation(reader.nextEvent().asCharacters().getData());
                     }
-                    case PANEL -> panel = new Panel();
-                    case PANEL_NO -> {
-                        assert panel != null;
-                        panel.setPanelNumber(
-                                Integer.parseInt(reader.nextEvent().asCharacters().getData()));
-                    }
+                    case PANEL -> panel = new ENCPanel();
+                    //                    case PANEL_NO ->
+                    //                    {
+                    //                        assert panel != null;
+                    //                        panel.setPanelNumber(
+                    //
+                    // Integer.parseInt(reader.nextEvent().asCharacters().getData()));
+                    //                    }
                     case VERTEX -> coordinate = new Coordinate();
                     case LONG -> {
                         assert coordinate != null;
@@ -133,7 +126,7 @@ public class CatalogReader {
                                 Double.parseDouble(reader.nextEvent().asCharacters().getData());
                     }
                     default -> {
-                        // do nothing
+                        // ignore other tags
                     }
                 }
             }
@@ -144,13 +137,15 @@ public class CatalogReader {
                     case CELL -> catalog.addCell(cell);
                     case PANEL -> {
                         assert panel != null;
-                        panel.createGeom();
                         assert cell != null;
                         cell.addPanel(panel);
                     }
                     case VERTEX -> {
                         assert panel != null;
                         panel.addVertex(coordinate);
+                    }
+                    default -> {
+                        // ignore other tags
                     }
                 }
             }

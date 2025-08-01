@@ -3,7 +3,7 @@
  * All rights reserved.
  */
 
-package org.knowtiphy.charts.enc;
+package org.knowtiphy.charts.chart;
 
 import org.knowtiphy.charts.memstore.MemFeature;
 import org.knowtiphy.shapemap.api.FeatureGeomType;

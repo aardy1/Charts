@@ -2,9 +2,12 @@
  * Copyright Knowtiphy
  * All rights reserved.
  */
-
 package org.knowtiphy.charts.enc;
 
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.locationtech.jts.geom.Geometry;
@@ -12,16 +15,10 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.MultiPolygon;
 import org.locationtech.jts.geom.Polygon;
 
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-
-/**
- * @author graham
- */
+/** An ENC cell -- a list of ENC panels plus some metadata. */
 public class ENCCell {
-    private final Catalog catalog;
+
+    private final String regionName;
 
     private String name;
 
@@ -33,16 +30,16 @@ public class ENCCell {
 
     private String zipFileLocation;
 
-    private final List<Panel> panels = new ArrayList<>();
+    private final List<ENCPanel> panels = new ArrayList<>();
 
     private Path location;
 
-    public ENCCell(Catalog catalog) {
-        this.catalog = catalog;
+    public ENCCell(String regionName) {
+        this.regionName = regionName;
     }
 
-    public Catalog catalog() {
-        return catalog;
+    public String regionName() {
+        return regionName;
     }
 
     public String name() {
@@ -85,11 +82,11 @@ public class ENCCell {
         this.zipFileLocation = zipFileLocation;
     }
 
-    public List<Panel> panels() {
+    public List<ENCPanel> panels() {
         return panels;
     }
 
-    public void addPanel(Panel panel) {
+    public void addPanel(ENCPanel panel) {
         this.panels.add(panel);
     }
 

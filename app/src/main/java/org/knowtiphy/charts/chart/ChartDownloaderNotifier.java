@@ -1,4 +1,6 @@
-package org.knowtiphy.charts.enc;
+package org.knowtiphy.charts.chart;
+
+import org.knowtiphy.charts.enc.ENCCell;
 
 public class ChartDownloaderNotifier {
     public void start() {

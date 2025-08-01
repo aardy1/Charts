@@ -2,10 +2,8 @@
  * Copyright Knowtiphy
  * All rights reserved.
  */
-
 package org.knowtiphy.charts.enc;
 
-import javax.xml.stream.XMLStreamException;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -13,6 +11,7 @@ import java.io.InputStreamReader;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import javax.xml.stream.XMLStreamException;
 
 /**
  * @author graham
@@ -29,16 +28,16 @@ public class Setup {
                     "-f",
                     "ESRI Shapefile");
 
-    public static Catalog setup(Path catalogFile)
+    public static ENCProductCatalog setup(Path catalogFile)
             throws XMLStreamException, IOException, InterruptedException {
-        var catalog = new CatalogReader(null, catalogFile).read();
+        var catalog = new ENCCatalogReader(null, catalogFile).read();
 
         var src = "/Users/graham/Documents/Charts/ENC/US_REGION08";
         var baseTarget = "/Users/graham/tmp/ENC/" + regionName(catalog.title());
 
         ensureDirExists(baseTarget);
 
-        for (var cell : catalog.activeCells()) {
+        for (var cell : catalog.cells()) {
             var cellTargetDir =
                     baseTarget
                             + "/"

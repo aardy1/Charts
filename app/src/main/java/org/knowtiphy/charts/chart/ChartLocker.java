@@ -2,35 +2,10 @@
  * Copyright Knowtiphy
  * All rights reserved.
  */
+package org.knowtiphy.charts.chart;
 
-package org.knowtiphy.charts.enc;
-
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.collections.transformation.SortedList;
-import javafx.scene.transform.NonInvertibleTransformException;
-import org.apache.commons.lang3.tuple.Pair;
-import org.geotools.api.feature.simple.SimpleFeatureType;
-import org.geotools.api.referencing.operation.TransformException;
-import org.geotools.geometry.jts.JTS;
-import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.knowtiphy.charts.chartview.MapDisplayOptions;
-import org.knowtiphy.charts.enc.event.ChartLockerEvent;
-import org.knowtiphy.charts.memstore.MemFeature;
-import org.knowtiphy.shapemap.model.MapModel;
-import org.knowtiphy.shapemap.model.MapViewport;
-import org.knowtiphy.shapemap.renderer.context.SVGCache;
-import org.knowtiphy.shapemap.style.parser.StyleSyntaxException;
-import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.TopologyException;
-import org.reactfx.EventSource;
-import org.reactfx.EventStream;
-
-import javax.xml.stream.XMLStreamException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
-import java.nio.channels.Channels;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -41,11 +16,36 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.collections.transformation.SortedList;
+import javafx.scene.transform.NonInvertibleTransformException;
+import javax.xml.stream.XMLStreamException;
+import org.apache.commons.lang3.tuple.Pair;
+import org.geotools.api.feature.simple.SimpleFeatureType;
+import org.geotools.api.referencing.operation.TransformException;
+import org.geotools.geometry.jts.JTS;
+import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.knowtiphy.charts.chart.event.ChartLockerEvent;
+import org.knowtiphy.charts.chartview.MapDisplayOptions;
+import org.knowtiphy.charts.enc.ENCCatalogReader;
+import org.knowtiphy.charts.enc.ENCCell;
+import org.knowtiphy.charts.enc.ENCProductCatalog;
+import org.knowtiphy.charts.memstore.MemFeature;
+import org.knowtiphy.shapemap.model.MapModel;
+import org.knowtiphy.shapemap.model.MapViewport;
+import org.knowtiphy.shapemap.renderer.context.SVGCache;
+import org.knowtiphy.shapemap.style.parser.StyleSyntaxException;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.TopologyException;
+import org.reactfx.EventSource;
+import org.reactfx.EventStream;
 
 /**
  * @author graham
  */
 public class ChartLocker {
+
     private final Path catalogsDir;
 
     private final Path chartsDir;
@@ -56,7 +56,7 @@ public class ChartLocker {
 
     private final EventSource<ChartLockerEvent> chartEvents = new EventSource<>();
 
-    private final List<Catalog> availableCatalogs = new ArrayList<>();
+    private final List<ENCProductCatalog> availableCatalogs = new ArrayList<>();
 
     private final ObservableList<ENCCell> unsortedHistory = FXCollections.observableArrayList();
 
@@ -75,7 +75,7 @@ public class ChartLocker {
         this.mapDisplayOptions = mapDisplayOptions;
         //  load cached catalogs
         for (var catalogFile : readAvailableCatalogs(catalogsDir)) {
-            var catalog = new CatalogReader(chartsDir, catalogFile).read();
+            var catalog = new ENCCatalogReader(chartsDir, catalogFile).read();
             availableCatalogs.add(catalog);
         }
     }
@@ -89,7 +89,7 @@ public class ChartLocker {
 
         var result = new ArrayList<ENCCell>();
         for (var catalog : availableCatalogs()) {
-            for (var cell : catalog.activeCells()) {
+            for (var cell : catalog.cells()) {
                 if (cell.intersects(bounds)) {
                     result.add(cell);
                 }
@@ -146,7 +146,7 @@ public class ChartLocker {
     // TODO -- needs to go away or be smarter
     public ENCCell getCell(String lname, int cscale) {
         for (var catalog : availableCatalogs) {
-            for (var cell : catalog.activeCells()) {
+            for (var cell : catalog.cells()) {
                 if (cell.lName().equals(lname) && cell.cScale() == cscale) {
                     return cell;
                 }
@@ -156,23 +156,23 @@ public class ChartLocker {
         throw new IllegalArgumentException();
     }
 
-    public Collection<Catalog> availableCatalogs() {
+    public Collection<ENCProductCatalog> availableCatalogs() {
         return availableCatalogs;
     }
 
     //  TODO -- reading it twice is a bit clumsy
     public void addCatalog(URL url) throws IOException, XMLStreamException {
-        //  read and check for no syntax issues
-        var catalog = new CatalogReader(chartsDir, url).read();
-
-        //  read and place in the catalogs directory
-        var filePath = catalogsDir.resolve(Path.of(catalog.title() + ".xml"));
-        try (var channel = Channels.newChannel(url.openStream());
-                var fileOutputStream = new FileOutputStream(filePath.toFile());
-                var fileChannel = fileOutputStream.getChannel()) {
-            fileChannel.transferFrom(channel, 0, Long.MAX_VALUE);
-            availableCatalogs.add(catalog);
-        }
+        //        //  read and check for no syntax issues
+        //        var catalog = new ENCCatalogReader().read(url.openStream());
+        //
+        //        //  read and place in the catalogs directory
+        //        var filePath = catalogsDir.resolve(Path.of(catalog.title() + ".xml"));
+        //        try (var channel = Channels.newChannel(url.openStream()); var fileOutputStream =
+        // new FileOutputStream(filePath.toFile()); var fileChannel = fileOutputStream.getChannel())
+        //        {
+        //            fileChannel.transferFrom(channel, 0, Long.MAX_VALUE);
+        //            availableCatalogs.add(catalog);
+        //        }
     }
 
     public void downloadChart(ENCCell cell, ChartDownloaderNotifier notifier) throws IOException {
@@ -213,7 +213,6 @@ public class ChartLocker {
         //      quilt.add(Pair.of(ithCell, ithGeom.difference(used).intersection(extent)));
         //      used = used.union(ithGeom);
         //    }
-
         var cell = intersections.get(0);
         var geom = cell.geom().intersection(extent);
         quilt.add(Pair.of(cell, geom));

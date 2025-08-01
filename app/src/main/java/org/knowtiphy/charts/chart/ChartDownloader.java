@@ -3,7 +3,7 @@
  * All rights reserved.
  */
 
-package org.knowtiphy.charts.enc;
+package org.knowtiphy.charts.chart;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -20,6 +20,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import org.knowtiphy.charts.enc.ENCCell;
+import org.knowtiphy.charts.enc.ENCProductCatalog;
+import org.knowtiphy.charts.enc.Naming;
 
 /** A downloader of charts from the web */
 public class ChartDownloader {
@@ -55,20 +58,21 @@ public class ChartDownloader {
     }
 
     public static void downloadCatalog(
-            Catalog catalog, Path chartsDir, ChartDownloaderNotifier notifier) throws IOException {
+            ENCProductCatalog catalog, Path chartsDir, ChartDownloaderNotifier notifier)
+            throws IOException {
         notifier.start();
 
         var downloadTo = Files.createTempDirectory(null);
 
         try {
             //  download the zip files referenced in the catalog
-            for (var cell : catalog.activeCells()) {
+            for (var cell : catalog.cells()) {
                 notifier.reading(cell);
                 unzipFolder(new URL(cell.zipFileLocation()), downloadTo);
             }
 
             //  convert the downloaded ENC files into shape files
-            for (var cell : catalog.activeCells()) {
+            for (var cell : catalog.cells()) {
                 convertCell(cell, chartsDir, downloadTo);
             }
         } finally {

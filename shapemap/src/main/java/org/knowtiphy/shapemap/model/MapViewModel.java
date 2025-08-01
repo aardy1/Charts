@@ -1,26 +1,25 @@
 package org.knowtiphy.shapemap.model;
 
-import javafx.geometry.Rectangle2D;
-import javafx.scene.transform.Affine;
+import java.util.List;
 import javafx.scene.transform.NonInvertibleTransformException;
 import org.geotools.api.referencing.operation.TransformException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.knowtiphy.shapemap.api.IFeatureAdapter;
 import org.knowtiphy.shapemap.api.IRenderablePolygonProvider;
 import org.knowtiphy.shapemap.api.ISVGProvider;
-import org.knowtiphy.shapemap.api.ITextSizeProvider;
+import org.knowtiphy.shapemap.api.ITextBoundsFunction;
 import org.reactfx.Change;
 
 /**
- * A map view model for a single map -- a map model, a viewport, and some event streams.
+ * A map view model for a single map model.
  *
  * @param <S> the type of the schema in the map model
  * @param <F> the type of the features in the map model
  */
 public abstract class MapViewModel<S, F> extends BaseMapViewModel<S, F> {
-    private final MapModel<S, F> map;
 
-    private final MapViewport viewPort;
+    private final MapModel<S, F> map;
+    private final List<MapModel<S, F>> maps;
 
     protected MapViewModel(
             MapModel<S, F> map,
@@ -28,10 +27,10 @@ public abstract class MapViewModel<S, F> extends BaseMapViewModel<S, F> {
             IFeatureAdapter<F> featureAdapter,
             IRenderablePolygonProvider renderablePolygonProvider,
             ISVGProvider svgProvider,
-            ITextSizeProvider textSizeProvider) {
-        super(featureAdapter, renderablePolygonProvider, svgProvider, textSizeProvider);
+            ITextBoundsFunction textSizeProvider) {
+        super(viewPort, featureAdapter, renderablePolygonProvider, svgProvider, textSizeProvider);
         this.map = map;
-        this.viewPort = viewPort;
+        this.maps = List.of(map);
 
         for (var layer : map.layers()) {
             layer.layerVisibilityEvent().feedTo(layerVisibilityEvent);
@@ -40,43 +39,22 @@ public abstract class MapViewModel<S, F> extends BaseMapViewModel<S, F> {
         //  TODO -- should also have some way of subscribing to add/remove of layers
     }
 
-    public MapModel<S, F> map() {
-        return map;
+    public List<MapModel<S, F>> maps() {
+        return this.maps;
     }
 
     public ReferencedEnvelope bounds() {
         return map.bounds();
     }
 
-    public ReferencedEnvelope viewPortBounds() {
-        return viewPort.bounds();
-    }
-
     public void setViewPortBounds(ReferencedEnvelope bounds)
             throws TransformException, NonInvertibleTransformException {
         var newExtent = clip(bounds);
         if (!newExtent.equals(viewPortBounds())) {
-            var oldBounds = viewPort.bounds();
-            viewPort.setBounds(newExtent);
+            var oldBounds = viewPort().bounds();
+            viewPort().setBounds(newExtent);
             viewPortBoundsEvent.push(new Change<>(oldBounds, newExtent));
         }
-    }
-
-    public Rectangle2D viewPortScreenArea() {
-        return viewPort.screenArea();
-    }
-
-    public void setViewPortScreenArea(Rectangle2D screenArea)
-            throws TransformException, NonInvertibleTransformException {
-        viewPort.setScreenArea(screenArea);
-    }
-
-    public Affine viewPortScreenToWorld() {
-        return viewPort.screenToWorld();
-    }
-
-    public Affine viewPortWorldToScreen() {
-        return viewPort.worldToScreen();
     }
 
     private ReferencedEnvelope clip(ReferencedEnvelope envelope) {
