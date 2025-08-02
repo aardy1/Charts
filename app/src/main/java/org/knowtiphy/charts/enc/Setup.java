@@ -28,7 +28,7 @@ public class Setup {
                     "-f",
                     "ESRI Shapefile");
 
-    public static ENCProductCatalog setup(Path catalogFile)
+    public static ENCCatalog setup(Path catalogFile)
             throws XMLStreamException, IOException, InterruptedException {
         var catalog = new ENCCatalogReader(null, catalogFile).read();
 

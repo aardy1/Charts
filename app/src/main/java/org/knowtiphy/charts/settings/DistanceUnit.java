@@ -7,7 +7,7 @@ public enum DistanceUnit {
 
     private final String name;
 
-    DistanceUnit(String name) {
+    private DistanceUnit(String name) {
         this.name = name;
     }
 

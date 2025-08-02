@@ -23,10 +23,8 @@ import org.knowtiphy.shapemap.style.parser.StyleSyntaxException;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.index.strtree.STRtree;
 
-/**
- * @author graham
- */
-public class ChartBuilder {
+/** A builder for ENC charts. */
+public class MapModelReader {
 
     public static final String[] LAYER_ORDER =
             new String[] { //
@@ -97,7 +95,7 @@ public class ChartBuilder {
 
     private final MapDisplayOptions displayOptions;
 
-    public ChartBuilder(
+    public MapModelReader(
             ENCCell cell,
             AppSettings settings,
             StyleReader<SimpleFeatureType, MemFeature> styleReader,
@@ -109,7 +107,7 @@ public class ChartBuilder {
         this.displayOptions = displayOptions;
     }
 
-    public MapModel<SimpleFeatureType, MemFeature> build()
+    public MapModel<SimpleFeatureType, MemFeature> read()
             throws IOException, XMLStreamException, StyleSyntaxException {
         var fileNames = listShapeFilePaths(cell.location());
 

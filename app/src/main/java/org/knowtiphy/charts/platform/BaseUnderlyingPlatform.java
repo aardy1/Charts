@@ -12,14 +12,14 @@ import javafx.stage.Screen;
 import java.nio.file.Path;
 
 /** Base class for all abstractions of the underlying platform */
-public abstract class BasePlatform {
+public abstract class BaseUnderlyingPlatform {
     private final Path root;
 
     // private final DisplayService display;
     //
     // private final PositionService positionService;
 
-    BasePlatform(Path root) {
+    BaseUnderlyingPlatform(Path root) {
         this.root = root;
         // display = Services.get(DisplayService.class).get();
         // var posService = Services.get(PositionService.class);

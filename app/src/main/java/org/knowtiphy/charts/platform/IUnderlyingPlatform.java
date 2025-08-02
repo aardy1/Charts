@@ -5,14 +5,14 @@
 
 package org.knowtiphy.charts.platform;
 
+import java.nio.file.Path;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.layout.Region;
 import javafx.stage.Stage;
 
-import java.nio.file.Path;
-
 /** Abstraction of the underlying platform. */
-public interface IPlatform {
+public interface IUnderlyingPlatform {
+
     void setStageTitle(Stage stage, String title);
 
     void setWindowIcons(Stage stage, Class<?> cls);

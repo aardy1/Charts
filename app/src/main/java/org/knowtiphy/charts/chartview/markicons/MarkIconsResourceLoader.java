@@ -6,8 +6,8 @@
 package org.knowtiphy.charts.chartview.markicons;
 
 /**
- * Resource loader to load mark icons.
+ * Resource loader to load the mark icons.
  */
-public class ResourceLoader
+public class MarkIconsResourceLoader
 {
 }

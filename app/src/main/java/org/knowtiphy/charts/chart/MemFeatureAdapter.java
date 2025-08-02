@@ -10,14 +10,12 @@ import org.knowtiphy.shapemap.api.FeatureGeomType;
 import org.knowtiphy.shapemap.api.IFeatureAdapter;
 import org.locationtech.jts.geom.Geometry;
 
-/**
- * @author graham
- */
-public class FeatureAdapter implements IFeatureAdapter<MemFeature> {
+/** The feature adapter for mem features */
+public class MemFeatureAdapter implements IFeatureAdapter<MemFeature> {
 
-    public static final FeatureAdapter ADAPTER = new FeatureAdapter();
+    public static final MemFeatureAdapter ADAPTER = new MemFeatureAdapter();
 
-    private FeatureAdapter() {}
+    private MemFeatureAdapter() {}
 
     @Override
     public Geometry defaultGeometry(MemFeature feature) {

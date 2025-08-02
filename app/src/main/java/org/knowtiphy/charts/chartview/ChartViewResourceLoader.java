@@ -6,9 +6,8 @@
 package org.knowtiphy.charts.chartview;
 
 /**
- * @author graham
+ *  Resource Loader to load style sheets etc for a chart view.
  */
-public class ResourceLoader
+public class ChartViewResourceLoader
 {
-
 }

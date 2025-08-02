@@ -114,7 +114,7 @@ public class ChartView extends Control {
             default:
                 if (DEFAULT_STYLE_SHEET == null) {
                     DEFAULT_STYLE_SHEET =
-                            org.knowtiphy.charts.chartview.ResourceLoader.class
+                            org.knowtiphy.charts.chartview.ChartViewResourceLoader.class
                                     .getResource("chartview.css")
                                     .toExternalForm();
                 }

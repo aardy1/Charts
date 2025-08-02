@@ -12,7 +12,6 @@ import java.util.logging.Logger;
 import javafx.collections.ListChangeListener;
 import javafx.geometry.Pos;
 import javafx.geometry.Side;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
@@ -30,16 +29,16 @@ import org.knowtiphy.charts.chartview.MapDisplayOptions;
 import org.knowtiphy.charts.enc.ENCCell;
 import org.knowtiphy.charts.geotools.Coordinates;
 import org.knowtiphy.charts.settings.UnitProfile;
-import org.knowtiphy.charts.utils.FXUtils;
+import static org.knowtiphy.charts.utils.FXUtils.button;
+import static org.knowtiphy.charts.utils.FXUtils.menuButton;
+import static org.knowtiphy.charts.utils.FXUtils.nonResizeable;
 import org.knowtiphy.charts.utils.ToggleModel;
 import org.knowtiphy.shapemap.renderer.context.SVGCache;
 import org.reactfx.Subscription;
 
-/**
- * @author graham
- */
+/** The info bar at the bottom of the chart view. */
 public class InfoBar extends StackPane {
-    private static double ZOOM_FACTOR = 2;
+    //    private static double ZOOM_FACTOR = 2;
 
     private final Label chartScale = new Label();
 
@@ -65,6 +64,7 @@ public class InfoBar extends StackPane {
 
     private final SVGCache svgCache;
 
+    //  chart listener subscriptions
     private final List<Subscription> subscriptions = new ArrayList<>();
 
     public InfoBar(
@@ -74,47 +74,49 @@ public class InfoBar extends StackPane {
             ChartLocker chartLocker,
             MapDisplayOptions displayOptions,
             SVGCache svgCache) {
+
         this.chart = chrt;
         this.unitProfile = unitProfile;
         this.chartLocker = chartLocker;
         this.displayOptions = displayOptions;
         this.svgCache = svgCache;
 
-        var zoomIn = new Button("", Fonts.plus());
-        zoomIn.setTooltip(new Tooltip("Zoom In"));
-        zoomIn.setOnAction(x -> chrt.setZoom(chrt.zoom() + 1)); // * ZOOM_FACTOR));
-        var zoomOut = new Button("", Fonts.minus());
-        zoomOut.setTooltip(new Tooltip("Zoom Out"));
-        zoomOut.setOnAction(x -> chrt.setZoom(chrt.zoom() - 1)); // * (1 / ZOOM_FACTOR)));
+        //  zoom in and out buttons
+        var zoomIn =
+                button(Fonts.plus(), _ -> chart.setZoom(chart.zoom() + 1), new Tooltip("Zoom In"));
+        var zoomOut =
+                button(
+                        Fonts.minus(),
+                        _ -> chart.setZoom(chart.zoom() - 1),
+                        new Tooltip("Zoom Out"));
 
-        var mapDisplaySettings = new Button("", Fonts.setting());
-        mapDisplaySettings.setTooltip(new Tooltip("Configure Map Visuals"));
-        mapDisplaySettings.setOnAction(evt -> toggleModel.toggle());
+        //  chart display settings button
+        var chartDisplaySettings =
+                button(
+                        Fonts.setting(),
+                        _ -> toggleModel.toggle(),
+                        new Tooltip("Configure Map Visuals"));
 
-        var resetViewPort = new Button("", Fonts.resetToOriginalBounds());
-        resetViewPort.setTooltip(new Tooltip("Reset Map to Original Dimensions"));
-        resetViewPort.setOnAction(
-                x -> {
-                    try {
-                        chart.setViewPortBounds(chart.bounds());
-                    } catch (TransformException | NonInvertibleTransformException ex) {
-                        Logger.getLogger(InfoBar.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                });
+        //  viewport reset button
+        var resetViewPort =
+                button(
+                        Fonts.resetToOriginalBounds(),
+                        _ -> {
+                            try {
+                                chart.setViewPortBounds(chart.bounds());
+                            } catch (TransformException | NonInvertibleTransformException ex) {
+                                Logger.getLogger(InfoBar.class.getName())
+                                        .log(Level.SEVERE, null, ex);
+                            }
+                        },
+                        new Tooltip("Reset Map to Original Dimensions"));
 
-        history = new MenuButton("", Fonts.history());
+        history = menuButton("", Fonts.history(), historyMenuItems(), new Tooltip("Chart History"));
         history.setPopupSide(Side.TOP);
-        history.setTooltip(new Tooltip("Chart History"));
-        var items = new ArrayList<MenuItem>();
-        for (var description : chartLocker.history()) {
-            var menuItem = new MenuItem(description.lname() + "  1:" + description.cScale());
-            menuItem.setOnAction(event -> loadChart(description));
-            items.add(menuItem);
-        }
-        history.getItems().addAll(items);
 
+        //  the buttons in the center of the info bar
         var centerControlsBar =
-                FXUtils.nonResizeable(
+                nonResizeable(
                         new ToolBar(
                                 zoomIn,
                                 zoomOut,
@@ -122,55 +124,63 @@ public class InfoBar extends StackPane {
                                 new Separator(),
                                 history,
                                 new Separator(),
-                                mapDisplaySettings));
+                                chartDisplaySettings));
         centerControlsBar.getStyleClass().add("controlbar");
         StackPane.setAlignment(centerControlsBar, Pos.BOTTOM_CENTER);
 
-        var leftControlsBar = FXUtils.nonResizeable(new ToolBar(chartScale));
+        //  the information on the left of the info bar
+        var leftControlsBar = nonResizeable(new ToolBar(currentExtent));
         leftControlsBar.getStyleClass().add("controlbar");
         StackPane.setAlignment(leftControlsBar, Pos.BOTTOM_LEFT);
 
-        var variableLabels =
-                FXUtils.nonResizeable(
+        //  the information on the right side of the info bar
+        var rightLabels =
+                nonResizeable(
                         new HBox(
-                                currentExtent,
+                                chartScale,
                                 currentMapSpan,
                                 adjustedDisplayScale,
                                 displayScale,
                                 zoomLevel));
-        variableLabels.getStyleClass().add("infobar");
-        StackPane.setAlignment(variableLabels, Pos.BOTTOM_RIGHT);
+        rightLabels.getStyleClass().add("infobar");
+        StackPane.setAlignment(rightLabels, Pos.BOTTOM_RIGHT);
 
-        getChildren().addAll(leftControlsBar, centerControlsBar, variableLabels);
+        //  set the initial chart info
+        updateChartInfo();
 
-        showFixedChartInfo();
-        showVariableChartInfo();
+        //  add the various components to the info bar
+        getChildren().addAll(leftControlsBar, centerControlsBar, rightLabels);
 
-        widthProperty().addListener(ch -> showVariableChartInfo());
-        heightProperty().addListener(ch -> showVariableChartInfo());
-        unitProfile
-                .unitChangeEvents()
-                .subscribe(
-                        ch -> {
-                            showFixedChartInfo();
-                            showVariableChartInfo();
-                        });
+        //  when the info bar width or height changes, or  the unit profile changes, update the
+        // chart info
+        widthProperty().addListener(_ -> updateChartInfo());
+        heightProperty().addListener(_ -> updateChartInfo());
+        unitProfile.unitChangeEvents().subscribe(_ -> updateChartInfo());
 
         chartLocker
                 .history()
                 .addListener(
                         (ListChangeListener<ENCCell>)
                                 c -> {
-                                    c.next();
-                                    for (var description : c.getAddedSubList()) {
-                                        var menuItem =
-                                                new MenuItem(
-                                                        description.lname()
-                                                                + "  1:"
-                                                                + description.cScale());
-                                        menuItem.setOnAction(event -> loadChart(description));
-                                        history.getItems().add(menuItem);
-                                    }
+                                    //                                    c.next();
+                                    //                                    for (var description :
+                                    // c.getAddedSubList()) {
+                                    //                                        var menuItem =
+                                    //                                                new MenuItem(
+                                    //
+                                    // description.lname()
+                                    //
+                                    //  + "  1:"
+                                    //
+                                    //  + description.cScale());
+                                    //
+                                    // menuItem.setOnAction(event -> loadChart(description));
+                                    //
+                                    // history.getItems().add(menuItem);
+                                    //                                    }
+                                    //                                    menuItem.setOnAction(event
+                                    // -> loadChart(description));
+                                    history.getItems().setAll(historyMenuItems());
                                 });
 
         chartLocker
@@ -190,51 +200,56 @@ public class InfoBar extends StackPane {
                         event -> {
                             chart = event.chart();
                             setupListeners();
-                            showFixedChartInfo();
-                            showVariableChartInfo();
+                            updateChartInfo();
                         });
 
         setupListeners();
-
-        //    ShapeMapRenderer.count.addListener(x -> showFixedChartInfo());
     }
 
+    // when the viewport changes update the variable chart info
     private void setupListeners() {
-        subscriptions.add(chart.viewPortBoundsEvent().subscribe(c -> showVariableChartInfo()));
+        subscriptions.add(chart.viewPortBoundsEvent().subscribe(c -> updateChartInfo()));
     }
 
-    //  TODO -- needs to go away
-    private void showFixedChartInfo() {
-        //    chartName.setText(chart.title());
-        //    chartScale.setText(ShapeMapRenderer.count.get() + ""); // chart.currentScale() +
-        // "");
-        // chartScale.setText(chart.currentScale() + "");
-        //    extentLabel.setText(unitProfile.formatEnvelope(chart.bounds()));
-    }
+    //  updated chart information
+    private void updateChartInfo() {
 
-    private void showVariableChartInfo() {
-        var envelope = chart.viewPortBounds();
-        var mapWidth = Coordinates.distanceAcross(envelope);
-        currentMapSpan.setText(unitProfile.formatDistance(mapWidth, unitProfile::metersToMapUnits));
-        // currentScreenToWorld.setText("1" + unitProfile.screenUnit + " : "
-        // + Coordinates.twoDec(unitProfile.convertFromScreenUnit(mapWidth /
-        // platform.windowWidthCM(this)))
-        // + unitProfile.distanceUnit);
-
+        currentExtent.setText(unitProfile.formatEnvelope(chart.bounds()));
+        currentMapSpan.setText(
+                unitProfile.formatDistance(
+                        Coordinates.distanceAcross(chart.viewPortBounds()),
+                        unitProfile::metersToMapUnits));
         displayScale.setText(chart.displayScale() + "");
         adjustedDisplayScale.setText(chart.adjustedDisplayScale() + "");
         zoomLevel.setText(Coordinates.twoDec(chart.zoom()));
+        //  technically this can't change as the UI is manipulated, so really only needs to be set
+        // once
+        chartScale.setText(chart.cScale() + "");
     }
 
+    //  the menu items in the history menu
+    private ArrayList<MenuItem> historyMenuItems() {
+
+        var items = new ArrayList<MenuItem>();
+        for (var description : chartLocker.history()) {
+            var menuItem = new MenuItem(description.lname() + "  1:" + description.cScale());
+            menuItem.setOnAction(_ -> loadChart(description));
+            items.add(menuItem);
+        }
+
+        return items;
+    }
+
+    //  TODO -- need to update this for quilting
     private void loadChart(ENCCell chartDescription) {
-        //    try
-        //    {
-        //      chartLocker.loadChart(chartDescription, displayOptions, svgCache);
-        //    }
-        //    catch(TransformException | FactoryException | NonInvertibleTransformException |
-        //          StyleSyntaxException ex)
-        //    {
-        //      Logger.getLogger(InfoBar.class.getName()).log(Level.SEVERE, null, ex);
-        //    }
+        //        try {
+        //            chartLocker.loadChart(chart.bounds(), chartDescription, displayOptions,
+        // svgCache);
+        //        } catch (TransformException
+        //                | FactoryException
+        //                | NonInvertibleTransformException
+        //                | StyleSyntaxException ex) {
+        //            Logger.getLogger(InfoBar.class.getName()).log(Level.SEVERE, null, ex);
+        //        }
     }
 }

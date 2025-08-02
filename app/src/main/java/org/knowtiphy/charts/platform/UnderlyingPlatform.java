@@ -8,8 +8,8 @@ package org.knowtiphy.charts.platform;
 import org.apache.commons.lang3.SystemUtils;
 
 /** Get the platform the app is running on. */
-public class Platform {
-    public static IPlatform getPlatform() {
+public class UnderlyingPlatform {
+    public static IUnderlyingPlatform getPlatform() {
         // if (com.gluonhq.attach.util.Platform.isIOS())
         // return new IOS();
         // else if (com.gluonhq.attach.util.Platform.isAndroid())

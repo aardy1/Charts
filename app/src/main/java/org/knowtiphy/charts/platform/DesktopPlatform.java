@@ -5,16 +5,14 @@
 
 package org.knowtiphy.charts.platform;
 
+import java.nio.file.Paths;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
-import java.nio.file.Paths;
+/** Base class for desktop platforms. */
+public abstract class DesktopPlatform extends BaseUnderlyingPlatform {
 
-/**
- * @author graham
- */
-public abstract class Desktop extends BasePlatform {
-    Desktop() {
+    DesktopPlatform() {
         super(Paths.get(System.getProperty("user.home"), "Documents", "Knowtiphy Charts"));
     }
 

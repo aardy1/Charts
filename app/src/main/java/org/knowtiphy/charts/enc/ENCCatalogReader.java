@@ -59,7 +59,7 @@ public class ENCCatalogReader {
      * @throws XMLStreamException on a malformed catalog file
      */
     @SuppressWarnings("null")
-    public ENCProductCatalog read() throws XMLStreamException {
+    public ENCCatalog read() throws XMLStreamException {
         XMLEventReader reader = XMLInputFactory.newInstance().createXMLEventReader(stream);
 
         ENCProductCatalogBuilder catalogBuilder = new ENCProductCatalogBuilder(chartsDir);

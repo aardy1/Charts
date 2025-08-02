@@ -18,8 +18,9 @@ import org.knowtiphy.charts.settings.AppSettings;
 import org.knowtiphy.shapemap.model.MapModel;
 import org.knowtiphy.shapemap.style.parser.StyleSyntaxException;
 
-/** A loader of maps from a local ENC chart cache. */
+/** A loader of ENC charts from the local file system */
 public class ChartLoader {
+
     private final AppSettings settings;
 
     private final StyleReader<SimpleFeatureType, MemFeature> styleReader;
@@ -28,16 +29,19 @@ public class ChartLoader {
 
     public ChartLoader(
             AppSettings settings, StyleReader<SimpleFeatureType, MemFeature> styleReader) {
+
         this.styleReader = styleReader;
         this.settings = settings;
     }
 
-    MapModel<SimpleFeatureType, MemFeature> loadMap(ENCCell cell, MapDisplayOptions displayOptions)
+    public synchronized MapModel<SimpleFeatureType, MemFeature> loadMap(
+            ENCCell cell, MapDisplayOptions displayOptions)
             throws IOException, XMLStreamException, StyleSyntaxException {
+
         var map = loaded.get(cell);
         System.err.println("cached " + cell.lname() + " = " + (map != null));
         if (map == null) {
-            map = new ChartBuilder(cell, settings, styleReader, displayOptions).build();
+            map = new MapModelReader(cell, settings, styleReader, displayOptions).read();
             loaded.put(cell, map);
         }
 

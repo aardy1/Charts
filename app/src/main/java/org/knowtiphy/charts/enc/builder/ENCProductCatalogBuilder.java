@@ -9,7 +9,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import org.knowtiphy.charts.enc.ENCCell;
-import org.knowtiphy.charts.enc.ENCProductCatalog;
+import org.knowtiphy.charts.enc.ENCCatalog;
 
 /**
  * An ENC product catalog -- a named/titled collection of ENC cells. (there are other fields other
@@ -40,7 +40,7 @@ public class ENCProductCatalogBuilder {
         return chartsDir.resolve(Paths.get(regionName, cellName));
     }
 
-    public ENCProductCatalog build() {
-        return new ENCProductCatalog(title, cells);
+    public ENCCatalog build() {
+        return new ENCCatalog(title, cells);
     }
 }

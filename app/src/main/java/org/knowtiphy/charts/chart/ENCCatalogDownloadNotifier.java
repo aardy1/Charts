@@ -1,9 +1,11 @@
 package org.knowtiphy.charts.chart;
 
 import org.knowtiphy.charts.enc.ENCCell;
+import org.knowtiphy.charts.enc.ENCCatalog;
 
-public class ChartDownloaderNotifier {
-    public void start() {
+public class ENCCatalogDownloadNotifier {
+
+    public void start(ENCCatalog catalog) {
         //  do nothing
     }
 
@@ -15,11 +17,11 @@ public class ChartDownloaderNotifier {
         //  do nothing
     }
 
-    public void cleaningUp() {
+    public void cleaningUp(ENCCatalog cell) {
         //  do nothing
     }
 
-    public void finished() {
+    public void finished(ENCCatalog cell) {
         //  do nothing
     }
 }

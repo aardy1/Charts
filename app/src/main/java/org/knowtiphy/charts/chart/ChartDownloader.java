@@ -20,8 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import org.knowtiphy.charts.enc.ENCCatalog;
 import org.knowtiphy.charts.enc.ENCCell;
-import org.knowtiphy.charts.enc.ENCProductCatalog;
 
 /** A downloader of charts from the web */
 public class ChartDownloader {
@@ -36,9 +36,10 @@ public class ChartDownloader {
                     "ESRI Shapefile");
 
     //  TODO -- refactor with next method
-    public static void downloadCell(ENCCell cell, Path chartsDir, ChartDownloaderNotifier notifier)
+    public static void downloadCell(ENCCell cell, Path chartsDir, ENCChartDownloadNotifier notifier)
             throws IOException {
-        notifier.start();
+
+        notifier.start(cell);
 
         var downloadTo = Files.createTempDirectory(null);
 
@@ -48,25 +49,26 @@ public class ChartDownloader {
             notifier.converting(cell);
             convertCell(cell, chartsDir, downloadTo);
         } finally {
-            notifier.cleaningUp();
-            notifier.finished();
+            notifier.cleaningUp(cell);
             if (downloadTo != null) {
                 deleteDirectory(downloadTo);
             }
+            notifier.finished(cell);
         }
     }
 
     public static void downloadCatalog(
-            ENCProductCatalog catalog, Path chartsDir, ChartDownloaderNotifier notifier)
+            ENCCatalog catalog, Path chartsDir, ENCCatalogDownloadNotifier catalogNotifier)
             throws IOException {
-        notifier.start();
+
+        catalogNotifier.start(catalog);
 
         var downloadTo = Files.createTempDirectory(null);
 
         try {
             //  download the zip files referenced in the catalog
             for (var cell : catalog.cells()) {
-                notifier.reading(cell);
+                catalogNotifier.reading(cell);
                 unzipFolder(new URL(cell.zipFileLocation()), downloadTo);
             }
 
@@ -75,8 +77,8 @@ public class ChartDownloader {
                 convertCell(cell, chartsDir, downloadTo);
             }
         } finally {
-            notifier.cleaningUp();
-            notifier.finished();
+            catalogNotifier.cleaningUp(catalog);
+            catalogNotifier.finished(catalog);
             if (downloadTo != null) {
                 deleteDirectory(downloadTo);
             }
@@ -128,7 +130,6 @@ public class ChartDownloader {
         Path targetDirResolved = targetDir.resolve(zipEntry.getName());
 
         // make sure normalized file still has targetDir as its prefix
-        // else throws exception
         Path normalizePath = targetDirResolved.normalize();
         if (!normalizePath.startsWith(targetDir)) {
             throw new IOException("Bad zip entry: " + zipEntry.getName());

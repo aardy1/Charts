@@ -1,6 +1,5 @@
 package org.knowtiphy.charts.chartview;
 
-import org.knowtiphy.charts.chartview.markicons.ResourceLoader;
 import java.io.IOException;
 import java.net.URL;
 import java.util.logging.Level;
@@ -30,8 +29,8 @@ import javafx.stage.StageStyle;
 import org.controlsfx.dialog.ProgressDialog;
 import org.controlsfx.glyphfont.Glyph;
 import org.knowtiphy.charts.Fonts;
-import org.knowtiphy.charts.chart.ChartDownloaderNotifier;
 import org.knowtiphy.charts.chart.ChartLocker;
+import org.knowtiphy.charts.chart.ENCChartDownloadNotifier;
 import static org.knowtiphy.charts.chartview.AvailableCatalogs.BUILTIN_CATALOGS;
 import org.knowtiphy.charts.enc.ENCCell;
 import static org.knowtiphy.charts.utils.FXUtils.alwaysGrow;
@@ -39,6 +38,7 @@ import static org.knowtiphy.charts.utils.FXUtils.neverGrow;
 import org.knowtiphy.shapemap.renderer.context.SVGCache;
 
 public class ChartLockerDialog {
+
     //  can't set the size in CSS :-(
     private static final int BUTTON_SIZE = 16;
 
@@ -55,6 +55,7 @@ public class ChartLockerDialog {
             ChartLocker chartLocker,
             MapDisplayOptions mapDisplayOptions,
             SVGCache svgCache) {
+
         this.parent = parent;
         this.chartLocker = chartLocker;
         this.mapDisplayOptions = mapDisplayOptions;
@@ -88,7 +89,10 @@ public class ChartLockerDialog {
 
         var scene = new Scene(root, width, height);
         scene.getStylesheets()
-                .add(ResourceLoader.class.getResource("chartlockerdialog.css").toExternalForm());
+                .add(
+                        ChartViewResourceLoader.class
+                                .getResource("chartlockerdialog.css")
+                                .toExternalForm());
 
         stage.setScene(scene);
         stage.sizeToScene();
@@ -120,7 +124,9 @@ public class ChartLockerDialog {
         return button;
     }
 
+    //  scroll pane for the available catalogs -- loaded first, available second
     private ScrollPane availableCatalogs() {
+
         var pane = new GridPane();
         var loaded = new Label("Loaded");
         loaded.getStyleClass().add("catalogName");
@@ -129,8 +135,7 @@ public class ChartLockerDialog {
         var row = 1;
 
         for (var catalog : chartLocker.availableCatalogs()) {
-            var catalogName = new Label(catalog.title());
-            pane.add(catalogName, 1, row);
+            pane.add(new Label(catalog.title()), 1, row);
             row++;
         }
 
@@ -140,10 +145,9 @@ public class ChartLockerDialog {
         row++;
 
         for (var catalog : BUILTIN_CATALOGS.entrySet()) {
-            var catalogName = new Label(catalog.getKey());
             var loadButton = new Button("Load");
             loadButton.setOnAction(event -> loadCatalog(catalog.getValue()));
-            pane.add(catalogName, 1, row);
+            pane.add(new Label(catalog.getKey()), 1, row);
             pane.add(loadButton, 2, row);
             row++;
         }
@@ -166,7 +170,7 @@ public class ChartLockerDialog {
                 var scale = new Label(" 1:" + cell.cScale());
                 var show = showButton(cell);
                 show.setDisable(!cell.isLoaded());
-                var load = loadButton(cell, show);
+                var load = loadCellButton(cell, show);
                 load.setDisable(cell.isLoaded());
                 grid.addRow(row++, name, scale, show, load);
             }
@@ -183,7 +187,8 @@ public class ChartLockerDialog {
         return scrollPane;
     }
 
-    private Button loadButton(ENCCell cell, Button show) {
+    //  button to load a cell
+    private Button loadCellButton(ENCCell cell, Button show) {
         var button = new Button("Load");
         button.setOnAction(
                 event -> {
@@ -222,7 +227,7 @@ public class ChartLockerDialog {
         }
     }
 
-    private Task<Boolean> loadTask(ENCCell cell, ChartDownloaderNotifier notifier) {
+    private Task<Boolean> loadTask(ENCCell cell, ENCChartDownloadNotifier notifier) {
         return new Task<>() {
             @Override
             protected Boolean call() {
@@ -256,11 +261,12 @@ public class ChartLockerDialog {
         return progress;
     }
 
-    private static class Notifier extends ChartDownloaderNotifier {
+    private static class Notifier extends ENCChartDownloadNotifier {
+
         public final StringProperty message = new SimpleStringProperty();
 
         @Override
-        public void start() {
+        public void start(ENCCell cell) {
             runLater(() -> message.set("Starting Download"));
         }
 
@@ -275,12 +281,12 @@ public class ChartLockerDialog {
         }
 
         @Override
-        public void cleaningUp() {
+        public void cleaningUp(ENCCell cell) {
             runLater(() -> message.set("Cleaning Up"));
         }
 
         @Override
-        public void finished() {
+        public void finished(ENCCell cell) {
             runLater(() -> message.set("Finished Download"));
         }
     }

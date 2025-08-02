@@ -6,7 +6,7 @@ public enum LatLongFormat {
 
     private final String name;
 
-    LatLongFormat(String name) {
+    private LatLongFormat(String name) {
         this.name = name;
     }
 

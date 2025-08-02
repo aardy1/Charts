@@ -6,7 +6,7 @@ public enum TemperatureUnit {
 
     final String name;
 
-    TemperatureUnit(String name) {
+    private TemperatureUnit(String name) {
         this.name = name;
     }
 

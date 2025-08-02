@@ -30,10 +30,12 @@ import org.knowtiphy.charts.chart.event.ChartLockerEvent;
 import org.knowtiphy.charts.chartview.MapDisplayOptions;
 import org.knowtiphy.charts.enc.ENCCatalogReader;
 import org.knowtiphy.charts.enc.ENCCell;
-import org.knowtiphy.charts.enc.ENCProductCatalog;
+import org.knowtiphy.charts.enc.ENCCatalog;
 import org.knowtiphy.charts.memstore.MemFeature;
 import org.knowtiphy.shapemap.model.MapModel;
 import org.knowtiphy.shapemap.model.MapViewport;
+import org.knowtiphy.shapemap.renderer.context.RemoveHolesFromPolygon;
+import org.knowtiphy.shapemap.renderer.context.RenderGeomCache;
 import org.knowtiphy.shapemap.renderer.context.SVGCache;
 import org.knowtiphy.shapemap.style.parser.StyleSyntaxException;
 import org.locationtech.jts.geom.Geometry;
@@ -56,7 +58,7 @@ public class ChartLocker {
 
     private final EventSource<ChartLockerEvent> chartEvents = new EventSource<>();
 
-    private final List<ENCProductCatalog> availableCatalogs = new ArrayList<>();
+    private final List<ENCCatalog> availableCatalogs = new ArrayList<>();
 
     private final ObservableList<ENCCell> unsortedHistory = FXCollections.observableArrayList();
 
@@ -130,7 +132,14 @@ public class ChartLocker {
         //    chartEvents.push(new ChartLockerEvent(ChartLockerEvent.Type.UNLOADED, null));
         //    chartEvents.push(new ChartLockerEvent(ChartLockerEvent.Type.LOADED, newChart));
 
-        return new ENCChart(maps, viewPort, this, svgCache);
+        return new ENCChart(
+                maps,
+                viewPort,
+                this,
+                MemFeatureAdapter.ADAPTER,
+                new RemoveHolesFromPolygon(new RenderGeomCache()),
+                svgCache,
+                DefaultTextBoundsFunction.FUNCTION);
     }
 
     public ObservableList<ENCCell> history() {
@@ -156,7 +165,7 @@ public class ChartLocker {
         throw new IllegalArgumentException();
     }
 
-    public Collection<ENCProductCatalog> availableCatalogs() {
+    public Collection<ENCCatalog> availableCatalogs() {
         return availableCatalogs;
     }
 
@@ -175,7 +184,7 @@ public class ChartLocker {
         //        }
     }
 
-    public void downloadChart(ENCCell cell, ChartDownloaderNotifier notifier) throws IOException {
+    public void downloadChart(ENCCell cell, ENCChartDownloadNotifier notifier) throws IOException {
         ChartDownloader.downloadCell(cell, chartsDir, notifier);
     }
 

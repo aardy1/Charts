@@ -5,19 +5,17 @@
 
 package org.knowtiphy.charts.settings;
 
+import java.util.function.UnaryOperator;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import static org.knowtiphy.charts.settings.SpeedUnit.KNOTS;
 import org.knowtiphy.charts.utils.Utils;
 import org.reactfx.EventSource;
 import org.reactfx.EventStream;
-
-import java.util.function.UnaryOperator;
-
-import static org.knowtiphy.charts.settings.SpeedUnit.KNOTS;
 
 /**
  * @author graham

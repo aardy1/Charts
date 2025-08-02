@@ -13,8 +13,8 @@ import org.reactfx.Change;
 /**
  * A map view model for a collection of map models quilted together.
  *
- * @param <S> the type of the schema in the map model
- * @param <F> the type of the features in the map model
+ * @param <S> the type of the schema for the map models
+ * @param <F> the type of the features in the map models
  */
 public class Quilt<S, F> extends BaseMapViewModel<S, F> {
 

@@ -8,10 +8,10 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * An ENC product catalog -- a named/titled collection of ENC cells. (there are other fields other
+ * An ENC (product )catalog -- a named/titled collection of ENC cells. (there are other fields other
  * than the name/title but we don't keep them for the moment)
  */
-public record ENCProductCatalog(String title, List<ENCCell> cells) {
+public record ENCCatalog(String title, List<ENCCell> cells) {
 
     @Override
     public int hashCode() {
@@ -32,7 +32,7 @@ public record ENCProductCatalog(String title, List<ENCCell> cells) {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final ENCProductCatalog other = (ENCProductCatalog) obj;
+        final ENCCatalog other = (ENCCatalog) obj;
         return Objects.equals(this.title, other.title);
     }
 

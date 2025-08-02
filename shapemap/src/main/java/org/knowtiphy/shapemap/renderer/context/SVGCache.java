@@ -15,9 +15,7 @@ import org.apache.commons.lang3.tuple.Triple;
 import org.girod.javafx.svgimage.SVGLoader;
 import org.knowtiphy.shapemap.api.ISVGProvider;
 
-/**
- * @author graham
- */
+/** A cache of SVG images at varying sizes and rotations. */
 public class SVGCache implements ISVGProvider {
     private static final SnapshotParameters SVG_RENDERING_PARAMETERS = new SnapshotParameters();
 
@@ -39,18 +37,18 @@ public class SVGCache implements ISVGProvider {
 
     @Override
     public Image get(String name, int size, double rotation) {
-        var image = cache.get(Triple.of(name, size, rotation));
-        if (image == null) {
-            System.out.println(name);
-            var svgImage = SVGLoader.load(resourceLoader.getResource(name));
-            svgImage.setScaleX(size / svgImage.getWidth());
-            svgImage.setScaleY(size / svgImage.getHeight());
-            // for some reason SVGLoader loads the images upside down ...
-            SVG_RENDERING_PARAMETERS.setTransform(new Rotate(180 - rotation));
-            image = svgImage.toImage(SVG_RENDERING_PARAMETERS);
-            put(name, size, rotation, image);
-        }
-
-        return image;
+        return cache.computeIfAbsent(
+                Triple.of(name, size, rotation),
+                key -> {
+                    //                            System.out.println("Loading " + name + " " + size
+                    // + " : " + rotation);
+                    var svgImage = SVGLoader.load(resourceLoader.getResource(name));
+                    svgImage.setScaleX(size / svgImage.getWidth());
+                    svgImage.setScaleY(size / svgImage.getHeight());
+                    // for some reason SVGLoader loads the images upside down ...
+                    //  TODO how does this work sharing the rendering parameters?
+                    SVG_RENDERING_PARAMETERS.setTransform(new Rotate(180 - rotation));
+                    return svgImage.toImage(SVG_RENDERING_PARAMETERS);
+                });
     }
 }

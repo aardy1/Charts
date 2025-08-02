@@ -10,11 +10,12 @@ import org.geotools.api.feature.simple.SimpleFeatureType;
 import org.geotools.api.referencing.operation.TransformException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.knowtiphy.charts.memstore.MemFeature;
+import org.knowtiphy.shapemap.api.IFeatureAdapter;
+import org.knowtiphy.shapemap.api.IRenderablePolygonProvider;
+import org.knowtiphy.shapemap.api.ITextBoundsFunction;
 import org.knowtiphy.shapemap.model.MapModel;
 import org.knowtiphy.shapemap.model.MapViewport;
 import org.knowtiphy.shapemap.model.Quilt;
-import org.knowtiphy.shapemap.renderer.context.RemoveHolesFromPolygon;
-import org.knowtiphy.shapemap.renderer.context.RenderGeomCache;
 import org.knowtiphy.shapemap.renderer.context.SVGCache;
 
 /**
@@ -29,15 +30,12 @@ public class ENCChart extends Quilt<SimpleFeatureType, MemFeature> {
             List<MapModel<SimpleFeatureType, MemFeature>> maps,
             MapViewport viewport,
             ChartLocker chartLocker,
-            SVGCache svgCache) {
-        super(
-                maps,
-                viewport,
-                FeatureAdapter.ADAPTER,
-                new RemoveHolesFromPolygon(new RenderGeomCache()),
-                svgCache,
-                DefaultTextBoundsFunction.FUNCTION);
+            IFeatureAdapter<MemFeature> featureAdapter,
+            IRenderablePolygonProvider polygonProvider,
+            SVGCache svgCache,
+            ITextBoundsFunction textBoundsFunction) {
 
+        super(maps, viewport, featureAdapter, polygonProvider, svgCache, textBoundsFunction);
         this.chartLocker = chartLocker;
     }
 

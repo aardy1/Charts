@@ -1,6 +1,15 @@
 package org.knowtiphy.charts.utils;
 
+import java.io.InputStream;
+import java.util.List;
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.scene.Node;
+import javafx.scene.control.Button;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuButton;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.layout.ColumnConstraints;
@@ -10,10 +19,9 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
-import java.io.InputStream;
-
-/** Collection of utility classes for Fx. */
+/** Collection of utility classes for JavaFX. */
 public class FXUtils {
+
     public static void later(Runnable r) {
         Platform.runLater(r);
     }
@@ -43,6 +51,30 @@ public class FXUtils {
         return tooltip;
     }
 
+    public static Button button(
+            String title, Node node, EventHandler<ActionEvent> eh, Tooltip tooltip) {
+        var button = new Button(title, node);
+        button.setTooltip(tooltip);
+        button.setOnAction(eh);
+        return button;
+    }
+
+    public static Button button(Node node, EventHandler<ActionEvent> eh, Tooltip tooltip) {
+        return button("", node, eh, tooltip);
+    }
+
+    public static MenuButton menuButton(
+            String title, Node node, List<MenuItem> items, Tooltip tooltip) {
+        var button = new MenuButton(title, node);
+        button.getItems().addAll(items);
+        button.setTooltip(tooltip);
+        return button;
+    }
+
+    public static MenuButton menuButton(Node node, List<MenuItem> items, Tooltip tooltip) {
+        return menuButton("", node, items, tooltip);
+    }
+
     public static ColumnConstraints neverGrow() {
         var constraint = new ColumnConstraints();
         constraint.setHgrow(Priority.NEVER);
@@ -54,5 +86,11 @@ public class FXUtils {
         constraint.setHgrow(Priority.ALWAYS);
         constraint.setFillWidth(true);
         return constraint;
+    }
+
+    public static MenuBar systemMenuBar() {
+        var menuBar = new MenuBar();
+        menuBar.setUseSystemMenuBar(true);
+        return menuBar;
     }
 }

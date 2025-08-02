@@ -10,7 +10,8 @@ import javafx.stage.Stage;
 /**
  * @author graham
  */
-public class MacOSX extends Desktop implements IPlatform {
+public class MacOSX extends DesktopPlatform implements IUnderlyingPlatform {
+
     @Override
     public void setWindowIcons(Stage stage, Class<?> cls) {
         // Mac apps do not have window icons

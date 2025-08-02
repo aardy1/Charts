@@ -7,7 +7,7 @@ public enum DepthUnit {
 
     private final String name;
 
-    DepthUnit(String name) {
+    private DepthUnit(String name) {
         this.name = name;
     }
 

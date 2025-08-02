@@ -6,7 +6,7 @@ public enum SpeedUnit {
 
     private final String name;
 
-    SpeedUnit(String name) {
+    private SpeedUnit(String name) {
         this.name = name;
     }
 
