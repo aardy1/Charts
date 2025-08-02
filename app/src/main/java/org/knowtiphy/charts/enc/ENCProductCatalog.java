@@ -4,53 +4,36 @@
  */
 package org.knowtiphy.charts.enc;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
 /**
- * An ENC product catalog -- a named collection of ENC cells. (there are other fields other than the
- * name/title but we don't keep them for the moment)
+ * An ENC product catalog -- a named/titled collection of ENC cells. (there are other fields other
+ * than the name/title but we don't keep them for the moment)
  */
-public class ENCProductCatalog {
-
-    private final List<ENCCell> cells = new ArrayList<>();
-
-    private String title;
-
-    public String title() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public void addCell(ENCCell cell) {
-        cells.add(cell);
-    }
-
-    public Collection<ENCCell> cells() {
-        return cells;
-    }
-
-    //  TODO -- when are two catalogs the same?
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        var catalog = (ENCProductCatalog) o;
-        return Objects.equals(title, catalog.title);
-    }
+public record ENCProductCatalog(String title, List<ENCCell> cells) {
 
     @Override
     public int hashCode() {
-        return Objects.hash(title);
+        int hash = 7;
+        hash = 13 * hash + Objects.hashCode(this.title);
+        return hash;
+    }
+
+    //  TODO -- when are two catalogs the same? Do need this?
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final ENCProductCatalog other = (ENCProductCatalog) obj;
+        return Objects.equals(this.title, other.title);
     }
 
     @Override

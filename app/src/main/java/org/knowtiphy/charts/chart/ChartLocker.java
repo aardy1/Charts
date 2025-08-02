@@ -147,7 +147,7 @@ public class ChartLocker {
     public ENCCell getCell(String lname, int cscale) {
         for (var catalog : availableCatalogs) {
             for (var cell : catalog.cells()) {
-                if (cell.lName().equals(lname) && cell.cScale() == cscale) {
+                if (cell.lname().equals(lname) && cell.cScale() == cscale) {
                     return cell;
                 }
             }

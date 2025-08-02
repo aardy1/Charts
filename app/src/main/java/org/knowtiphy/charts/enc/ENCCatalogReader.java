@@ -11,7 +11,10 @@ import java.nio.file.Path;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
-import org.locationtech.jts.geom.Coordinate;
+import org.knowtiphy.charts.enc.builder.ENCCellBuilder;
+import org.knowtiphy.charts.enc.builder.ENCPanelBuilder;
+import org.knowtiphy.charts.enc.builder.ENCProductCatalogBuilder;
+import org.knowtiphy.charts.enc.builder.VertexBuilder;
 
 /** A reader of ENC Catalogs (in XML format) from a path. */
 public class ENCCatalogReader {
@@ -32,7 +35,7 @@ public class ENCCatalogReader {
 
     private static final String PANEL = "panel";
 
-    private static final String PANEL_NO = "panel_no";
+    //    private static final String PANEL_NO = "panel_no";
 
     private static final String VERTEX = "vertex";
 
@@ -41,8 +44,6 @@ public class ENCCatalogReader {
     private static final String LONG = "long";
 
     private final Path chartsDir;
-
-    private ENCProductCatalog catalog;
 
     private final InputStream stream;
 
@@ -61,11 +62,10 @@ public class ENCCatalogReader {
     public ENCProductCatalog read() throws XMLStreamException {
         XMLEventReader reader = XMLInputFactory.newInstance().createXMLEventReader(stream);
 
-        ENCCell cell = null;
-        ENCPanel panel = null;
-        Coordinate coordinate = null;
-
-        catalog = new ENCProductCatalog();
+        ENCProductCatalogBuilder catalogBuilder = new ENCProductCatalogBuilder(chartsDir);
+        ENCCellBuilder cellBuilder = null;
+        ENCPanelBuilder panelBuilder = null;
+        VertexBuilder vertexBuilder = null;
 
         while (reader.hasNext()) {
             var nextEvent = reader.nextEvent();
@@ -74,39 +74,40 @@ public class ENCCatalogReader {
                 var startElement = nextEvent.asStartElement();
                 switch (startElement.getName().getLocalPart()) {
                     case TITLE -> {
-                        catalog.setTitle(reader.nextEvent().asCharacters().getData());
+                        assert catalogBuilder != null;
+                        catalogBuilder.title(reader.nextEvent().asCharacters().getData());
                     }
                     case CELL -> {
-                        assert catalog != null;
-                        cell = new ENCCell(Naming.regionName(catalog));
+                        cellBuilder = new ENCCellBuilder();
                     }
                     case CELL_NAME -> {
-                        assert cell != null;
-                        cell.setName(reader.nextEvent().asCharacters().getData());
-                        cell.setLocation(Naming.cellName(chartsDir, cell));
+                        assert cellBuilder != null;
+                        var cellName = reader.nextEvent().asCharacters().getData();
+                        cellBuilder.name(cellName);
+                        cellBuilder.location(catalogBuilder.cellPath(cellName));
                     }
                     case CELL_LNAME -> {
-                        assert cell != null;
-                        cell.setLname(reader.nextEvent().asCharacters().getData());
+                        assert cellBuilder != null;
+                        cellBuilder.lName(reader.nextEvent().asCharacters().getData());
                     }
                     case CSCALE -> {
-                        assert cell != null;
-                        cell.setcScale(
+                        assert cellBuilder != null;
+                        cellBuilder.cScale(
                                 Integer.parseInt(reader.nextEvent().asCharacters().getData()));
                     }
                     case STATUS -> {
-                        assert cell != null;
-                        cell.setActive(
+                        assert cellBuilder != null;
+                        cellBuilder.active(
                                 reader.nextEvent()
                                         .asCharacters()
                                         .getData()
                                         .equalsIgnoreCase("active"));
                     }
                     case ZIP_FILE_LOCATION -> {
-                        assert cell != null;
-                        cell.setZipFileLocation(reader.nextEvent().asCharacters().getData());
+                        assert cellBuilder != null;
+                        cellBuilder.zipFileLocation(reader.nextEvent().asCharacters().getData());
                     }
-                    case PANEL -> panel = new ENCPanel();
+                    case PANEL -> panelBuilder = new ENCPanelBuilder();
                     //                    case PANEL_NO ->
                     //                    {
                     //                        assert panel != null;
@@ -114,16 +115,16 @@ public class ENCCatalogReader {
                     //
                     // Integer.parseInt(reader.nextEvent().asCharacters().getData()));
                     //                    }
-                    case VERTEX -> coordinate = new Coordinate();
+                    case VERTEX -> vertexBuilder = new VertexBuilder();
                     case LONG -> {
-                        assert coordinate != null;
-                        coordinate.x =
-                                Double.parseDouble(reader.nextEvent().asCharacters().getData());
+                        assert vertexBuilder != null;
+                        vertexBuilder.longitude(
+                                Double.parseDouble(reader.nextEvent().asCharacters().getData()));
                     }
                     case LAT -> {
-                        assert coordinate != null;
-                        coordinate.y =
-                                Double.parseDouble(reader.nextEvent().asCharacters().getData());
+                        assert vertexBuilder != null;
+                        vertexBuilder.latitude(
+                                Double.parseDouble(reader.nextEvent().asCharacters().getData()));
                     }
                     default -> {
                         // ignore other tags
@@ -134,15 +135,20 @@ public class ENCCatalogReader {
             if (nextEvent.isEndElement()) {
                 var endElement = nextEvent.asEndElement();
                 switch (endElement.getName().getLocalPart()) {
-                    case CELL -> catalog.addCell(cell);
+                    case CELL -> {
+                        assert catalogBuilder != null;
+                        assert cellBuilder != null;
+                        catalogBuilder.cell(cellBuilder.build());
+                    }
                     case PANEL -> {
-                        assert panel != null;
-                        assert cell != null;
-                        cell.addPanel(panel);
+                        assert panelBuilder != null;
+                        assert cellBuilder != null;
+                        cellBuilder.panel(panelBuilder.build());
                     }
                     case VERTEX -> {
-                        assert panel != null;
-                        panel.addVertex(coordinate);
+                        assert panelBuilder != null;
+                        assert vertexBuilder != null;
+                        panelBuilder.vertex(vertexBuilder.build());
                     }
                     default -> {
                         // ignore other tags
@@ -151,6 +157,6 @@ public class ENCCatalogReader {
             }
         }
 
-        return catalog;
+        return catalogBuilder.build();
     }
 }

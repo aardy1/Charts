@@ -115,7 +115,7 @@ public class ChartBuilder {
 
         var map =
                 new MapModel<SimpleFeatureType, MemFeature>(
-                        cell.bounds(), cell.cScale(), cell.lName());
+                        cell.bounds(), cell.cScale(), cell.lname());
         var store = new MemStore(map);
 
         for (var featureTypeName : LAYER_ORDER) {

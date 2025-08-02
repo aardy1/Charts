@@ -62,7 +62,8 @@ public class KnowtiphyCharts extends Application {
 
     private static final int CHART_LOCKER_HEIGHT = 400;
 
-    private static final SVGCache SVG_CACHE = new SVGCache(ResourceLoader.class);
+    private static final SVGCache SVG_CACHE =
+            new SVGCache(org.knowtiphy.charts.chartview.markicons.ResourceLoader.class);
 
     private ChartLocker chartLocker;
 

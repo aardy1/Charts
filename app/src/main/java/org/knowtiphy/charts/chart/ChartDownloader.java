@@ -22,7 +22,6 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import org.knowtiphy.charts.enc.ENCCell;
 import org.knowtiphy.charts.enc.ENCProductCatalog;
-import org.knowtiphy.charts.enc.Naming;
 
 /** A downloader of charts from the web */
 public class ChartDownloader {
@@ -143,7 +142,7 @@ public class ChartDownloader {
         var downloadPath =
                 downloadTo.resolve(Path.of("ENC_ROOT", cell.name(), cell.name() + ".000"));
         System.err.println("download path = " + downloadPath);
-        var convertedPath = Naming.cellName(chartsDir, cell);
+        var convertedPath = cell.location(); // Naming.cellName(chartsDir, cell);
         System.err.println("target path = " + convertedPath);
         convert(downloadPath, convertedPath);
     }

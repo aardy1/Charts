@@ -5,6 +5,8 @@
 
 package org.knowtiphy.shapemap.renderer.context;
 
+import java.util.HashMap;
+import java.util.Map;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
@@ -12,9 +14,6 @@ import javafx.scene.transform.Rotate;
 import org.apache.commons.lang3.tuple.Triple;
 import org.girod.javafx.svgimage.SVGLoader;
 import org.knowtiphy.shapemap.api.ISVGProvider;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author graham
@@ -42,6 +41,7 @@ public class SVGCache implements ISVGProvider {
     public Image get(String name, int size, double rotation) {
         var image = cache.get(Triple.of(name, size, rotation));
         if (image == null) {
+            System.out.println(name);
             var svgImage = SVGLoader.load(resourceLoader.getResource(name));
             svgImage.setScaleX(size / svgImage.getWidth());
             svgImage.setScaleY(size / svgImage.getHeight());

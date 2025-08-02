@@ -1,5 +1,6 @@
 package org.knowtiphy.charts.chartview;
 
+import java.util.List;
 import javafx.css.CssMetaData;
 import javafx.css.SimpleStyleableObjectProperty;
 import javafx.css.Styleable;
@@ -11,16 +12,14 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.input.ZoomEvent;
 import javafx.scene.paint.Color;
-import org.knowtiphy.charts.dynamics.AISEvent;
-import org.knowtiphy.charts.dynamics.AISModel;
 import org.knowtiphy.charts.chart.ChartLocker;
 import org.knowtiphy.charts.chart.ENCChart;
+import org.knowtiphy.charts.dynamics.AISEvent;
+import org.knowtiphy.charts.dynamics.AISModel;
 import org.knowtiphy.charts.settings.UnitProfile;
 import org.knowtiphy.shapemap.renderer.context.SVGCache;
 import org.reactfx.EventSource;
 import org.reactfx.EventStream;
-
-import java.util.List;
 
 /** A control to show maps. */
 public class ChartView extends Control {
@@ -115,7 +114,9 @@ public class ChartView extends Control {
             default:
                 if (DEFAULT_STYLE_SHEET == null) {
                     DEFAULT_STYLE_SHEET =
-                            ResourceLoader.class.getResource("chartview.css").toExternalForm();
+                            org.knowtiphy.charts.chartview.ResourceLoader.class
+                                    .getResource("chartview.css")
+                                    .toExternalForm();
                 }
                 return DEFAULT_STYLE_SHEET;
         }

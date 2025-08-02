@@ -5,6 +5,10 @@
 
 package org.knowtiphy.charts;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.collections.ListChangeListener;
 import javafx.geometry.Pos;
 import javafx.geometry.Side;
@@ -19,22 +23,17 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.transform.NonInvertibleTransformException;
 import org.geotools.api.referencing.operation.TransformException;
-import org.knowtiphy.charts.chartview.MapDisplayOptions;
 import org.knowtiphy.charts.chart.ChartLocker;
-import org.knowtiphy.charts.enc.ENCCell;
 import org.knowtiphy.charts.chart.ENCChart;
 import org.knowtiphy.charts.chart.event.ChartLockerEvent;
+import org.knowtiphy.charts.chartview.MapDisplayOptions;
+import org.knowtiphy.charts.enc.ENCCell;
 import org.knowtiphy.charts.geotools.Coordinates;
 import org.knowtiphy.charts.settings.UnitProfile;
 import org.knowtiphy.charts.utils.FXUtils;
 import org.knowtiphy.charts.utils.ToggleModel;
 import org.knowtiphy.shapemap.renderer.context.SVGCache;
 import org.reactfx.Subscription;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * @author graham
@@ -108,7 +107,7 @@ public class InfoBar extends StackPane {
         history.setTooltip(new Tooltip("Chart History"));
         var items = new ArrayList<MenuItem>();
         for (var description : chartLocker.history()) {
-            var menuItem = new MenuItem(description.lName() + "  1:" + description.cScale());
+            var menuItem = new MenuItem(description.lname() + "  1:" + description.cScale());
             menuItem.setOnAction(event -> loadChart(description));
             items.add(menuItem);
         }
@@ -166,7 +165,7 @@ public class InfoBar extends StackPane {
                                     for (var description : c.getAddedSubList()) {
                                         var menuItem =
                                                 new MenuItem(
-                                                        description.lName()
+                                                        description.lname()
                                                                 + "  1:"
                                                                 + description.cScale());
                                         menuItem.setOnAction(event -> loadChart(description));

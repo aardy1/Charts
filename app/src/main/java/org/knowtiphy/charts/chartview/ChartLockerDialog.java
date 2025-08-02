@@ -1,5 +1,11 @@
 package org.knowtiphy.charts.chartview;
 
+import org.knowtiphy.charts.chartview.markicons.ResourceLoader;
+import java.io.IOException;
+import java.net.URL;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import static javafx.application.Platform.runLater;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.concurrent.Task;
@@ -26,18 +32,11 @@ import org.controlsfx.glyphfont.Glyph;
 import org.knowtiphy.charts.Fonts;
 import org.knowtiphy.charts.chart.ChartDownloaderNotifier;
 import org.knowtiphy.charts.chart.ChartLocker;
-import org.knowtiphy.charts.enc.ENCCell;
-import org.knowtiphy.shapemap.renderer.context.SVGCache;
-
-import java.io.IOException;
-import java.net.URL;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import static javafx.application.Platform.runLater;
 import static org.knowtiphy.charts.chartview.AvailableCatalogs.BUILTIN_CATALOGS;
+import org.knowtiphy.charts.enc.ENCCell;
 import static org.knowtiphy.charts.utils.FXUtils.alwaysGrow;
 import static org.knowtiphy.charts.utils.FXUtils.neverGrow;
+import org.knowtiphy.shapemap.renderer.context.SVGCache;
 
 public class ChartLockerDialog {
     //  can't set the size in CSS :-(
@@ -163,7 +162,7 @@ public class ChartLockerDialog {
 
             var row = 0;
             for (var cell : catalog.cells()) {
-                var name = new Label(cell.lName());
+                var name = new Label(cell.lname());
                 var scale = new Label(" 1:" + cell.cScale());
                 var show = showButton(cell);
                 show.setDisable(!cell.isLoaded());
