@@ -1,6 +1,5 @@
 package org.knowtiphy.charts.chartview.view.canvas;
 
-import java.util.Collection;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.layout.BorderPane;
@@ -12,7 +11,6 @@ import org.knowtiphy.charts.chartview.BaseMapViewModel;
 import org.knowtiphy.charts.chartview.view.ShapeMapBaseSkin;
 import org.knowtiphy.charts.chartview.view.ShapeMapView;
 import org.knowtiphy.charts.chartview.view.model.MapModel;
-import org.knowtiphy.shapemap.api.IMapLayer;
 import org.knowtiphy.shapemap.api.RenderingContext;
 import org.knowtiphy.shapemap.renderer.RendererUtilities;
 import org.knowtiphy.shapemap.renderer.ShapeMapRenderer;
@@ -132,7 +130,7 @@ public class CanvasShapeMapSkin<S, F> extends ShapeMapBaseSkin<S, F> {
                     try {
                         var rendererContext =
                                 new RenderingContext<>(
-                                        layers(model),
+                                        model.layers(),
                                         model.totalRuleCount(),
                                         JTS.toEnvelope(model.geometry()),
                                         //  TODO -- shouldn't this be in the viewport?
@@ -180,7 +178,7 @@ public class CanvasShapeMapSkin<S, F> extends ShapeMapBaseSkin<S, F> {
 
                     var rendererContext =
                             new RenderingContext<>(
-                                    layers(model),
+                                    model.layers(),
                                     model.totalRuleCount(),
                                     JTS.toEnvelope(model.geometry()),
                                     //  TODO -- shouldn't this be in the viewport?
@@ -207,10 +205,6 @@ public class CanvasShapeMapSkin<S, F> extends ShapeMapBaseSkin<S, F> {
         }
     }
 
-    //  TODO this is clumsy
-    private Collection<IMapLayer<S, F>> layers(MapModel<S, F> mapModel) {
-        return mapModel.layers().stream().map(l -> (IMapLayer<S, F>) l).toList();
-    }
     //    private Rectangle2D screenArea(Transformation tx, Envelope envelope)
     //    {
     //        tx.apply(envelope.getMinX(), envelope.getMaxY());

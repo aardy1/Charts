@@ -8,15 +8,10 @@ import java.util.Collection;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.transform.Affine;
 import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.knowtiphy.shapemap.api.IFeatureAdapter;
-import org.knowtiphy.shapemap.api.IRenderablePolygonProvider;
-import org.knowtiphy.shapemap.api.ISVGProvider;
-import org.knowtiphy.shapemap.api.ITextBoundsFunction;
-import org.knowtiphy.shapemap.api.IMapLayer;
 
 /** The information the shape map renderer needs to render a map. */
 public record RenderingContext<S, F>(
-        Collection<IMapLayer<S, F>> layers,
+        Collection<? extends IMapLayer<S, F>> layers,
         //  what does this do?
         int totalRuleCount,
         ReferencedEnvelope viewPortBounds,

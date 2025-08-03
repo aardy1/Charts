@@ -73,7 +73,7 @@ tasks.withType(JavaExec) {
 
 dependencies {
 
-  implementation project(':shapemap')
+  implementation project(':shapemaprenderer')
 
   implementation libs.geotools.shapefile
   implementation libs.geotools.sld
