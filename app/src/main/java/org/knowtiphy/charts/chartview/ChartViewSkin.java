@@ -1,6 +1,13 @@
 package org.knowtiphy.charts.chartview;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.event.ActionEvent;
+import javafx.geometry.Point2D;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
@@ -20,33 +27,28 @@ import org.controlsfx.control.PopOver;
 import org.controlsfx.glyphfont.Glyph;
 import org.geotools.api.feature.simple.SimpleFeatureType;
 import org.geotools.api.referencing.operation.TransformException;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.knowtiphy.charts.Fonts;
+import org.knowtiphy.charts.chart.ChartLocker;
+import org.knowtiphy.charts.chart.ENCChart;
+import org.knowtiphy.charts.chart.event.ChartLockerEvent;
 import org.knowtiphy.charts.chartview.ChartView.EventModel;
+import org.knowtiphy.charts.chartview.shapemapview.SingleCanvasShapeMapView;
 import org.knowtiphy.charts.dynamics.AISEvent;
 import org.knowtiphy.charts.dynamics.AISInformation;
 import org.knowtiphy.charts.dynamics.AISModel;
-import org.knowtiphy.charts.chart.ChartLocker;
 import org.knowtiphy.charts.enc.ENCCell;
-import org.knowtiphy.charts.chart.ENCChart;
-import org.knowtiphy.charts.chart.event.ChartLockerEvent;
 import org.knowtiphy.charts.geotools.Queries;
 import org.knowtiphy.charts.memstore.MemFeature;
 import org.knowtiphy.charts.ontology.S57;
 import org.knowtiphy.charts.settings.UnitProfile;
-import org.knowtiphy.shapemap.renderer.Transformation;
+import org.knowtiphy.charts.utils.DragState;
+import org.knowtiphy.charts.utils.FXUtils;
+import static org.knowtiphy.charts.utils.FXUtils.resizeable;
 import org.knowtiphy.shapemap.context.SVGCache;
-import org.knowtiphy.charts.chartview.view.ShapeMapView;
+import org.knowtiphy.shapemap.renderer.Transformation;
 import org.reactfx.EventStreams;
 import org.reactfx.Subscription;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import static org.knowtiphy.charts.utils.FXUtils.resizeable;
 
 public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView> {
 
@@ -54,7 +56,7 @@ public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView
 
     private static final double PREFERRED_HEIGHT = Region.USE_COMPUTED_SIZE;
 
-    private final ShapeMapView<SimpleFeatureType, MemFeature> mapSurface;
+    private final SingleCanvasShapeMapView<SimpleFeatureType, MemFeature> mapSurface;
 
     private final ChartLocker chartLocker;
 
@@ -101,17 +103,16 @@ public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView
         getChildren().addAll(root);
 
         var surfaceDragEventsPane = new Pane();
-        mapSurface = makeMapSurface();
+        mapSurface = mapView();
         // iconsSurface = makeIconsSurface();
         var quiltingSurface = makeQuiltingSurface();
-        coordinateGrid = makeCoordinateGrid(unitProfile);
+        coordinateGrid = coordinateGrid(unitProfile);
         // aisPane = makeDynamicsSurface();
 
         root.getChildren()
                 .addAll(surfaceDragEventsPane, mapSurface, quiltingSurface, coordinateGrid); // ,
         // iconsSurface,
         // //
-        // quiltingSurface,
         // aisPane);
 
         if (Double.compare(S().getPrefWidth(), 0.0) <= 0
@@ -190,11 +191,11 @@ public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView
         };
     }
 
-    private Pane makeCoordinateGrid(UnitProfile unitProfile) {
-        var theGrid = resizeable(new CoordinateGrid(chartLocker, chart, unitProfile));
-        theGrid.setPickOnBounds(false);
-        theGrid.setMouseTransparent(true);
-        return theGrid;
+    private Pane coordinateGrid(UnitProfile unitProfile) {
+        var grid = resizeable(new CoordinateGrid(chartLocker, chart, unitProfile));
+        grid.setPickOnBounds(false);
+        grid.setMouseTransparent(true);
+        return grid;
     }
 
     private Pane makeQuiltingSurface() {
@@ -203,17 +204,56 @@ public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView
         return theSurface;
     }
 
-    private ShapeMapView<SimpleFeatureType, MemFeature> makeMapSurface() {
-        var theSurface = new ShapeMapView<>(chart, Color.LIGHTGREY);
-        theSurface.setMouseTransparent(true);
-        return theSurface;
+    private SingleCanvasShapeMapView<SimpleFeatureType, MemFeature> mapView() {
+        var shapeMapView =
+                new SingleCanvasShapeMapView<SimpleFeatureType, MemFeature>(chart, Color.LIGHTGREY);
+        //        theSurface.setMouseTransparent(true);
+
+        //  double click re-positions the chart
+        FXUtils.addDoubleClickHandler(
+                shapeMapView, event -> chart.positionAt(event.getX(), event.getY()));
+
+        //  chart zooming by pinching
+        FXUtils.addZoomHandler(
+                shapeMapView,
+                event -> {
+                    // not sure what NaN means -- something to do with Zoom start/finish
+                    if (!Double.isNaN(event.getZoomFactor())) {
+                        chart.setZoom(chart.zoom() * event.getZoomFactor());
+                    }
+                });
+
+        //  chart dragging
+        FXUtils.addDragHandler(
+                shapeMapView,
+                (event, dragState) -> {
+                    var difX = event.getX() - dragState.startX;
+                    var difY = event.getY() - dragState.startY;
+                    dragState.startX = event.getX();
+                    dragState.startY = event.getY();
+                    var newPos = new Point2D(difX, difY);
+                    var result = chart.viewPortScreenToWorld().transform(newPos);
+
+                    var newVPBounds = new ReferencedEnvelope(chart.viewPortBounds());
+                    newVPBounds.translate(
+                            newVPBounds.getMinimum(0) - result.getX(),
+                            newVPBounds.getMaximum(1) - result.getY());
+
+                    try {
+                        chart.setViewPortBounds(newVPBounds);
+                    } catch (TransformException | NonInvertibleTransformException ex) {
+                        ex.printStackTrace();
+                    }
+                });
+
+        return shapeMapView;
     }
 
     private void setupListeners() {
-        subscriptions.add(DragPanZoomSupport.addPositionAtSupport(eventModel, chart));
-        subscriptions.add(DragPanZoomSupport.addDragSupport(eventModel, chart));
+        //        subscriptions.add(DragPanZoomSupport.addPositionAtSupport(eventModel, chart));
+        //        subscriptions.add(DragPanZoomSupport.addDragSupport(eventModel, chart));
         subscriptions.addAll(DragPanZoomSupport.addPanningSupport(eventModel, chart));
-        subscriptions.add(DragPanZoomSupport.addZoomSupport(eventModel, chart));
+        //        subscriptions.add(DragPanZoomSupport.addZoomSupport(eventModel, chart));
 
         subscriptions.add(
                 displayOptions.showGridEvents.subscribe(
@@ -364,6 +404,26 @@ public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView
     private void updateBoats() {
         for (var boat : boats.values()) {
             setBoatPosition(boat.getRight(), boat.getLeft());
+        }
+    }
+
+    private void doDrag(MouseEvent event, DragState dragState) {
+        var difX = event.getX() - dragState.startX;
+        var difY = event.getY() - dragState.startY;
+        dragState.startX = event.getX();
+        dragState.startY = event.getY();
+        var newPos = new Point2D(difX, difY);
+        var result = chart.viewPortScreenToWorld().transform(newPos);
+
+        var newVPBounds = new ReferencedEnvelope(chart.viewPortBounds());
+        newVPBounds.translate(
+                newVPBounds.getMinimum(0) - result.getX(),
+                newVPBounds.getMaximum(1) - result.getY());
+
+        try {
+            chart.setViewPortBounds(newVPBounds);
+        } catch (TransformException | NonInvertibleTransformException ex) {
+            Logger.getLogger(DragPanZoomSupport.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 }

@@ -1,4 +1,4 @@
-package org.knowtiphy.charts.chartview.view;
+package org.knowtiphy.charts.chartview.view.canvas;
 
 import java.util.List;
 import java.util.Objects;
@@ -18,14 +18,14 @@ import org.knowtiphy.charts.chartview.view.canvas.CanvasShapeMapSkin;
  * @param <S> the type of the schema
  * @param <F> the type of the features
  */
-public class ShapeMapView<S, F> extends Control {
+public class ShapeMapControl<S, F> extends Control {
 
     public enum SkinType {
         CANVAS
     }
 
     // CSS styling
-    private static final StyleablePropertyFactory<ShapeMapView<?, ?>> FACTORY =
+    private static final StyleablePropertyFactory<ShapeMapControl<?, ?>> FACTORY =
             new StyleablePropertyFactory<>(Control.getClassCssMetaData());
 
     private static String DEFAULT_STYLE_SHEET;
@@ -36,7 +36,7 @@ public class ShapeMapView<S, F> extends Control {
 
     private final Color background;
 
-    public ShapeMapView(BaseMapViewModel<S, F> map, Color background) {
+    public ShapeMapControl(BaseMapViewModel<S, F> map, Color background) {
         this.map = map;
         this.background = background;
         this.skinType = SkinType.CANVAS;
@@ -44,7 +44,7 @@ public class ShapeMapView<S, F> extends Control {
     }
 
     @Override
-    protected Skin<ShapeMapView<S, F>> createDefaultSkin() {
+    protected Skin<ShapeMapControl<S, F>> createDefaultSkin() {
         return switch (skinType) {
             default -> new CanvasShapeMapSkin<>(this, map, background);
         };

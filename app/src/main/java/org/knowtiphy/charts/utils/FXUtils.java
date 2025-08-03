@@ -2,6 +2,7 @@ package org.knowtiphy.charts.utils;
 
 import java.io.InputStream;
 import java.util.List;
+import java.util.function.BiConsumer;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -13,6 +14,8 @@ import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.input.ZoomEvent;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
@@ -21,6 +24,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import org.apache.commons.lang3.tuple.Pair;
+import org.knowtiphy.charts.chartview.DragPanZoomSupport;
 
 /** Collection of utility classes for JavaFX. */
 public class FXUtils {
@@ -113,5 +117,36 @@ public class FXUtils {
         TEXT.setText(s);
         TEXT.setFont(font);
         return TEXT.getBoundsInLocal();
+    }
+
+    public static void addMousePressedHandler(Node node, EventHandler<MouseEvent> eh) {
+        node.addEventHandler(MouseEvent.MOUSE_PRESSED, eh);
+    }
+
+    public static void addDoubleClickHandler(Node node, EventHandler<MouseEvent> eh) {
+        node.addEventHandler(
+                MouseEvent.MOUSE_CLICKED,
+                event -> {
+                    if (event.getClickCount() > 1) {
+                        eh.handle(event);
+                    }
+                });
+    }
+
+    public static void addZoomHandler(Node node, EventHandler<ZoomEvent> eh) {
+        node.addEventHandler(ZoomEvent.ANY, eh);
+    }
+
+    public static void addDragHandler(Node node, BiConsumer<MouseEvent, DragState> eh) {
+        org.knowtiphy.charts.utils.DragState dragState = new DragState();
+
+        addMousePressedHandler(
+                node,
+                event -> {
+                    dragState.startX = event.getSceneX();
+                    dragState.startY = event.getSceneY();
+                });
+
+        node.addEventHandler(MouseEvent.MOUSE_DRAGGED, event -> eh.accept(event, dragState));
     }
 }

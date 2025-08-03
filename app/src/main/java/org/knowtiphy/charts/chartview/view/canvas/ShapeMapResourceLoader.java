@@ -3,7 +3,7 @@
  * All rights reserved.
  */
 
-package org.knowtiphy.charts.chartview.view;
+package org.knowtiphy.charts.chartview.view.canvas;
 
 import org.knowtiphy.charts.chartview.markicons.*;
 

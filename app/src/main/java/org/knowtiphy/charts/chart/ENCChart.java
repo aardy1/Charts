@@ -9,13 +9,13 @@ import javafx.scene.transform.NonInvertibleTransformException;
 import org.geotools.api.feature.simple.SimpleFeatureType;
 import org.geotools.api.referencing.operation.TransformException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.knowtiphy.charts.chartview.MapViewport;
+import org.knowtiphy.charts.chartview.Quilt;
+import org.knowtiphy.charts.chartview.view.model.MapModel;
 import org.knowtiphy.charts.memstore.MemFeature;
 import org.knowtiphy.shapemap.api.IFeatureAdapter;
 import org.knowtiphy.shapemap.api.IRenderablePolygonProvider;
 import org.knowtiphy.shapemap.api.ITextBoundsFunction;
-import org.knowtiphy.charts.chartview.view.model.MapModel;
-import org.knowtiphy.charts.chartview.MapViewport;
-import org.knowtiphy.charts.chartview.Quilt;
 import org.knowtiphy.shapemap.context.SVGCache;
 
 /**

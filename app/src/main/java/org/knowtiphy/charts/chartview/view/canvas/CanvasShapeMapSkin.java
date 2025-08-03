@@ -8,8 +8,6 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import org.geotools.geometry.jts.JTS;
 import org.knowtiphy.charts.chartview.BaseMapViewModel;
-import org.knowtiphy.charts.chartview.view.ShapeMapBaseSkin;
-import org.knowtiphy.charts.chartview.view.ShapeMapView;
 import org.knowtiphy.charts.chartview.view.model.MapModel;
 import org.knowtiphy.shapemap.api.RenderingContext;
 import org.knowtiphy.shapemap.renderer.RendererUtilities;
@@ -17,7 +15,9 @@ import org.knowtiphy.shapemap.renderer.ShapeMapRenderer;
 import org.knowtiphy.shapemap.renderer.Transformation;
 
 /**
- * A skin for a shape map view that uses a JavaFX canvas to show an ESRI shape map of layers of
+ * NO LONGER USED
+ *
+ * <p>A skin for a shape map view that uses a JavaFX canvas to show an ESRI shape map of layers of
  * features of some schema type.
  *
  * @param <S> the type of the schema
@@ -25,6 +25,7 @@ import org.knowtiphy.shapemap.renderer.Transformation;
  */
 public class CanvasShapeMapSkin<S, F> extends ShapeMapBaseSkin<S, F> {
 
+    private static int count = 0;
     private static final double PREFERRED_WIDTH = Region.USE_COMPUTED_SIZE;
 
     private static final double PREFERRED_HEIGHT = Region.USE_COMPUTED_SIZE;
@@ -36,7 +37,7 @@ public class CanvasShapeMapSkin<S, F> extends ShapeMapBaseSkin<S, F> {
     private final StackPane root = new StackPane();
 
     public CanvasShapeMapSkin(
-            ShapeMapView<S, F> surface, BaseMapViewModel<S, F> viewModel, Color background) {
+            ShapeMapControl<S, F> surface, BaseMapViewModel<S, F> viewModel, Color background) {
         super(surface);
 
         this.viewModel = viewModel;
@@ -66,16 +67,25 @@ public class CanvasShapeMapSkin<S, F> extends ShapeMapBaseSkin<S, F> {
     @Override
     public void layoutChildren(
             final double x, final double y, final double width, final double height) {
-        System.err.println("layout children");
+        System.err.println("layout children : " + width + " : " + height);
         super.layoutChildren(x, y, width, height);
-        repaint();
+        repaint(width, height);
     }
 
-    private void repaint() {
-        var width = (int) root.getWidth();
-        var height = (int) root.getHeight();
+    private void repaint(final double width, final double height) {
+        //        var width = (int) root.getWidth();
+        //        var height = (int) root.getHeight();
+        count++;
+        System.out.println("repaint " + count + " : " + width + " : " + height);
+        System.out.println(
+                "SA dimensions "
+                        + viewModel.getScreenAreaWidth()
+                        + " : "
+                        + viewModel.getScreenAreaHeight());
 
         if (viewModel.maps().isEmpty()) {
+            System.out.println("EMPTY");
+
             var canvas = new Canvas(width, height);
             var graphics = canvas.getGraphicsContext2D();
             graphics.setFill(background);

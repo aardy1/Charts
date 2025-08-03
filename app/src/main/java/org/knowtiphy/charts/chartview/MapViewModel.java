@@ -4,11 +4,11 @@ import java.util.List;
 import javafx.scene.transform.NonInvertibleTransformException;
 import org.geotools.api.referencing.operation.TransformException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.knowtiphy.charts.chartview.view.model.MapModel;
 import org.knowtiphy.shapemap.api.IFeatureAdapter;
 import org.knowtiphy.shapemap.api.IRenderablePolygonProvider;
 import org.knowtiphy.shapemap.api.ISVGProvider;
 import org.knowtiphy.shapemap.api.ITextBoundsFunction;
-import org.knowtiphy.charts.chartview.view.model.MapModel;
 import org.reactfx.Change;
 
 /**
@@ -52,8 +52,8 @@ public abstract class MapViewModel<S, F> extends BaseMapViewModel<S, F> {
             throws TransformException, NonInvertibleTransformException {
         var newExtent = clip(bounds);
         if (!newExtent.equals(viewPortBounds())) {
-            var oldBounds = viewPort().bounds();
-            viewPort().setBounds(newExtent);
+            var oldBounds = viewPort.bounds();
+            viewPort.setBounds(newExtent);
             viewPortBoundsEvent.push(new Change<>(oldBounds, newExtent));
         }
     }

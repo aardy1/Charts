@@ -21,10 +21,11 @@ import org.knowtiphy.shapemap.context.SVGCache;
 import org.reactfx.EventSource;
 import org.reactfx.EventStream;
 
-/** A control to show maps. */
+/** A control to show ENC quilts. */
 public class ChartView extends Control {
 
     public enum SkinType {
+        //  will have a multi-canvas view too?
         CANVAS
     }
 
@@ -32,11 +33,11 @@ public class ChartView extends Control {
     private static final StyleablePropertyFactory<ChartView> FACTORY =
             new StyleablePropertyFactory<>(Control.getClassCssMetaData());
 
-    private static final CssMetaData<ChartView, Color> COLOR_META =
-            FACTORY.createColorCssMetaData("-color", s -> s.color, Color.RED, false);
-
     private StyleableProperty<Color> color =
-            new SimpleStyleableObjectProperty<>(COLOR_META, this, "color");
+            new SimpleStyleableObjectProperty<>(
+                    FACTORY.createColorCssMetaData("-color", s -> s.color, Color.RED, false),
+                    this,
+                    "color");
 
     private static String DEFAULT_STYLE_SHEET;
 
@@ -74,6 +75,7 @@ public class ChartView extends Control {
             MapDisplayOptions displayOptions,
             SVGCache svgCache,
             SkinType skinType) {
+
         this.chartLocker = chartLocker;
         this.chart = map;
         this.dynamics = dynamics;

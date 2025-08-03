@@ -1,0 +1,42 @@
+plugins {
+    id "java"
+    id "org.openjfx.javafxplugin" version "0.1.0"
+}
+
+repositories {
+    maven { url  'https://repo.osgeo.org/repository/release/' }
+    maven { url  'https://repo.osgeo.org/repository/snapshot/' }
+    maven { url 'https://jitpack.io' }
+    mavenCentral()
+}
+
+dependencies {
+    implementation libs.geotools.sld
+    implementation libs.commons.lang3
+    implementation libs.stax.api
+    implementation libs.fx.base
+    implementation libs.fx.graphics
+    implementation libs.fx.controls
+    implementation libs.reactfx
+    implementation libs.fxsvgimage
+}
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
+}
+
+compileJava {
+    options.compilerArgs.addAll(['-Xlint'])
+}
+
+javafx {
+    version = "21"
+    modules = [ 'javafx.base', 'javafx.graphics', 'javafx.controls' ]
+}
+
+//tasks.withType(JavaExec) {
+//    enableAssertions = true
+//}
+//   maven { url 'https://nexus.gluonhq.com/nexus/content/repositories/releases/' }
