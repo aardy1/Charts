@@ -1,7 +1,8 @@
-package org.knowtiphy.shapemap.model;
+package org.knowtiphy.charts.chartview.view.model;
 
 import javafx.beans.property.SimpleBooleanProperty;
 import org.knowtiphy.shapemap.api.IFeatureSource;
+import org.knowtiphy.shapemap.api.IMapLayer;
 import org.knowtiphy.shapemap.renderer.FeatureTypeStyle;
 import org.reactfx.Change;
 import org.reactfx.EventStream;
@@ -11,9 +12,9 @@ import org.reactfx.EventStreams;
  * A layer in a map model -- a feature source, a style, and some event streams.
  *
  * @param <S> the type of the schema for the feature source
- * @param <F> the type of the features provded by the feature source
+ * @param <F> the type of the features provided by the feature source
  */
-public class MapLayer<S, F> {
+public class MapLayer<S, F> implements IMapLayer<S, F> {
     private final IFeatureSource<S, F> featureSource;
 
     private final FeatureTypeStyle<S, F> style;
@@ -36,14 +37,17 @@ public class MapLayer<S, F> {
         this.scaleLess = scaleLess;
     }
 
+    @Override
     public IFeatureSource<S, F> featureSource() {
         return featureSource;
     }
 
+    @Override
     public FeatureTypeStyle<S, F> style() {
         return style;
     }
 
+    @Override
     public boolean isVisible() {
         return visible.get();
     }
@@ -52,6 +56,7 @@ public class MapLayer<S, F> {
         this.visible.set(visible);
     }
 
+    @Override
     public boolean isScaleLess() {
         return scaleLess;
     }

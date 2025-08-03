@@ -3,7 +3,7 @@
  * All rights reserved.
  */
 
-package org.knowtiphy.shapemap.renderer.context;
+package org.knowtiphy.shapemap.context;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -15,7 +15,7 @@ import org.apache.commons.lang3.tuple.Triple;
 import org.girod.javafx.svgimage.SVGLoader;
 import org.knowtiphy.shapemap.api.ISVGProvider;
 
-/** A cache of SVG images at varying sizes and rotations. */
+/** A simple cache of SVG images at varying sizes and rotations. */
 public class SVGCache implements ISVGProvider {
     private static final SnapshotParameters SVG_RENDERING_PARAMETERS = new SnapshotParameters();
 

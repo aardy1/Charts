@@ -9,8 +9,8 @@ import org.geotools.api.feature.simple.SimpleFeatureType;
 import org.geotools.api.feature.type.Name;
 import org.geotools.api.feature.type.PropertyDescriptor;
 import org.geotools.api.filter.identity.FeatureId;
-import org.knowtiphy.shapemap.model.MapLayer;
-import org.knowtiphy.shapemap.model.MapViewModel;
+import org.knowtiphy.charts.chartview.view.model.MapLayer;
+import org.knowtiphy.charts.chartview.MapViewModel;
 
 import java.io.IOException;
 import java.util.HashMap;

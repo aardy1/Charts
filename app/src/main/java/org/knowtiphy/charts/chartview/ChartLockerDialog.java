@@ -35,7 +35,7 @@ import static org.knowtiphy.charts.chartview.AvailableCatalogs.BUILTIN_CATALOGS;
 import org.knowtiphy.charts.enc.ENCCell;
 import static org.knowtiphy.charts.utils.FXUtils.alwaysGrow;
 import static org.knowtiphy.charts.utils.FXUtils.neverGrow;
-import org.knowtiphy.shapemap.renderer.context.SVGCache;
+import org.knowtiphy.shapemap.context.SVGCache;
 
 public class ChartLockerDialog {
 

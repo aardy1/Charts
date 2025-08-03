@@ -5,6 +5,7 @@ import java.util.List;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Bounds;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.MenuBar;
@@ -16,11 +17,15 @@ import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import org.apache.commons.lang3.tuple.Pair;
 
 /** Collection of utility classes for JavaFX. */
 public class FXUtils {
+
+    private static final Text TEXT = new Text();
 
     public static void later(Runnable r) {
         Platform.runLater(r);
@@ -92,5 +97,21 @@ public class FXUtils {
         var menuBar = new MenuBar();
         menuBar.setUseSystemMenuBar(true);
         return menuBar;
+    }
+
+    public static Pair<Double, Double> textSize(Font font, String s) {
+        TEXT.setText(s);
+        TEXT.setFont(font);
+        return Pair.of(TEXT.getBoundsInLocal().getWidth(), TEXT.getBoundsInLocal().getHeight());
+    }
+
+    public static Pair<Double, Double> textSize(Font font) {
+        return textSize(font, "A");
+    }
+
+    public static Bounds textSizeFast(Font font, String s) {
+        TEXT.setText(s);
+        TEXT.setFont(font);
+        return TEXT.getBoundsInLocal();
     }
 }

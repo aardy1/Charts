@@ -3,17 +3,14 @@
  * All rights reserved.
  */
 
-package org.knowtiphy.shapemap.renderer.context;
-
-import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.Polygon;
+package org.knowtiphy.shapemap.context;
 
 import java.util.HashMap;
 import java.util.function.Function;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.Polygon;
 
-/**
- * @author graham
- */
+/** A simple cache of rendering geometries.. */
 public class RenderGeomCache {
     private final HashMap<Polygon, Polygon> cache = new HashMap<>();
 

@@ -1,4 +1,4 @@
-package org.knowtiphy.shapemap.model;
+package org.knowtiphy.charts.chartview;
 
 import java.util.List;
 import javafx.scene.transform.NonInvertibleTransformException;
@@ -8,6 +8,7 @@ import org.knowtiphy.shapemap.api.IFeatureAdapter;
 import org.knowtiphy.shapemap.api.IRenderablePolygonProvider;
 import org.knowtiphy.shapemap.api.ISVGProvider;
 import org.knowtiphy.shapemap.api.ITextBoundsFunction;
+import org.knowtiphy.charts.chartview.view.model.MapModel;
 import org.reactfx.Change;
 
 /**

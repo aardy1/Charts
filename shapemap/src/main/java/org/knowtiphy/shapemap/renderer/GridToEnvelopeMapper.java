@@ -324,7 +324,6 @@ public class GridToEnvelopeMapper {
 
     private static Affine createAffine(LinearTransform tx) {
         var gMatrix = tx.getMatrix();
-        //  @formatter:off
         return new Affine(
                 gMatrix.getElement(0, 0),
                 gMatrix.getElement(0, 1),
@@ -332,6 +331,5 @@ public class GridToEnvelopeMapper {
                 gMatrix.getElement(1, 0),
                 gMatrix.getElement(1, 1),
                 gMatrix.getElement(1, 2));
-        //  @formatter:om
     }
 }

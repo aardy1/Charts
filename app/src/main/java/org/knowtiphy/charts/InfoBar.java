@@ -33,7 +33,7 @@ import static org.knowtiphy.charts.utils.FXUtils.button;
 import static org.knowtiphy.charts.utils.FXUtils.menuButton;
 import static org.knowtiphy.charts.utils.FXUtils.nonResizeable;
 import org.knowtiphy.charts.utils.ToggleModel;
-import org.knowtiphy.shapemap.renderer.context.SVGCache;
+import org.knowtiphy.shapemap.context.SVGCache;
 import org.reactfx.Subscription;
 
 /** The info bar at the bottom of the chart view. */

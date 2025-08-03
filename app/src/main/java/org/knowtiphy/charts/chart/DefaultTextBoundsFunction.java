@@ -7,6 +7,7 @@ package org.knowtiphy.charts.chart;
 import javafx.geometry.Bounds;
 import javafx.scene.text.Font;
 import org.knowtiphy.charts.Fonts;
+import org.knowtiphy.charts.utils.FXUtils;
 import org.knowtiphy.shapemap.api.ITextBoundsFunction;
 
 /**
@@ -21,6 +22,6 @@ public class DefaultTextBoundsFunction implements ITextBoundsFunction {
 
     @Override
     public Bounds apply(Font font, String s) {
-        return Fonts.textSizeFast(font, s);
+        return FXUtils.textSizeFast(font, s);
     }
 }

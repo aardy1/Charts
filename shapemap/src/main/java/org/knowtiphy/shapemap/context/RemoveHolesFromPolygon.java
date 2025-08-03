@@ -3,18 +3,17 @@
  * All rights reserved.
  */
 
-package org.knowtiphy.shapemap.renderer.context;
+package org.knowtiphy.shapemap.context;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import org.apache.commons.lang3.tuple.Pair;
 import org.knowtiphy.shapemap.api.IRenderablePolygonProvider;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LinearRing;
 import org.locationtech.jts.geom.Polygon;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
 public class RemoveHolesFromPolygon implements IRenderablePolygonProvider {
     private static final GeometryFactory GF = new GeometryFactory();

@@ -15,7 +15,7 @@ import org.knowtiphy.charts.enc.ENCCell;
 import org.knowtiphy.charts.memstore.MemFeature;
 import org.knowtiphy.charts.memstore.StyleReader;
 import org.knowtiphy.charts.settings.AppSettings;
-import org.knowtiphy.shapemap.model.MapModel;
+import org.knowtiphy.charts.chartview.view.model.MapModel;
 import org.knowtiphy.shapemap.style.parser.StyleSyntaxException;
 
 /** A loader of ENC charts from the local file system */

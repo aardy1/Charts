@@ -1,10 +1,7 @@
 package org.knowtiphy.charts;
 
-import javafx.geometry.Bounds;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
-import javafx.scene.text.Text;
-import org.apache.commons.lang3.tuple.Pair;
 import org.controlsfx.glyphfont.FontAwesome;
 import org.controlsfx.glyphfont.Glyph;
 import org.controlsfx.glyphfont.GlyphFont;
@@ -22,34 +19,6 @@ public class Fonts {
     public static final Font DEFAULT_FONT_10 = Font.font(10);
 
     public static final Font DEFAULT_FONT_9 = Font.font(9);
-
-    private static Text TEXT = new Text();
-
-    public static Pair<Double, Double> textSize(Font font, String s) {
-        // TODO -- why is this necessary?
-        if (TEXT == null) {
-            TEXT = new Text();
-        }
-
-        TEXT.setText(s);
-        TEXT.setFont(font);
-        return Pair.of(TEXT.getBoundsInLocal().getWidth(), TEXT.getBoundsInLocal().getHeight());
-    }
-
-    public static Pair<Double, Double> textSize(Font font) {
-        return textSize(font, "A");
-    }
-
-    public static Bounds textSizeFast(Font font, String s) {
-        // TODO -- why is this necessary?
-        if (TEXT == null) {
-            TEXT = new Text();
-        }
-
-        TEXT.setText(s);
-        TEXT.setFont(font);
-        return TEXT.getBoundsInLocal();
-    }
 
     private static final GlyphFont FONT_AWESOME = GlyphFontRegistry.font("FontAwesome");
 

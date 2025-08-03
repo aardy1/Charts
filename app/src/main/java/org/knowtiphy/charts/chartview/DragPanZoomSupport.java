@@ -1,5 +1,9 @@
 package org.knowtiphy.charts.chartview;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.geometry.Point2D;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
@@ -8,13 +12,7 @@ import org.geotools.api.referencing.operation.TransformException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.knowtiphy.charts.chartview.ChartView.EventModel;
 import org.knowtiphy.charts.geotools.Coordinates;
-import org.knowtiphy.shapemap.model.BaseMapViewModel;
 import org.reactfx.Subscription;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Support for dragging, panning, and zooming a map, plus positioning a map at some screen
@@ -51,7 +49,6 @@ public class DragPanZoomSupport {
                         .filter(evt -> evt.getEventType().equals(ScrollEvent.SCROLL_FINISHED))
                         .subscribe(evt -> scrollState.isTouchpad = false));
 
-        // @formatter:off
         subscriptions.add(
                 eventModel
                         .scrollEvents
@@ -91,8 +88,6 @@ public class DragPanZoomSupport {
                                         //          Coordinates.zoom(map, zoomFactor);
                                     }
                                 }));
-
-        // @formatter:on
 
         return subscriptions;
     }

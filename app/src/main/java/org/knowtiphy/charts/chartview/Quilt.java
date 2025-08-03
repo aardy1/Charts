@@ -1,4 +1,4 @@
-package org.knowtiphy.shapemap.model;
+package org.knowtiphy.charts.chartview;
 
 import java.util.List;
 import javafx.scene.transform.NonInvertibleTransformException;
@@ -8,6 +8,7 @@ import org.knowtiphy.shapemap.api.IFeatureAdapter;
 import org.knowtiphy.shapemap.api.IRenderablePolygonProvider;
 import org.knowtiphy.shapemap.api.ISVGProvider;
 import org.knowtiphy.shapemap.api.ITextBoundsFunction;
+import org.knowtiphy.charts.chartview.view.model.MapModel;
 import org.reactfx.Change;
 
 /**
@@ -58,26 +59,6 @@ public class Quilt<S, F> extends BaseMapViewModel<S, F> {
         viewPortBoundsEvent.push(new Change<>(oldBounds, bounds));
     }
 
-    //
-    //    @Override
-    //    public void setViewPortScreenArea(Rectangle2D bounds)
-    //        throws TransformException, NonInvertibleTransformException
-    //    {
-    //        viewPort.setScreenArea(bounds);
-    //    }
-    //
-    //    @Override
-    //    public Affine viewPortScreenToWorld()
-    //    {
-    //        return viewPort.screenToWorld();
-    //    }
-    //
-    //    @Override
-    //    public Affine viewPortWorldToScreen()
-    //    {
-    //        return viewPort.worldToScreen();
-    //    }
-
     @Override
     public double displayScale() {
         return maps().get(0).cScale() / zoom();
@@ -87,15 +68,4 @@ public class Quilt<S, F> extends BaseMapViewModel<S, F> {
     public ReferencedEnvelope bounds() {
         return viewPort.bounds();
     }
-
-    //    @Override
-    //    public ReferencedEnvelope viewPortBounds()
-    //    {
-    //        return viewPort.bounds();
-    //    }
-    //    @Override
-    //    public Rectangle2D viewPortScreenArea()
-    //    {
-    //        return viewPort.screenArea();
-    //    }
 }

@@ -7,8 +7,8 @@ package org.knowtiphy.charts.memstore;
 
 import org.geotools.api.feature.simple.SimpleFeatureType;
 import org.knowtiphy.charts.ontology.ENC;
-import org.knowtiphy.shapemap.model.MapLayer;
-import org.knowtiphy.shapemap.model.MapModel;
+import org.knowtiphy.charts.chartview.view.model.MapLayer;
+import org.knowtiphy.charts.chartview.view.model.MapModel;
 import org.locationtech.jts.geom.Geometry;
 
 import java.util.ArrayList;

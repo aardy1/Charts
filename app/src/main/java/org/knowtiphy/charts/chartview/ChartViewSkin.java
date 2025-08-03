@@ -34,8 +34,8 @@ import org.knowtiphy.charts.memstore.MemFeature;
 import org.knowtiphy.charts.ontology.S57;
 import org.knowtiphy.charts.settings.UnitProfile;
 import org.knowtiphy.shapemap.renderer.Transformation;
-import org.knowtiphy.shapemap.renderer.context.SVGCache;
-import org.knowtiphy.shapemap.view.ShapeMapView;
+import org.knowtiphy.shapemap.context.SVGCache;
+import org.knowtiphy.charts.chartview.view.ShapeMapView;
 import org.reactfx.EventStreams;
 import org.reactfx.Subscription;
 

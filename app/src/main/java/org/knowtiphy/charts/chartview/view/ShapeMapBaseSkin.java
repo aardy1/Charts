@@ -1,4 +1,4 @@
-package org.knowtiphy.shapemap.view;
+package org.knowtiphy.charts.chartview.view;
 
 import javafx.scene.control.Skin;
 import javafx.scene.control.SkinBase;

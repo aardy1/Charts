@@ -28,15 +28,15 @@ import org.geotools.geometry.jts.JTS;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.knowtiphy.charts.chart.event.ChartLockerEvent;
 import org.knowtiphy.charts.chartview.MapDisplayOptions;
+import org.knowtiphy.charts.enc.ENCCatalog;
 import org.knowtiphy.charts.enc.ENCCatalogReader;
 import org.knowtiphy.charts.enc.ENCCell;
-import org.knowtiphy.charts.enc.ENCCatalog;
 import org.knowtiphy.charts.memstore.MemFeature;
-import org.knowtiphy.shapemap.model.MapModel;
-import org.knowtiphy.shapemap.model.MapViewport;
-import org.knowtiphy.shapemap.renderer.context.RemoveHolesFromPolygon;
-import org.knowtiphy.shapemap.renderer.context.RenderGeomCache;
-import org.knowtiphy.shapemap.renderer.context.SVGCache;
+import org.knowtiphy.charts.chartview.view.model.MapModel;
+import org.knowtiphy.charts.chartview.MapViewport;
+import org.knowtiphy.shapemap.context.RemoveHolesFromPolygon;
+import org.knowtiphy.shapemap.context.RenderGeomCache;
+import org.knowtiphy.shapemap.context.SVGCache;
 import org.knowtiphy.shapemap.style.parser.StyleSyntaxException;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.TopologyException;
@@ -71,6 +71,7 @@ public class ChartLocker {
             ChartLoader chartLoader,
             MapDisplayOptions mapDisplayOptions)
             throws IOException, XMLStreamException {
+
         this.catalogsDir = catalogsDir;
         this.chartsDir = chartsDir;
         this.chartLoader = chartLoader;

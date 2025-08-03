@@ -1,4 +1,4 @@
-package org.knowtiphy.shapemap.model;
+package org.knowtiphy.charts.chartview;
 
 import java.util.List;
 import java.util.logging.Level;
@@ -9,6 +9,7 @@ import javafx.scene.transform.NonInvertibleTransformException;
 import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.api.referencing.operation.TransformException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.knowtiphy.charts.chartview.view.model.MapModel;
 import org.knowtiphy.shapemap.api.IFeatureAdapter;
 import org.knowtiphy.shapemap.api.IRenderablePolygonProvider;
 import org.knowtiphy.shapemap.api.ISVGProvider;
@@ -49,6 +50,7 @@ public abstract class BaseMapViewModel<S, F> {
             IRenderablePolygonProvider renderablePolygonProvider,
             ISVGProvider svgProvider,
             ITextBoundsFunction textSizeProvider) {
+
         this.viewPort = viewPort;
         this.featureAdapter = featureAdapter;
         this.renderablePolygonProvider = renderablePolygonProvider;

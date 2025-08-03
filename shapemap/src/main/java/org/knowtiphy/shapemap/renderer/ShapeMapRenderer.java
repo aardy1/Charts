@@ -6,7 +6,7 @@ package org.knowtiphy.shapemap.renderer;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.transform.Affine;
-import org.knowtiphy.shapemap.renderer.context.RenderingContext;
+import org.knowtiphy.shapemap.api.RenderingContext;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.Rule;
 import org.locationtech.jts.index.quadtree.Quadtree;
 
@@ -29,7 +29,6 @@ public class ShapeMapRenderer<S, F> {
 
         var index = new Quadtree();
 
-        // @formatter:off
         var graphicsRenderingContext =
                 new GraphicsRenderingContext<>(
                         renderingContext,
@@ -39,7 +38,6 @@ public class ShapeMapRenderer<S, F> {
                         onePixelY(renderingContext.screenToWorld()),
                         index,
                         renderingContext.viewPortBounds());
-        // @formatter:off
 
         try {
             // pass 1 -- do graphics -- point, line and polygon symbolizers

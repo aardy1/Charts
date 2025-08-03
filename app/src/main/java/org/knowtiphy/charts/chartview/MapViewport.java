@@ -1,4 +1,4 @@
-package org.knowtiphy.shapemap.model;
+package org.knowtiphy.charts.chartview;
 
 import javafx.geometry.Point2D;
 import javafx.geometry.Rectangle2D;
@@ -82,8 +82,8 @@ public class MapViewport {
     }
 
     /**
-     * Calculates transforms suitable for aspect ratio matching. The world bounds will be centred in
-     * the screen area.
+     * Calculates transforms suitable for aspect ratio matching. The world bounds will be centered
+     * in the screen area.
      */
     private void calculateCenteringTransforms() throws NonInvertibleTransformException {
         double xscale = screenArea.getWidth() / bounds.getWidth();

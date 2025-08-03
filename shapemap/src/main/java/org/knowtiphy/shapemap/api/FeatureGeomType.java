@@ -10,7 +10,6 @@ package org.knowtiphy.shapemap.api;
  * names and hence compares for geometry types).
  */
 public enum FeatureGeomType {
-    // @formatter:off
     POINT,
     MULTI_POINT,
     LINE_STRING,
@@ -19,5 +18,4 @@ public enum FeatureGeomType {
     POLYGON,
     MULTI_POLYGON,
     GEOMETRY_COLLECTION
-    // @formatter:on
 }

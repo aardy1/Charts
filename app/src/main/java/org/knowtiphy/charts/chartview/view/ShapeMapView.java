@@ -1,16 +1,15 @@
-package org.knowtiphy.shapemap.view;
+package org.knowtiphy.charts.chartview.view;
 
+import java.util.List;
+import java.util.Objects;
 import javafx.css.CssMetaData;
 import javafx.css.Styleable;
 import javafx.css.StyleablePropertyFactory;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 import javafx.scene.paint.Color;
-import org.knowtiphy.shapemap.model.Quilt;
-import org.knowtiphy.shapemap.view.canvas.CanvasShapeMapSkin;
-
-import java.util.List;
-import java.util.Objects;
+import org.knowtiphy.charts.chartview.BaseMapViewModel;
+import org.knowtiphy.charts.chartview.view.canvas.CanvasShapeMapSkin;
 
 /**
  * A shape map view -- a control that shows an ESRI shape map of layers of features of some schema
@@ -33,11 +32,11 @@ public class ShapeMapView<S, F> extends Control {
 
     private final SkinType skinType;
 
-    private final Quilt<S, F> map;
+    private final BaseMapViewModel<S, F> map;
 
     private final Color background;
 
-    public ShapeMapView(Quilt<S, F> map, Color background) {
+    public ShapeMapView(BaseMapViewModel<S, F> map, Color background) {
         this.map = map;
         this.background = background;
         this.skinType = SkinType.CANVAS;
@@ -59,7 +58,8 @@ public class ShapeMapView<S, F> extends Control {
             default:
                 if (DEFAULT_STYLE_SHEET == null) {
                     DEFAULT_STYLE_SHEET =
-                            Objects.requireNonNull(ShapeMapView.class.getResource("canvas.css"))
+                            Objects.requireNonNull(
+                                            ShapeMapResourceLoader.class.getResource("canvas.css"))
                                     .toExternalForm();
                 }
                 return DEFAULT_STYLE_SHEET;

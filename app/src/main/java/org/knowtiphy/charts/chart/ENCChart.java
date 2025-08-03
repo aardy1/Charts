@@ -13,10 +13,10 @@ import org.knowtiphy.charts.memstore.MemFeature;
 import org.knowtiphy.shapemap.api.IFeatureAdapter;
 import org.knowtiphy.shapemap.api.IRenderablePolygonProvider;
 import org.knowtiphy.shapemap.api.ITextBoundsFunction;
-import org.knowtiphy.shapemap.model.MapModel;
-import org.knowtiphy.shapemap.model.MapViewport;
-import org.knowtiphy.shapemap.model.Quilt;
-import org.knowtiphy.shapemap.renderer.context.SVGCache;
+import org.knowtiphy.charts.chartview.view.model.MapModel;
+import org.knowtiphy.charts.chartview.MapViewport;
+import org.knowtiphy.charts.chartview.Quilt;
+import org.knowtiphy.shapemap.context.SVGCache;
 
 /**
  * An ENC chart -- a map view model that maintains a quilt of ENC cells (loaded from a chart locker)

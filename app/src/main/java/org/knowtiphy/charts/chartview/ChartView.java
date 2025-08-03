@@ -17,7 +17,7 @@ import org.knowtiphy.charts.chart.ENCChart;
 import org.knowtiphy.charts.dynamics.AISEvent;
 import org.knowtiphy.charts.dynamics.AISModel;
 import org.knowtiphy.charts.settings.UnitProfile;
-import org.knowtiphy.shapemap.renderer.context.SVGCache;
+import org.knowtiphy.shapemap.context.SVGCache;
 import org.reactfx.EventSource;
 import org.reactfx.EventStream;
 

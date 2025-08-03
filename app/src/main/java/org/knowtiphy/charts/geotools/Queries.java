@@ -7,7 +7,7 @@ package org.knowtiphy.charts.geotools;
 
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.knowtiphy.shapemap.api.IFeatureSourceIterator;
-import org.knowtiphy.shapemap.model.BaseMapViewModel;
+import org.knowtiphy.charts.chartview.BaseMapViewModel;
 import org.knowtiphy.shapemap.renderer.Transformation;
 
 import java.util.ArrayList;

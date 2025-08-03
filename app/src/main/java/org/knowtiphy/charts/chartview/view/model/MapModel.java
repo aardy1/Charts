@@ -1,14 +1,13 @@
-package org.knowtiphy.shapemap.model;
-
-import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
-import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.locationtech.jts.geom.Geometry;
+package org.knowtiphy.charts.chartview.view.model;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
+import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.locationtech.jts.geom.Geometry;
 
 /**
  * A map model -- map bounds and compilation scale, and a collection of map layers.
