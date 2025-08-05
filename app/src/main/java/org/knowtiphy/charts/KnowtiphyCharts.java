@@ -8,6 +8,7 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
@@ -22,16 +23,20 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
+import javafx.scene.transform.NonInvertibleTransformException;
 import javafx.stage.Stage;
 import org.controlsfx.control.PropertySheet;
 import org.geotools.api.feature.simple.SimpleFeatureType;
-import org.knowtiphy.charts.chart.ChartLoader;
-import org.knowtiphy.charts.chart.ChartLocker;
-import org.knowtiphy.charts.chart.ENCChart;
-import org.knowtiphy.charts.chart.event.ChartLockerEvent;
+import org.geotools.api.referencing.operation.TransformException;
+import org.knowtiphy.charts.chartlocker.ChartLocker;
+import org.knowtiphy.charts.chartlocker.DefaultTextBoundsFunction;
+import org.knowtiphy.charts.chartlocker.ENCCellLoader;
+import org.knowtiphy.charts.chartlocker.MemFeatureAdapter;
 import org.knowtiphy.charts.chartview.ChartLockerDialog;
 import org.knowtiphy.charts.chartview.ChartView;
+import org.knowtiphy.charts.chartview.ChartViewModel;
 import org.knowtiphy.charts.chartview.MapDisplayOptions;
+import org.knowtiphy.charts.chartview.MapViewport;
 import org.knowtiphy.charts.chartview.markicons.MarkIconsResourceLoader;
 import org.knowtiphy.charts.desktop.AppSettingsDialog;
 import org.knowtiphy.charts.dynamics.AISModel;
@@ -44,15 +49,18 @@ import org.knowtiphy.charts.settings.AppSettings;
 import org.knowtiphy.charts.settings.UnitProfile;
 import org.knowtiphy.charts.utils.FXUtils;
 import static org.knowtiphy.charts.utils.FXUtils.later;
+import static org.knowtiphy.charts.utils.FXUtils.nonResizeable;
 import static org.knowtiphy.charts.utils.FXUtils.resizeable;
 import static org.knowtiphy.charts.utils.FXUtils.systemMenuBar;
 import org.knowtiphy.charts.utils.ToggleModel;
+import org.knowtiphy.shapemap.context.RemoveHolesFromPolygon;
+import org.knowtiphy.shapemap.context.RenderGeomCache;
 import org.knowtiphy.shapemap.context.SVGCache;
 
 /** The Knowtiphy Charts application. */
 public class KnowtiphyCharts extends Application {
 
-    // need to work these out from screen dimensions
+    // TODO need to work these out from screen dimensions
     private static final int WIDTH = 1300;
 
     private static final int HEIGHT = 750;
@@ -65,16 +73,15 @@ public class KnowtiphyCharts extends Application {
 
     private static final int CHART_LOCKER_HEIGHT = 400;
 
-    //  the global cache of SVG "images"
-    private final SVGCache svgCache = new SVGCache(MarkIconsResourceLoader.class);
-
-    //  global options and settings (creating the MapDisplayOptions can throw an exception so is
-    // done in the main method)
-    private MapDisplayOptions displayOptions;
-    private final AppSettings appSettings = new AppSettings(new UnitProfile());
-
     //  the platform we are running on
-    private final IUnderlyingPlatform platform = UnderlyingPlatform.getPlatform();
+    private IUnderlyingPlatform platform;
+
+    //  global options and settings
+    private MapDisplayOptions displayOptions;
+    private AppSettings appSettings;
+
+    //  the global cache of SVG "images"
+    private SVGCache svgCache;
 
     // the global chart locker
     private ChartLocker chartLocker;
@@ -82,32 +89,61 @@ public class KnowtiphyCharts extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
 
-        //  show initial platform info for debugging
+        //  work out what platform we are running on and show initial platform info for debugging
+        platform = UnderlyingPlatform.getPlatform();
         showInitialSetup(platform);
 
-        //  create global display options
+        //  create the global options
         displayOptions = new MapDisplayOptions();
+        appSettings = new AppSettings(new UnitProfile());
+
+        //  create the global svg cache
+        svgCache = new SVGCache(MarkIconsResourceLoader.class);
 
         //  create the global chart locker
         var styleReader = new StyleReader<SimpleFeatureType, MemFeature>(ResourceLoader.class);
-        var chartLoader = new ChartLoader(appSettings, styleReader);
-        chartLocker =
-                new ChartLocker(
-                        platform.catalogsDir(), platform.chartsDir(), chartLoader, displayOptions);
+        var chartLoader = new ENCCellLoader(styleReader);
+        chartLocker = new ChartLocker(platform.catalogsDir(), platform.chartsDir(), chartLoader);
 
-        //  load an initial chart  just for demos
+        //  load an initial chart  just for demos and dump its stats for debugging
         var cell = chartLocker.getCell("Gulf of Mexico", 2_160_000);
-        var chart = chartLocker.loadChart(cell.bounds(), cell.cScale() / 2.0, svgCache);
+        var quilt =
+                chartLocker.loadQuilt(
+                        cell.bounds(), cell.cScale() / 2.0, appSettings, displayOptions);
+        var viewPort = new MapViewport(cell.bounds(), false);
+        System.out.println("Initial chart view port bounds = " + viewPort.bounds());
+        //  notify that the old chart is unloaded, and the new chart is available
+        //    chartEvents.push(new ChartLockerEvent(ChartLockerEvent.Type.UNLOADED, null));
+        //    chartEvents.push(new ChartLockerEvent(ChartLockerEvent.Type.LOADED, newChart));
 
-        //  dump the charts stats for debugging
+        var chart =
+                new ChartViewModel(
+                        quilt,
+                        viewPort,
+                        chartLocker,
+                        appSettings,
+                        displayOptions,
+                        MemFeatureAdapter.ADAPTER,
+                        new RemoveHolesFromPolygon(new RenderGeomCache()),
+                        svgCache,
+                        DefaultTextBoundsFunction.FUNCTION);
+
         var stats = new MapStats(chart.maps()).stats();
         stats.print();
 
+        initGraphics(primaryStage, chart);
+        registerListeners(primaryStage, chart);
+    }
+
+    private void initGraphics(Stage primaryStage, ChartViewModel chart)
+            throws NonInvertibleTransformException, TransformException {
+
         // this won't be right after the info bar is done, but that will be resized later
-        // chart.setViewPortScreenArea(new Rectangle2D(0, 0, width, height));
+        chart.setViewPortScreenArea(new Rectangle2D(0, 0, WIDTH, HEIGHT));
+
+        var dynamicsModel = new AISModel();
 
         //  the view of the current chart
-        var dynamicsModel = new AISModel();
         var chartView =
                 resizeable(
                         new ChartView(
@@ -118,17 +154,11 @@ public class KnowtiphyCharts extends Application {
                                 displayOptions,
                                 svgCache));
 
-        //  when a new chart is loaded update the primary stage title
-        chartLocker
-                .chartEvents()
-                .filter(ChartLockerEvent::isLoad)
-                .subscribe(change -> setStageTitle(primaryStage, change.chart()));
-
-        //  when the app settings are changed update the primary stage title
-        appSettings
-                .unitProfile()
-                .unitChangeEvents()
-                .subscribe(change -> setStageTitle(primaryStage, chart));
+        //        //  when a new chart is loaded update the primary stage title
+        //        chartLocker
+        //                .chartEvents()
+        //                .filter(ChartLockerEvent::isLoad)
+        //                .subscribe(change -> setStageTitle(primaryStage, change.chart()));
 
         //  the chart options pane that slides in and out when toggled on and off
         var toggle = new ToggleModel();
@@ -136,18 +166,19 @@ public class KnowtiphyCharts extends Application {
 
         //  the info bar below the chart view
         var infoBar =
-                new InfoBar(
-                        toggle,
-                        chart,
-                        appSettings.unitProfile(),
-                        chartLocker,
-                        displayOptions,
-                        svgCache);
+                FXUtils.resizeable(
+                        new InfoBar(
+                                toggle,
+                                chart,
+                                appSettings.unitProfile(),
+                                chartLocker,
+                                displayOptions,
+                                svgCache));
 
-        //  main menu bar
-        var menuBar = mainMenuBar(primaryStage);
+        //  the main menu bar
+        var menuBar = createMainMenuBar(primaryStage);
 
-        //  main content area -- the main menu above the chart view above the info bar
+        //  the main content area -- the main menu above the chart view above the info bar
         var mainContent = new VBox();
         mainContent.getStyleClass().add("charts");
         VBox.setVgrow(chartView, Priority.ALWAYS);
@@ -166,14 +197,21 @@ public class KnowtiphyCharts extends Application {
         primaryStage.show();
     }
 
+    private void registerListeners(Stage primaryStage, ChartViewModel chart) {
+        //  when the app settings are changed update the primary stage title
+        appSettings
+                .unitProfile()
+                .unitChangeEvents()
+                .subscribe(change -> setStageTitle(primaryStage, chart));
+    }
+
     //  the chart specific options pane
     private BorderPane chartOptionsPane(ToggleModel toggle) {
 
         var options = new BorderPane();
         options.setPickOnBounds(false);
 
-        var propertiesView =
-                FXUtils.nonResizeable(new PropertySheet(displayOptions.getProperties()));
+        var propertiesView = nonResizeable(new PropertySheet(displayOptions.getProperties()));
         BorderPane.setAlignment(propertiesView, Pos.CENTER);
 
         propertiesView.setOnMouseExited(evt -> toggle.toggle());
@@ -190,9 +228,9 @@ public class KnowtiphyCharts extends Application {
         var items = new ArrayList<MenuItem>();
 
         //  Settings entry on the main menu
-        //  TODO this should be platform dependent -- are settings COMMA on other platforms
 
         var showSettings = new MenuItem("Settings");
+        //  TODO this should be platform dependent -- are settings COMMA on other platforms
         showSettings.setAccelerator(
                 new KeyCodeCombination(KeyCode.COMMA, KeyCombination.META_DOWN));
         showSettings.setOnAction(
@@ -206,7 +244,7 @@ public class KnowtiphyCharts extends Application {
 
         var showChartLocker = new MenuItem("Chart Locker");
         showChartLocker.setOnAction(
-                x ->
+                _ ->
                         new ChartLockerDialog(stage, chartLocker, displayOptions, svgCache)
                                 .create(CHART_LOCKER_WIDTH, CHART_LOCKER_HEIGHT)
                                 .showAndWait());
@@ -217,6 +255,7 @@ public class KnowtiphyCharts extends Application {
         if (platform.isMac()) {
             stage.setOnCloseRequest(event -> Platform.exit());
         } else {
+            //  TODO -- what is this?
             var separatorNode = new HBox();
             separatorNode.setPadding(new Insets(5, 0, 0, 0));
             var separator = new SeparatorMenuItem();
@@ -234,14 +273,14 @@ public class KnowtiphyCharts extends Application {
     }
 
     //  the main menu bar for the app
-    private MenuBar mainMenuBar(Stage stage) {
+    private MenuBar createMainMenuBar(Stage stage) {
         var menuBar = systemMenuBar();
         menuBar.getMenus().addAll(mainMenu(stage));
         return menuBar;
     }
 
     //  set the title of the main stage
-    private void setStageTitle(Stage stage, ENCChart chart) {
+    private void setStageTitle(Stage stage, ChartViewModel chart) {
 
         platform.setStageTitle(
                 stage,
