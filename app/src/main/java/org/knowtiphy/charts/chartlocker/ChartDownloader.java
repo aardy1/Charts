@@ -23,7 +23,7 @@ import java.util.zip.ZipInputStream;
 import org.knowtiphy.charts.enc.ENCCatalog;
 import org.knowtiphy.charts.enc.ENCCell;
 
-/** A downloader of charts from the web */
+/** A down loader of ENC charts from the web */
 public class ChartDownloader {
     private static final List<String> CONVERT_COMMAND =
             List.of(

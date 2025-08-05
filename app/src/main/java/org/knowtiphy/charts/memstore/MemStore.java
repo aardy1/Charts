@@ -6,7 +6,7 @@
 package org.knowtiphy.charts.memstore;
 
 import org.geotools.api.feature.simple.SimpleFeatureType;
-import org.knowtiphy.charts.chartview.view.model.MapModel;
+import org.knowtiphy.charts.model.MapModel;
 import org.locationtech.jts.index.strtree.STRtree;
 
 import java.util.HashMap;

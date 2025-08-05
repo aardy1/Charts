@@ -10,7 +10,7 @@ import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.knowtiphy.charts.ontology.S57;
 import org.knowtiphy.shapemap.api.IFeatureSource;
 import org.knowtiphy.shapemap.api.IFeatureSourceIterator;
-import org.knowtiphy.charts.chartview.view.model.MapModel;
+import org.knowtiphy.charts.model.MapModel;
 import org.locationtech.jts.index.strtree.STRtree;
 
 import java.util.ArrayList;

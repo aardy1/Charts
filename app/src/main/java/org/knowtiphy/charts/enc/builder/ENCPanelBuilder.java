@@ -6,8 +6,8 @@ package org.knowtiphy.charts.enc.builder;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.knowtiphy.charts.enc.ENCPanel;
 import static org.knowtiphy.charts.enc.Constants.GEOMETRY_FACTORY;
+import org.knowtiphy.charts.enc.ENCPanel;
 import org.locationtech.jts.geom.Coordinate;
 
 /** An ENC Panel builder. */
@@ -26,6 +26,6 @@ public class ENCPanelBuilder {
             pts[i] = vertices.get(i);
         }
 
-        return new ENCPanel(GEOMETRY_FACTORY.createPolygon(pts), vertices);
+        return new ENCPanel(vertices, GEOMETRY_FACTORY.createPolygon(pts));
     }
 }

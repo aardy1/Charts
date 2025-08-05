@@ -16,19 +16,11 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import org.knowtiphy.charts.Fonts;
-import org.knowtiphy.charts.chart.ChartLocker;
-import org.knowtiphy.charts.chart.ENCChart;
-import org.knowtiphy.charts.chart.event.ChartLockerEvent;
-import org.knowtiphy.shapemap.renderer.Transformation;
 import org.knowtiphy.shapemap.context.RemoveHolesFromPolygon;
 import org.knowtiphy.shapemap.context.RenderGeomCache;
-import org.knowtiphy.shapemap.context.SVGCache;
+import org.knowtiphy.shapemap.renderer.Transformation;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Polygon;
-import org.reactfx.Subscription;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author graham
@@ -36,71 +28,38 @@ import java.util.List;
 public class QuiltingSurface extends StackPane {
     private static final Insets INSETS = new Insets(2, 2, 3, 2);
 
-    private final ChartLocker chartLocker;
+    private final ChartViewModel viewModel;
 
-    private ENCChart chart;
+    private FlowPane controls;
+    private Pane displaySurface;
 
-    private final MapDisplayOptions displayOptions;
+    public QuiltingSurface(ChartViewModel viewModel) {
 
-    private final SVGCache svgCache;
+        this.viewModel = viewModel;
+        initGraphics();
+        setupListeners();
+    }
 
-    private final FlowPane controls = new FlowPane();
+    private void initGraphics() {
 
-    private final Pane displaySurface = new Pane();
-
-    private final List<Subscription> subscriptions = new ArrayList<>();
-
-    public QuiltingSurface(
-            ChartLocker chartLocker,
-            ENCChart chart,
-            MapDisplayOptions displayOptions,
-            SVGCache svgCache) {
-        this.chartLocker = chartLocker;
-        this.chart = chart;
-        this.displayOptions = displayOptions;
-        this.svgCache = svgCache;
+        controls = new FlowPane();
         controls.setVgap(4);
         controls.setHgap(4);
-
-        // var separator = new HBox();
-        // HBox.setHgrow(separator, Priority.ALWAYS);
-
         controls.setPadding(INSETS);
         controls.setAlignment(Pos.BOTTOM_CENTER);
         controls.setPickOnBounds(false);
 
+        displaySurface = new Pane();
         displaySurface.setMouseTransparent(true);
         displaySurface.setPickOnBounds(false);
 
         getChildren().addAll(displaySurface, controls);
-
-        widthProperty().addListener(cl -> makeQuilting());
-        heightProperty().addListener(cl -> makeQuilting());
-
-        chartLocker
-                .chartEvents()
-                .filter(ChartLockerEvent::isUnload)
-                .subscribe(
-                        event -> {
-                            subscriptions.forEach(Subscription::unsubscribe);
-                            subscriptions.clear();
-                        });
-
-        chartLocker
-                .chartEvents()
-                .filter(ChartLockerEvent::isLoad)
-                .subscribe(
-                        change -> {
-                            this.chart = change.chart();
-                            setupListeners();
-                            makeQuilting();
-                        });
-
-        setupListeners();
     }
 
     private void setupListeners() {
-        subscriptions.add(chart.viewPortBoundsEvent().subscribe(extent -> makeQuilting()));
+        widthProperty().addListener(cl -> makeQuilting());
+        heightProperty().addListener(cl -> makeQuilting());
+        viewModel.viewPortBoundsEvent().subscribe(extent -> makeQuilting());
     }
 
     private void makeQuilting() {
@@ -110,7 +69,7 @@ public class QuiltingSurface extends StackPane {
         //    var intersecting = chartLocker.computeQuilt(chart);
         //    intersecting.sort(Comparator.comparingInt(p -> p.getLeft().cScale()));
 
-        for (var map : chart.maps()) {
+        for (var map : viewModel.maps()) {
             var label = new Button(map.cScale() + "");
             label.setFont(Fonts.DEFAULT_FONT_10);
             //      label.setOnAction(eh -> {
@@ -138,7 +97,7 @@ public class QuiltingSurface extends StackPane {
     private void showQuilting(Geometry mp) {
         displaySurface.getChildren().clear();
 
-        var tx = new Transformation(chart.viewPortWorldToScreen());
+        var tx = new Transformation(viewModel.viewPortWorldToScreen());
         //  TODO -- need a null cache here
         var remover = new RemoveHolesFromPolygon(new RenderGeomCache());
 

@@ -5,31 +5,30 @@
 
 package org.knowtiphy.charts.memstore;
 
-import org.geotools.api.feature.simple.SimpleFeatureType;
-import org.geotools.api.feature.type.Name;
-import org.geotools.api.feature.type.PropertyDescriptor;
-import org.geotools.api.filter.identity.FeatureId;
-import org.knowtiphy.charts.chartview.view.model.MapLayer;
-import org.knowtiphy.charts.chartview.MapViewModel;
-
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.geotools.api.feature.simple.SimpleFeatureType;
+import org.geotools.api.feature.type.Name;
+import org.geotools.api.feature.type.PropertyDescriptor;
+import org.geotools.api.filter.identity.FeatureId;
+import org.knowtiphy.charts.chartview.ChartViewModel;
+import org.knowtiphy.charts.model.MapLayer;
 
 /**
  * @author graham
  */
 public class Dump<S extends SimpleFeatureType, F> {
-    private final MapViewModel<S, F> mapContent;
+    private final ChartViewModel mapContent;
 
     private final Set<PropertyDescriptor> descriptors = new HashSet<>();
 
     private final Map<FeatureId, Map<Name, List<Object>>> featureProperties = new HashMap<>();
 
-    public Dump(MapViewModel<S, F> mapContent) {
+    public Dump(ChartViewModel mapContent) {
         this.mapContent = mapContent;
     }
 

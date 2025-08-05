@@ -1,17 +1,11 @@
 package org.knowtiphy.charts.chartview.shapemapview;
 
-import javafx.geometry.Rectangle2D;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
-import javafx.scene.transform.Affine;
-import javafx.scene.transform.NonInvertibleTransformException;
-import org.geotools.api.referencing.operation.TransformException;
 import org.geotools.geometry.jts.JTS;
-import org.knowtiphy.charts.chartview.BaseMapViewModel;
 import org.knowtiphy.shapemap.api.RenderingContext;
-import static org.knowtiphy.shapemap.renderer.RendererUtilities.worldToScreenTransform;
 import org.knowtiphy.shapemap.renderer.ShapeMapRenderer;
 
 //  TODO -- extract the background color into a style sheet
@@ -28,38 +22,67 @@ public class SingleCanvasShapeMapView<S, F> extends Region {
     //  for debugging
     private static int paintCount = 0;
 
-    private final BaseMapViewModel<S, F> viewModel;
+    private final IShapeMapViewModel<S, F> viewModel;
 
     private final Color background;
 
-    private final Canvas canvas = new Canvas(0, 0);
-    private final GraphicsContext gctx = canvas.getGraphicsContext2D();
+    private Canvas canvas;
 
-    public SingleCanvasShapeMapView(BaseMapViewModel<S, F> viewModel, Color background) {
+    private GraphicsContext gctx;
+
+    public SingleCanvasShapeMapView(IShapeMapViewModel<S, F> viewModel, Color background) {
 
         this.viewModel = viewModel;
         this.background = background;
+        initGraphics();
+        registerListeners();
+    }
 
+    private void initGraphics() {
+        canvas = new Canvas(0, 0);
+        gctx = canvas.getGraphicsContext2D();
         getChildren().add(canvas);
+    }
 
-        widthProperty().addListener(o -> repaint());
-        heightProperty().addListener(o -> repaint());
-        viewModel.viewPortBoundsEvent().subscribe(x -> repaint());
+    private void registerListeners() {
+        viewModel.viewPortBoundsEvent().subscribe(_ -> requestLayout());
+        viewModel.quiltChangeEvent().subscribe(_ -> requestLayout());
+        viewModel.layerVisibilityEvent().subscribe(_ -> requestLayout());
+    }
+
+    @Override
+    public void layoutChildren() {
+
+        super.layoutChildren();
+        repaint();
+        //        var width =
+        //                viewModel
+        //                        .getScreenAreaWidth(); // getWidth(); // int)
+        //                                               // viewModel.getScreenAreaWidth();
+        //        var height = getHeight(); // int) viewModel.getScreenAreaHeight();
+        //        if (width > 0 && height > 0) {
+        //            repaint(width, height);
+        //   }
     }
 
     @SuppressWarnings("CallToPrintStackTrace")
-    private void repaint() {
+    private void repaint() { // double width, double height) {
 
         assert getChildren().size() == 1;
-        paintCount++;
 
-        var width = (int) viewModel.getScreenAreaWidth();
-        var height = (int) viewModel.getScreenAreaHeight();
-
+        var screenArea = viewModel.viewPortScreenArea();
+        var width = screenArea.getWidth();
+        var height = screenArea.getHeight();
         System.out.println("repaint ");
         System.out.println("\tpaint count = " + paintCount);
         System.out.println("\tSA w, h = " + width + ", " + height);
         System.out.println("\tRegion w, h = " + getWidth() + ", " + getHeight());
+
+        if (width == 0 || height == 0) {
+            return;
+        }
+
+        paintCount++;
 
         canvas.setWidth(width);
         canvas.setHeight(height);
@@ -70,31 +93,19 @@ public class SingleCanvasShapeMapView<S, F> extends Region {
             return;
         }
 
-        int whichMap = 0;
-        var screenArea = new Rectangle2D(0, 0, width, height);
-
-        //  compute world to screen and screen to world transforms
-        Affine wts, stw;
-        try {
-            wts = worldToScreenTransform(viewModel.bounds(), screenArea, viewModel.crs());
-            stw = wts.createInverse();
-        } catch (NonInvertibleTransformException | TransformException ex) {
-            ex.printStackTrace();
-            return;
-        }
-
         //  render each map from the view model into the shared canvas
+        int whichMap = 0; //  for debugging
         for (var map : viewModel.maps()) {
             System.err.println("Map # = " + whichMap);
             var rendererContext =
-                    new RenderingContext<>(
+                    new RenderingContext<S, F>(
                             map.layers(),
                             map.totalRuleCount(),
                             JTS.toEnvelope(map.geometry()),
                             //  TODO -- shouldn't this be in the viewport?
                             screenArea,
-                            wts,
-                            stw,
+                            viewModel.viewPortWorldToScreen(),
+                            viewModel.viewPortScreenToWorld(),
                             viewModel.adjustedDisplayScale(),
                             viewModel.featureAdapter(),
                             viewModel.renderablePolygonProvider(),

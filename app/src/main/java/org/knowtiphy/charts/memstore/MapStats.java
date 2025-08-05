@@ -5,21 +5,19 @@
 
 package org.knowtiphy.charts.memstore;
 
-import org.geotools.api.feature.simple.SimpleFeatureType;
-import org.knowtiphy.charts.ontology.ENC;
-import org.knowtiphy.charts.chartview.view.model.MapLayer;
-import org.knowtiphy.charts.chartview.view.model.MapModel;
-import org.locationtech.jts.geom.Geometry;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.IntBinaryOperator;
-
+import org.geotools.api.feature.simple.SimpleFeatureType;
+import org.knowtiphy.charts.model.MapModel;
 import static org.knowtiphy.charts.geotools.Coordinates.distanceAcross;
+import org.knowtiphy.charts.ontology.ENC;
 import static org.knowtiphy.charts.ontology.S57.AT_SCAMAX;
 import static org.knowtiphy.charts.ontology.S57.AT_SCAMIN;
+import org.knowtiphy.shapemap.api.IMapLayer;
+import org.locationtech.jts.geom.Geometry;
 
 /**
  * @author graham
@@ -175,7 +173,7 @@ public class MapStats {
         return value == null ? "N/A" : (value + "");
     }
 
-    private void featureScan(MapLayer<SimpleFeatureType, MemFeature> layer) throws Exception {
+    private void featureScan(IMapLayer<SimpleFeatureType, MemFeature> layer) throws Exception {
         try (var features = layer.featureSource().features()) {
             while (features.hasNext()) {
                 var feature = features.next();

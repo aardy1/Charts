@@ -29,8 +29,8 @@ import javafx.stage.StageStyle;
 import org.controlsfx.dialog.ProgressDialog;
 import org.controlsfx.glyphfont.Glyph;
 import org.knowtiphy.charts.Fonts;
-import org.knowtiphy.charts.chart.ChartLocker;
-import org.knowtiphy.charts.chart.ENCChartDownloadNotifier;
+import org.knowtiphy.charts.chartlocker.ChartLocker;
+import org.knowtiphy.charts.chartlocker.ENCChartDownloadNotifier;
 import static org.knowtiphy.charts.chartview.AvailableCatalogs.BUILTIN_CATALOGS;
 import org.knowtiphy.charts.enc.ENCCell;
 import static org.knowtiphy.charts.utils.FXUtils.alwaysGrow;
@@ -232,7 +232,7 @@ public class ChartLockerDialog {
             @Override
             protected Boolean call() {
                 try {
-                    chartLocker.downloadChart(cell, notifier);
+                    chartLocker.downloadCell(cell, notifier);
                 } catch (IOException interrupted) {
                     //  do nothing
                 }

@@ -6,10 +6,8 @@
 package org.knowtiphy.charts;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.collections.ListChangeListener;
+import javafx.event.ActionEvent;
 import javafx.geometry.Pos;
 import javafx.geometry.Side;
 import javafx.scene.control.Label;
@@ -22,9 +20,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.transform.NonInvertibleTransformException;
 import org.geotools.api.referencing.operation.TransformException;
-import org.knowtiphy.charts.chart.ChartLocker;
-import org.knowtiphy.charts.chart.ENCChart;
-import org.knowtiphy.charts.chart.event.ChartLockerEvent;
+import org.knowtiphy.charts.chartlocker.ChartLocker;
+import org.knowtiphy.charts.chartview.ChartViewModel;
 import org.knowtiphy.charts.chartview.MapDisplayOptions;
 import org.knowtiphy.charts.enc.ENCCell;
 import org.knowtiphy.charts.geotools.Coordinates;
@@ -34,104 +31,70 @@ import static org.knowtiphy.charts.utils.FXUtils.menuButton;
 import static org.knowtiphy.charts.utils.FXUtils.nonResizeable;
 import org.knowtiphy.charts.utils.ToggleModel;
 import org.knowtiphy.shapemap.context.SVGCache;
-import org.reactfx.Subscription;
 
-/** The info bar at the bottom of the chart view. */
+/**
+ * The info bar at the bottom of the chart view.
+ *
+ * <p>TODO -- make this into a region based setup
+ */
 public class InfoBar extends StackPane {
-    //    private static double ZOOM_FACTOR = 2;
-
-    private final Label chartScale = new Label();
-
-    private final Label currentExtent = new Label();
-
-    private final Label currentMapSpan = new Label();
-
-    private final Label displayScale = new Label();
-
-    private final Label adjustedDisplayScale = new Label();
-
-    private final Label zoomLevel = new Label();
 
     private final UnitProfile unitProfile;
 
-    private ENCChart chart;
+    private final ChartViewModel chart;
 
     private final ChartLocker chartLocker;
 
-    private final MenuButton history;
-
+    //  will be used when we get the history menu running again
     private final MapDisplayOptions displayOptions;
 
     private final SVGCache svgCache;
 
-    //  chart listener subscriptions
-    private final List<Subscription> subscriptions = new ArrayList<>();
+    private final ToggleModel toggleModel;
+
+    private MenuButton history;
+    private Label chartScale;
+    private Label currentExtent;
+    private Label currentMapSpan;
+    private Label displayScale;
+    private Label adjustedDisplayScale;
+    private Label zoomLevel;
 
     public InfoBar(
             ToggleModel toggleModel,
-            ENCChart chrt,
+            ChartViewModel chrt,
             UnitProfile unitProfile,
             ChartLocker chartLocker,
             MapDisplayOptions displayOptions,
             SVGCache svgCache) {
 
+        this.toggleModel = toggleModel;
         this.chart = chrt;
         this.unitProfile = unitProfile;
         this.chartLocker = chartLocker;
         this.displayOptions = displayOptions;
         this.svgCache = svgCache;
 
-        //  zoom in and out buttons
-        var zoomIn =
-                button(Fonts.plus(), _ -> chart.setZoom(chart.zoom() + 1), new Tooltip("Zoom In"));
-        var zoomOut =
-                button(
-                        Fonts.minus(),
-                        _ -> chart.setZoom(chart.zoom() - 1),
-                        new Tooltip("Zoom Out"));
+        initGraphics();
+        registerListeners();
+    }
 
-        //  chart display settings button
-        var chartDisplaySettings =
-                button(
-                        Fonts.setting(),
-                        _ -> toggleModel.toggle(),
-                        new Tooltip("Configure Map Visuals"));
+    private void initGraphics() {
 
-        //  viewport reset button
-        var resetViewPort =
-                button(
-                        Fonts.resetToOriginalBounds(),
-                        _ -> {
-                            try {
-                                chart.setViewPortBounds(chart.bounds());
-                            } catch (TransformException | NonInvertibleTransformException ex) {
-                                Logger.getLogger(InfoBar.class.getName())
-                                        .log(Level.SEVERE, null, ex);
-                            }
-                        },
-                        new Tooltip("Reset Map to Original Dimensions"));
+        currentExtent = new Label();
+        chartScale = new Label();
+        currentMapSpan = new Label();
+        displayScale = new Label();
+        adjustedDisplayScale = new Label();
+        zoomLevel = new Label();
 
-        history = menuButton("", Fonts.history(), historyMenuItems(), new Tooltip("Chart History"));
-        history.setPopupSide(Side.TOP);
-
-        //  the buttons in the center of the info bar
-        var centerControlsBar =
-                nonResizeable(
-                        new ToolBar(
-                                zoomIn,
-                                zoomOut,
-                                resetViewPort,
-                                new Separator(),
-                                history,
-                                new Separator(),
-                                chartDisplaySettings));
-        centerControlsBar.getStyleClass().add("controlbar");
-        StackPane.setAlignment(centerControlsBar, Pos.BOTTOM_CENTER);
+        //  the center controls bar
+        var controlsBar = nonResizeable(makeControlsBar());
+        controlsBar.getStyleClass().add("controlbar");
 
         //  the information on the left of the info bar
-        var leftControlsBar = nonResizeable(new ToolBar(currentExtent));
-        leftControlsBar.getStyleClass().add("controlbar");
-        StackPane.setAlignment(leftControlsBar, Pos.BOTTOM_LEFT);
+        var leftInfoBar = nonResizeable(new ToolBar(currentExtent));
+        leftInfoBar.getStyleClass().add("controlbar");
 
         //  the information on the right side of the info bar
         var rightLabels =
@@ -143,75 +106,50 @@ public class InfoBar extends StackPane {
                                 displayScale,
                                 zoomLevel));
         rightLabels.getStyleClass().add("infobar");
-        StackPane.setAlignment(rightLabels, Pos.BOTTOM_RIGHT);
-
-        //  set the initial chart info
-        updateChartInfo();
 
         //  add the various components to the info bar
-        getChildren().addAll(leftControlsBar, centerControlsBar, rightLabels);
+        StackPane.setAlignment(controlsBar, Pos.BOTTOM_CENTER);
+        StackPane.setAlignment(leftInfoBar, Pos.BOTTOM_LEFT);
+        StackPane.setAlignment(rightLabels, Pos.BOTTOM_RIGHT);
+        getChildren().addAll(leftInfoBar, controlsBar, rightLabels);
 
-        //  when the info bar width or height changes, or  the unit profile changes, update the
-        // chart info
-        widthProperty().addListener(_ -> updateChartInfo());
-        heightProperty().addListener(_ -> updateChartInfo());
+        updateChartInfo();
+    }
+
+    private void registerListeners() {
         unitProfile.unitChangeEvents().subscribe(_ -> updateChartInfo());
+        chart.viewPortBoundsEvent().subscribe(_ -> updateChartInfo());
+        chart.quiltChangeEvent().subscribe(_ -> updateChartInfo());
+    }
+
+    private ToolBar makeControlsBar() {
+
+        //  zoom  buttons
+        var zoomIn = button(Fonts.plus(), this::zoomIn, new Tooltip("Zoom In"));
+        var zoomOut = button(Fonts.minus(), this::zoomOut, new Tooltip("Zoom Out"));
+
+        //  chart display settings button
+        var chartDisplaySettings =
+                button(
+                        Fonts.setting(),
+                        _ -> toggleModel.toggle(),
+                        new Tooltip("Configure Map Visuals"));
+
+        //  history menu
+        history = menuButton("", Fonts.history(), historyMenuItems(), new Tooltip("Chart History"));
+        history.setPopupSide(Side.TOP);
 
         chartLocker
                 .history()
                 .addListener(
                         (ListChangeListener<ENCCell>)
-                                c -> {
-                                    //                                    c.next();
-                                    //                                    for (var description :
-                                    // c.getAddedSubList()) {
-                                    //                                        var menuItem =
-                                    //                                                new MenuItem(
-                                    //
-                                    // description.lname()
-                                    //
-                                    //  + "  1:"
-                                    //
-                                    //  + description.cScale());
-                                    //
-                                    // menuItem.setOnAction(event -> loadChart(description));
-                                    //
-                                    // history.getItems().add(menuItem);
-                                    //                                    }
-                                    //                                    menuItem.setOnAction(event
-                                    // -> loadChart(description));
-                                    history.getItems().setAll(historyMenuItems());
-                                });
+                                _ -> history.getItems().setAll(historyMenuItems()));
 
-        chartLocker
-                .chartEvents()
-                .filter(ChartLockerEvent::isUnload)
-                .subscribe(
-                        event -> {
-                            // unsubscribe listeners on the old chart
-                            subscriptions.forEach(Subscription::unsubscribe);
-                            subscriptions.clear();
-                        });
-
-        chartLocker
-                .chartEvents()
-                .filter(ChartLockerEvent::isLoad)
-                .subscribe(
-                        event -> {
-                            chart = event.chart();
-                            setupListeners();
-                            updateChartInfo();
-                        });
-
-        setupListeners();
+        return new ToolBar(
+                zoomIn, zoomOut, new Separator(), history, new Separator(), chartDisplaySettings);
     }
 
-    // when the viewport changes update the variable chart info
-    private void setupListeners() {
-        subscriptions.add(chart.viewPortBoundsEvent().subscribe(c -> updateChartInfo()));
-    }
-
-    //  updated chart information
+    //  update the chart information in the info bar
     private void updateChartInfo() {
 
         currentExtent.setText(unitProfile.formatEnvelope(chart.bounds()));
@@ -240,6 +178,25 @@ public class InfoBar extends StackPane {
         return items;
     }
 
+    @SuppressWarnings("CallToPrintStackTrace")
+    private void zoomIn(@SuppressWarnings("unused") ActionEvent _event) {
+        try {
+            System.out.println("InfoBar ZOOMIN");
+            chart.incZoom();
+        } catch (TransformException | NonInvertibleTransformException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    @SuppressWarnings("CallToPrintStackTrace")
+    private void zoomOut(@SuppressWarnings("unused") ActionEvent _event) {
+        try {
+            chart.decZoom();
+        } catch (TransformException | NonInvertibleTransformException ex) {
+            ex.printStackTrace();
+        }
+    }
+
     //  TODO -- need to update this for quilting
     private void loadChart(ENCCell chartDescription) {
         //        try {
@@ -253,3 +210,17 @@ public class InfoBar extends StackPane {
         //        }
     }
 }
+
+     //  viewport reset button -- pretty sure this is nonsens
+//        @SuppressWarnings("CallToPrintStackTrace")
+//        var resetViewPort =
+//                button(
+//                        Fonts.resetToOriginalBounds(),
+//                        _ -> {
+//                            try {
+//                                chart.reset();
+//                            } catch (TransformException | NonInvertibleTransformException ex) {
+//                                ex.printStackTrace();
+//                            }
+//                        },
+//                        new Tooltip("Reset Map to Original Dimensions"));

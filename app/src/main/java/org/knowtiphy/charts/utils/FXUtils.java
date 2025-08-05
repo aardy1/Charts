@@ -17,6 +17,7 @@ import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ZoomEvent;
 import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.text.Font;
@@ -24,7 +25,6 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import org.apache.commons.lang3.tuple.Pair;
-import org.knowtiphy.charts.chartview.DragPanZoomSupport;
 
 /** Collection of utility classes for JavaFX. */
 public class FXUtils {
@@ -148,5 +148,26 @@ public class FXUtils {
                 });
 
         node.addEventHandler(MouseEvent.MOUSE_DRAGGED, event -> eh.accept(event, dragState));
+    }
+
+    public static void addContextMenuHandler(Node node, EventHandler<MouseEvent> eh) {
+
+        // windows on clicked, mac on pressed
+        node.addEventHandler(
+                MouseEvent.MOUSE_PRESSED,
+                event -> {
+                    if (event.isPopupTrigger()) eh.handle(event);
+                });
+        node.addEventHandler(
+                MouseEvent.MOUSE_CLICKED,
+                event -> {
+                    if (event.isPopupTrigger()) eh.handle(event);
+                });
+    }
+
+    public static Region spacer() {
+        var region = new Region();
+        HBox.setHgrow(region, Priority.ALWAYS);
+        return region;
     }
 }

@@ -5,6 +5,8 @@
 
 package org.knowtiphy.charts.chartview;
 
+import java.util.ArrayList;
+import java.util.List;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
@@ -12,9 +14,6 @@ import javafx.scene.shape.Polyline;
 import javafx.scene.shape.Shape;
 import javafx.scene.shape.StrokeType;
 import org.controlsfx.glyphfont.Glyph;
-import org.knowtiphy.charts.chart.ChartLocker;
-import org.knowtiphy.charts.chart.ENCChart;
-import org.knowtiphy.charts.chart.event.ChartLockerEvent;
 import org.knowtiphy.charts.memstore.MemFeature;
 import org.knowtiphy.shapemap.renderer.Transformation;
 import org.locationtech.jts.geom.Geometry;
@@ -22,47 +21,23 @@ import org.reactfx.Change;
 import org.reactfx.EventStream;
 import org.reactfx.Subscription;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * @author graham
  */
 public class IconSurface extends Pane {
-    private ENCChart chart;
+    private ChartViewModel chart;
 
     private final List<Subscription> subscriptions = new ArrayList<>();
 
-    public IconSurface(ChartLocker chartLocker, ENCChart chart) {
+    public IconSurface(ChartViewModel chart) {
         this.chart = chart;
-
-        widthProperty().addListener(x -> makeIconLayers());
-        heightProperty().addListener(x -> makeIconLayers());
-
-        chartLocker
-                .chartEvents()
-                .filter(ChartLockerEvent::isUnload)
-                .subscribe(
-                        event -> {
-                            // unsubscribe listeners on the old chart
-                            subscriptions.forEach(Subscription::unsubscribe);
-                            subscriptions.clear();
-                        });
-
-        chartLocker
-                .chartEvents()
-                .filter(ChartLockerEvent::isLoad)
-                .subscribe(
-                        event -> {
-                            this.chart = event.chart();
-                            makeIconLayers();
-                            setupListeners();
-                        });
-
         setupListeners();
     }
 
     private void setupListeners() {
+        //  listeners that don't depend on the chart
+        widthProperty().addListener(x -> makeIconLayers());
+        heightProperty().addListener(x -> makeIconLayers());
         subscriptions.add(chart.viewPortBoundsEvent().subscribe(b -> makeIconLayers()));
         subscriptions.add(chart.layerVisibilityEvent().subscribe(b -> makeIconLayers()));
     }

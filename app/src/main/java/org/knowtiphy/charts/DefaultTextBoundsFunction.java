@@ -2,7 +2,7 @@
  * Copyright Knowtiphy
  * All rights reserved.
  */
-package org.knowtiphy.charts.chartlocker;
+package org.knowtiphy.charts;
 
 import javafx.geometry.Bounds;
 import javafx.scene.text.Font;

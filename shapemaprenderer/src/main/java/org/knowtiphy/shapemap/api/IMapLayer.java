@@ -1,15 +1,12 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Interface.java to edit this template
- */
-
 package org.knowtiphy.shapemap.api;
 
-import org.knowtiphy.shapemap.api.IFeatureSource;
 import org.knowtiphy.shapemap.renderer.FeatureTypeStyle;
 
 /**
- * @author graham
+ * A map layer.
+ *
+ * @param <S> the type of the schema for the map layers
+ * @param <F> the type of the features for the map layers
  */
 public interface IMapLayer<S, F> {
 
@@ -21,6 +18,7 @@ public interface IMapLayer<S, F> {
     //    }
     //
     boolean isScaleLess();
+
     //
     //    public EventStream<Change<Boolean>> layerVisibilityEvent() {
     //        return layerVisibilityEvent;

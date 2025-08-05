@@ -13,7 +13,11 @@ import org.knowtiphy.shapemap.renderer.RendererUtilities;
  * viewport in pixels, and transforms between the two.
  */
 public class MapViewport {
+
+    private static final double INITIAL_ZOOM = 1;
+
     private ReferencedEnvelope bounds;
+    private final ReferencedEnvelope originalBounds;
 
     private final boolean matchingAspectRatio;
 
@@ -25,23 +29,36 @@ public class MapViewport {
 
     private boolean hasCenteringTransforms;
 
-    public MapViewport(ReferencedEnvelope bounds, boolean matchAspectRatio)
+    double zoom;
+
+    public MapViewport(ReferencedEnvelope bounds, Rectangle2D screenArea, boolean matchAspectRatio)
             throws TransformException, NonInvertibleTransformException {
-        this.screenArea = Rectangle2D.EMPTY;
-        this.hasCenteringTransforms = false;
-        this.matchingAspectRatio = matchAspectRatio;
+
         this.bounds = bounds;
-        setTransforms();
+        this.screenArea = screenArea;
+
+        originalBounds = bounds;
+        hasCenteringTransforms = false;
+        matchingAspectRatio = matchAspectRatio;
+        zoom = INITIAL_ZOOM;
+
+        calculateNewTransforms();
     }
 
     public ReferencedEnvelope bounds() {
         return bounds;
     }
 
-    public void setBounds(ReferencedEnvelope bounds)
+    public ReferencedEnvelope setBounds(ReferencedEnvelope newBounds)
             throws TransformException, NonInvertibleTransformException {
-        this.bounds = bounds;
-        setTransforms();
+
+        var oldBounds = bounds;
+        this.bounds = newBounds;
+        System.out.println("VP set bounds");
+        System.out.println("old bounds = " + oldBounds);
+        System.out.println("new bounds = " + bounds);
+        calculateNewTransforms();
+        return oldBounds;
     }
 
     public Rectangle2D screenArea() {
@@ -51,7 +68,7 @@ public class MapViewport {
     public void setScreenArea(Rectangle2D screenArea)
             throws TransformException, NonInvertibleTransformException {
         this.screenArea = screenArea;
-        setTransforms();
+        calculateNewTransforms();
     }
 
     public Affine screenToWorld() {
@@ -62,7 +79,28 @@ public class MapViewport {
         return worldToScreen;
     }
 
-    private void setTransforms() throws TransformException, NonInvertibleTransformException {
+    public double zoom() {
+        return zoom;
+    }
+
+    public ReferencedEnvelope setZoom(double newZoom)
+            throws TransformException, NonInvertibleTransformException {
+
+        this.zoom = Math.max(INITIAL_ZOOM, newZoom);
+
+        //  recalculate the new bounds from the original bounds and the zoom factor
+        var width = originalBounds.getWidth();
+        var height = originalBounds.getHeight();
+        var newWidth = width / zoom;
+        var newHeight = height / zoom;
+        // expanding/shrinking mutates the envelope so copy it
+        var newBounds = new ReferencedEnvelope(originalBounds);
+        newBounds.expandBy((newWidth - width) / 2.0, (newHeight - height) / 2.0);
+        return setBounds(newBounds);
+    }
+
+    private void calculateNewTransforms()
+            throws TransformException, NonInvertibleTransformException {
         if (screenArea.equals(Rectangle2D.EMPTY)) {
             screenToWorld = worldToScreen = null;
             hasCenteringTransforms = false;

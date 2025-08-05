@@ -7,8 +7,8 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import org.geotools.geometry.jts.JTS;
-import org.knowtiphy.charts.chartview.BaseMapViewModel;
-import org.knowtiphy.charts.chartview.view.model.MapModel;
+import org.knowtiphy.charts.chartview.shapemapview.IShapeMapViewModel;
+import org.knowtiphy.charts.model.MapModel;
 import org.knowtiphy.shapemap.api.RenderingContext;
 import org.knowtiphy.shapemap.renderer.RendererUtilities;
 import org.knowtiphy.shapemap.renderer.ShapeMapRenderer;
@@ -30,14 +30,14 @@ public class CanvasShapeMapSkin<S, F> extends ShapeMapBaseSkin<S, F> {
 
     private static final double PREFERRED_HEIGHT = Region.USE_COMPUTED_SIZE;
 
-    private final BaseMapViewModel<S, F> viewModel;
+    private final IShapeMapViewModel<S, F> viewModel;
 
     private final Color background;
 
     private final StackPane root = new StackPane();
 
     public CanvasShapeMapSkin(
-            ShapeMapControl<S, F> surface, BaseMapViewModel<S, F> viewModel, Color background) {
+            ShapeMapControl<S, F> surface, IShapeMapViewModel<S, F> viewModel, Color background) {
         super(surface);
 
         this.viewModel = viewModel;
@@ -77,11 +77,11 @@ public class CanvasShapeMapSkin<S, F> extends ShapeMapBaseSkin<S, F> {
         //        var height = (int) root.getHeight();
         count++;
         System.out.println("repaint " + count + " : " + width + " : " + height);
-        System.out.println(
-                "SA dimensions "
-                        + viewModel.getScreenAreaWidth()
-                        + " : "
-                        + viewModel.getScreenAreaHeight());
+        //        System.out.println(
+        //                "SA dimensions "
+        //                        + viewModel.getScreenAreaWidth()
+        //                        + " : "
+        //                        + viewModel.getScreenAreaHeight());
 
         if (viewModel.maps().isEmpty()) {
             System.out.println("EMPTY");

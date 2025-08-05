@@ -1,4 +1,4 @@
-package org.knowtiphy.charts.chartview.view.model;
+package org.knowtiphy.charts.model;
 
 import javafx.beans.property.SimpleBooleanProperty;
 import org.knowtiphy.shapemap.api.IFeatureSource;

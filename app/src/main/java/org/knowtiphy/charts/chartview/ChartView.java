@@ -8,18 +8,11 @@ import javafx.css.StyleableProperty;
 import javafx.css.StyleablePropertyFactory;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.input.ScrollEvent;
-import javafx.scene.input.ZoomEvent;
 import javafx.scene.paint.Color;
-import org.knowtiphy.charts.chart.ChartLocker;
-import org.knowtiphy.charts.chart.ENCChart;
-import org.knowtiphy.charts.dynamics.AISEvent;
+import org.knowtiphy.charts.chartlocker.ChartLocker;
 import org.knowtiphy.charts.dynamics.AISModel;
 import org.knowtiphy.charts.settings.UnitProfile;
 import org.knowtiphy.shapemap.context.SVGCache;
-import org.reactfx.EventSource;
-import org.reactfx.EventStream;
 
 /** A control to show ENC quilts. */
 public class ChartView extends Control {
@@ -45,7 +38,7 @@ public class ChartView extends Control {
 
     private final ChartLocker chartLocker;
 
-    private final ENCChart chart;
+    private final ChartViewModel chart;
 
     private final AISModel dynamics;
 
@@ -55,11 +48,9 @@ public class ChartView extends Control {
 
     private final SVGCache svgCache;
 
-    private final EventModel eventModel;
-
     public ChartView(
             ChartLocker chartLocker,
-            ENCChart chart,
+            ChartViewModel chart,
             AISModel dynamics,
             UnitProfile unitProfile,
             MapDisplayOptions displayOptions,
@@ -69,7 +60,7 @@ public class ChartView extends Control {
 
     public ChartView(
             ChartLocker chartLocker,
-            ENCChart map,
+            ChartViewModel map,
             AISModel dynamics,
             UnitProfile unitProfile,
             MapDisplayOptions displayOptions,
@@ -80,7 +71,6 @@ public class ChartView extends Control {
         this.chart = map;
         this.dynamics = dynamics;
         this.unitProfile = unitProfile;
-        this.eventModel = new EventModel();
         this.displayOptions = displayOptions;
         this.svgCache = svgCache;
 
@@ -88,7 +78,7 @@ public class ChartView extends Control {
         getStyleClass().add("chartview");
 
         // publish events for changes in the dynamics
-        eventModel.boatUpdates.feedFrom(dynamics.aisEvents);
+        //        eventModel.boatUpdates.feedFrom(dynamics.aisEvents);
     }
 
     @Override
@@ -99,14 +89,7 @@ public class ChartView extends Control {
     @Override
     protected Skin createDefaultSkin() {
         return new ChartViewSkin(
-                this,
-                chartLocker,
-                chart,
-                dynamics,
-                eventModel,
-                unitProfile,
-                displayOptions,
-                svgCache);
+                this, chartLocker, chart, dynamics, unitProfile, displayOptions, svgCache);
     }
 
     @Override
@@ -132,36 +115,37 @@ public class ChartView extends Control {
     public List<CssMetaData<? extends Styleable, ?>> getControlCssMetaData() {
         return FACTORY.getCssMetaData();
     }
-
-    public class EventModel {
-
-        public final EventSource<MouseEvent> mouseEvents = new EventSource<>();
-
-        public final EventStream<MouseEvent> mousePressed =
-                mouseEvents.filter(event -> event.getEventType() == MouseEvent.MOUSE_PRESSED);
-
-        public final EventStream<MouseEvent> mouseReleased =
-                mouseEvents.filter(event -> event.getEventType() == MouseEvent.MOUSE_RELEASED);
-
-        public final EventStream<MouseEvent> mouseClicked =
-                mouseEvents.filter(event -> event.getEventType() == MouseEvent.MOUSE_CLICKED);
-
-        public final EventStream<MouseEvent> mouseDoubleClicked =
-                mouseEvents.filter(
-                        event ->
-                                event.getEventType() == MouseEvent.MOUSE_CLICKED
-                                        && event.getClickCount() > 1);
-
-        public final EventStream<MouseEvent> mouseDragStarted =
-                mouseEvents.filter(event -> event.getEventType() == MouseEvent.DRAG_DETECTED);
-
-        public final EventStream<MouseEvent> mouseDragged =
-                mouseEvents.filter(event -> event.getEventType() == MouseEvent.MOUSE_DRAGGED);
-
-        public final EventSource<ScrollEvent> scrollEvents = new EventSource<>();
-
-        public final EventSource<ZoomEvent> zoomEvents = new EventSource<>();
-
-        public final EventSource<AISEvent> boatUpdates = new EventSource<>();
-    }
+    //
+    //    public class EventModel {
+    //
+    //        public final EventSource<MouseEvent> mouseEvents = new EventSource<>();
+    //
+    //        public final EventStream<MouseEvent> mousePressed =
+    //                mouseEvents.filter(event -> event.getEventType() == MouseEvent.MOUSE_PRESSED);
+    //
+    //        public final EventStream<MouseEvent> mouseReleased =
+    //                mouseEvents.filter(event -> event.getEventType() ==
+    // MouseEvent.MOUSE_RELEASED);
+    //
+    //        public final EventStream<MouseEvent> mouseClicked =
+    //                mouseEvents.filter(event -> event.getEventType() == MouseEvent.MOUSE_CLICKED);
+    //
+    //        public final EventStream<MouseEvent> mouseDoubleClicked =
+    //                mouseEvents.filter(
+    //                        event ->
+    //                                event.getEventType() == MouseEvent.MOUSE_CLICKED
+    //                                        && event.getClickCount() > 1);
+    //
+    //        public final EventStream<MouseEvent> mouseDragStarted =
+    //                mouseEvents.filter(event -> event.getEventType() == MouseEvent.DRAG_DETECTED);
+    //
+    //        public final EventStream<MouseEvent> mouseDragged =
+    //                mouseEvents.filter(event -> event.getEventType() == MouseEvent.MOUSE_DRAGGED);
+    //
+    //        public final EventSource<ScrollEvent> scrollEvents = new EventSource<>();
+    //
+    //        public final EventSource<ZoomEvent> zoomEvents = new EventSource<>();
+    //
+    //        public final EventSource<AISEvent> boatUpdates = new EventSource<>();
+    //    }
 }

@@ -1,4 +1,4 @@
-package org.knowtiphy.charts.chartview.view.model;
+package org.knowtiphy.charts.model;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.knowtiphy.shapemap.api.IMapLayer;
 import org.locationtech.jts.geom.Geometry;
 
 /**
@@ -16,13 +17,14 @@ import org.locationtech.jts.geom.Geometry;
  * @param <F> the type of the features for the map layers
  */
 public class MapModel<S, F> {
+
     private final ReferencedEnvelope bounds;
 
     private final int cScale;
 
     private final String title;
 
-    private final List<MapLayer<S, F>> layers = new LinkedList<>();
+    private final List<IMapLayer<S, F>> layers = new LinkedList<>();
 
     private final Map<String, MapLayer<S, F>> nameToLayer = new LinkedHashMap<>();
 
@@ -57,7 +59,7 @@ public class MapModel<S, F> {
         this.geometry = geometry;
     }
 
-    public Collection<MapLayer<S, F>> layers() {
+    public Collection<? extends IMapLayer<S, F>> layers() {
         return layers;
     }
 

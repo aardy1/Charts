@@ -8,8 +8,7 @@ import javafx.css.StyleablePropertyFactory;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 import javafx.scene.paint.Color;
-import org.knowtiphy.charts.chartview.BaseMapViewModel;
-import org.knowtiphy.charts.chartview.view.canvas.CanvasShapeMapSkin;
+import org.knowtiphy.charts.chartview.shapemapview.IShapeMapViewModel;
 
 /**
  * A shape map view -- a control that shows an ESRI shape map of layers of features of some schema
@@ -32,12 +31,12 @@ public class ShapeMapControl<S, F> extends Control {
 
     private final SkinType skinType;
 
-    private final BaseMapViewModel<S, F> map;
+    private final IShapeMapViewModel<S, F> viewModel;
 
     private final Color background;
 
-    public ShapeMapControl(BaseMapViewModel<S, F> map, Color background) {
-        this.map = map;
+    public ShapeMapControl(IShapeMapViewModel<S, F> viewModel, Color background) {
+        this.viewModel = viewModel;
         this.background = background;
         this.skinType = SkinType.CANVAS;
         getStyleClass().add("shapemap-view");
@@ -46,7 +45,7 @@ public class ShapeMapControl<S, F> extends Control {
     @Override
     protected Skin<ShapeMapControl<S, F>> createDefaultSkin() {
         return switch (skinType) {
-            default -> new CanvasShapeMapSkin<>(this, map, background);
+            default -> new CanvasShapeMapSkin<>(this, viewModel, background);
         };
     }
 

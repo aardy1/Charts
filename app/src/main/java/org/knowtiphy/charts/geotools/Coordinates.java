@@ -1,22 +1,15 @@
 package org.knowtiphy.charts.geotools;
 
-import javafx.scene.transform.NonInvertibleTransformException;
-import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
-import org.geotools.api.referencing.crs.GeographicCRS;
-import org.geotools.api.referencing.operation.TransformException;
-import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.geotools.referencing.CRS;
-import org.knowtiphy.charts.chartview.BaseMapViewModel;
-import org.knowtiphy.charts.chartview.MapViewModel;
-import org.knowtiphy.shapemap.renderer.Transformation;
-import si.uom.SI;
-
-import javax.measure.Unit;
-import javax.measure.quantity.Length;
 import java.text.NumberFormat;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.measure.Unit;
+import javax.measure.quantity.Length;
+import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
+import org.geotools.api.referencing.crs.GeographicCRS;
+import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.referencing.CRS;
+import si.uom.SI;
 
 /** */
 public class Coordinates {
@@ -36,47 +29,9 @@ public class Coordinates {
         //    clip(maxExtent, copy, crs);
     }
 
-    public static <S, F> void zoom(BaseMapViewModel<S, F> map, double zoomFactor) {
-        try {
-            var vpBounds = map.viewPortBounds();
-            var newExtent = zoom(vpBounds, zoomFactor);
-            if (!newExtent.equals(vpBounds)) {
-                map.setViewPortBounds(newExtent);
-            }
-        } catch (TransformException | NonInvertibleTransformException ex) {
-            Logger.getLogger(Coordinates.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-
     private static final double DEFAULT_WIDTH = 3;
 
     private static final double DEFAULT_HEIGHT = 3;
-
-    // need to make this adaptive -- like 1/2 the maxX
-    public static <S, F> void positionAt(BaseMapViewModel<S, F> map, double x, double y)
-            throws NonInvertibleTransformException, TransformException {
-
-        var world = map.viewPortBounds();
-
-        var defaultWidth =
-                world.getWidth() <= 2 * DEFAULT_WIDTH ? world.getWidth() / 8 : DEFAULT_WIDTH;
-        var defaultHeight =
-                world.getHeight() <= 2 * DEFAULT_HEIGHT ? world.getHeight() / 8 : DEFAULT_HEIGHT;
-
-        // TODO -- why does this not center the view port on the x, y world coords?
-        var tx = new Transformation(map.viewPortScreenToWorld());
-        tx.apply(x, y);
-
-        var envelope =
-                new ReferencedEnvelope(
-                        tx.getX() - defaultWidth,
-                        tx.getX() + defaultWidth,
-                        tx.getY() - defaultHeight,
-                        tx.getY() + defaultHeight,
-                        map.crs());
-        //    var newExtent = clip(map, envelope);
-        map.setViewPortBounds(envelope);
-    }
 
     //  public static <S, F> ReferencedEnvelope clip(
     //    BaseMapViewModel<S, F> map, ReferencedEnvelope envelope)
@@ -139,13 +94,14 @@ public class Coordinates {
     //    return new ReferencedEnvelope(minX, maxX, minY, maxY, crs);
     //  }
 
-    public static <S, F> double getMapScale(MapViewModel<S, F> map, int screenWidth, double dpi) {
-        // if it's geodetic, we're dealing with lat/lon unit measures
-        var crs = map.viewPortBounds().getCoordinateReferenceSystem();
-        double width = map.viewPortBounds().getWidth();
-        double widthMeters = toMeters(width, crs);
-        return widthMeters / (screenWidth / getDpi(Map.of("dpi", dpi)) * 0.0254);
-    }
+    //    public static <S, F> double getMapScale(MapViewModel<S, F> map, int screenWidth, double
+    // dpi) {
+    //        // if it's geodetic, we're dealing with lat/lon unit measures
+    //        var crs = map.viewPortBounds().getCoordinateReferenceSystem();
+    //        double width = map.viewPortBounds().getWidth();
+    //        double widthMeters = toMeters(width, crs);
+    //        return widthMeters / (screenWidth / getDpi(Map.of("dpi", dpi)) * 0.0254);
+    //    }
 
     /**
      * Either gets a DPI from the hints, or return the OGC standard, stating that a pixel is 0.28 mm

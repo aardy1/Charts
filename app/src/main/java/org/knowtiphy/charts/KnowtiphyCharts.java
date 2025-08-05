@@ -26,12 +26,9 @@ import javafx.scene.text.Font;
 import javafx.scene.transform.NonInvertibleTransformException;
 import javafx.stage.Stage;
 import org.controlsfx.control.PropertySheet;
-import org.geotools.api.feature.simple.SimpleFeatureType;
 import org.geotools.api.referencing.operation.TransformException;
 import org.knowtiphy.charts.chartlocker.ChartLocker;
-import org.knowtiphy.charts.chartlocker.DefaultTextBoundsFunction;
 import org.knowtiphy.charts.chartlocker.ENCCellLoader;
-import org.knowtiphy.charts.chartlocker.MemFeatureAdapter;
 import org.knowtiphy.charts.chartview.ChartLockerDialog;
 import org.knowtiphy.charts.chartview.ChartView;
 import org.knowtiphy.charts.chartview.ChartViewModel;
@@ -41,7 +38,6 @@ import org.knowtiphy.charts.chartview.markicons.MarkIconsResourceLoader;
 import org.knowtiphy.charts.desktop.AppSettingsDialog;
 import org.knowtiphy.charts.dynamics.AISModel;
 import org.knowtiphy.charts.memstore.MapStats;
-import org.knowtiphy.charts.memstore.MemFeature;
 import org.knowtiphy.charts.memstore.StyleReader;
 import org.knowtiphy.charts.platform.IUnderlyingPlatform;
 import org.knowtiphy.charts.platform.UnderlyingPlatform;
@@ -101,20 +97,20 @@ public class KnowtiphyCharts extends Application {
         svgCache = new SVGCache(MarkIconsResourceLoader.class);
 
         //  create the global chart locker
-        var styleReader = new StyleReader<SimpleFeatureType, MemFeature>(ResourceLoader.class);
-        var chartLoader = new ENCCellLoader(styleReader);
-        chartLocker = new ChartLocker(platform.catalogsDir(), platform.chartsDir(), chartLoader);
+        chartLocker =
+                new ChartLocker(
+                        platform.catalogsDir(),
+                        platform.chartsDir(),
+                        new ENCCellLoader(new StyleReader<>(ResourceLoader.class)));
 
         //  load an initial chart  just for demos and dump its stats for debugging
+
         var cell = chartLocker.getCell("Gulf of Mexico", 2_160_000);
         var quilt =
                 chartLocker.loadQuilt(
                         cell.bounds(), cell.cScale() / 2.0, appSettings, displayOptions);
-        var viewPort = new MapViewport(cell.bounds(), false);
-        System.out.println("Initial chart view port bounds = " + viewPort.bounds());
-        //  notify that the old chart is unloaded, and the new chart is available
-        //    chartEvents.push(new ChartLockerEvent(ChartLockerEvent.Type.UNLOADED, null));
-        //    chartEvents.push(new ChartLockerEvent(ChartLockerEvent.Type.LOADED, newChart));
+        // this won't be right after the info bar is done, but that will be resized later
+        var viewPort = new MapViewport(cell.bounds(), new Rectangle2D(0, 0, WIDTH, HEIGHT), false);
 
         var chart =
                 new ChartViewModel(
@@ -133,13 +129,15 @@ public class KnowtiphyCharts extends Application {
 
         initGraphics(primaryStage, chart);
         registerListeners(primaryStage, chart);
+
+        //  show the app
+        primaryStage.sizeToScene();
+        platform.setWindowIcons(primaryStage, ResourceLoader.class);
+        primaryStage.show();
     }
 
     private void initGraphics(Stage primaryStage, ChartViewModel chart)
             throws NonInvertibleTransformException, TransformException {
-
-        // this won't be right after the info bar is done, but that will be resized later
-        chart.setViewPortScreenArea(new Rectangle2D(0, 0, WIDTH, HEIGHT));
 
         var dynamicsModel = new AISModel();
 
@@ -153,12 +151,6 @@ public class KnowtiphyCharts extends Application {
                                 appSettings.unitProfile(),
                                 displayOptions,
                                 svgCache));
-
-        //        //  when a new chart is loaded update the primary stage title
-        //        chartLocker
-        //                .chartEvents()
-        //                .filter(ChartLockerEvent::isLoad)
-        //                .subscribe(change -> setStageTitle(primaryStage, change.chart()));
 
         //  the chart options pane that slides in and out when toggled on and off
         var toggle = new ToggleModel();
@@ -192,9 +184,6 @@ public class KnowtiphyCharts extends Application {
         scene.getStylesheets().add(ResourceLoader.class.getResource("charts.css").toExternalForm());
         primaryStage.setScene(scene);
         setStageTitle(primaryStage, chart);
-        primaryStage.sizeToScene();
-        platform.setWindowIcons(primaryStage, ResourceLoader.class);
-        primaryStage.show();
     }
 
     private void registerListeners(Stage primaryStage, ChartViewModel chart) {

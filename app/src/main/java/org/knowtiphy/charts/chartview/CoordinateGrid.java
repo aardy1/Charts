@@ -5,6 +5,8 @@
 
 package org.knowtiphy.charts.chartview;
 
+import java.util.ArrayList;
+import java.util.List;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
@@ -16,22 +18,17 @@ import javafx.scene.shape.Line;
 import org.geotools.api.referencing.operation.TransformException;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.knowtiphy.charts.chart.ChartLocker;
-import org.knowtiphy.charts.chart.ENCChart;
-import org.knowtiphy.charts.chart.event.ChartLockerEvent;
+import org.knowtiphy.charts.chartlocker.ChartLocker;
 import org.knowtiphy.charts.settings.UnitProfile;
 import org.knowtiphy.shapemap.renderer.Transformation;
 import org.locationtech.jts.geom.Coordinate;
 import org.reactfx.Subscription;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * @author graham
  */
 public class CoordinateGrid extends Pane {
-    private ENCChart chart;
+    private ChartViewModel chart;
 
     private final UnitProfile unitProfile;
 
@@ -41,44 +38,51 @@ public class CoordinateGrid extends Pane {
 
     private final Insets LONGITUDE_INSET = new Insets(3, 0, 0, 3);
 
-    public CoordinateGrid(ChartLocker chartLocker, ENCChart chrt, UnitProfile unitProfile) {
+    public CoordinateGrid(ChartLocker chartLocker, ChartViewModel chrt, UnitProfile unitProfile) {
         this.chart = chrt;
         this.unitProfile = unitProfile;
-        setupListeners();
+        initGraphics();
+        registerListeners();
 
-        //  listeners which don't depend on the chart
-        widthProperty().addListener(change -> drawGrid());
-        heightProperty().addListener(change -> drawGrid());
-        unitProfile.unitChangeEvents().subscribe(e -> drawGrid());
-
-        chartLocker
-                .chartEvents()
-                .filter(ChartLockerEvent::isUnload)
-                .subscribe(
-                        event -> {
-                            // unsubscribe listeners on the old chart
-                            subscriptions.forEach(Subscription::unsubscribe);
-                            subscriptions.clear();
-                        });
-
-        chartLocker
-                .chartEvents()
-                .filter(ChartLockerEvent::isLoad)
-                .subscribe(
-                        event -> {
-                            chart = event.chart();
-                            setupListeners();
-                            requestLayout();
-                        });
+        //        chartLocker
+        //                .chartEvents()
+        //                .filter(ChartLockerEvent::isUnload)
+        //                .subscribe(
+        //                        event -> {
+        //                            // unsubscribe listeners on the old chart
+        //                            subscriptions.forEach(Subscription::unsubscribe);
+        //                            subscriptions.clear();
+        //                        });
+        //
+        //        chartLocker
+        //                .chartEvents()
+        //                .filter(ChartLockerEvent::isLoad)
+        //                .subscribe(
+        //                        event -> {
+        //                            chart = event.chart();
+        //                            setupListeners();
+        //                            requestLayout();
+        //                        });
     }
 
-    private void setupListeners() {
+    private void initGraphics() {
+        drawGrid();
+    }
+
+    private void registerListeners() {
+        //  listeners which don't depend on the chart
+        widthProperty().addListener(_ -> drawGrid());
+        //        heightProperty().addListener(_ -> drawGrid());
+        unitProfile.unitChangeEvents().subscribe(_ -> drawGrid());
         subscriptions.add(chart.viewPortBoundsEvent().subscribe(extent -> drawGrid()));
     }
 
     private void drawGrid() {
         getChildren().clear();
 
+        var width = getWidth();
+        var height = getHeight();
+        //        if (chart.viewPortWorldToScreen() == null) return;
         var transform = new Transformation(chart.viewPortWorldToScreen());
         var delta = getLongitudeDelta();
 
