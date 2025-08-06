@@ -5,17 +5,16 @@
 
 package org.knowtiphy.charts.memstore;
 
-import org.geotools.api.feature.simple.SimpleFeatureType;
-import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.knowtiphy.charts.ontology.S57;
-import org.knowtiphy.shapemap.api.IFeatureSource;
-import org.knowtiphy.shapemap.api.IFeatureSourceIterator;
-import org.knowtiphy.charts.model.MapModel;
-import org.locationtech.jts.index.strtree.STRtree;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import org.geotools.api.feature.simple.SimpleFeatureType;
+import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.knowtiphy.charts.model.MapModel;
+import org.knowtiphy.charts.ontology.S57;
+import org.knowtiphy.shapemap.api.IFeatureSource;
+import org.knowtiphy.shapemap.api.IFeatureSourceIterator;
+import org.locationtech.jts.index.strtree.STRtree;
 
 /**
  * @author graham
@@ -54,13 +53,14 @@ public record MemStoreFeatureSource(
 
         sbounds = System.currentTimeMillis() - sbounds;
 
-        //    System.err.println(
-        //      "map = " + map.title() + " " + map.cScale() + " :: " + featureType.getTypeName());
-        //    System.err.println("\tcurrent scale = " + displayScale + ", scaleLess = " +
+        //        System.err.println(
+        //                "map = " + map.title() + " " + map.cScale() + " :: " +
+        // featureType.getTypeName());
+        //        System.err.println("\tcurrent scale = " + displayScale + ", scaleLess = " +
         // scaleLess);
-        //    System.err.println("\t\t#In Bounds = " + featuresInBounds.size() + " : time = " +
+        //        System.err.println("\t\t#In Bounds = " + featuresInBounds.size() + " : time = " +
         // ebounds);
-        //    System.err.println("\t\t#In Scale = " + featuresInScale.size() + " : time = " +
+        //        System.err.println("\t\t#In Scale = " + featuresInScale.size() + " : time = " +
         // sbounds);
 
         return new MemStoreFeatureIterator(featuresInScale.iterator());

@@ -19,6 +19,11 @@ public class Coordinates {
         return toMeters(degreeDiff, referencedEnvelope.getCoordinateReferenceSystem());
     }
 
+    public static double distanceDown(ReferencedEnvelope referencedEnvelope) {
+        var degreeDiff = referencedEnvelope.getMaxY() - referencedEnvelope.getMinY();
+        return toMeters(degreeDiff, referencedEnvelope.getCoordinateReferenceSystem());
+    }
+
     public static ReferencedEnvelope zoom(ReferencedEnvelope envelope, double zoomFactor) {
         var newWidth = envelope.getWidth() * zoomFactor;
         var newHeight = envelope.getHeight() * zoomFactor;
@@ -175,6 +180,10 @@ public class Coordinates {
             return size;
         }
         return unit.getConverterTo(SI.METRE).convert(size);
+    }
+
+    public static double toCM(double size) {
+        return size * 100;
     }
 
     private static final NumberFormat TWO_PLACES = NumberFormat.getNumberInstance();

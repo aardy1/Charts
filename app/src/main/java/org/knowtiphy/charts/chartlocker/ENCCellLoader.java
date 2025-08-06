@@ -10,11 +10,11 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.xml.stream.XMLStreamException;
 import org.geotools.api.feature.simple.SimpleFeatureType;
-import org.knowtiphy.charts.model.MapModel;
 import org.knowtiphy.charts.chartview.MapDisplayOptions;
 import org.knowtiphy.charts.enc.ENCCell;
 import org.knowtiphy.charts.memstore.MemFeature;
 import org.knowtiphy.charts.memstore.StyleReader;
+import org.knowtiphy.charts.model.MapModel;
 import org.knowtiphy.charts.settings.AppSettings;
 import org.knowtiphy.shapemap.style.parser.StyleSyntaxException;
 
@@ -36,7 +36,6 @@ public class ENCCellLoader {
             throws IOException, XMLStreamException, StyleSyntaxException {
 
         var map = loaded.get(cell);
-        System.err.println("cached " + cell.lname() + " = " + (map != null));
         if (map == null) {
             map = new MapModelReader(cell, settings, styleReader, displayOptions).read();
             loaded.put(cell, map);

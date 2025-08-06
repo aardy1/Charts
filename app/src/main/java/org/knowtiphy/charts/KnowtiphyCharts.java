@@ -110,7 +110,9 @@ public class KnowtiphyCharts extends Application {
                 chartLocker.loadQuilt(
                         cell.bounds(), cell.cScale() / 2.0, appSettings, displayOptions);
         // this won't be right after the info bar is done, but that will be resized later
-        var viewPort = new MapViewport(cell.bounds(), new Rectangle2D(0, 0, WIDTH, HEIGHT), false);
+        var viewPort =
+                new MapViewport(
+                        cell.bounds(), new Rectangle2D(0, 0, WIDTH, HEIGHT), platform, false);
 
         var chart =
                 new ChartViewModel(
@@ -119,6 +121,7 @@ public class KnowtiphyCharts extends Application {
                         chartLocker,
                         appSettings,
                         displayOptions,
+                        platform,
                         MemFeatureAdapter.ADAPTER,
                         new RemoveHolesFromPolygon(new RenderGeomCache()),
                         svgCache,
@@ -191,7 +194,9 @@ public class KnowtiphyCharts extends Application {
         appSettings
                 .unitProfile()
                 .unitChangeEvents()
-                .subscribe(change -> setStageTitle(primaryStage, chart));
+                .subscribe(_ -> setStageTitle(primaryStage, chart));
+        chart.viewPortBoundsEvent().subscribe(_ -> setStageTitle(primaryStage, chart));
+        chart.quiltChangeEvent().subscribe(_ -> setStageTitle(primaryStage, chart));
     }
 
     //  the chart specific options pane
@@ -273,12 +278,11 @@ public class KnowtiphyCharts extends Application {
 
         platform.setStageTitle(
                 stage,
-                "%s%s             1::%d             %s"
+                "%s             %s             %s"
                         .formatted(
-                                chart.isQuilt() ? "Quilt " : "",
-                                chart.title(),
-                                chart.cScale(),
-                                appSettings.unitProfile().formatEnvelope(chart.bounds())));
+                                chart.isQuilt() ? "Quilt " : chart.title(),
+                                chart.isQuilt() ? "Multiple cScales " : "1::" + chart.cScale(),
+                                appSettings.unitProfile().formatEnvelope(chart.viewPortBounds())));
     }
 
     public static void main(String[] args) {

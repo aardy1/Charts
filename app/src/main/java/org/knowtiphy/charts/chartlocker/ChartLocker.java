@@ -22,13 +22,13 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.geotools.api.feature.simple.SimpleFeatureType;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.knowtiphy.charts.model.MapModel;
-import org.knowtiphy.charts.model.Quilt;
 import org.knowtiphy.charts.chartview.MapDisplayOptions;
 import org.knowtiphy.charts.enc.ENCCatalog;
 import org.knowtiphy.charts.enc.ENCCatalogReader;
 import org.knowtiphy.charts.enc.ENCCell;
 import org.knowtiphy.charts.memstore.MemFeature;
+import org.knowtiphy.charts.model.MapModel;
+import org.knowtiphy.charts.model.Quilt;
 import org.knowtiphy.charts.settings.AppSettings;
 import org.knowtiphy.shapemap.style.parser.StyleSyntaxException;
 import org.locationtech.jts.geom.Geometry;
@@ -86,7 +86,7 @@ public class ChartLocker {
             double adjustedDisplayScale,
             AppSettings settings,
             MapDisplayOptions mapDisplayOptions) {
-        System.err.println("recompute the quilt ");
+
         var quilt = computeQuiltCellGeomPairs(bounds, adjustedDisplayScale);
 
         var maps = new LinkedList<MapModel<SimpleFeatureType, MemFeature>>();
@@ -153,7 +153,6 @@ public class ChartLocker {
 
     private List<Pair<ENCCell, Geometry>> computeQuiltCellGeomPairs(
             ReferencedEnvelope viewPortBounds, double scale) {
-        System.err.println("adjusted scale = " + scale);
 
         var intersections =
                 intersections(viewPortBounds).stream()

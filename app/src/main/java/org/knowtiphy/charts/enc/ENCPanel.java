@@ -12,8 +12,8 @@ import org.locationtech.jts.geom.Polygon;
 /**
  * An ENC Panel -- a list of boundary points making up a polygon.
  *
- * @param vertices -- the list of boundary points
- * @param -- the polygon geometry formed by the vertices
+ * @param vertices the list of boundary points
+ * @param geom the polygon geometry formed by the vertices
  */
 public record ENCPanel(List<Coordinate> vertices, Polygon geom) {
 

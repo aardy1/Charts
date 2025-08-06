@@ -8,7 +8,9 @@ package org.knowtiphy.charts.chartview.shapemapview;
 import java.util.List;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.transform.Affine;
+import javafx.scene.transform.NonInvertibleTransformException;
 import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
+import org.geotools.api.referencing.operation.TransformException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.knowtiphy.charts.model.MapModel;
 import org.knowtiphy.charts.model.Quilt;
@@ -32,21 +34,15 @@ public interface IShapeMapViewModel<S, F> {
 
     CoordinateReferenceSystem crs();
 
-    ReferencedEnvelope bounds();
+    ReferencedEnvelope viewPortBounds();
 
     Rectangle2D viewPortScreenArea();
 
     double adjustedDisplayScale();
 
-    Affine viewPortScreenToWorld();
+    Affine viewPortScreenToWorld() throws TransformException, NonInvertibleTransformException;
 
-    Affine viewPortWorldToScreen();
-
-    EventStream<Change<Quilt<S, F>>> quiltChangeEvent();
-
-    EventStream<Change<ReferencedEnvelope>> viewPortBoundsEvent();
-
-    EventStream<Change<Boolean>> layerVisibilityEvent();
+    Affine viewPortWorldToScreen() throws TransformException, NonInvertibleTransformException;
 
     IFeatureAdapter<F> featureAdapter();
 
@@ -56,5 +52,14 @@ public interface IShapeMapViewModel<S, F> {
 
     ITextBoundsFunction textSizeProvider();
 
-    List<IFeatureSourceIterator<F>> featuresNearXYWorld(double x, double y, int radius);
+    List<IFeatureSourceIterator<F>> featuresNearXYWorld(double x, double y, int radius)
+            throws TransformException, NonInvertibleTransformException;
+
+    EventStream<Change<Quilt<S, F>>> quiltChangeEvent();
+
+    EventStream<Change<ReferencedEnvelope>> viewPortBoundsEvent();
+
+    EventStream<Change<Rectangle2D>> viewPortScreenAreaEvent();
+
+    EventStream<Change<Boolean>> layerVisibilityEvent();
 }

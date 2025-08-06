@@ -119,11 +119,11 @@ public class CanvasShapeMapSkin<S, F> extends ShapeMapBaseSkin<S, F> {
         try {
             var foo =
                     RendererUtilities.worldToScreenTransform(
-                            viewModel.bounds(),
+                            viewModel.viewPortBounds(),
                             new Rectangle2D(0, 0, width, height),
                             viewModel.crs());
             var overallWts = new Transformation(foo);
-            overallWts.apply(viewModel.bounds().getMinX(), viewModel.bounds().getMaxY());
+            overallWts.apply(viewModel.viewPortBounds().getMinX(), viewModel.viewPortBounds().getMaxY());
             System.err.println(overallWts.getX() + " , " + overallWts.getY());
 
             if (true) {

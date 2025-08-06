@@ -7,7 +7,6 @@ package org.knowtiphy.charts;
 
 import java.util.ArrayList;
 import javafx.collections.ListChangeListener;
-import javafx.event.ActionEvent;
 import javafx.geometry.Pos;
 import javafx.geometry.Side;
 import javafx.scene.control.Label;
@@ -18,8 +17,6 @@ import javafx.scene.control.ToolBar;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
-import javafx.scene.transform.NonInvertibleTransformException;
-import org.geotools.api.referencing.operation.TransformException;
 import org.knowtiphy.charts.chartlocker.ChartLocker;
 import org.knowtiphy.charts.chartview.ChartViewModel;
 import org.knowtiphy.charts.chartview.MapDisplayOptions;
@@ -30,6 +27,7 @@ import static org.knowtiphy.charts.utils.FXUtils.button;
 import static org.knowtiphy.charts.utils.FXUtils.menuButton;
 import static org.knowtiphy.charts.utils.FXUtils.nonResizeable;
 import org.knowtiphy.charts.utils.ToggleModel;
+import static org.knowtiphy.charts.utils.Utils.formatDecimal;
 import org.knowtiphy.shapemap.context.SVGCache;
 
 /**
@@ -53,7 +51,6 @@ public class InfoBar extends StackPane {
     private final ToggleModel toggleModel;
 
     private MenuButton history;
-    private Label chartScale;
     private Label currentExtent;
     private Label currentMapSpan;
     private Label displayScale;
@@ -82,7 +79,6 @@ public class InfoBar extends StackPane {
     private void initGraphics() {
 
         currentExtent = new Label();
-        chartScale = new Label();
         currentMapSpan = new Label();
         displayScale = new Label();
         adjustedDisplayScale = new Label();
@@ -99,12 +95,7 @@ public class InfoBar extends StackPane {
         //  the information on the right side of the info bar
         var rightLabels =
                 nonResizeable(
-                        new HBox(
-                                chartScale,
-                                currentMapSpan,
-                                adjustedDisplayScale,
-                                displayScale,
-                                zoomLevel));
+                        new HBox(currentMapSpan, adjustedDisplayScale, displayScale, zoomLevel));
         rightLabels.getStyleClass().add("infobar");
 
         //  add the various components to the info bar
@@ -117,6 +108,8 @@ public class InfoBar extends StackPane {
     }
 
     private void registerListeners() {
+        widthProperty().addListener(_ -> updateChartInfo());
+        heightProperty().addListener(_ -> updateChartInfo());
         unitProfile.unitChangeEvents().subscribe(_ -> updateChartInfo());
         chart.viewPortBoundsEvent().subscribe(_ -> updateChartInfo());
         chart.quiltChangeEvent().subscribe(_ -> updateChartInfo());
@@ -125,8 +118,8 @@ public class InfoBar extends StackPane {
     private ToolBar makeControlsBar() {
 
         //  zoom  buttons
-        var zoomIn = button(Fonts.plus(), this::zoomIn, new Tooltip("Zoom In"));
-        var zoomOut = button(Fonts.minus(), this::zoomOut, new Tooltip("Zoom Out"));
+        var zoomIn = button(Fonts.plus(), _ -> chart.incZoom(), new Tooltip("Zoom In"));
+        var zoomOut = button(Fonts.minus(), _ -> chart.decZoom(), new Tooltip("Zoom Out"));
 
         //  chart display settings button
         var chartDisplaySettings =
@@ -152,17 +145,14 @@ public class InfoBar extends StackPane {
     //  update the chart information in the info bar
     private void updateChartInfo() {
 
-        currentExtent.setText(unitProfile.formatEnvelope(chart.bounds()));
+        currentExtent.setText(unitProfile.formatEnvelope(chart.viewPortBounds()));
         currentMapSpan.setText(
                 unitProfile.formatDistance(
                         Coordinates.distanceAcross(chart.viewPortBounds()),
                         unitProfile::metersToMapUnits));
-        displayScale.setText(chart.displayScale() + "");
+        displayScale.setText("DS = " + formatDecimal(chart.dScale(), 2) + "");
         adjustedDisplayScale.setText(chart.adjustedDisplayScale() + "");
-        zoomLevel.setText(Coordinates.twoDec(chart.zoom()));
-        //  technically this can't change as the UI is manipulated, so really only needs to be set
-        // once
-        chartScale.setText(chart.cScale() + "");
+        //        zoomLevel.setText(Coordinates.twoDec(chart.zoom()));
     }
 
     //  the menu items in the history menu
@@ -179,24 +169,6 @@ public class InfoBar extends StackPane {
     }
 
     @SuppressWarnings("CallToPrintStackTrace")
-    private void zoomIn(@SuppressWarnings("unused") ActionEvent _event) {
-        try {
-            System.out.println("InfoBar ZOOMIN");
-            chart.incZoom();
-        } catch (TransformException | NonInvertibleTransformException ex) {
-            ex.printStackTrace();
-        }
-    }
-
-    @SuppressWarnings("CallToPrintStackTrace")
-    private void zoomOut(@SuppressWarnings("unused") ActionEvent _event) {
-        try {
-            chart.decZoom();
-        } catch (TransformException | NonInvertibleTransformException ex) {
-            ex.printStackTrace();
-        }
-    }
-
     //  TODO -- need to update this for quilting
     private void loadChart(ENCCell chartDescription) {
         //        try {

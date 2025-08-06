@@ -10,6 +10,9 @@ import java.util.Objects;
 /**
  * An ENC (product )catalog -- a named/titled collection of ENC cells. (there are other fields other
  * than the name/title but we don't keep them for the moment)
+ *
+ * @param title the title of the catalog
+ * @param cells the cells in the catalog
  */
 public record ENCCatalog(String title, List<ENCCell> cells) {
 

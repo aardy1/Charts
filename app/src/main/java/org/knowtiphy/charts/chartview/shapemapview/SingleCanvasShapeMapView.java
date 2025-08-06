@@ -4,6 +4,8 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
+import javafx.scene.transform.NonInvertibleTransformException;
+import org.geotools.api.referencing.operation.TransformException;
 import org.geotools.geometry.jts.JTS;
 import org.knowtiphy.shapemap.api.RenderingContext;
 import org.knowtiphy.shapemap.renderer.ShapeMapRenderer;
@@ -52,7 +54,6 @@ public class SingleCanvasShapeMapView<S, F> extends Region {
 
     @Override
     public void layoutChildren() {
-
         super.layoutChildren();
         repaint();
         //        var width =
@@ -97,24 +98,27 @@ public class SingleCanvasShapeMapView<S, F> extends Region {
         int whichMap = 0; //  for debugging
         for (var map : viewModel.maps()) {
             System.err.println("Map # = " + whichMap);
-            var rendererContext =
-                    new RenderingContext<S, F>(
-                            map.layers(),
-                            map.totalRuleCount(),
-                            JTS.toEnvelope(map.geometry()),
-                            //  TODO -- shouldn't this be in the viewport?
-                            screenArea,
-                            viewModel.viewPortWorldToScreen(),
-                            viewModel.viewPortScreenToWorld(),
-                            viewModel.adjustedDisplayScale(),
-                            viewModel.featureAdapter(),
-                            viewModel.renderablePolygonProvider(),
-                            viewModel.svgProvider(),
-                            viewModel.textSizeProvider());
+            try {
+                var rendererContext =
+                        new RenderingContext<S, F>(
+                                map.layers(),
+                                map.totalRuleCount(),
+                                JTS.toEnvelope(map.geometry()),
+                                screenArea,
+                                viewModel.viewPortWorldToScreen(),
+                                viewModel.viewPortScreenToWorld(),
+                                viewModel.adjustedDisplayScale(),
+                                viewModel.featureAdapter(),
+                                viewModel.renderablePolygonProvider(),
+                                viewModel.svgProvider(),
+                                viewModel.textSizeProvider());
 
-            var renderer = new ShapeMapRenderer<>(rendererContext, gctx);
-            renderer.paint();
-            whichMap++;
+                var renderer = new ShapeMapRenderer<>(rendererContext, gctx);
+                renderer.paint();
+                whichMap++;
+            } catch (NonInvertibleTransformException | TransformException e) {
+                e.printStackTrace();
+            }
         }
     }
 

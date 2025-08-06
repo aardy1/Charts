@@ -2,8 +2,6 @@ package org.knowtiphy.charts.chartview;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.event.ActionEvent;
 import javafx.geometry.Point2D;
 import javafx.geometry.Rectangle2D;
@@ -46,7 +44,7 @@ public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView
 
     private final ChartLocker chartLocker;
 
-    private ChartViewModel viewModel;
+    private final ChartViewModel viewModel;
 
     // private final AISModel dynamics;
 
@@ -109,9 +107,7 @@ public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView
 
         var root = makeRoot();
 
-        mapSurface =
-                new SingleCanvasShapeMapView<SimpleFeatureType, MemFeature>(
-                        viewModel, Color.LIGHTGREY);
+        mapSurface = new SingleCanvasShapeMapView<>(viewModel, Color.LIGHTGREY);
 
         var surfaceDragEventsPane = new Pane();
         // iconsSurface = makeIconsSurface();
@@ -128,6 +124,7 @@ public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView
         getChildren().addAll(root);
     }
 
+    @SuppressWarnings("CallToPrintStackTrace")
     private void registerListeners() {
 
         //  chart  re-positioning
@@ -147,11 +144,7 @@ public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView
                 event -> {
                     // not sure what NaN means -- something to do with Zoom start/finish
                     if (!Double.isNaN(event.getZoomFactor())) {
-                        try {
-                            viewModel.setZoom(viewModel.zoom() * event.getZoomFactor());
-                        } catch (TransformException | NonInvertibleTransformException ex) {
-                            ex.printStackTrace();
-                        }
+                        viewModel.changeZoomByFactor(event.getZoomFactor());
                     }
                 });
 
@@ -164,14 +157,13 @@ public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView
                     dragState.startX = event.getX();
                     dragState.startY = event.getY();
                     var newPos = new Point2D(difX, difY);
-                    var result = viewModel.viewPortScreenToWorld().transform(newPos);
-
-                    var newVPBounds = new ReferencedEnvelope(viewModel.viewPortBounds());
-                    newVPBounds.translate(
-                            newVPBounds.getMinimum(0) - result.getX(),
-                            newVPBounds.getMaximum(1) - result.getY());
-
                     try {
+                        var result = viewModel.viewPortScreenToWorld().transform(newPos);
+                        var newVPBounds = new ReferencedEnvelope(viewModel.viewPortBounds());
+                        newVPBounds.translate(
+                                newVPBounds.getMinimum(0) - result.getX(),
+                                newVPBounds.getMaximum(1) - result.getY());
+
                         viewModel.setViewPortBounds(newVPBounds);
                     } catch (TransformException | NonInvertibleTransformException ex) {
                         ex.printStackTrace();
@@ -202,7 +194,7 @@ public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView
                     change -> map.layer(S57.OC_SOUNDG).setVisible(change.getNewValue()));
         }
 
-        viewModel.layerVisibilityEvent().subscribe(b -> mapSurface.requestLayout());
+        viewModel.layerVisibilityEvent().subscribe(_ -> mapSurface.requestLayout());
 
         // subscriptions.add(chart.viewPortBoundsEvent.subscribe(change ->
         // updateBoats()));
@@ -213,15 +205,15 @@ public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView
 
             @Override
             public void layoutChildren() {
-                System.out.println(
-                        "Skin layout children : " + (int) getWidth() + " : " + (int) getHeight());
-                try {
-                    // set the screen area of the viewport before laying out the children
-                    viewModel.setViewPortScreenArea(
-                            new Rectangle2D(0, 0, (int) getWidth(), (int) getHeight()));
-                } catch (TransformException | NonInvertibleTransformException ex) {
-                    Logger.getLogger(ChartViewSkin.class.getName()).log(Level.SEVERE, null, ex);
-                }
+                System.out.println("Skin layout children : " + getWidth() + " : " + getHeight());
+                //                try {
+                // set the screen area of the viewport before laying out the children
+                viewModel.setViewPortScreenArea(new Rectangle2D(0, 0, getWidth(), getHeight()));
+                //                } catch (TransformException | NonInvertibleTransformException ex)
+                // {
+                //
+                // Logger.getLogger(ChartViewSkin.class.getName()).log(Level.SEVERE, null, ex);
+                //                }
 
                 super.layoutChildren();
             }
@@ -236,7 +228,7 @@ public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView
     }
 
     private Pane makeQuiltingSurface() {
-        var theSurface = new QuiltingSurface(viewModel);
+        var theSurface = new QuiltOverlayView(viewModel);
         theSurface.setPickOnBounds(false);
         return theSurface;
     }
@@ -303,8 +295,16 @@ public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView
         //        }
     }
 
+    @SuppressWarnings("CallToPrintStackTrace")
     private void showMaxDetail(MouseEvent event) {
-        var envelope = viewModel.tinyPolygon(event.getX(), event.getY());
+
+        ReferencedEnvelope envelope;
+        try {
+            envelope = viewModel.tinyPolygon(event.getX(), event.getY());
+        } catch (TransformException | NonInvertibleTransformException ex) {
+            ex.printStackTrace();
+            return;
+        }
 
         ENCCell mostDetailed = null;
         var smallestScale = Integer.MAX_VALUE;
@@ -316,18 +316,9 @@ public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView
             }
         }
 
-        //    if(mostDetailed != null && mostDetailed != chart.cell())
-        //    {
-        //      try
-        //      {
-        //        chartLocker.loadChart(mostDetailed, displayOptions, svgCache);
-        //      }
-        //      catch(TransformException | FactoryException | NonInvertibleTransformException |
-        //            StyleSyntaxException ex)
-        //      {
-        //        Logger.getLogger(ChartViewSkin.class.getName()).log(Level.SEVERE, null, ex);
-        //      }
-        //    }
+        if (mostDetailed != null) {
+            viewModel.loadNewChart(mostDetailed);
+        }
     }
 
     private ContextMenu makeContextMenu(MouseEvent mouseEvent) {
@@ -335,7 +326,7 @@ public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView
         var maxDetail = new MenuItem("Max Detail Here");
         var whatsHere = new MenuItem("What's here");
 
-        maxDetail.setOnAction((ActionEvent event) -> showMaxDetail(mouseEvent));
+        maxDetail.setOnAction(_ -> showMaxDetail(mouseEvent));
         whatsHere.setOnAction((ActionEvent event) -> showInfo(mouseEvent));
 
         contextMenu.getItems().addAll(maxDetail, whatsHere);
@@ -361,9 +352,16 @@ public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView
         }
     }
 
+    @SuppressWarnings("CallToPrintStackTrace")
     private void setBoatPosition(Glyph boat, AISInformation aisInfo) {
         // need to clip the position?
-        var tx = new Transformation(viewModel.viewPortWorldToScreen());
+        Transformation tx;
+        try {
+            tx = new Transformation(viewModel.viewPortWorldToScreen());
+        } catch (TransformException | NonInvertibleTransformException ex) {
+            ex.printStackTrace();
+            return;
+        }
         tx.apply(aisInfo.getPosition().x, aisInfo.getPosition().y);
         boat.setTranslateX(tx.getX());
         boat.setTranslateY(tx.getY());
@@ -375,23 +373,26 @@ public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView
         }
     }
 
+    @SuppressWarnings("CallToPrintStackTrace")
     private void doDrag(MouseEvent event, DragState dragState) {
         var difX = event.getX() - dragState.startX;
         var difY = event.getY() - dragState.startY;
         dragState.startX = event.getX();
         dragState.startY = event.getY();
         var newPos = new Point2D(difX, difY);
-        var result = viewModel.viewPortScreenToWorld().transform(newPos);
+        Point2D result;
+        try {
+            result = viewModel.viewPortScreenToWorld().transform(newPos);
+        } catch (TransformException | NonInvertibleTransformException ex) {
+            ex.printStackTrace();
+            return;
+        }
 
         var newVPBounds = new ReferencedEnvelope(viewModel.viewPortBounds());
         newVPBounds.translate(
                 newVPBounds.getMinimum(0) - result.getX(),
                 newVPBounds.getMaximum(1) - result.getY());
 
-        try {
-            viewModel.setViewPortBounds(newVPBounds);
-        } catch (TransformException | NonInvertibleTransformException ex) {
-            Logger.getLogger(DragPanZoomSupport.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        viewModel.setViewPortBounds(newVPBounds);
     }
 }

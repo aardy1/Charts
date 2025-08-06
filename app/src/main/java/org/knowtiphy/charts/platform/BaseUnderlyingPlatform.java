@@ -5,11 +5,9 @@
 
 package org.knowtiphy.charts.platform;
 
-import javafx.geometry.Rectangle2D;
-import javafx.scene.layout.Region;
-import javafx.stage.Screen;
-
 import java.nio.file.Path;
+import javafx.geometry.Rectangle2D;
+import javafx.stage.Screen;
 
 /** Base class for all abstractions of the underlying platform */
 public abstract class BaseUnderlyingPlatform {
@@ -61,8 +59,17 @@ public abstract class BaseUnderlyingPlatform {
         return screen.getWidth() / ppi() * 2.54;
     }
 
-    public double windowWidthCM(Region region) {
-        return screenWidthCM() * (region.getWidth() / screenDimensions().getWidth());
+    public double screenHeightCM() {
+        var screen = screenDimensions();
+        return screen.getHeight() / ppi() * 2.54;
+    }
+
+    public double windowWidthCM(double regionWidth) {
+        return screenWidthCM() * (regionWidth / screenDimensions().getWidth());
+    }
+
+    public double windowHeightCM(double height) {
+        return screenHeightCM() * (height / screenDimensions().getHeight());
     }
 
     // public ReadOnlyObjectProperty<Position> positionProperty() {

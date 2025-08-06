@@ -7,7 +7,6 @@ package org.knowtiphy.charts.platform;
 
 import java.nio.file.Path;
 import javafx.geometry.Rectangle2D;
-import javafx.scene.layout.Region;
 import javafx.stage.Stage;
 
 /** Abstraction of the underlying platform. */
@@ -25,7 +24,9 @@ public interface IUnderlyingPlatform {
 
     Rectangle2D screenDimensions();
 
-    double windowWidthCM(Region region);
+    double windowWidthCM(double width);
+
+    double windowHeightCM(double width);
 
     double ppi();
 

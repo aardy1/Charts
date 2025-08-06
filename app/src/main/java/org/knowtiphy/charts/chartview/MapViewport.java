@@ -6,58 +6,63 @@ import javafx.scene.transform.Affine;
 import javafx.scene.transform.NonInvertibleTransformException;
 import org.geotools.api.referencing.operation.TransformException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.knowtiphy.charts.geotools.Coordinates;
+import static org.knowtiphy.charts.geotools.Coordinates.toCM;
+import org.knowtiphy.charts.platform.IUnderlyingPlatform;
 import org.knowtiphy.shapemap.renderer.RendererUtilities;
 
 /**
  * A map viewport -- the bounds of the viewport in world coordinates, the screen area of the
  * viewport in pixels, and transforms between the two.
+ *
+ * <p>NOTE: transforms are computed lazily, so when they are fetched, not when they are set. This
+ * allows for changes to screen are and view port bounds to be batched.
  */
 public class MapViewport {
 
-    private static final double INITIAL_ZOOM = 1;
-
+    private ReferencedEnvelope originalBounds;
     private ReferencedEnvelope bounds;
-    private final ReferencedEnvelope originalBounds;
 
     private final boolean matchingAspectRatio;
 
     private Rectangle2D screenArea;
 
+    private final IUnderlyingPlatform platform;
     private Affine screenToWorld;
 
     private Affine worldToScreen;
 
     private boolean hasCenteringTransforms;
 
-    double zoom;
+    private boolean needToRecompute = true;
 
-    public MapViewport(ReferencedEnvelope bounds, Rectangle2D screenArea, boolean matchAspectRatio)
-            throws TransformException, NonInvertibleTransformException {
+    public MapViewport(
+            ReferencedEnvelope bounds,
+            Rectangle2D screenArea,
+            IUnderlyingPlatform platform,
+            boolean matchAspectRatio) {
 
         this.bounds = bounds;
         this.screenArea = screenArea;
-
-        originalBounds = bounds;
+        this.platform = platform;
         hasCenteringTransforms = false;
         matchingAspectRatio = matchAspectRatio;
-        zoom = INITIAL_ZOOM;
-
-        calculateNewTransforms();
+        originalBounds = bounds;
+        //        calculateNewTransforms();
     }
 
     public ReferencedEnvelope bounds() {
         return bounds;
     }
 
-    public ReferencedEnvelope setBounds(ReferencedEnvelope newBounds)
-            throws TransformException, NonInvertibleTransformException {
+    public synchronized ReferencedEnvelope setBounds(ReferencedEnvelope newBounds) {
 
         var oldBounds = bounds;
-        this.bounds = newBounds;
-        System.out.println("VP set bounds");
-        System.out.println("old bounds = " + oldBounds);
-        System.out.println("new bounds = " + bounds);
-        calculateNewTransforms();
+        if (!newBounds.equals(bounds)) {
+            this.bounds = newBounds;
+            needToRecompute = true;
+        }
+
         return oldBounds;
     }
 
@@ -65,38 +70,81 @@ public class MapViewport {
         return screenArea;
     }
 
-    public void setScreenArea(Rectangle2D screenArea)
-            throws TransformException, NonInvertibleTransformException {
-        this.screenArea = screenArea;
-        calculateNewTransforms();
+    public synchronized Rectangle2D setScreenArea(Rectangle2D newScreenArea) {
+
+        var oldScreenArea = screenArea;
+        if (!newScreenArea.equals(screenArea)) {
+            this.screenArea = newScreenArea;
+            needToRecompute = true;
+        }
+
+        return oldScreenArea;
     }
 
-    public Affine screenToWorld() {
+    public synchronized void calculateTransforms()
+            throws TransformException, NonInvertibleTransformException {
+
+        if (needToRecompute) {
+            System.out.println("Recomputing xforms");
+            calculateNewTransforms();
+            needToRecompute = false;
+        } else System.out.println("Re-using xforms");
+    }
+
+    public Affine screenToWorld() throws TransformException, NonInvertibleTransformException {
+        calculateTransforms();
         return screenToWorld;
     }
 
-    public Affine worldToScreen() {
+    public Affine worldToScreen() throws TransformException, NonInvertibleTransformException {
+        calculateTransforms();
         return worldToScreen;
     }
 
-    public double zoom() {
-        return zoom;
-    }
+    //    public double zoom() {
+    //        return zoom;
+    //    }
 
-    public ReferencedEnvelope setZoom(double newZoom)
-            throws TransformException, NonInvertibleTransformException {
+    public ReferencedEnvelope setZoom(double zoomFactor) {
 
-        this.zoom = Math.max(INITIAL_ZOOM, newZoom);
+        //        this.zoom = newZoom; // Math.max(INITIAL_ZOOM, newZoom);
 
         //  recalculate the new bounds from the original bounds and the zoom factor
-        var width = originalBounds.getWidth();
-        var height = originalBounds.getHeight();
-        var newWidth = width / zoom;
-        var newHeight = height / zoom;
+        var width = bounds.getWidth();
+        var height = bounds.getHeight();
+        var newWidth = width * zoomFactor;
+        var newHeight = height * zoomFactor;
         // expanding/shrinking mutates the envelope so copy it
-        var newBounds = new ReferencedEnvelope(originalBounds);
+        var newBounds = new ReferencedEnvelope(bounds);
         newBounds.expandBy((newWidth - width) / 2.0, (newHeight - height) / 2.0);
         return setBounds(newBounds);
+    }
+
+    //  cscale 1cm : 500m means 1cm on the map is 500m in the physical world
+    //  dscale 1cm : 20000m  means 1cm on the screen is 20000m in the physical world
+    /**
+     * The display scale -- the size of the map
+     *
+     * @return
+     */
+    public double dScale() {
+        var acrossKM = Coordinates.distanceAcross(bounds());
+        var screenAreaWidthPX = screenArea().getWidth();
+        var screenAreaWidthCM = platform.windowWidthCM(screenAreaWidthPX);
+        //        System.out.println("dist across M = " + acrossKM);
+        //        System.out.println("screenAreaWidthPx = " + screenAreaWidthPX);
+        //        System.out.println("screenAreaWidthCM = " + screenAreaWidthCM);
+        //        System.out.println("dscale width = " + toCM(acrossKM / screenAreaWidthCM));
+
+        //        var downKM = Coordinates.distanceDown(bounds());
+        //        var screenAreaHeightPX = screenArea().getHeight();
+        //        var screenAreaHeightCM = platform.windowHeightCM(screenAreaHeightPX);
+        //        System.out.println("dist down M = " + downKM);
+        //        System.out.println("screenAreaHeightPx = " + screenAreaHeightPX);
+        //        System.out.println("screenAreaHeightCM = " + screenAreaHeightCM);
+        //        System.out.println("dscale height = " + toCM(downKM / screenAreaHeightCM));
+
+        return toCM(acrossKM / screenAreaWidthCM);
     }
 
     private void calculateNewTransforms()
