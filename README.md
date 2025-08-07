@@ -3,7 +3,7 @@
 The project has two goals:
 
 1. build a pure JavaFX ESRI shape file renderer (so no use of AWT or bridges to AWT)
-2. build an Electronic Navigation Chart (ENC) viewer (inspired by [OpenCPN](https://opencpn.org)) running natively on all desktop and mobile platforms
+2. build an Electronic Navigation Chart (ENC) viewer (inspired by or plugging into [OpenCPN](https://opencpn.org)) running natively on my iPhone (and generaly all desktop and mobile platforms)
 
 Part 1 enables part 2, because JavaFX runs on all platforns, including mobile.
 
