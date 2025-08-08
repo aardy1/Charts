@@ -20,18 +20,13 @@ import org.knowtiphy.shapemap.renderer.RendererUtilities;
  */
 public class MapViewport {
 
-    private ReferencedEnvelope originalBounds;
     private ReferencedEnvelope bounds;
-
-    private final boolean matchingAspectRatio;
-
     private Rectangle2D screenArea;
-
+    private final boolean matchAspectRatio;
     private final IUnderlyingPlatform platform;
+
     private Affine screenToWorld;
-
     private Affine worldToScreen;
-
     private boolean hasCenteringTransforms;
 
     private boolean needToRecompute = true;
@@ -45,79 +40,61 @@ public class MapViewport {
         this.bounds = bounds;
         this.screenArea = screenArea;
         this.platform = platform;
+
         hasCenteringTransforms = false;
-        matchingAspectRatio = matchAspectRatio;
-        originalBounds = bounds;
+        this.matchAspectRatio = matchAspectRatio;
         //        calculateNewTransforms();
     }
 
-    public ReferencedEnvelope bounds() {
+    public ReferencedEnvelope getBounds() {
         return bounds;
     }
 
-    public synchronized ReferencedEnvelope setBounds(ReferencedEnvelope newBounds) {
+    public synchronized void setBounds(ReferencedEnvelope newBounds) {
 
+        System.out.println("set bounds old = " + bounds);
+        System.out.println("set bounds new = " + newBounds);
         var oldBounds = bounds;
-        if (!newBounds.equals(bounds)) {
-            this.bounds = newBounds;
+        this.bounds = newBounds;
+        if (!oldBounds.equals(bounds)) {
             needToRecompute = true;
         }
-
-        return oldBounds;
     }
 
-    public Rectangle2D screenArea() {
+    public Rectangle2D getScreenArea() {
         return screenArea;
     }
 
-    public synchronized Rectangle2D setScreenArea(Rectangle2D newScreenArea) {
+    public synchronized void setScreenArea(Rectangle2D newScreenArea) {
 
         var oldScreenArea = screenArea;
-        if (!newScreenArea.equals(screenArea)) {
-            this.screenArea = newScreenArea;
+        this.screenArea = newScreenArea;
+        if (!oldScreenArea.equals(screenArea)) {
             needToRecompute = true;
         }
-
-        return oldScreenArea;
     }
 
-    public synchronized void calculateTransforms()
-            throws TransformException, NonInvertibleTransformException {
-
-        if (needToRecompute) {
-            System.out.println("Recomputing xforms");
-            calculateNewTransforms();
-            needToRecompute = false;
-        } else System.out.println("Re-using xforms");
-    }
-
-    public Affine screenToWorld() throws TransformException, NonInvertibleTransformException {
+    public Affine getScreenToWorld() throws TransformException, NonInvertibleTransformException {
         calculateTransforms();
         return screenToWorld;
     }
 
-    public Affine worldToScreen() throws TransformException, NonInvertibleTransformException {
+    public Affine getWorldToScreen() throws TransformException, NonInvertibleTransformException {
         calculateTransforms();
         return worldToScreen;
     }
 
-    //    public double zoom() {
-    //        return zoom;
-    //    }
-
-    public ReferencedEnvelope setZoom(double zoomFactor) {
-
-        //        this.zoom = newZoom; // Math.max(INITIAL_ZOOM, newZoom);
+    public void zoomBy(double zoomFactor) {
 
         //  recalculate the new bounds from the original bounds and the zoom factor
         var width = bounds.getWidth();
         var height = bounds.getHeight();
         var newWidth = width * zoomFactor;
         var newHeight = height * zoomFactor;
-        // expanding/shrinking mutates the envelope so copy it
+        // expanding/shrinking mutates the envelope so copy it -- could not do the copy
         var newBounds = new ReferencedEnvelope(bounds);
         newBounds.expandBy((newWidth - width) / 2.0, (newHeight - height) / 2.0);
-        return setBounds(newBounds);
+        setBounds(newBounds);
     }
 
     //  cscale 1cm : 500m means 1cm on the map is 500m in the physical world
@@ -128,8 +105,8 @@ public class MapViewport {
      * @return
      */
     public double dScale() {
-        var acrossKM = Coordinates.distanceAcross(bounds());
-        var screenAreaWidthPX = screenArea().getWidth();
+        var acrossKM = Coordinates.distanceAcross(getBounds());
+        var screenAreaWidthPX = getScreenArea().getWidth();
         var screenAreaWidthCM = platform.windowWidthCM(screenAreaWidthPX);
         //        System.out.println("dist across M = " + acrossKM);
         //        System.out.println("screenAreaWidthPx = " + screenAreaWidthPX);
@@ -147,24 +124,29 @@ public class MapViewport {
         return toCM(acrossKM / screenAreaWidthCM);
     }
 
-    private void calculateNewTransforms()
-            throws TransformException, NonInvertibleTransformException {
-        if (screenArea.equals(Rectangle2D.EMPTY)) {
-            screenToWorld = worldToScreen = null;
-            hasCenteringTransforms = false;
-        } else if (bounds.isEmpty()) {
-            screenToWorld = new Affine();
-            worldToScreen = new Affine();
-            hasCenteringTransforms = false;
-        } else if (matchingAspectRatio) {
-            if (!hasCenteringTransforms) {
-                calculateCenteringTransforms();
+    private void calculateTransforms() throws TransformException, NonInvertibleTransformException {
+
+        if (needToRecompute) {
+            System.out.println("Recomputing xforms");
+            if (screenArea.equals(Rectangle2D.EMPTY)) {
+                screenToWorld = worldToScreen = null;
+                hasCenteringTransforms = false;
+            } else if (bounds.isEmpty()) {
+                screenToWorld = new Affine();
+                worldToScreen = new Affine();
+                hasCenteringTransforms = false;
+            } else if (matchAspectRatio) {
+                if (!hasCenteringTransforms) {
+                    calculateCenteringTransforms();
+                }
+                bounds = calculateActualBounds();
+            } else {
+                calculateSimpleTransforms(bounds);
+                hasCenteringTransforms = false;
             }
-            bounds = calculateActualBounds();
-        } else {
-            calculateSimpleTransforms(bounds);
-            hasCenteringTransforms = false;
-        }
+
+            needToRecompute = false;
+        } else System.out.println("Re-using xforms");
     }
 
     /**

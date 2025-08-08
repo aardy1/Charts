@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE actions SYSTEM "action-mapping.dtd">
+<actions>
+    <action displayName="native build" name="custom-1" repeatable="true">
+        <args>--configure-on-demand -w -Ptarget=host -x check nativeCompile nativeLink nativePackage nativeInstall</args>
+    </action>
+</actions>

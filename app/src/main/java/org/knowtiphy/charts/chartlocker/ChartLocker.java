@@ -32,6 +32,7 @@ import org.knowtiphy.charts.model.Quilt;
 import org.knowtiphy.charts.settings.AppSettings;
 import org.knowtiphy.shapemap.style.parser.StyleSyntaxException;
 import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.TopologyException;
 
 /**
@@ -80,6 +81,36 @@ public class ChartLocker {
         return result;
     }
 
+    public ENCCell mostDetailedCell(Point p) {
+
+        var smallestScale = Integer.MAX_VALUE;
+        ENCCell mostDetailed = null;
+
+        for (var catalog : availableCatalogs()) {
+            for (var cell : catalog.cells()) {
+                if (cell.geom().contains(p)) {
+                    if (cell.cScale() < smallestScale) {
+                        smallestScale = cell.cScale();
+                        mostDetailed = cell;
+                    }
+                }
+            }
+        }
+
+        return mostDetailed;
+    }
+
+    public Quilt<SimpleFeatureType, MemFeature> loadMostDetailedQuilt(
+            Point point,
+            double adjustedDisplayScale,
+            AppSettings settings,
+            MapDisplayOptions mapDisplayOptions) {
+
+        var mostDetailed = mostDetailedCell(point);
+        System.out.println("Most detailed cell : " + mostDetailed);
+        return loadQuilt(mostDetailed.bounds(), mostDetailed.cScale(), settings, mapDisplayOptions);
+    }
+
     @SuppressWarnings("CallToPrintStackTrace")
     public Quilt<SimpleFeatureType, MemFeature> loadQuilt(
             ReferencedEnvelope bounds,
@@ -87,8 +118,9 @@ public class ChartLocker {
             AppSettings settings,
             MapDisplayOptions mapDisplayOptions) {
 
+        System.out.println("LOAD QUILT " + bounds);
         var quilt = computeQuiltCellGeomPairs(bounds, adjustedDisplayScale);
-
+        System.out.println("Quilt size = " + quilt.size());
         var maps = new LinkedList<MapModel<SimpleFeatureType, MemFeature>>();
         for (var entry : quilt) {
             var cell = entry.getKey();
@@ -154,12 +186,24 @@ public class ChartLocker {
     private List<Pair<ENCCell, Geometry>> computeQuiltCellGeomPairs(
             ReferencedEnvelope viewPortBounds, double scale) {
 
+        System.out.println("Compute QGP scale = " + scale);
+        System.out.println("Compute QGP vpb = " + viewPortBounds);
         var intersections =
                 intersections(viewPortBounds).stream()
                         .filter(cell -> cell.cScale() >= scale)
                         .sorted(Comparator.comparingInt(ENCCell::cScale))
                         .toList();
-
+        System.out.println("Intersection size = " + intersections.size());
+        for (var foo : intersections) {
+            System.out.println(
+                    foo.lname()
+                            + " : "
+                            + foo.cScale()
+                            + " :  "
+                            + scale
+                            + " : "
+                            + (foo.cScale() > scale));
+        }
         if (intersections.isEmpty()) {
             return new ArrayList<>();
         }

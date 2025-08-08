@@ -1,6 +1,7 @@
 package org.knowtiphy.charts.geotools;
 
 import java.text.NumberFormat;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 import javax.measure.Unit;
@@ -9,6 +10,8 @@ import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.api.referencing.crs.GeographicCRS;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.knowtiphy.charts.model.MapModel;
 import si.uom.SI;
 
 /** */
@@ -34,16 +37,37 @@ public class Coordinates {
         //    clip(maxExtent, copy, crs);
     }
 
+    //  compute a bounding box for a collection of maps.
+
+    public static <S, F> ReferencedEnvelope bounds(List<MapModel<S, F>> maps) {
+
+        var minX = Double.POSITIVE_INFINITY;
+        var minY = Double.POSITIVE_INFINITY;
+        var maxX = Double.NEGATIVE_INFINITY;
+        var maxY = Double.NEGATIVE_INFINITY;
+
+        for (var map : maps) {
+            var b = map.bounds();
+            minX = Math.min(minX, b.getMinX());
+            minY = Math.min(minY, b.getMinY());
+            maxX = Math.max(maxX, b.getMaxX());
+            maxY = Math.max(maxY, b.getMaxY());
+        }
+
+        // TODO -- get the CRS from the cell file
+        return new ReferencedEnvelope(minX, maxX, minY, maxY, DefaultGeographicCRS.WGS84);
+    }
+
     private static final double DEFAULT_WIDTH = 3;
 
     private static final double DEFAULT_HEIGHT = 3;
 
+    //      TODO -- keep this as its needed when not quilting.
     //  public static <S, F> ReferencedEnvelope clip(
     //    BaseMapViewModel<S, F> map, ReferencedEnvelope envelope)
     //  {
     //    return clip(map.viewPortBounds(), envelope, map.crs());
     //  }
-
     //  public static ReferencedEnvelope clip(
     //    ReferencedEnvelope maxExtent, ReferencedEnvelope envelope, CoordinateReferenceSystem crs)
     //  {

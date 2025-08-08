@@ -1,9 +1,5 @@
 package org.knowtiphy.charts.chartview;
 
-import java.util.HashMap;
-import java.util.Map;
-import javafx.event.ActionEvent;
-import javafx.geometry.Point2D;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
@@ -15,26 +11,20 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.transform.NonInvertibleTransformException;
-import org.apache.commons.lang3.tuple.Pair;
-import org.controlsfx.glyphfont.Glyph;
 import org.geotools.api.feature.simple.SimpleFeatureType;
 import org.geotools.api.referencing.operation.TransformException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.knowtiphy.charts.Fonts;
 import org.knowtiphy.charts.chartlocker.ChartLocker;
 import org.knowtiphy.charts.chartview.shapemapview.SingleCanvasShapeMapView;
-import org.knowtiphy.charts.dynamics.AISEvent;
-import org.knowtiphy.charts.dynamics.AISInformation;
 import org.knowtiphy.charts.dynamics.AISModel;
-import org.knowtiphy.charts.enc.ENCCell;
+import org.knowtiphy.charts.enc.Constants;
 import org.knowtiphy.charts.memstore.MemFeature;
 import org.knowtiphy.charts.ontology.S57;
 import org.knowtiphy.charts.settings.UnitProfile;
-import org.knowtiphy.charts.utils.DragState;
 import org.knowtiphy.charts.utils.FXUtils;
 import static org.knowtiphy.charts.utils.FXUtils.resizeable;
-import org.knowtiphy.shapemap.context.SVGCache;
 import org.knowtiphy.shapemap.renderer.Transformation;
+import org.locationtech.jts.geom.Coordinate;
 
 public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView> {
 
@@ -42,51 +32,35 @@ public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView
 
     private static final double PREFERRED_HEIGHT = Region.USE_COMPUTED_SIZE;
 
+    private final ChartView control;
+
     private final ChartLocker chartLocker;
 
-    private final ChartViewModel viewModel;
-
-    // private final AISModel dynamics;
+    private final ChartViewModel chart;
 
     private final MapDisplayOptions displayOptions;
 
     private final UnitProfile unitProfile;
 
-    private final SVGCache svgCache;
-
-    // private final Pane iconsSurface;
-    private SingleCanvasShapeMapView<SimpleFeatureType, MemFeature> mapSurface;
+    private SingleCanvasShapeMapView<SimpleFeatureType, MemFeature> mapView;
 
     private Pane coordinateGrid;
-
-    // private final Pane aisPane;
-
-    // boat glyphs
-    private final Map<Long, Pair<AISInformation, Glyph>> boats = new HashMap<>();
 
     public ChartViewSkin(
             ChartView chartView,
             ChartLocker chartLocker,
-            ChartViewModel viewModel,
+            ChartViewModel chart,
             AISModel dynamics,
             UnitProfile unitProfile,
-            MapDisplayOptions displayOptions,
-            SVGCache svgCache) {
+            MapDisplayOptions displayOptions) {
+
         super(chartView);
 
+        this.control = chartView;
         this.chartLocker = chartLocker;
-        this.viewModel = viewModel;
+        this.chart = chart;
         this.unitProfile = unitProfile;
-        // this.dynamics = dynamics;
         this.displayOptions = displayOptions;
-        this.svgCache = svgCache;
-        //        eventModel.mouseEvents.feedFrom(EventStreams.eventsOf(root,
-        // MouseEvent.ANY));
-        //        eventModel.scrollEvents.feedFrom(EventStreams.eventsOf(root, ScrollEvent.ANY));
-        //        eventModel.zoomEvents.feedFrom(EventStreams.eventsOf(root, ZoomEvent.ANY));
-
-        //        subscriptions.add(chartLocker.chartEvents().subscribe(change -> updateBoats()));
-        // subscriptions.add(dynamics.aisEvents.subscribe(this::updateAISInformation));
 
         initGraphics();
         registerListeners();
@@ -94,160 +68,90 @@ public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView
 
     private void initGraphics() {
 
-        if (Double.compare(S().getPrefWidth(), 0.0) <= 0
-                || Double.compare(S().getPrefHeight(), 0.0) <= 0
-                || Double.compare(S().getWidth(), 0.0) <= 0
-                || Double.compare(S().getHeight(), 0.0) <= 0) {
-            if (S().getPrefWidth() > 0 && S().getPrefHeight() > 0) {
-                S().setPrefSize(S().getPrefWidth(), S().getPrefHeight());
+        if (Double.compare(control.getPrefWidth(), 0.0) <= 0
+                || Double.compare(control.getPrefHeight(), 0.0) <= 0
+                || Double.compare(control.getWidth(), 0.0) <= 0
+                || Double.compare(control.getHeight(), 0.0) <= 0) {
+            if (control.getPrefWidth() > 0 && control.getPrefHeight() > 0) {
+                control.setPrefSize(control.getPrefWidth(), control.getPrefHeight());
             } else {
-                S().setPrefSize(PREFERRED_WIDTH, PREFERRED_HEIGHT);
+                control.setPrefSize(PREFERRED_WIDTH, PREFERRED_HEIGHT);
             }
         }
 
-        var root = makeRoot();
+        var root = createRoot();
 
-        mapSurface = new SingleCanvasShapeMapView<>(viewModel, Color.LIGHTGREY);
+        mapView = new SingleCanvasShapeMapView<>(chart, Color.LIGHTGREY);
 
-        var surfaceDragEventsPane = new Pane();
-        // iconsSurface = makeIconsSurface();
-        var quiltingSurface = makeQuiltingSurface();
-        coordinateGrid = coordinateGrid(unitProfile);
-        // aisPane = makeDynamicsSurface();
+        var quiltingOverlayView = createQuiltingOverlayView();
+        coordinateGrid = createCoordinateGrid(unitProfile);
 
-        root.getChildren()
-                .addAll(surfaceDragEventsPane, mapSurface, quiltingSurface, coordinateGrid); // ,
-        // iconsSurface,
-        // //
-        // aisPane);
-
+        root.getChildren().addAll(mapView, quiltingOverlayView, coordinateGrid); // ,
         getChildren().addAll(root);
     }
 
-    @SuppressWarnings("CallToPrintStackTrace")
     private void registerListeners() {
 
-        //  chart  re-positioning
-        FXUtils.addDoubleClickHandler(
-                mapSurface,
-                event -> {
-                    try {
-                        viewModel.positionAt(event.getX(), event.getY());
-                    } catch (TransformException | NonInvertibleTransformException ex) {
-                        ex.printStackTrace();
-                    }
-                });
+        //  chart zoom drag, panning and re-positioning support
+        DragPanZoomSupport.addZoomSupport(mapView, chart);
+        DragPanZoomSupport.addDragSupport(mapView, chart);
+        DragPanZoomSupport.addPanningSupport(mapView, chart);
+        DragPanZoomSupport.addPositionAtSupport(mapView, chart);
 
-        //  chart zooming
-        FXUtils.addZoomHandler(
-                mapSurface,
-                event -> {
-                    // not sure what NaN means -- something to do with Zoom start/finish
-                    if (!Double.isNaN(event.getZoomFactor())) {
-                        viewModel.changeZoomByFactor(event.getZoomFactor());
-                    }
-                });
-
-        //  chart dragging
-        FXUtils.addDragHandler(
-                mapSurface,
-                (event, dragState) -> {
-                    var difX = event.getX() - dragState.startX;
-                    var difY = event.getY() - dragState.startY;
-                    dragState.startX = event.getX();
-                    dragState.startY = event.getY();
-                    var newPos = new Point2D(difX, difY);
-                    try {
-                        var result = viewModel.viewPortScreenToWorld().transform(newPos);
-                        var newVPBounds = new ReferencedEnvelope(viewModel.viewPortBounds());
-                        newVPBounds.translate(
-                                newVPBounds.getMinimum(0) - result.getX(),
-                                newVPBounds.getMaximum(1) - result.getY());
-
-                        viewModel.setViewPortBounds(newVPBounds);
-                    } catch (TransformException | NonInvertibleTransformException ex) {
-                        ex.printStackTrace();
-                    }
-                });
-
+        //  map context menu
         FXUtils.addContextMenuHandler(
-                mapSurface,
+                mapView,
                 event ->
-                        makeContextMenu(event)
-                                .show(mapSurface, event.getScreenX(), event.getScreenY()));
+                        createContextMenu(event)
+                                .show(mapView, event.getScreenX(), event.getScreenY()));
 
-        //  listeners that don't depend on the chart
-        unitProfile.unitChangeEvents().subscribe(_ -> mapSurface.requestLayout());
-
-        //        subscriptions.addAll(DragPanZoomSupport.addPanningSupport(eventModel, viewModel));
+        unitProfile.unitChangeEvents().subscribe(_ -> mapView.requestLayout());
+        chart.layerVisibilityEvent().subscribe(_ -> mapView.requestLayout());
 
         displayOptions.showGridEvents.subscribe(c -> coordinateGrid.setVisible(c.getNewValue()));
 
-        for (var map : viewModel.maps()) {
+        for (var map : chart.maps()) {
             displayOptions.showLightsEvents.subscribe(
-                    change -> map.layer(S57.OC_LIGHTS).setVisible(change.getNewValue()));
+                    change ->
+                            chart.setLayerVisible(map.layer(S57.OC_LIGHTS), change.getNewValue()));
             displayOptions.showPlatformEvents.subscribe(
-                    change -> map.layer(S57.OC_OFSPLF).setVisible(change.getNewValue()));
+                    change ->
+                            chart.setLayerVisible(map.layer(S57.OC_OFSPLF), change.getNewValue()));
             displayOptions.showWreckEvents.subscribe(
-                    change -> map.layer(S57.OC_WRECKS).setVisible(change.getNewValue()));
+                    change ->
+                            chart.setLayerVisible(map.layer(S57.OC_WRECKS), change.getNewValue()));
             displayOptions.showSoundingsEvents.subscribe(
-                    change -> map.layer(S57.OC_SOUNDG).setVisible(change.getNewValue()));
+                    change ->
+                            chart.setLayerVisible(map.layer(S57.OC_SOUNDG), change.getNewValue()));
         }
-
-        viewModel.layerVisibilityEvent().subscribe(_ -> mapSurface.requestLayout());
-
-        // subscriptions.add(chart.viewPortBoundsEvent.subscribe(change ->
-        // updateBoats()));
     }
 
-    private StackPane makeRoot() {
+    private StackPane createRoot() {
+
         return new StackPane() {
 
             @Override
             public void layoutChildren() {
                 System.out.println("Skin layout children : " + getWidth() + " : " + getHeight());
-                //                try {
-                // set the screen area of the viewport before laying out the children
-                viewModel.setViewPortScreenArea(new Rectangle2D(0, 0, getWidth(), getHeight()));
-                //                } catch (TransformException | NonInvertibleTransformException ex)
-                // {
-                //
-                // Logger.getLogger(ChartViewSkin.class.getName()).log(Level.SEVERE, null, ex);
-                //                }
-
+                // TODO -- is this sane? set the screen area of the viewport before laying out the
+                // children
+                chart.setViewPortScreenArea(new Rectangle2D(0, 0, getWidth(), getHeight()));
                 super.layoutChildren();
             }
         };
     }
 
-    private Pane coordinateGrid(UnitProfile unitProfile) {
-        var grid = resizeable(new CoordinateGrid(chartLocker, viewModel, unitProfile));
+    private Pane createCoordinateGrid(UnitProfile unitProfile) {
+        var grid = resizeable(new CoordinateGrid(chartLocker, chart, unitProfile));
         grid.setPickOnBounds(false);
         grid.setMouseTransparent(true);
         return grid;
     }
 
-    private Pane makeQuiltingSurface() {
-        var theSurface = new QuiltOverlayView(viewModel);
-        theSurface.setPickOnBounds(false);
-        return theSurface;
-    }
-
-    /**
-     * Create a single canvas shape map view and add dragging, zooming etc support
-     *
-     * @return the shape map view
-     */
-    private Pane makeDynamicsSurface() {
-        var pane = new Pane();
-        pane.setPickOnBounds(false);
-        pane.widthProperty().addListener(cl -> updateBoats());
-        pane.heightProperty().addListener(cl -> updateBoats());
-        return pane;
-    }
-
-    private Pane makeIconsSurface() {
-        return new IconSurface(viewModel);
+    private Pane createQuiltingOverlayView() {
+        var overlayView = new QuiltOverlayView(chart);
+        overlayView.setPickOnBounds(false);
+        return overlayView;
     }
 
     private void showInfo(MouseEvent event) {
@@ -300,99 +204,109 @@ public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView
 
         ReferencedEnvelope envelope;
         try {
-            envelope = viewModel.tinyPolygon(event.getX(), event.getY());
+            var tx = new Transformation(chart.viewPortScreenToWorld());
+            tx.apply(event.getX(), event.getY());
+            chart.loadMostDetailedChart(
+                    Constants.GEOMETRY_FACTORY.createPoint(new Coordinate(tx.getX(), tx.getY())));
         } catch (TransformException | NonInvertibleTransformException ex) {
             ex.printStackTrace();
             return;
         }
+        //
+        //        ENCCell mostDetailed = null;
+        //        var smallestScale = Integer.MAX_VALUE;
+        //
+        //        for (var cell : chartLocker.intersections(envelope)) {
+        //            if (cell.cScale() < smallestScale) {
+        //                smallestScale = cell.cScale();
+        //                mostDetailed = cell;
+        //            }
+        //        }
+        //
+        //        if (mostDetailed != null) {
 
-        ENCCell mostDetailed = null;
-        var smallestScale = Integer.MAX_VALUE;
-
-        for (var cell : chartLocker.intersections(envelope)) {
-            if (cell.cScale() < smallestScale) {
-                smallestScale = cell.cScale();
-                mostDetailed = cell;
-            }
-        }
-
-        if (mostDetailed != null) {
-            viewModel.loadNewChart(mostDetailed);
-        }
     }
 
-    private ContextMenu makeContextMenu(MouseEvent mouseEvent) {
-        var contextMenu = new ContextMenu();
-        var maxDetail = new MenuItem("Max Detail Here");
-        var whatsHere = new MenuItem("What's here");
+    private ContextMenu createContextMenu(MouseEvent mouseEvent) {
 
+        var contextMenu = new ContextMenu();
+
+        var maxDetail = new MenuItem("Max Detail Here");
         maxDetail.setOnAction(_ -> showMaxDetail(mouseEvent));
-        whatsHere.setOnAction((ActionEvent event) -> showInfo(mouseEvent));
+
+        var whatsHere = new MenuItem("What's here");
+        whatsHere.setOnAction(_ -> showInfo(mouseEvent));
 
         contextMenu.getItems().addAll(maxDetail, whatsHere);
         return contextMenu;
     }
-
-    private ChartView S() {
-        return getSkinnable();
-    }
-
-    private void updateAISInformation(AISEvent event) {
-        var asInfo = event.aisInformation();
-        var id = asInfo.getId();
-        if (!boats.containsKey(id)) {
-            var newBoat = Fonts.boat();
-            boats.put(id, Pair.of(asInfo, newBoat));
-            setBoatPosition(newBoat, asInfo);
-            // later(() -> aisPane.getChildren().add(newBoat));
-        } else {
-            var boat = boats.get(id).getRight();
-            boats.put(id, Pair.of(asInfo, boat));
-            setBoatPosition(boat, asInfo);
-        }
-    }
-
-    @SuppressWarnings("CallToPrintStackTrace")
-    private void setBoatPosition(Glyph boat, AISInformation aisInfo) {
-        // need to clip the position?
-        Transformation tx;
-        try {
-            tx = new Transformation(viewModel.viewPortWorldToScreen());
-        } catch (TransformException | NonInvertibleTransformException ex) {
-            ex.printStackTrace();
-            return;
-        }
-        tx.apply(aisInfo.getPosition().x, aisInfo.getPosition().y);
-        boat.setTranslateX(tx.getX());
-        boat.setTranslateY(tx.getY());
-    }
-
-    private void updateBoats() {
-        for (var boat : boats.values()) {
-            setBoatPosition(boat.getRight(), boat.getLeft());
-        }
-    }
-
-    @SuppressWarnings("CallToPrintStackTrace")
-    private void doDrag(MouseEvent event, DragState dragState) {
-        var difX = event.getX() - dragState.startX;
-        var difY = event.getY() - dragState.startY;
-        dragState.startX = event.getX();
-        dragState.startY = event.getY();
-        var newPos = new Point2D(difX, difY);
-        Point2D result;
-        try {
-            result = viewModel.viewPortScreenToWorld().transform(newPos);
-        } catch (TransformException | NonInvertibleTransformException ex) {
-            ex.printStackTrace();
-            return;
-        }
-
-        var newVPBounds = new ReferencedEnvelope(viewModel.viewPortBounds());
-        newVPBounds.translate(
-                newVPBounds.getMinimum(0) - result.getX(),
-                newVPBounds.getMaximum(1) - result.getY());
-
-        viewModel.setViewPortBounds(newVPBounds);
-    }
 }
+
+//  old stuff
+
+    // private final Pane aisPane;
+    // private final AISModel dynamics;
+
+    // boat glyphs
+//    private final Map<Long, Pair<AISInformation, Glyph>> boats = new HashMap<>();
+
+        //        subscriptions.add(chartLocker.chartEvents().subscribe(change -> updateBoats()));
+        // subscriptions.add(dynamics.aisEvents.subscribe(this::updateAISInformation));
+
+//
+//    private void updateAISInformation(AISEvent event) {
+//        var asInfo = event.aisInformation();
+//        var id = asInfo.getId();
+//        if (!boats.containsKey(id)) {
+//            var newBoat = Fonts.boat();
+//            boats.put(id, Pair.of(asInfo, newBoat));
+//            setBoatPosition(newBoat, asInfo);
+//            // later(() -> aisPane.getChildren().add(newBoat));
+//        } else {
+//            var boat = boats.get(id).getRight();
+//            boats.put(id, Pair.of(asInfo, boat));
+//            setBoatPosition(boat, asInfo);
+//        }
+//    }
+//
+//    @SuppressWarnings("CallToPrintStackTrace")
+//    private void setBoatPosition(Glyph boat, AISInformation aisInfo) {
+//        // need to clip the position?
+//        Transformation tx;
+//        try {
+//            tx = new Transformation(chart.viewPortWorldToScreen());
+//        } catch (TransformException | NonInvertibleTransformException ex) {
+//            ex.printStackTrace();
+//            return;
+//        }
+//        tx.apply(aisInfo.getPosition().x, aisInfo.getPosition().y);
+//        boat.setTranslateX(tx.getX());
+//        boat.setTranslateY(tx.getY());
+//    }
+//
+//    private void updateBoats() {
+//        for (var boat : boats.values()) {
+//            setBoatPosition(boat.getRight(), boat.getLeft());
+//        }
+//    }
+//
+//    private Pane makeDynamicsSurface() {
+//        var pane = new Pane();
+//        pane.setPickOnBounds(false);
+//        pane.widthProperty().addListener(cl -> updateBoats());
+//        pane.heightProperty().addListener(cl -> updateBoats());
+//        return pane;
+//    }
+//
+//    private Pane makeIconsSurface() {
+//        return new IconSurface(chart);
+//    }
+
+        // subscriptions.add(chart.viewPortBoundsEvent.subscribe(change ->
+        // updateBoats()));
+
+        // this.dynamics = dynamics;
+    // private final Pane iconsSurface;
+        //        var surfaceDragEventsPane = new Pane();
+        // iconsSurface = makeIconsSurface();
+             // aisPane = makeDynamicsSurface();

@@ -48,7 +48,13 @@ public class SingleCanvasShapeMapView<S, F> extends Region {
 
     private void registerListeners() {
         viewModel.viewPortBoundsEvent().subscribe(_ -> requestLayout());
-        viewModel.quiltChangeEvent().subscribe(_ -> requestLayout());
+        viewModel
+                .quiltChangeEvent()
+                .subscribe(
+                        _ -> {
+                            System.out.println("change event " + viewModel.viewPortBounds());
+                            requestLayout();
+                        });
         viewModel.layerVisibilityEvent().subscribe(_ -> requestLayout());
     }
 

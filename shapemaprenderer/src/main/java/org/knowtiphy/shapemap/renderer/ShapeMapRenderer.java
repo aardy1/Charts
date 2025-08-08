@@ -8,12 +8,13 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.transform.Affine;
 import org.knowtiphy.shapemap.api.RenderingContext;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.Rule;
-import org.locationtech.jts.index.quadtree.Quadtree;
 
 /**
  * @author graham
  */
-public class ShapeMapRenderer<S, F> {
+public class ShapeMapRenderer<S, F, G> {
+
+    private int featureCount = 0;
 
     private final RenderingContext<S, F> renderingContext;
 
@@ -25,9 +26,11 @@ public class ShapeMapRenderer<S, F> {
     }
 
     public void paint() {
+
+        featureCount = 0;
         var start = System.currentTimeMillis();
 
-        var index = new Quadtree();
+        //        var index = new Quadtree();
 
         var graphicsRenderingContext =
                 new GraphicsRenderingContext<>(
@@ -36,7 +39,7 @@ public class ShapeMapRenderer<S, F> {
                         new Transformation(renderingContext.worldToScreen()),
                         onePixelX(renderingContext.screenToWorld()),
                         onePixelY(renderingContext.screenToWorld()),
-                        index,
+                        //                        index,
                         renderingContext.viewPortBounds());
 
         try {
@@ -66,6 +69,8 @@ public class ShapeMapRenderer<S, F> {
             System.err.println("Rendering exception");
             ex.printStackTrace(System.err);
         }
+
+        System.err.println("Total features " + featureCount);
     }
 
     private void renderGraphics(
@@ -91,6 +96,7 @@ public class ShapeMapRenderer<S, F> {
                                         renderingContext.displayScale(),
                                         layer.isScaleLess())) {
                     for (var feature : iterator) {
+                        featureCount++;
                         //                        var feature = iterator.next();
                         layerNeedsTextLayout[layerPos] |=
                                 applyStyle(style, context, feature, appliedRule, rulePos);

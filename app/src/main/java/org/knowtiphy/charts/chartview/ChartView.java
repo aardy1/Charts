@@ -14,7 +14,7 @@ import org.knowtiphy.charts.dynamics.AISModel;
 import org.knowtiphy.charts.settings.UnitProfile;
 import org.knowtiphy.shapemap.context.SVGCache;
 
-/** A control to show ENC quilts. */
+/** A control to show ENC charts and quilts of charts. */
 public class ChartView extends Control {
 
     public enum SkinType {
@@ -46,8 +46,6 @@ public class ChartView extends Control {
 
     private final MapDisplayOptions displayOptions;
 
-    private final SVGCache svgCache;
-
     public ChartView(
             ChartLocker chartLocker,
             ChartViewModel chart,
@@ -72,7 +70,6 @@ public class ChartView extends Control {
         this.dynamics = dynamics;
         this.unitProfile = unitProfile;
         this.displayOptions = displayOptions;
-        this.svgCache = svgCache;
 
         this.skinType = skinType;
         getStyleClass().add("chartview");
@@ -88,8 +85,7 @@ public class ChartView extends Control {
 
     @Override
     protected Skin createDefaultSkin() {
-        return new ChartViewSkin(
-                this, chartLocker, chart, dynamics, unitProfile, displayOptions, svgCache);
+        return new ChartViewSkin(this, chartLocker, chart, dynamics, unitProfile, displayOptions);
     }
 
     @Override

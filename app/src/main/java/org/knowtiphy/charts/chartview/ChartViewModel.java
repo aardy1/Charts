@@ -13,10 +13,12 @@ import org.geotools.api.feature.simple.SimpleFeatureType;
 import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.api.referencing.operation.TransformException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.knowtiphy.charts.DefaultTextBoundsFunction;
 import org.knowtiphy.charts.chartlocker.ChartLocker;
 import org.knowtiphy.charts.chartview.shapemapview.IShapeMapViewModel;
 import org.knowtiphy.charts.enc.ENCCell;
 import org.knowtiphy.charts.memstore.MemFeature;
+import org.knowtiphy.charts.model.MapLayer;
 import org.knowtiphy.charts.model.MapModel;
 import org.knowtiphy.charts.model.Quilt;
 import org.knowtiphy.charts.platform.IUnderlyingPlatform;
@@ -27,19 +29,21 @@ import org.knowtiphy.shapemap.api.IRenderablePolygonProvider;
 import org.knowtiphy.shapemap.api.ISVGProvider;
 import org.knowtiphy.shapemap.api.ITextBoundsFunction;
 import org.knowtiphy.shapemap.renderer.Transformation;
+import org.locationtech.jts.geom.Point;
 import org.reactfx.Change;
 import org.reactfx.EventSource;
 import org.reactfx.EventStream;
 
 /**
- * An ENC chart view model -- a quilt of ENC cells (loaded from a chart locker) and viewport related
- * stuff.
+ * An ENC chart view model -- a quilt of ENC cells (loaded from a chart locker) together with a
+ * viewport, event streams, etc.
  */
 public class ChartViewModel implements IShapeMapViewModel<SimpleFeatureType, MemFeature> {
 
     private static final double DEFAULT_WIDTH = 3;
 
     private static final double DEFAULT_HEIGHT = 3;
+
     //  on zoom in change the view port to be smaller by this factor
     private static final double ZOOM_FACTOR_MULTIPLIER = 0.8;
 
@@ -54,13 +58,11 @@ public class ChartViewModel implements IShapeMapViewModel<SimpleFeatureType, Mem
     private final IFeatureAdapter<MemFeature> featureAdapter;
     private final IRenderablePolygonProvider renderablePolygonProvider;
     private final ISVGProvider svgProvider;
-    private final ITextBoundsFunction textBoundsFunction;
+    //    private final ITextBoundsFunction textBoundsFunction;
 
     private final EventSource<Change<Quilt<SimpleFeatureType, MemFeature>>> quiltChangeEvent;
     private final EventSource<Change<ReferencedEnvelope>> viewPortBoundsEvent;
-
     private final EventStream<Change<Rectangle2D>> viewPortScreenAreaEvent;
-
     private final EventSource<Change<Boolean>> layerVisibilityEvent;
 
     public ChartViewModel(
@@ -72,8 +74,9 @@ public class ChartViewModel implements IShapeMapViewModel<SimpleFeatureType, Mem
             IUnderlyingPlatform platform,
             IFeatureAdapter<MemFeature> featureAdapter,
             IRenderablePolygonProvider renderablePolygonProvider,
-            ISVGProvider svgProvider,
-            ITextBoundsFunction textBoundsFunction) {
+            ISVGProvider svgProvider
+            //            ITextBoundsFunction textBoundsFunction
+            ) {
 
         this.quilt = quilt;
         this.viewPort = viewPort;
@@ -84,7 +87,7 @@ public class ChartViewModel implements IShapeMapViewModel<SimpleFeatureType, Mem
         this.featureAdapter = featureAdapter;
         this.renderablePolygonProvider = renderablePolygonProvider;
         this.svgProvider = svgProvider;
-        this.textBoundsFunction = textBoundsFunction;
+        //        this.textBoundsFunction = textBoundsFunction;
 
         quiltChangeEvent = new EventSource<>();
         viewPortBoundsEvent = new EventSource<>();
@@ -105,7 +108,7 @@ public class ChartViewModel implements IShapeMapViewModel<SimpleFeatureType, Mem
 
     @Override
     public ReferencedEnvelope viewPortBounds() {
-        return viewPort.bounds();
+        return viewPort.getBounds();
     }
 
     //  SCAMIN and cScale are based on some 22inch screen so adjust
@@ -114,24 +117,25 @@ public class ChartViewModel implements IShapeMapViewModel<SimpleFeatureType, Mem
     public double adjustedDisplayScale() {
         var swIn = platform.screenDimensions().getWidth() / platform.ppi();
         var adjustment = swIn / 22;
-        return (dScale() * adjustment);
+        return dScale() / 3; // * adjustment;
     }
 
-    public double dScale() {
-        return viewPort.dScale();
+    @Override
+    public Affine viewPortScreenToWorld()
+            throws TransformException, NonInvertibleTransformException {
+        return viewPort.getScreenToWorld();
     }
 
-    public void changeZoomByFactor(double setZoomFactor) {
-        var oldBounds = viewPort.setZoom(setZoomFactor);
-        updateQuilt(oldBounds);
+    @Override
+    public Affine viewPortWorldToScreen()
+            throws TransformException, NonInvertibleTransformException {
+        return viewPort.getWorldToScreen();
     }
 
-    public void incZoom() {
-        changeZoomByFactor(ZOOM_FACTOR_MULTIPLIER);
-    }
-
-    public void decZoom() {
-        changeZoomByFactor(1 / ZOOM_FACTOR_MULTIPLIER);
+    //  do we need this -- surely the screen area is computed by the widgets?
+    @Override
+    public Rectangle2D viewPortScreenArea() {
+        return viewPort.getScreenArea();
     }
 
     @Override
@@ -139,15 +143,12 @@ public class ChartViewModel implements IShapeMapViewModel<SimpleFeatureType, Mem
         return quiltChangeEvent;
     }
 
-    public void calculateTransforms() throws TransformException, NonInvertibleTransformException {
-        viewPort.calculateTransforms();
-    }
-
     @Override
     public EventStream<Change<ReferencedEnvelope>> viewPortBoundsEvent() {
         return viewPortBoundsEvent;
     }
 
+    @Override
     public EventStream<Change<Rectangle2D>> viewPortScreenAreaEvent() {
         return viewPortScreenAreaEvent;
     }
@@ -174,7 +175,19 @@ public class ChartViewModel implements IShapeMapViewModel<SimpleFeatureType, Mem
 
     @Override
     public ITextBoundsFunction textSizeProvider() {
-        return textBoundsFunction;
+        return new DefaultTextBoundsFunction();
+    }
+
+    public AppSettings getAppSettings() {
+        return appSettings;
+    }
+
+    public MapDisplayOptions getMapDisplayOptions() {
+        return mapDisplayOptions;
+    }
+
+    public EventSource<Change<Boolean>> getLayerVisibilityEvent() {
+        return layerVisibilityEvent;
     }
 
     @Override
@@ -193,6 +206,23 @@ public class ChartViewModel implements IShapeMapViewModel<SimpleFeatureType, Mem
         }
 
         return result;
+    }
+
+    public double dScale() {
+        return viewPort.dScale();
+    }
+
+    public void changeZoomByFactor(double zoomFactor) {
+        viewPort.zoomBy(zoomFactor);
+        recomputeQuilt();
+    }
+
+    public void incZoom() {
+        changeZoomByFactor(ZOOM_FACTOR_MULTIPLIER);
+    }
+
+    public void decZoom() {
+        changeZoomByFactor(1 / ZOOM_FACTOR_MULTIPLIER);
     }
 
     public boolean isQuilt() {
@@ -216,69 +246,24 @@ public class ChartViewModel implements IShapeMapViewModel<SimpleFeatureType, Mem
 
     public void setViewPortBounds(ReferencedEnvelope newBounds) {
 
-        var oldBounds = viewPort.setBounds(newBounds);
-        updateQuilt(oldBounds);
-
-        //
-        //        if (isQuilt()) {
-        //            //  when the viewport bounds change we have to recompute the quilt
-        //            var newQuilt =
-        //                    chartLocker.loadQuilt(
-        //                            bounds, adjustedDisplayScale(), appSettings,
-        // mapDisplayOptions);
-        //            System.err.println("--------------------");
-        //            System.err.println("VP bounds change");
-        //            System.err.println("quilt size = " + newQuilt.maps().size());
-        //            System.err.println("old bounds = " + oldBounds);
-        //            System.err.println("new bounds = " + bounds);
-        //            System.err.println("adjusted display scale = " + adjustedDisplayScale());
-        //            for (var map : newQuilt.maps()) {
-        //                System.err.println("\tmap " + map.title() + " scale " + map.cScale());
-        //            }
-        //            setQuilt(newQuilt);
-        //        } else {
-        //            viewPortBoundsEvent.push(new Change<>(oldBounds, bounds));
-        //        }
-    }
-
-    private void updateQuilt(ReferencedEnvelope oldBounds) {
-
-        //  when the viewport bounds change we have to recompute the quilt
-        var newQuilt =
-                chartLocker.loadQuilt(
-                        viewPortBounds(), adjustedDisplayScale(), appSettings, mapDisplayOptions);
-        //        System.err.println("--------------------");
-        //        System.err.println("VP bounds change");
-        //        System.err.println("quilt size = " + newQuilt.maps().size());
-        //        System.err.println("old bounds = " + oldBounds);
-        //        System.err.println("new bounds = " + viewPort.bounds());Ca
-        //        System.err.println("adjusted display scale = " + adjustedDisplayScale());
-        //        for (var map : newQuilt.maps()) {
-        //            System.err.println("\tmap " + map.title() + " scale " + map.cScale());
-        //        }
-        setQuilt(newQuilt);
-    }
-
-    public Affine viewPortScreenToWorld()
-            throws TransformException, NonInvertibleTransformException {
-        return viewPort.screenToWorld();
-    }
-
-    public Affine viewPortWorldToScreen()
-            throws TransformException, NonInvertibleTransformException {
-        return viewPort.worldToScreen();
-    }
-
-    //  do we need this -- surely the screen area is computed by the widgets?
-    public Rectangle2D viewPortScreenArea() {
-        return viewPort.screenArea();
+        viewPort.setBounds(newBounds);
+        //  only need to do this if the viewport bounds have actually changed
+        recomputeQuilt();
     }
 
     public void setViewPortScreenArea(Rectangle2D screenArea) {
         viewPort.setScreenArea(screenArea);
     }
 
-    // need to make this adaptive -- like 1/2 the maxX
+    public void setLayerVisible(MapLayer<SimpleFeatureType, MemFeature> layer, boolean newValue) {
+        if (newValue != layer.isVisible()) {
+            var oldValue = layer.isVisible();
+            layer.setVisible(newValue);
+            layerVisibilityEvent.push(new Change<>(oldValue, layer.isVisible()));
+        }
+    }
+
+    // need to make this adaptive --  like 1/2 the maxX
     public void positionAt(double x, double y)
             throws TransformException, NonInvertibleTransformException {
 
@@ -305,10 +290,17 @@ public class ChartViewModel implements IShapeMapViewModel<SimpleFeatureType, Mem
     }
 
     public void loadNewChart(ENCCell cell) {
-        var quilt =
+        System.out.println("load new chart");
+        setQuilt(
                 chartLocker.loadQuilt(
-                        viewPortBounds(), adjustedDisplayScale(), appSettings, mapDisplayOptions);
-        setQuilt(quilt);
+                        cell.bounds(), adjustedDisplayScale(), appSettings, mapDisplayOptions));
+    }
+
+    public void loadMostDetailedChart(Point point) {
+        System.out.println("load most detailed chart : " + point);
+        setQuilt(
+                chartLocker.loadMostDetailedQuilt(
+                        point, adjustedDisplayScale(), getAppSettings(), getMapDisplayOptions()));
     }
 
     public ReferencedEnvelope tinyPolygon(double x, double y, int radius)
@@ -345,11 +337,31 @@ public class ChartViewModel implements IShapeMapViewModel<SimpleFeatureType, Mem
         if (newQuilt.maps().isEmpty()) return;
         var oldQuilt = quilt;
         quilt = newQuilt;
+        //        viewPort.setBounds(quilt.bounds());
+        System.out.println("SwtQuilt : " + viewPortBounds());
         quiltChangeEvent.push(new Change<>(oldQuilt, newQuilt));
     }
-}
 
-    //  public double zoomFactor()
-    //  {
-    //    return bounds().getWidth() / (viewPortBounds().getWidth());
-    //  }
+    //  when the viewport bounds change we have to recompute the quilt
+    private void recomputeQuilt() {
+
+        //  adjustscale will be correct since its based on the viewport bounds which have already
+        // changed
+        var newQuilt =
+                chartLocker.loadQuilt(
+                        viewPort.getBounds(),
+                        adjustedDisplayScale(),
+                        appSettings,
+                        mapDisplayOptions);
+        System.err.println("--------------------");
+        System.err.println("VP bounds change");
+        System.err.println("quilt size = " + newQuilt.maps().size());
+        //        System.err.println("old bounds = " + oldBounds);
+        System.err.println("new bounds = " + viewPort.getBounds());
+        System.err.println("adjusted display scale = " + adjustedDisplayScale());
+        for (var map : newQuilt.maps()) {
+            System.err.println("\tmap " + map.title() + " scale " + map.cScale());
+        }
+        setQuilt(newQuilt);
+    }
+}

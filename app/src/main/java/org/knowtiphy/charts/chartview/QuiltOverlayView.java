@@ -95,7 +95,6 @@ public class QuiltOverlayView extends StackPane {
 
         Transformation tx;
         try {
-            viewModel.calculateTransforms();
             tx = new Transformation(viewModel.viewPortWorldToScreen());
         } catch (TransformException | NonInvertibleTransformException ex) {
             ex.printStackTrace();

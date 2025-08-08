@@ -10,7 +10,7 @@ import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 /** Base class for desktop platforms. */
-public abstract class DesktopPlatform extends BaseUnderlyingPlatform {
+public abstract class DesktopPlatform extends UnderlyingPlatform {
 
     DesktopPlatform() {
         super(Paths.get(System.getProperty("user.home"), "Documents", "Knowtiphy Charts"));

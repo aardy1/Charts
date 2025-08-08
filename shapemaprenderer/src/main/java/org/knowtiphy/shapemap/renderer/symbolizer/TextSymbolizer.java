@@ -95,7 +95,7 @@ public class TextSymbolizer<S, F> {
             if (!StringUtils.isBlank(text)) {
                 var graphicsContext = context.graphicsContext();
                 var tx = context.worldToScreen();
-                var blocked = context.blocked();
+                //                var blocked = context.blocked();
 
                 tx.apply(point.getX(), point.getY());
                 // TODO -- this is wrong since it supposed to be from the bounding box
@@ -112,8 +112,8 @@ public class TextSymbolizer<S, F> {
                                         ? 0
                                         : labelPlacement.pointPlacement().getDisplacementY());
 
-                var textDimensions =
-                        context.renderingContext().textSizeProvider().apply(font, text);
+                var textDude = context.renderingContext().textSizeProvider();
+                var textDimensions = textDude.getSize(font, text);
                 var textBounds =
                         new ReferencedEnvelope(
                                 x,
@@ -122,7 +122,7 @@ public class TextSymbolizer<S, F> {
                                 y + textDimensions.getHeight(),
                                 DefaultEngineeringCRS.CARTESIAN_2D);
 
-                if (!overlaps(textBounds, blocked)) {
+                if (!textDude.overlaps(textBounds)) {
 
                     if (fillInfo != null) {
                         graphicsContext.fillText(text, x, y);
@@ -133,7 +133,7 @@ public class TextSymbolizer<S, F> {
                     }
 
                     // TODO -- set bounds from greater of fill or stroke
-                    blocked.insert(textBounds, textBounds);
+                    textDude.insert(textBounds, textBounds);
                 }
             }
         }
@@ -154,7 +154,7 @@ public class TextSymbolizer<S, F> {
     private boolean overlaps(ReferencedEnvelope bounds, Quadtree index) {
         for (var box : index.query(bounds)) {
             if (((BoundingBox) box).intersects(bounds)) {
-                // System.err.println("Real intersection");
+                //                System.err.println(" Real intersection");
                 return true;
             }
         }

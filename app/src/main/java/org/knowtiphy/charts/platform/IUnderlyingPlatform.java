@@ -5,6 +5,7 @@
 
 package org.knowtiphy.charts.platform;
 
+import java.io.InputStream;
 import java.nio.file.Path;
 import javafx.geometry.Rectangle2D;
 import javafx.stage.Stage;
@@ -15,6 +16,8 @@ public interface IUnderlyingPlatform {
     void setStageTitle(Stage stage, String title);
 
     void setWindowIcons(Stage stage, Class<?> cls);
+
+    void setDockIcon(Stage stage, InputStream iconStream);
 
     Path rootDir();
 

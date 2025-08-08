@@ -31,6 +31,7 @@ public record ENCCell(
         return panels.stream().anyMatch(p -> p.intersects(envelope));
     }
 
+    //  should cache this?
     public ReferencedEnvelope bounds() {
         var minX = Double.POSITIVE_INFINITY;
         var minY = Double.POSITIVE_INFINITY;

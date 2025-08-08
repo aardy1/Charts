@@ -12,7 +12,7 @@ import java.nio.file.Paths;
 /**
  * @author graham
  */
-public class IOS extends BaseUnderlyingPlatform implements IUnderlyingPlatform {
+public class IOS extends UnderlyingPlatform implements IUnderlyingPlatform {
 
     public IOS() {
         super(Paths.get(System.getProperty("user.home"))); // , "Documents", "Knowtiphy

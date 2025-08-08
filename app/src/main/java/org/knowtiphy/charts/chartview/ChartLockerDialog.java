@@ -18,6 +18,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.ToolBar;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
@@ -33,9 +34,9 @@ import org.knowtiphy.charts.chartlocker.ChartLocker;
 import org.knowtiphy.charts.chartlocker.ENCChartDownloadNotifier;
 import static org.knowtiphy.charts.chartview.AvailableCatalogs.BUILTIN_CATALOGS;
 import org.knowtiphy.charts.enc.ENCCell;
+import org.knowtiphy.charts.utils.FXUtils;
 import static org.knowtiphy.charts.utils.FXUtils.alwaysGrow;
 import static org.knowtiphy.charts.utils.FXUtils.neverGrow;
-import org.knowtiphy.shapemap.context.SVGCache;
 
 public class ChartLockerDialog {
 
@@ -44,29 +45,30 @@ public class ChartLockerDialog {
 
     private final Stage parent;
 
+    private final ChartViewModel chart;
+
     private final ChartLocker chartLocker;
 
     private final MapDisplayOptions mapDisplayOptions;
 
-    private final SVGCache svgCache;
-
     public ChartLockerDialog(
             Stage parent,
             ChartLocker chartLocker,
-            MapDisplayOptions mapDisplayOptions,
-            SVGCache svgCache) {
+            ChartViewModel chart,
+            MapDisplayOptions mapDisplayOptions) {
 
         this.parent = parent;
+        this.chart = chart;
         this.chartLocker = chartLocker;
         this.mapDisplayOptions = mapDisplayOptions;
-        this.svgCache = svgCache;
     }
 
     public Stage create(int width, int height) {
+
         var stage = new Stage();
 
         var availableCharts = availableCharts();
-        var content = content(availableCharts);
+        var content = createContent(availableCharts);
 
         var loadedB =
                 button(
@@ -102,7 +104,7 @@ public class ChartLockerDialog {
         return stage;
     }
 
-    private BorderPane content(Node initialContent) {
+    private BorderPane createContent(Node initialContent) {
         var content = new BorderPane();
         content.getStyleClass().add("content");
         content.setCenter(initialContent);
@@ -204,17 +206,8 @@ public class ChartLockerDialog {
     }
 
     private Button showButton(ENCCell cell) {
-        var button = new Button("Show");
-        //    button.setOnAction(event -> {
-        //      try
-        //      {
-        //        var newChart = chartLocker.loadChart(cell, mapDisplayOptions, svgCache);
-        //      }
-        //      catch(Exception ex)
-        //      {
-        //        Logger.getLogger(ChartLockerDialog.class.getName()).log(Level.SEVERE, null, ex);
-        //      }
-        //    });
+        var button =
+                FXUtils.button("Show", null, _ -> chart.loadNewChart(cell), new Tooltip("FFF"));
 
         return button;
     }

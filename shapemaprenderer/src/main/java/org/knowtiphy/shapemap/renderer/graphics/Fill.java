@@ -6,6 +6,13 @@
 package org.knowtiphy.shapemap.renderer.graphics;
 
 import org.knowtiphy.shapemap.api.FeatureGeomType;
+import static org.knowtiphy.shapemap.api.FeatureGeomType.LINEAR_RING;
+import static org.knowtiphy.shapemap.api.FeatureGeomType.LINE_STRING;
+import static org.knowtiphy.shapemap.api.FeatureGeomType.MULTI_LINE_STRING;
+import static org.knowtiphy.shapemap.api.FeatureGeomType.MULTI_POINT;
+import static org.knowtiphy.shapemap.api.FeatureGeomType.MULTI_POLYGON;
+import static org.knowtiphy.shapemap.api.FeatureGeomType.POINT;
+import static org.knowtiphy.shapemap.api.FeatureGeomType.POLYGON;
 import org.knowtiphy.shapemap.renderer.GraphicsRenderingContext;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.FillInfo;
 import org.locationtech.jts.geom.Geometry;
@@ -37,22 +44,21 @@ public class Fill {
     public static void fill(GraphicsRenderingContext<?, ?> context, Geometry geom) {
 
         // TODO -- switch on strings is brain dead
-        switch (geom.getGeometryType()) {
-            case Geometry.TYPENAME_POINT -> fillPoint(context, (Point) geom);
-            case Geometry.TYPENAME_LINESTRING, Geometry.TYPENAME_LINEARRING ->
-                    fillLineString(context, (LineString) geom);
-            case Geometry.TYPENAME_POLYGON -> fillPolygon(context, (Polygon) geom);
-            case Geometry.TYPENAME_MULTIPOINT -> {
+        switch (context.renderingContext().featureAdapter().geomType(geom)) {
+            case POINT -> fillPoint(context, (Point) geom);
+            case LINE_STRING, LINEAR_RING -> fillLineString(context, (LineString) geom);
+            case POLYGON -> fillPolygon(context, (Polygon) geom);
+            case MULTI_POINT -> {
                 for (int i = 0; i < geom.getNumGeometries(); i++) {
                     fillPoint(context, (Point) geom.getGeometryN(i));
                 }
             }
-            case Geometry.TYPENAME_MULTILINESTRING -> {
+            case MULTI_LINE_STRING -> {
                 for (int i = 0; i < geom.getNumGeometries(); i++) {
                     fillLineString(context, (LineString) geom.getGeometryN(i));
                 }
             }
-            case Geometry.TYPENAME_MULTIPOLYGON -> {
+            case MULTI_POLYGON -> {
                 for (int i = 0; i < geom.getNumGeometries(); i++) {
                     fillPolygon(context, (Polygon) geom.getGeometryN(i));
                 }
@@ -134,3 +140,66 @@ public class Fill {
     // }
 
 }
+
+//
+//
+//  // TODO -- switch on strings is brain dead
+//        switch (geom.getGeometryType()) {
+//            case Geometry.TYPENAME_POINT -> fillPoint(context, (Point) geom);
+//            case Geometry.TYPENAME_LINESTRING, Geometry.TYPENAME_LINEARRING ->
+//                    fillLineString(context, (LineString) geom);
+//            case Geometry.TYPENAME_POLYGON -> fillPolygon(context, (Polygon) geom);
+//            case Geometry.TYPENAME_MULTIPOINT -> {
+//                for (int i = 0; i < geom.getNumGeometries(); i++) {
+//                    fillPoint(context, (Point) geom.getGeometryN(i));
+//                }
+//            }
+//            case Geometry.TYPENAME_MULTILINESTRING -> {
+//                for (int i = 0; i < geom.getNumGeometries(); i++) {
+//                    fillLineString(context, (LineString) geom.getGeometryN(i));
+//                }
+//            }
+//            case Geometry.TYPENAME_MULTIPOLYGON -> {
+//                for (int i = 0; i < geom.getNumGeometries(); i++) {
+//                    fillPolygon(context, (Polygon) geom.getGeometryN(i));
+//                }
+//            }
+//            default -> {
+//                for (int i = 0; i < geom.getNumGeometries(); i++) {
+//                    fill(context, geom.getGeometryN(i));
+//                } // recurse(context, geom);
+//            }
+//        }
+//    }
+//
+//    public static void fill(
+//            GraphicsRenderingContext<?, ?> context,
+//            Geometry geom,
+//            FeatureGeomType featureGeomType) {
+//
+//        switch (featureGeomType) {
+//            case POINT -> fillPoint(context, (Point) geom);
+//            case LINE_STRING, LINEAR_RING -> fillLineString(context, (LineString) geom);
+//            case POLYGON -> fillPolygon(context, (Polygon) geom);
+//            case MULTI_POINT -> {
+//                for (int i = 0; i < geom.getNumGeometries(); i++) {
+//                    fillPoint(context, (Point) geom.getGeometryN(i));
+//                }
+//            }
+//            case MULTI_LINE_STRING -> {
+//                for (int i = 0; i < geom.getNumGeometries(); i++) {
+//                    fillLineString(context, (LineString) geom.getGeometryN(i));
+//                }
+//            }
+//            case MULTI_POLYGON -> {
+//                for (int i = 0; i < geom.getNumGeometries(); i++) {
+//                    fillPolygon(context, (Polygon) geom.getGeometryN(i));
+//                }
+//            }
+//            default -> {
+//                // TODO -- recurses wrong, fix
+//                for (int i = 0; i < geom.getNumGeometries(); i++) {
+//                    fill(context, geom.getGeometryN(i));
+//                }
+//            }
+//        }

@@ -15,6 +15,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.input.ScrollEvent;
 import javafx.scene.input.ZoomEvent;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.HBox;
@@ -137,8 +138,28 @@ public class FXUtils {
         node.addEventHandler(ZoomEvent.ANY, eh);
     }
 
+    public static void addScrollHandler(Node node, BiConsumer<ScrollEvent, ScrollState> eh) {
+
+        var scrollState = new ScrollState();
+
+        node.addEventHandler(
+                ScrollEvent.SCROLL_STARTED,
+                event -> {
+                    scrollState.isTouchpad = true;
+                });
+
+        node.addEventHandler(
+                ScrollEvent.SCROLL_FINISHED,
+                event -> {
+                    scrollState.isTouchpad = false;
+                });
+
+        node.addEventHandler(ScrollEvent.SCROLL, event -> eh.accept(event, scrollState));
+    }
+
     public static void addDragHandler(Node node, BiConsumer<MouseEvent, DragState> eh) {
-        org.knowtiphy.charts.utils.DragState dragState = new DragState();
+
+        var dragState = new DragState();
 
         addMousePressedHandler(
                 node,
@@ -152,7 +173,7 @@ public class FXUtils {
 
     public static void addContextMenuHandler(Node node, EventHandler<MouseEvent> eh) {
 
-        // windows on clicked, mac on pressed
+        // TODO -- need to do this properly -- windows on clicked, mac on pressed
         node.addEventHandler(
                 MouseEvent.MOUSE_PRESSED,
                 event -> {

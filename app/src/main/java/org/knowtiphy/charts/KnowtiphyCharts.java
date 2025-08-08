@@ -107,8 +107,7 @@ public class KnowtiphyCharts extends Application {
 
         var cell = chartLocker.getCell("Gulf of Mexico", 2_160_000);
         var quilt =
-                chartLocker.loadQuilt(
-                        cell.bounds(), cell.cScale() / 2.0, appSettings, displayOptions);
+                chartLocker.loadQuilt(cell.bounds(), cell.cScale(), appSettings, displayOptions);
         // this won't be right after the info bar is done, but that will be resized later
         var viewPort =
                 new MapViewport(
@@ -124,8 +123,7 @@ public class KnowtiphyCharts extends Application {
                         platform,
                         MemFeatureAdapter.ADAPTER,
                         new RemoveHolesFromPolygon(new RenderGeomCache()),
-                        svgCache,
-                        DefaultTextBoundsFunction.FUNCTION);
+                        svgCache);
 
         var stats = new MapStats(chart.maps()).stats();
         stats.print();
@@ -136,6 +134,9 @@ public class KnowtiphyCharts extends Application {
         //  show the app
         primaryStage.sizeToScene();
         platform.setWindowIcons(primaryStage, ResourceLoader.class);
+        //        platform.setDockIcon(
+        //                primaryStage,
+        //                ResourceLoader.class.getResourceAsStream("knowtiphy_charts_icon_64.png"));
         primaryStage.show();
     }
 
@@ -171,7 +172,7 @@ public class KnowtiphyCharts extends Application {
                                 svgCache));
 
         //  the main menu bar
-        var menuBar = createMainMenuBar(primaryStage);
+        var menuBar = createMainMenuBar(primaryStage, chart);
 
         //  the main content area -- the main menu above the chart view above the info bar
         var mainContent = new VBox();
@@ -217,7 +218,7 @@ public class KnowtiphyCharts extends Application {
     }
 
     //  the main menu
-    private Menu mainMenu(Stage stage) {
+    private Menu mainMenu(Stage stage, ChartViewModel chart) {
 
         var items = new ArrayList<MenuItem>();
 
@@ -239,7 +240,7 @@ public class KnowtiphyCharts extends Application {
         var showChartLocker = new MenuItem("Chart Locker");
         showChartLocker.setOnAction(
                 _ ->
-                        new ChartLockerDialog(stage, chartLocker, displayOptions, svgCache)
+                        new ChartLockerDialog(stage, chartLocker, chart, displayOptions)
                                 .create(CHART_LOCKER_WIDTH, CHART_LOCKER_HEIGHT)
                                 .showAndWait());
         items.add(showChartLocker);
@@ -267,9 +268,9 @@ public class KnowtiphyCharts extends Application {
     }
 
     //  the main menu bar for the app
-    private MenuBar createMainMenuBar(Stage stage) {
+    private MenuBar createMainMenuBar(Stage stage, ChartViewModel chart) {
         var menuBar = systemMenuBar();
-        menuBar.getMenus().addAll(mainMenu(stage));
+        menuBar.getMenus().addAll(mainMenu(stage, chart));
         return menuBar;
     }
 

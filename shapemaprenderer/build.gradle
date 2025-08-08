@@ -7,6 +7,7 @@ repositories {
     maven { url  'https://repo.osgeo.org/repository/release/' }
     maven { url  'https://repo.osgeo.org/repository/snapshot/' }
     maven { url 'https://jitpack.io' }
+    maven { url  'https://mvnrepository.com' }
     mavenCentral()
 }
 

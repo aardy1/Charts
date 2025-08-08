@@ -61,7 +61,6 @@ public class CoordinateGrid extends Pane {
 
         Transformation wts;
         try {
-            chart.calculateTransforms();
             wts = new Transformation(chart.viewPortWorldToScreen());
         } catch (TransformException | NonInvertibleTransformException ex) {
             ex.printStackTrace();

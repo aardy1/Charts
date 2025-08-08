@@ -151,7 +151,7 @@ public class InfoBar extends StackPane {
                         Coordinates.distanceAcross(chart.viewPortBounds()),
                         unitProfile::metersToMapUnits));
         displayScale.setText("DS = " + formatDecimal(chart.dScale(), 2) + "");
-        adjustedDisplayScale.setText(chart.adjustedDisplayScale() + "");
+        adjustedDisplayScale.setText("AS = " + formatDecimal(chart.adjustedDisplayScale(), 2) + "");
         //        zoomLevel.setText(Coordinates.twoDec(chart.zoom()));
     }
 

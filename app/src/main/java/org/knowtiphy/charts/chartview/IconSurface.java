@@ -36,10 +36,10 @@ public class IconSurface extends Pane {
 
     private void setupListeners() {
         //  listeners that don't depend on the chart
-        widthProperty().addListener(x -> makeIconLayers());
-        heightProperty().addListener(x -> makeIconLayers());
-        subscriptions.add(chart.viewPortBoundsEvent().subscribe(b -> makeIconLayers()));
-        subscriptions.add(chart.layerVisibilityEvent().subscribe(b -> makeIconLayers()));
+        widthProperty().addListener(x -> requestLayout());
+        heightProperty().addListener(x -> requestLayout());
+        chart.viewPortBoundsEvent().subscribe(b -> makeIconLayers());
+        chart.layerVisibilityEvent().subscribe(b -> makeIconLayers());
     }
 
     public void makeIconLayers() {
@@ -47,7 +47,7 @@ public class IconSurface extends Pane {
         getChildren().clear();
 
         try {
-            // createIconLayer(S57.OC_CTNARE, Fonts::info, List.of(AT_INFORM), null,
+            //            createIconLayer(S57.OC_CTNARE, Fonts::info, List.of(AT_INFORM), null,
             // null);
             // createIconLayer(S57.OC_MIPARE, Fonts::jet, List.of(AT_INFORM), null, null);
             // createIconLayer(S57.OC_UNSARE, Fonts::info, List.of(AT_INFORM), null,
