@@ -43,7 +43,7 @@ public class PointSymbolizer<S, F> implements ISymbolizer<S, F> {
     }
 
     @Override
-    public void render(GraphicsRenderingContext<S, F> context, F feature) {
+    public void render(GraphicsRenderingContext<S, F, ?> context, F feature) {
 
         DrawPoint.setup(context, opacity);
         var geom = context.renderingContext().featureAdapter().defaultGeometry(feature);

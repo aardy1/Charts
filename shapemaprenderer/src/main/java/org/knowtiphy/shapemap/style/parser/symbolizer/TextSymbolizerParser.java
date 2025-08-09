@@ -5,12 +5,15 @@
 
 package org.knowtiphy.shapemap.style.parser.symbolizer;
 
+import javax.xml.stream.XMLEventReader;
+import javax.xml.stream.XMLStreamException;
 import org.knowtiphy.shapemap.api.IStyleCompiler;
 import org.knowtiphy.shapemap.renderer.Operators;
 import org.knowtiphy.shapemap.renderer.symbolizer.TextSymbolizer;
 import org.knowtiphy.shapemap.style.builder.TextSymbolizerBuilder;
 import org.knowtiphy.shapemap.style.parser.StyleSyntaxException;
 import org.knowtiphy.shapemap.style.parser.Utils;
+import static org.knowtiphy.shapemap.style.parser.Utils.normalize;
 import org.knowtiphy.shapemap.style.parser.VendorOptionParser;
 import org.knowtiphy.shapemap.style.parser.XML;
 import org.knowtiphy.shapemap.style.parser.basic.FillParser;
@@ -18,11 +21,6 @@ import org.knowtiphy.shapemap.style.parser.basic.FontParser;
 import org.knowtiphy.shapemap.style.parser.basic.LabelPlacementParser;
 import org.knowtiphy.shapemap.style.parser.basic.StrokeParser;
 import org.knowtiphy.shapemap.style.parser.expression.ExpressionParser;
-
-import javax.xml.stream.XMLEventReader;
-import javax.xml.stream.XMLStreamException;
-
-import static org.knowtiphy.shapemap.style.parser.Utils.normalize;
 
 /**
  * @author graham

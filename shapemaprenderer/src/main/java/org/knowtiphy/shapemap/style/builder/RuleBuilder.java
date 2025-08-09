@@ -5,13 +5,12 @@
 
 package org.knowtiphy.shapemap.style.builder;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.knowtiphy.shapemap.api.IFeatureFunction;
 import org.knowtiphy.shapemap.renderer.symbolizer.ISymbolizer;
 import org.knowtiphy.shapemap.renderer.symbolizer.TextSymbolizer;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.Rule;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author graham

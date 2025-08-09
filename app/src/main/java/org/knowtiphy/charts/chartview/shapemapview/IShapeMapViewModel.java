@@ -18,9 +18,9 @@ import org.knowtiphy.shapemap.api.IFeatureAdapter;
 import org.knowtiphy.shapemap.api.IFeatureSourceIterator;
 import org.knowtiphy.shapemap.api.IRenderablePolygonProvider;
 import org.knowtiphy.shapemap.api.ISVGProvider;
-import org.knowtiphy.shapemap.api.ITextBoundsFunction;
 import org.reactfx.Change;
 import org.reactfx.EventStream;
+import org.knowtiphy.shapemap.api.ITextAdapter;
 
 /**
  * A view model for maps of features conforming to some schema.
@@ -50,7 +50,7 @@ public interface IShapeMapViewModel<S, F> {
 
     ISVGProvider svgProvider();
 
-    ITextBoundsFunction textSizeProvider();
+    ITextAdapter textSizeProvider();
 
     List<IFeatureSourceIterator<F>> featuresNearXYWorld(double x, double y, int radius)
             throws TransformException, NonInvertibleTransformException;

@@ -13,7 +13,7 @@ import org.geotools.api.feature.simple.SimpleFeatureType;
 import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.api.referencing.operation.TransformException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.knowtiphy.charts.DefaultTextBoundsFunction;
+import org.knowtiphy.charts.TextAdapter;
 import org.knowtiphy.charts.chartlocker.ChartLocker;
 import org.knowtiphy.charts.chartview.shapemapview.IShapeMapViewModel;
 import org.knowtiphy.charts.enc.ENCCell;
@@ -27,12 +27,12 @@ import org.knowtiphy.shapemap.api.IFeatureAdapter;
 import org.knowtiphy.shapemap.api.IFeatureSourceIterator;
 import org.knowtiphy.shapemap.api.IRenderablePolygonProvider;
 import org.knowtiphy.shapemap.api.ISVGProvider;
-import org.knowtiphy.shapemap.api.ITextBoundsFunction;
 import org.knowtiphy.shapemap.renderer.Transformation;
 import org.locationtech.jts.geom.Point;
 import org.reactfx.Change;
 import org.reactfx.EventSource;
 import org.reactfx.EventStream;
+import org.knowtiphy.shapemap.api.ITextAdapter;
 
 /**
  * An ENC chart view model -- a quilt of ENC cells (loaded from a chart locker) together with a
@@ -174,8 +174,8 @@ public class ChartViewModel implements IShapeMapViewModel<SimpleFeatureType, Mem
     }
 
     @Override
-    public ITextBoundsFunction textSizeProvider() {
-        return new DefaultTextBoundsFunction();
+    public ITextAdapter textSizeProvider() {
+        return new TextAdapter();
     }
 
     public AppSettings getAppSettings() {

@@ -1,5 +1,6 @@
-package org.knowtiphy.shapemap.renderer;
+package org.knowtiphy.charts.chartview;
 
+import java.text.MessageFormat;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.transform.Affine;
 import javafx.scene.transform.NonInvertibleTransformException;
@@ -12,11 +13,9 @@ import org.geotools.metadata.i18n.ErrorKeys;
 import org.geotools.referencing.CRS;
 import org.locationtech.jts.geom.Envelope;
 
-import java.text.MessageFormat;
-
 public class RendererUtilities {
     /**
-     * Helber class for building affine transforms. We use one instance per thread, in order to
+     * Helper class for building affine transforms. We use one instance per thread, in order to
      * avoid the need for {@code synchronized} statements.
      */
     private static final ThreadLocal<GridToEnvelopeMapper> gridToEnvelopeMappers =

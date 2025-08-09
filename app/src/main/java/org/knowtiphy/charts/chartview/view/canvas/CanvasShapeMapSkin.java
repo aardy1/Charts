@@ -10,7 +10,7 @@ import org.geotools.geometry.jts.JTS;
 import org.knowtiphy.charts.chartview.shapemapview.IShapeMapViewModel;
 import org.knowtiphy.charts.model.MapModel;
 import org.knowtiphy.shapemap.api.RenderingContext;
-import org.knowtiphy.shapemap.renderer.RendererUtilities;
+import org.knowtiphy.charts.chartview.RendererUtilities;
 import org.knowtiphy.shapemap.renderer.ShapeMapRenderer;
 import org.knowtiphy.shapemap.renderer.Transformation;
 

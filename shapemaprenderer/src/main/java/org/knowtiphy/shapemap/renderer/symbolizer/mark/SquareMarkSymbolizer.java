@@ -24,7 +24,7 @@ public class SquareMarkSymbolizer<S, F> extends BaseMarkSymbolizer<S, F> {
 
     @Override
     public void render(
-            GraphicsRenderingContext<S, F> context,
+            GraphicsRenderingContext<S, F, ?> context,
             F feature,
             Point pt,
             PointSymbolizer<S, F> pointSymbolizer) {

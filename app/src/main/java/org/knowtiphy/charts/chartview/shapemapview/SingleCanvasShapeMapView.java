@@ -7,6 +7,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.transform.NonInvertibleTransformException;
 import org.geotools.api.referencing.operation.TransformException;
 import org.geotools.geometry.jts.JTS;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.knowtiphy.shapemap.api.RenderingContext;
 import org.knowtiphy.shapemap.renderer.ShapeMapRenderer;
 
@@ -106,7 +107,7 @@ public class SingleCanvasShapeMapView<S, F> extends Region {
             System.err.println("Map # = " + whichMap);
             try {
                 var rendererContext =
-                        new RenderingContext<S, F>(
+                        new RenderingContext<S, F, ReferencedEnvelope>(
                                 map.layers(),
                                 map.totalRuleCount(),
                                 JTS.toEnvelope(map.geometry()),

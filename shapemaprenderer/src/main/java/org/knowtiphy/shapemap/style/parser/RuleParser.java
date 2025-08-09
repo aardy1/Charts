@@ -5,20 +5,18 @@
 
 package org.knowtiphy.shapemap.style.parser;
 
+import java.io.FileNotFoundException;
+import javax.xml.stream.XMLEventReader;
+import javax.xml.stream.XMLStreamException;
 import org.knowtiphy.shapemap.api.IStyleCompiler;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.Rule;
 import org.knowtiphy.shapemap.style.builder.RuleBuilder;
+import static org.knowtiphy.shapemap.style.parser.Utils.normalize;
 import org.knowtiphy.shapemap.style.parser.expression.ExpressionParser;
 import org.knowtiphy.shapemap.style.parser.symbolizer.LineSymbolizerParser;
 import org.knowtiphy.shapemap.style.parser.symbolizer.PointSymbolizerParser;
 import org.knowtiphy.shapemap.style.parser.symbolizer.PolygonSymbolizerParser;
 import org.knowtiphy.shapemap.style.parser.symbolizer.TextSymbolizerParser;
-
-import javax.xml.stream.XMLEventReader;
-import javax.xml.stream.XMLStreamException;
-import java.io.FileNotFoundException;
-
-import static org.knowtiphy.shapemap.style.parser.Utils.normalize;
 
 /**
  * @author graham

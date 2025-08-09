@@ -12,5 +12,5 @@ import org.knowtiphy.shapemap.renderer.GraphicsRenderingContext;
  */
 public interface ISymbolizer<S, F> {
 
-    void render(GraphicsRenderingContext<S, F> context, F feature);
+    void render(GraphicsRenderingContext<S, F, ?> context, F feature);
 }

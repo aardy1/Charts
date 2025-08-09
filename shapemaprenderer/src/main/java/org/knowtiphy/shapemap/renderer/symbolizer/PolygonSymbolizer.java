@@ -26,7 +26,7 @@ public class PolygonSymbolizer<S, F> implements ISymbolizer<S, F> {
     }
 
     @Override
-    public void render(GraphicsRenderingContext<S, F> context, F feature) {
+    public void render(GraphicsRenderingContext<S, F, ?> context, F feature) {
 
         var featureAdapter = context.renderingContext().featureAdapter();
         if (fillInfo != null) {

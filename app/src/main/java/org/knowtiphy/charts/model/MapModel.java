@@ -24,7 +24,7 @@ public class MapModel<S, F> {
 
     private final String title;
 
-    private final List<IMapLayer<S, F>> layers = new LinkedList<>();
+    private final List<IMapLayer<S, F, ReferencedEnvelope>> layers = new LinkedList<>();
 
     private final Map<String, MapLayer<S, F>> nameToLayer = new LinkedHashMap<>();
 
@@ -59,7 +59,7 @@ public class MapModel<S, F> {
         this.geometry = geometry;
     }
 
-    public Collection<? extends IMapLayer<S, F>> layers() {
+    public Collection<? extends IMapLayer<S, F, ReferencedEnvelope>> layers() {
         return layers;
     }
 

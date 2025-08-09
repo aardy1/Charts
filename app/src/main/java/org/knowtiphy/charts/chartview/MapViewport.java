@@ -9,7 +9,6 @@ import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.knowtiphy.charts.geotools.Coordinates;
 import static org.knowtiphy.charts.geotools.Coordinates.toCM;
 import org.knowtiphy.charts.platform.IUnderlyingPlatform;
-import org.knowtiphy.shapemap.renderer.RendererUtilities;
 
 /**
  * A map viewport -- the bounds of the viewport in world coordinates, the screen area of the

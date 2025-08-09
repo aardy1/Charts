@@ -3,8 +3,9 @@
  * All rights reserved.
  */
 
-package org.knowtiphy.shapemap.renderer;
+package org.knowtiphy.charts.chartview;
 
+import java.awt.image.BufferedImage;
 import javafx.scene.transform.Affine;
 import org.geotools.api.coverage.grid.GridEnvelope;
 import org.geotools.api.geometry.Bounds;
@@ -68,7 +69,7 @@ import org.geotools.referencing.operation.transform.ProjectiveTransform;
  * @since 2.3
  */
 public class GridToEnvelopeMapper {
-    //  bit mask for the {@link #setSwapXY swapXY} property.
+    // bit mask for the {@link #setSwapXY swapXY} property.
     private static final int SWAP_XY = 1;
 
     //  bit mask for the {@link #setReverseAxis reverseAxis} property.

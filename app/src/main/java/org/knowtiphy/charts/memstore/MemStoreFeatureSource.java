@@ -23,7 +23,7 @@ public record MemStoreFeatureSource(
         MapModel<SimpleFeatureType, MemFeature> map,
         SimpleFeatureType featureType,
         STRtree featureIndex)
-        implements IFeatureSource<SimpleFeatureType, MemFeature> {
+        implements IFeatureSource<SimpleFeatureType, MemFeature, ReferencedEnvelope> {
     @Override
     @SuppressWarnings("unchecked")
     public IFeatureSourceIterator<MemFeature> features() {

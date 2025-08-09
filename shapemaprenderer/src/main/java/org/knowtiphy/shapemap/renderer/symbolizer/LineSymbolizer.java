@@ -21,7 +21,7 @@ public class LineSymbolizer<S, F> implements ISymbolizer<S, F> {
     }
 
     @Override
-    public void render(GraphicsRenderingContext<S, F> context, F feature) {
+    public void render(GraphicsRenderingContext<S, F, ?> context, F feature) {
         Stroke.setup(context, strokeInfo);
         Stroke.stroke(
                 context,

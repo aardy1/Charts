@@ -1,5 +1,6 @@
-package org.knowtiphy.shapemap.renderer;
+package org.knowtiphy.charts.chartview;
 
+import javafx.scene.shape.Rectangle;
 import org.geotools.api.coverage.grid.GridEnvelope;
 import org.geotools.coverage.grid.GeneralGridEnvelope;
 import org.geotools.coverage.grid.GridCoordinates2D;

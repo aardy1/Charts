@@ -7,9 +7,6 @@ package org.knowtiphy.shapemap.renderer.symbolizer;
 
 import javafx.scene.text.Font;
 import org.apache.commons.lang3.StringUtils;
-import org.geotools.api.geometry.BoundingBox;
-import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.geotools.referencing.crs.DefaultEngineeringCRS;
 import org.knowtiphy.shapemap.api.IFeatureFunction;
 import org.knowtiphy.shapemap.renderer.GraphicsRenderingContext;
 import org.knowtiphy.shapemap.renderer.graphics.Fill;
@@ -20,7 +17,6 @@ import org.knowtiphy.shapemap.renderer.symbolizer.basic.StrokeInfo;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Point;
-import org.locationtech.jts.index.quadtree.Quadtree;
 
 /**
  * @author graham
@@ -51,7 +47,7 @@ public class TextSymbolizer<S, F> {
         this.labelPlacement = labelPlacement;
     }
 
-    public void render(GraphicsRenderingContext<S, F> context, F feature) {
+    public void render(GraphicsRenderingContext<S, F, ?> context, F feature) {
 
         if (fillInfo != null) {
             Fill.setup(context, fillInfo);
@@ -71,7 +67,7 @@ public class TextSymbolizer<S, F> {
                 context.renderingContext().featureAdapter().defaultGeometry(feature));
     }
 
-    private void text(GraphicsRenderingContext<S, F> context, F feature, Geometry geom) {
+    private void text(GraphicsRenderingContext<S, F, ?> context, F feature, Geometry geom) {
 
         // TODO -- switch on strings is brain dead
         switch (geom.getGeometryType()) {
@@ -87,7 +83,7 @@ public class TextSymbolizer<S, F> {
         }
     }
 
-    private void textPoint(GraphicsRenderingContext<S, F> context, F feature, Point point) {
+    private void textPoint(GraphicsRenderingContext<S, F, ?> context, F feature, Point point) {
 
         if (point != null && label != null) {
             var text = label.apply(feature, point);
@@ -112,17 +108,9 @@ public class TextSymbolizer<S, F> {
                                         ? 0
                                         : labelPlacement.pointPlacement().getDisplacementY());
 
-                var textDude = context.renderingContext().textSizeProvider();
-                var textDimensions = textDude.getSize(font, text);
-                var textBounds =
-                        new ReferencedEnvelope(
-                                x,
-                                x + textDimensions.getWidth(),
-                                y,
-                                y + textDimensions.getHeight(),
-                                DefaultEngineeringCRS.CARTESIAN_2D);
+                //                var textDimensions = textDude.canFit(font, text);
 
-                if (!textDude.overlaps(textBounds)) {
+                if (context.renderingContext().textSizeProvider().canFit(font, text, x, y)) {
 
                     if (fillInfo != null) {
                         graphicsContext.fillText(text, x, y);
@@ -131,9 +119,6 @@ public class TextSymbolizer<S, F> {
                     if (strokeInfo != null) {
                         graphicsContext.strokeText(text, x, y);
                     }
-
-                    // TODO -- set bounds from greater of fill or stroke
-                    textDude.insert(textBounds, textBounds);
                 }
             }
         }
@@ -142,24 +127,10 @@ public class TextSymbolizer<S, F> {
     // TODO -- text along line strings ...
 
     // only necessary if a multi-X, can contain another multi-X, rather than just X's
-    private void recurse(GraphicsRenderingContext<S, F> context, F feature, Geometry geom) {
+    private void recurse(GraphicsRenderingContext<S, F, ?> context, F feature, Geometry geom) {
         for (int i = 0; i < geom.getNumGeometries(); i++) {
             text(context, feature, geom.getGeometryN(i));
         }
-    }
-
-    // quadtree queries can gives false positives (can they,or is that just multi-X
-    // related?) (so a query result of non empty does not necessarily imply overlaps)
-
-    private boolean overlaps(ReferencedEnvelope bounds, Quadtree index) {
-        for (var box : index.query(bounds)) {
-            if (((BoundingBox) box).intersects(bounds)) {
-                //                System.err.println(" Real intersection");
-                return true;
-            }
-        }
-
-        return false;
     }
 }
 // private void renderAt(RenderingContext context, SimpleFeature feature, Point point) {
@@ -209,3 +180,17 @@ public class TextSymbolizer<S, F> {
 // }
 // }
 // }
+
+    // quadtree queries can gives false positives (can they,or is that just multi-X
+    // related?) (so a query result of non empty does not necessarily imply overlaps)
+
+//    private boolean overlaps(ReferencedEnvelope bounds, Quadtree index) {
+//        for (var box : index.query(bounds)) {
+//            if (((BoundingBox) box).intersects(bounds)) {
+//                //                System.err.println(" Real intersection");
+//                return true;
+//            }
+//        }
+//
+//        return false;
+//    }

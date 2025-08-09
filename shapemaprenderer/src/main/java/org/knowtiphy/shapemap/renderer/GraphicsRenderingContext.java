@@ -6,18 +6,17 @@
 package org.knowtiphy.shapemap.renderer;
 
 import javafx.scene.canvas.GraphicsContext;
-import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.knowtiphy.shapemap.api.RenderingContext;
 
 /**
  * @author graham
  */
-public record GraphicsRenderingContext<S, F>(
-        RenderingContext<S, F> renderingContext,
+public record GraphicsRenderingContext<S, F, E>(
+        RenderingContext<S, F, E> renderingContext,
         // the canvas being drawn to
         GraphicsContext graphicsContext,
         Transformation worldToScreen, // world to screen transformation
         double onePixelX, // one pixel width in x direction in world coordinates
-        double onePixelY, // one pixel width in y direction in world coordinates
+        double onePixelY // , // one pixel width in y direction in world coordinates
         //        Quadtree blocked, // screen coordinates blocked from having text over them
-        ReferencedEnvelope bounds) {}
+        ) {}

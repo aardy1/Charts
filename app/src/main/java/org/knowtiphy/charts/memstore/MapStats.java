@@ -11,8 +11,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.IntBinaryOperator;
 import org.geotools.api.feature.simple.SimpleFeatureType;
-import org.knowtiphy.charts.model.MapModel;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import static org.knowtiphy.charts.geotools.Coordinates.distanceAcross;
+import org.knowtiphy.charts.model.MapModel;
 import org.knowtiphy.charts.ontology.ENC;
 import static org.knowtiphy.charts.ontology.S57.AT_SCAMAX;
 import static org.knowtiphy.charts.ontology.S57.AT_SCAMIN;
@@ -173,7 +174,8 @@ public class MapStats {
         return value == null ? "N/A" : (value + "");
     }
 
-    private void featureScan(IMapLayer<SimpleFeatureType, MemFeature> layer) throws Exception {
+    private void featureScan(IMapLayer<SimpleFeatureType, MemFeature, ReferencedEnvelope> layer)
+            throws Exception {
         try (var features = layer.featureSource().features()) {
             while (features.hasNext()) {
                 var feature = features.next();

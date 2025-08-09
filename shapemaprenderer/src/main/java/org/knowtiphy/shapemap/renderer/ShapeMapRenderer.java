@@ -12,15 +12,15 @@ import org.knowtiphy.shapemap.renderer.symbolizer.basic.Rule;
 /**
  * @author graham
  */
-public class ShapeMapRenderer<S, F, G> {
+public class ShapeMapRenderer<S, F, E> {
 
     private int featureCount = 0;
 
-    private final RenderingContext<S, F> renderingContext;
+    private final RenderingContext<S, F, E> renderingContext;
 
     private final GraphicsContext graphics;
 
-    public ShapeMapRenderer(RenderingContext<S, F> renderingContext, GraphicsContext graphics) {
+    public ShapeMapRenderer(RenderingContext<S, F, E> renderingContext, GraphicsContext graphics) {
         this.renderingContext = renderingContext;
         this.graphics = graphics;
     }
@@ -38,9 +38,7 @@ public class ShapeMapRenderer<S, F, G> {
                         graphics,
                         new Transformation(renderingContext.worldToScreen()),
                         onePixelX(renderingContext.screenToWorld()),
-                        onePixelY(renderingContext.screenToWorld()),
-                        //                        index,
-                        renderingContext.viewPortBounds());
+                        onePixelY(renderingContext.screenToWorld()));
 
         try {
             // pass 1 -- do graphics -- point, line and polygon symbolizers
@@ -74,7 +72,7 @@ public class ShapeMapRenderer<S, F, G> {
     }
 
     private void renderGraphics(
-            GraphicsRenderingContext<S, F> context,
+            GraphicsRenderingContext<S, F, E> context,
             boolean[] appliedRule,
             boolean[] layerNeedsTextLayout)
             throws Exception {
@@ -112,7 +110,7 @@ public class ShapeMapRenderer<S, F, G> {
     }
 
     private void renderText(
-            GraphicsRenderingContext<S, F> context,
+            GraphicsRenderingContext<S, F, E> context,
             boolean[] appliedRule,
             boolean[] layerNeedsTextLayout)
             throws Exception {
@@ -148,7 +146,7 @@ public class ShapeMapRenderer<S, F, G> {
 
     private boolean applyStyle(
             FeatureTypeStyle<S, F> style,
-            GraphicsRenderingContext<S, F> context,
+            GraphicsRenderingContext<S, F, E> context,
             F feature,
             boolean[] appliedRule,
             int startPos) {
@@ -181,7 +179,7 @@ public class ShapeMapRenderer<S, F, G> {
     }
 
     private boolean applyGraphicsRule(
-            Rule<S, F> rule, GraphicsRenderingContext<S, F> context, F feature) {
+            Rule<S, F> rule, GraphicsRenderingContext<S, F, E> context, F feature) {
         var featureAdapter = context.renderingContext().featureAdapter();
         if (rule.filter() != null
                 && rule.filter().apply(feature, featureAdapter.defaultGeometry(feature))) {
@@ -195,7 +193,8 @@ public class ShapeMapRenderer<S, F, G> {
         return false;
     }
 
-    private void applyTextRule(Rule<S, F> rule, GraphicsRenderingContext<S, F> context, F feature) {
+    private void applyTextRule(
+            Rule<S, F> rule, GraphicsRenderingContext<S, F, E> context, F feature) {
         var featureAdapter = context.renderingContext().featureAdapter();
         if (rule.filter().apply(feature, featureAdapter.defaultGeometry(feature))) {
             for (var symbolizer : rule.textSymbolizers()) {

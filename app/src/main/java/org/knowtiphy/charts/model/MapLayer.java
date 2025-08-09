@@ -1,6 +1,7 @@
 package org.knowtiphy.charts.model;
 
 import javafx.beans.property.SimpleBooleanProperty;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.knowtiphy.shapemap.api.IFeatureSource;
 import org.knowtiphy.shapemap.api.IMapLayer;
 import org.knowtiphy.shapemap.renderer.FeatureTypeStyle;
@@ -14,8 +15,8 @@ import org.reactfx.EventStreams;
  * @param <S> the type of the schema for the feature source
  * @param <F> the type of the features provided by the feature source
  */
-public class MapLayer<S, F> implements IMapLayer<S, F> {
-    private final IFeatureSource<S, F> featureSource;
+public class MapLayer<S, F> implements IMapLayer<S, F, ReferencedEnvelope> {
+    private final IFeatureSource<S, F, ReferencedEnvelope> featureSource;
 
     private final FeatureTypeStyle<S, F> style;
 
@@ -27,7 +28,7 @@ public class MapLayer<S, F> implements IMapLayer<S, F> {
             EventStreams.changesOf(visible);
 
     public MapLayer(
-            IFeatureSource<S, F> featureSource,
+            IFeatureSource<S, F, ReferencedEnvelope> featureSource,
             FeatureTypeStyle<S, F> style,
             boolean visible,
             boolean scaleLess) {
@@ -38,7 +39,7 @@ public class MapLayer<S, F> implements IMapLayer<S, F> {
     }
 
     @Override
-    public IFeatureSource<S, F> featureSource() {
+    public IFeatureSource<S, F, ReferencedEnvelope> featureSource() {
         return featureSource;
     }
 

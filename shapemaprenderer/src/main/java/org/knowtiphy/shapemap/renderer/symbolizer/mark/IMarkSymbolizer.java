@@ -15,7 +15,7 @@ import org.locationtech.jts.geom.Point;
 public interface IMarkSymbolizer<S, F> {
 
     void render(
-            GraphicsRenderingContext<S, F> context,
+            GraphicsRenderingContext<S, F, ?> context,
             F feature,
             Point pt,
             PointSymbolizer<S, F> pointSymbolizer);
