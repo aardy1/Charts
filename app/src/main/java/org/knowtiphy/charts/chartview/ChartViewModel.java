@@ -27,12 +27,12 @@ import org.knowtiphy.shapemap.api.IFeatureAdapter;
 import org.knowtiphy.shapemap.api.IFeatureSourceIterator;
 import org.knowtiphy.shapemap.api.IRenderablePolygonProvider;
 import org.knowtiphy.shapemap.api.ISVGProvider;
+import org.knowtiphy.shapemap.api.ITextAdapter;
 import org.knowtiphy.shapemap.renderer.Transformation;
 import org.locationtech.jts.geom.Point;
 import org.reactfx.Change;
 import org.reactfx.EventSource;
 import org.reactfx.EventStream;
-import org.knowtiphy.shapemap.api.ITextAdapter;
 
 /**
  * An ENC chart view model -- a quilt of ENC cells (loaded from a chart locker) together with a
@@ -45,7 +45,7 @@ public class ChartViewModel implements IShapeMapViewModel<SimpleFeatureType, Mem
     private static final double DEFAULT_HEIGHT = 3;
 
     //  on zoom in change the view port to be smaller by this factor
-    private static final double ZOOM_FACTOR_MULTIPLIER = 0.8;
+    private static final double ZOOM_FACTOR_MULTIPLIER = 0.7;
 
     //  the quilt can change to a whole new quilt object
     private Quilt<SimpleFeatureType, MemFeature> quilt;
@@ -114,7 +114,7 @@ public class ChartViewModel implements IShapeMapViewModel<SimpleFeatureType, Mem
     //  SCAMIN and cScale are based on some 22inch screen so adjust
     //  TODO -- this is basically just a guess -- and a total fudge
     @Override
-    public double adjustedDisplayScale() {
+    public double aScale() {
         var swIn = platform.screenDimensions().getWidth() / platform.ppi();
         var adjustment = swIn / 22;
         return dScale() / 3; // * adjustment;
@@ -233,11 +233,6 @@ public class ChartViewModel implements IShapeMapViewModel<SimpleFeatureType, Mem
         return quilt.maps().get(0).cScale();
     }
 
-    public double displayScale() {
-        return viewPort.dScale();
-        //        return (int) (cScale() * (1 / viewPort.zoom()));
-    }
-
     //  TODO
     public String title() {
         //  only makes sense if the chart is not a quilt
@@ -291,16 +286,13 @@ public class ChartViewModel implements IShapeMapViewModel<SimpleFeatureType, Mem
 
     public void loadNewChart(ENCCell cell) {
         System.out.println("load new chart");
-        setQuilt(
-                chartLocker.loadQuilt(
-                        cell.bounds(), adjustedDisplayScale(), appSettings, mapDisplayOptions));
+        setQuilt(chartLocker.loadQuilt(cell.bounds(), aScale(), appSettings, mapDisplayOptions));
     }
 
     public void loadMostDetailedChart(Point point) {
-        System.out.println("load most detailed chart : " + point);
-        setQuilt(
-                chartLocker.loadMostDetailedQuilt(
-                        point, adjustedDisplayScale(), getAppSettings(), getMapDisplayOptions()));
+        var cell = chartLocker.getMostDetailedCell(point);
+        setViewPortBounds(cell.bounds());
+        setQuilt(chartLocker.loadQuilt(cell.bounds(), aScale(), appSettings, mapDisplayOptions));
     }
 
     public ReferencedEnvelope tinyPolygon(double x, double y, int radius)
@@ -348,9 +340,8 @@ public class ChartViewModel implements IShapeMapViewModel<SimpleFeatureType, Mem
         //  adjustscale will be correct since its based on the viewport bounds which have already
         // changed
         var newQuilt =
-                chartLocker.loadQuilt(
-                        viewPort.getBounds(),
-                        adjustedDisplayScale(),
+                chartLocker.loadQuilt(viewPort.getBounds(),
+                        aScale(),
                         appSettings,
                         mapDisplayOptions);
         System.err.println("--------------------");
@@ -358,7 +349,7 @@ public class ChartViewModel implements IShapeMapViewModel<SimpleFeatureType, Mem
         System.err.println("quilt size = " + newQuilt.maps().size());
         //        System.err.println("old bounds = " + oldBounds);
         System.err.println("new bounds = " + viewPort.getBounds());
-        System.err.println("adjusted display scale = " + adjustedDisplayScale());
+        System.err.println("adjusted display scale = " + aScale());
         for (var map : newQuilt.maps()) {
             System.err.println("\tmap " + map.title() + " scale " + map.cScale());
         }
