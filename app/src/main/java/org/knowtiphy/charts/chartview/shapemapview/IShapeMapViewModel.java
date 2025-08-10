@@ -12,8 +12,8 @@ import javafx.scene.transform.NonInvertibleTransformException;
 import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.api.referencing.operation.TransformException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.knowtiphy.charts.model.MapModel;
-import org.knowtiphy.charts.model.Quilt;
+import org.knowtiphy.charts.map.Map;
+import org.knowtiphy.charts.map.Quilt;
 import org.knowtiphy.shapemap.api.IFeatureAdapter;
 import org.knowtiphy.shapemap.api.IFeatureSourceIterator;
 import org.knowtiphy.shapemap.api.IRenderablePolygonProvider;
@@ -30,7 +30,7 @@ import org.knowtiphy.shapemap.api.ITextAdapter;
  */
 public interface IShapeMapViewModel<S, F> {
 
-    List<MapModel<S, F>> maps();
+    List<Map<S, F>> maps();
 
     CoordinateReferenceSystem crs();
 

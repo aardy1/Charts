@@ -7,37 +7,46 @@ package org.knowtiphy.charts.chartlocker;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Map;
 import javax.xml.stream.XMLStreamException;
 import org.geotools.api.feature.simple.SimpleFeatureType;
-import org.knowtiphy.charts.chartview.MapDisplayOptions;
 import org.knowtiphy.charts.enc.ENCCell;
+import org.knowtiphy.charts.map.Map;
+import org.knowtiphy.charts.map.MapReader;
 import org.knowtiphy.charts.memstore.MemFeature;
-import org.knowtiphy.charts.memstore.StyleReader;
-import org.knowtiphy.charts.model.MapModel;
-import org.knowtiphy.charts.settings.AppSettings;
 import org.knowtiphy.shapemap.style.parser.StyleSyntaxException;
 
-/** A loader of ENC cells from the local file system */
+/**
+ * A loader of ENC cells, loading the cells into Map objects. The loader maintains a cache of loaded
+ * cells.
+ */
 public class ENCCellLoader {
 
-    private final StyleReader<SimpleFeatureType, MemFeature> styleReader;
+    //  a reader of maps
+    private final MapReader mapReader;
 
     //  loaded cells cache
-    private final Map<ENCCell, MapModel<SimpleFeatureType, MemFeature>> loaded = new HashMap<>();
+    private final java.util.Map<ENCCell, Map<SimpleFeatureType, MemFeature>> loaded =
+            new HashMap<>();
 
-    public ENCCellLoader(StyleReader<SimpleFeatureType, MemFeature> styleReader) {
-        this.styleReader = styleReader;
+    public ENCCellLoader(MapReader mapReader) {
+        this.mapReader = mapReader;
     }
 
-    /** Load a single ENC cell.n */
-    public synchronized MapModel<SimpleFeatureType, MemFeature> loadCell(
-            ENCCell cell, AppSettings settings, MapDisplayOptions displayOptions)
+    /**
+     * Load a single ENC cell.
+     *
+     * @param cell the cell
+     * @return a map with the map data stored in a mem store.
+     * @throws IOException
+     * @throws XMLStreamException
+     * @throws StyleSyntaxException
+     */
+    public synchronized Map<SimpleFeatureType, MemFeature> loadCell(ENCCell cell)
             throws IOException, XMLStreamException, StyleSyntaxException {
 
         var map = loaded.get(cell);
         if (map == null) {
-            map = new MapModelReader(cell, settings, styleReader, displayOptions).read();
+            map = mapReader.read(cell);
             loaded.put(cell, map);
         }
 

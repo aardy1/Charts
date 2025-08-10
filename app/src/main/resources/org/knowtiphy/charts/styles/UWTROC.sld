@@ -7,7 +7,7 @@
     <NamedLayer>
         <UserStyle>
             <FeatureTypeStyle>
-                <FeatureTypeName>BCNSPP</FeatureTypeName>
+                <FeatureTypeName>UWTROC</FeatureTypeName>
                 <Rule>
                     <PointSymbolizer>
                         <Graphic>

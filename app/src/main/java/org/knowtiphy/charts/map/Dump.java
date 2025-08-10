@@ -3,7 +3,7 @@
  * All rights reserved.
  */
 
-package org.knowtiphy.charts.memstore;
+package org.knowtiphy.charts.map;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -16,7 +16,7 @@ import org.geotools.api.feature.type.Name;
 import org.geotools.api.feature.type.PropertyDescriptor;
 import org.geotools.api.filter.identity.FeatureId;
 import org.knowtiphy.charts.chartview.ChartViewModel;
-import org.knowtiphy.charts.model.MapLayer;
+import org.knowtiphy.charts.map.Layer;
 
 /**
  * @author graham
@@ -57,13 +57,13 @@ public class Dump<S extends SimpleFeatureType, F> {
         //    }
     }
 
-    public void dumpSchema(MapLayer<S, F> layer) throws IOException {
+    public void dumpSchema(Layer<S, F> layer) throws IOException {
         //
         //    var schema = layer.featureSource().getSchema();
         //    descriptors.addAll(schema.getDescriptors());
     }
 
-    public void dumpAttributeValues(MapLayer<S, F> layer) throws IOException {
+    public void dumpAttributeValues(Layer<S, F> layer) throws IOException {
 
         // var featureName =
         // layer.getFeatureSource().getSchema().getName().getLocalPart();

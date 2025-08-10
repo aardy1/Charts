@@ -17,10 +17,10 @@ import org.knowtiphy.charts.TextAdapter;
 import org.knowtiphy.charts.chartlocker.ChartLocker;
 import org.knowtiphy.charts.chartview.shapemapview.IShapeMapViewModel;
 import org.knowtiphy.charts.enc.ENCCell;
+import org.knowtiphy.charts.map.Layer;
+import org.knowtiphy.charts.map.Map;
+import org.knowtiphy.charts.map.Quilt;
 import org.knowtiphy.charts.memstore.MemFeature;
-import org.knowtiphy.charts.model.MapLayer;
-import org.knowtiphy.charts.model.MapModel;
-import org.knowtiphy.charts.model.Quilt;
 import org.knowtiphy.charts.platform.IUnderlyingPlatform;
 import org.knowtiphy.charts.settings.AppSettings;
 import org.knowtiphy.shapemap.api.IFeatureAdapter;
@@ -96,7 +96,7 @@ public class ChartViewModel implements IShapeMapViewModel<SimpleFeatureType, Mem
     }
 
     @Override
-    public List<MapModel<SimpleFeatureType, MemFeature>> maps() {
+    public List<Map<SimpleFeatureType, MemFeature>> maps() {
         return quilt.maps();
     }
 
@@ -201,7 +201,7 @@ public class ChartViewModel implements IShapeMapViewModel<SimpleFeatureType, Mem
 
         for (var map : maps()) {
             for (var layer : map.layers()) {
-                result.add(layer.featureSource().features(envelope, Double.MIN_VALUE, true));
+                result.add(layer.featureSource().features(envelope, Double.MIN_VALUE));
             }
         }
 
@@ -250,7 +250,7 @@ public class ChartViewModel implements IShapeMapViewModel<SimpleFeatureType, Mem
         viewPort.setScreenArea(screenArea);
     }
 
-    public void setLayerVisible(MapLayer<SimpleFeatureType, MemFeature> layer, boolean newValue) {
+    public void setLayerVisible(Layer<SimpleFeatureType, MemFeature> layer, boolean newValue) {
         if (newValue != layer.isVisible()) {
             var oldValue = layer.isVisible();
             layer.setVisible(newValue);

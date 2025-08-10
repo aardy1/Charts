@@ -26,9 +26,10 @@ import org.knowtiphy.charts.chartview.MapDisplayOptions;
 import org.knowtiphy.charts.enc.ENCCatalog;
 import org.knowtiphy.charts.enc.ENCCatalogReader;
 import org.knowtiphy.charts.enc.ENCCell;
+import org.knowtiphy.charts.geotools.Coordinates;
+import org.knowtiphy.charts.map.Map;
+import org.knowtiphy.charts.map.Quilt;
 import org.knowtiphy.charts.memstore.MemFeature;
-import org.knowtiphy.charts.model.MapModel;
-import org.knowtiphy.charts.model.Quilt;
 import org.knowtiphy.charts.settings.AppSettings;
 import org.knowtiphy.shapemap.style.parser.StyleSyntaxException;
 import org.locationtech.jts.geom.Geometry;
@@ -108,12 +109,12 @@ public class ChartLocker {
         System.out.println("LOAD QUILT " + envelope);
         var quilt = computeQuiltCellGeomPairs(envelope, adjustedDisplayScale);
         System.out.println("Quilt size = " + quilt.size());
-        var maps = new LinkedList<MapModel<SimpleFeatureType, MemFeature>>();
+        var maps = new LinkedList<Map<SimpleFeatureType, MemFeature>>();
         for (var entry : quilt) {
             var cell = entry.getKey();
             addChartHistory(cell);
             try {
-                var map = cellLoader.loadCell(cell, settings, mapDisplayOptions);
+                var map = cellLoader.loadCell(cell);
                 map.setGeometry(entry.getRight());
                 maps.addFirst(map);
             } catch (IOException | XMLStreamException | StyleSyntaxException ex) {
@@ -121,7 +122,8 @@ public class ChartLocker {
             }
         }
 
-        return new Quilt<>(maps);
+        var bounds = Coordinates.bounds(maps);
+        return new Quilt<>(maps, bounds);
     }
 
     public ObservableList<ENCCell> history() {

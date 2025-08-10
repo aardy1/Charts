@@ -37,7 +37,8 @@ import org.knowtiphy.charts.chartview.MapViewport;
 import org.knowtiphy.charts.chartview.markicons.MarkIconsResourceLoader;
 import org.knowtiphy.charts.desktop.AppSettingsDialog;
 import org.knowtiphy.charts.dynamics.AISModel;
-import org.knowtiphy.charts.memstore.MapStats;
+import org.knowtiphy.charts.map.MapReader;
+import org.knowtiphy.charts.map.MapStats;
 import org.knowtiphy.charts.memstore.StyleReader;
 import org.knowtiphy.charts.platform.IUnderlyingPlatform;
 import org.knowtiphy.charts.platform.UnderlyingPlatform;
@@ -97,18 +98,18 @@ public class KnowtiphyCharts extends Application {
         svgCache = new SVGCache(MarkIconsResourceLoader.class);
 
         //  create the global chart locker
+        var mapReader =
+                new MapReader(new StyleReader<>(ResourceLoader.class), appSettings, displayOptions);
         chartLocker =
                 new ChartLocker(
-                        platform.catalogsDir(),
-                        platform.chartsDir(),
-                        new ENCCellLoader(new StyleReader<>(ResourceLoader.class)));
+                        platform.catalogsDir(), platform.chartsDir(), new ENCCellLoader(mapReader));
 
         //  load an initial chart  just for demos and dump its stats for debugging
 
         var cell = chartLocker.getCell("Gulf of Mexico", 2_160_000);
         var quilt =
-                chartLocker.loadQuilt(
-                        cell.bounds(), cell.cScale(), appSettings, displayOptions);
+                chartLocker.loadQuilt(cell.bounds(), cell.cScale(), appSettings, displayOptions);
+
         // this won't be right after the info bar is done, but that will be resized later
         var viewPort =
                 new MapViewport(
@@ -126,7 +127,7 @@ public class KnowtiphyCharts extends Application {
                         new RemoveHolesFromPolygon(new RenderGeomCache()),
                         svgCache);
 
-        var stats = new MapStats(chart.maps()).stats();
+        var stats = new MapStats(quilt).compute();
         stats.print();
 
         initGraphics(primaryStage, chart);

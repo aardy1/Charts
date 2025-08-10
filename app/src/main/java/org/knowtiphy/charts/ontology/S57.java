@@ -5,8 +5,9 @@
 
 package org.knowtiphy.charts.ontology;
 
-/** Object classes and attribute for S-57 specification (used in ENC files) */
+/** Object classes and attributes for S-57 specification (used in ENC files) */
 public class S57 {
+
     //
     // object classes
     //
@@ -84,7 +85,7 @@ public class S57 {
     public static final String OC_WRECKS = "WRECKS";
 
     //
-    // attributes classes
+    // attributes
     //
 
     public static final String AT_OBJNAM = "OBJNAM";

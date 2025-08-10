@@ -14,5 +14,7 @@ public interface IFeatureSource<S, F, E> {
 
     IFeatureSourceIterator<F> features();
 
+    IFeatureSourceIterator<F> features(E bounds, double displayScale);
+
     IFeatureSourceIterator<F> features(E bounds, double displayScale, boolean scaleLess);
 }

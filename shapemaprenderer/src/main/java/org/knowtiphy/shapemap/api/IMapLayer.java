@@ -12,17 +12,7 @@ public interface IMapLayer<S, F, E> {
 
     IFeatureSource<S, F, E> featureSource();
 
-    //
-    //    public void setVisible(boolean visible) {
-    //        this.visible.set(visible);
-    //    }
-    //
     boolean isScaleLess();
-
-    //
-    //    public EventStream<Change<Boolean>> layerVisibilityEvent() {
-    //        return layerVisibilityEvent;
-    //    }
 
     boolean isVisible();
 

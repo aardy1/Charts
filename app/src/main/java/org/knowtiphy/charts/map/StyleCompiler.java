@@ -2,7 +2,7 @@
  * Copyright Knowtiphy
  * All rights reserved.
  */
-package org.knowtiphy.charts.chartlocker;
+package org.knowtiphy.charts.map;
 
 import java.util.Collection;
 import java.util.HashMap;

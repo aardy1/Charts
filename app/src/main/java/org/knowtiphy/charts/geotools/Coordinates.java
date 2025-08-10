@@ -2,7 +2,6 @@ package org.knowtiphy.charts.geotools;
 
 import java.text.NumberFormat;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Logger;
 import javax.measure.Unit;
 import javax.measure.quantity.Length;
@@ -11,7 +10,7 @@ import org.geotools.api.referencing.crs.GeographicCRS;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
-import org.knowtiphy.charts.model.MapModel;
+import org.knowtiphy.charts.map.Map;
 import org.knowtiphy.charts.platform.IUnderlyingPlatform;
 import si.uom.SI;
 
@@ -30,7 +29,7 @@ public class Coordinates {
 
     //  compute a bounding box for a collection of maps.
 
-    public static <S, F> ReferencedEnvelope bounds(List<MapModel<S, F>> maps) {
+    public static <S, F> ReferencedEnvelope bounds(List<Map<S, F>> maps) {
 
         var minX = Double.POSITIVE_INFINITY;
         var minY = Double.POSITIVE_INFINITY;
@@ -48,7 +47,6 @@ public class Coordinates {
         // TODO -- get the CRS from the cell file
         return new ReferencedEnvelope(minX, maxX, minY, maxY, DefaultGeographicCRS.WGS84);
     }
-
 
     static final double OGC_DEGREE_TO_METERS = 6378137.0 * 2.0 * Math.PI / 360;
 

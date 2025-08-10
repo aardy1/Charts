@@ -5,18 +5,16 @@
 
 package org.knowtiphy.charts.memstore;
 
+import java.util.Iterator;
+import java.util.function.Consumer;
 import org.knowtiphy.shapemap.api.IFeatureSourceIterator;
 
-import java.util.Iterator;
-
-/**
- * @author graham
- *     <p>An iterator for a "collection" of MemFeatures
- */
+/** An iterator over a "collection" of in memory features. */
 public record MemStoreFeatureIterator(Iterator<MemFeature> iterator)
         implements IFeatureSourceIterator<MemFeature> {
+
     @Override
-    public synchronized boolean hasNext() {
+    public boolean hasNext() {
         return iterator.hasNext();
     }
 
@@ -26,7 +24,12 @@ public record MemStoreFeatureIterator(Iterator<MemFeature> iterator)
     }
 
     @Override
-    public void close() {
-        // do nothing
+    public void forEachRemaining(Consumer<? super MemFeature> action) {
+        iterator.forEachRemaining(action);
+    }
+
+    @Override
+    public void close() throws Exception {
+        //  do nothing
     }
 }

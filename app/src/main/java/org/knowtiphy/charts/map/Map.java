@@ -1,22 +1,21 @@
-package org.knowtiphy.charts.model;
+package org.knowtiphy.charts.map;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.knowtiphy.shapemap.api.IMapLayer;
 import org.locationtech.jts.geom.Geometry;
 
 /**
- * A map model -- map bounds and compilation scale, and a collection of map layers.
+ * A map -- map bounds and compilation scale, and a collection of map layers.
  *
  * @param <S> the type of the schema for the map layers
  * @param <F> the type of the features for the map layers
  */
-public class MapModel<S, F> {
+public class Map<S, F> {
 
     private final ReferencedEnvelope bounds;
 
@@ -26,14 +25,14 @@ public class MapModel<S, F> {
 
     private final List<IMapLayer<S, F, ReferencedEnvelope>> layers = new LinkedList<>();
 
-    private final Map<String, MapLayer<S, F>> nameToLayer = new LinkedHashMap<>();
+    private final java.util.Map<String, Layer<S, F>> nameToLayer = new LinkedHashMap<>();
 
     private Geometry geometry;
 
     // possibly shouldnt be here -- but it makes for faster rendering
     private int totalRuleCount = 0;
 
-    public MapModel(ReferencedEnvelope bounds, int cScale, String title) {
+    public Map(ReferencedEnvelope bounds, int cScale, String title) {
         this.bounds = bounds;
         this.cScale = cScale;
         this.title = title;
@@ -63,14 +62,16 @@ public class MapModel<S, F> {
         return layers;
     }
 
-    public void addLayer(String layerName, MapLayer<S, F> layer) {
+    public void addLayer(String layerName, Layer<S, F> layer) {
+        assert !nameToLayer.containsKey(layerName);
+        assert layerName.equals(layer.style().featureType())
+                : (layerName + " : " + layer.style().featureType());
         layers.add(layer);
         nameToLayer.put(layerName, layer);
         totalRuleCount += layer.style().rules().size();
-        //  TODO -- publish an add layer event
     }
 
-    public MapLayer<S, F> layer(String type) {
+    public Layer<S, F> layer(String type) {
         return nameToLayer.get(type);
     }
 

@@ -9,7 +9,7 @@ import javafx.scene.paint.Color;
 import org.geotools.geometry.jts.JTS;
 import org.knowtiphy.charts.geotools.RendererUtilities;
 import org.knowtiphy.charts.chartview.shapemapview.IShapeMapViewModel;
-import org.knowtiphy.charts.model.MapModel;
+import org.knowtiphy.charts.map.Map;
 import org.knowtiphy.shapemap.api.RenderingContext;
 import org.knowtiphy.shapemap.renderer.ShapeMapRenderer;
 import org.knowtiphy.shapemap.renderer.Transformation;
@@ -43,7 +43,7 @@ public class CanvasShapeMapSkin<S, F> extends ShapeMapBaseSkin<S, F> {
         this.viewModel = viewModel;
         this.background = background;
 
-        for (MapModel<S, F> map : viewModel.maps()) {
+        for (Map<S, F> map : viewModel.maps()) {
             root.getChildren().add(new BorderPane());
         }
 

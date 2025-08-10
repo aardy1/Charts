@@ -125,7 +125,7 @@ public class ShapeMapRenderer<S, F, E> {
             if (layerNeedsTextLayout[layerPos]) {
                 try (var iterator =
                         layer.featureSource()
-                                .features(viewPortBounds, renderingContext.displayScale(), true)) {
+                                .features(viewPortBounds, renderingContext.displayScale())) {
                     for (var feature : iterator) {
                         var rp = rulePos;
                         for (var rule : layer.style().rules()) {

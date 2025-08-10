@@ -24,7 +24,7 @@ public class MemFeatureAdapter implements IFeatureAdapter<MemFeature> {
 
     @Override
     public FeatureGeomType geomType(MemFeature feature) {
-        return feature.geomType();
+        return feature.geometryType();
     }
 
     @Override

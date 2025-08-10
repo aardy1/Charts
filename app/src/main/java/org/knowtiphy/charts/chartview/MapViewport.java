@@ -1,6 +1,5 @@
 package org.knowtiphy.charts.chartview;
 
-import org.knowtiphy.charts.geotools.RendererUtilities;
 import javafx.geometry.Point2D;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.transform.Affine;
@@ -8,6 +7,7 @@ import javafx.scene.transform.NonInvertibleTransformException;
 import org.geotools.api.referencing.operation.TransformException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.knowtiphy.charts.geotools.Coordinates;
+import org.knowtiphy.charts.geotools.RendererUtilities;
 import org.knowtiphy.charts.platform.IUnderlyingPlatform;
 
 /**
@@ -129,7 +129,6 @@ public class MapViewport {
     private void calculateTransforms() throws TransformException, NonInvertibleTransformException {
 
         if (needToRecompute) {
-            System.out.println("Recomputing xforms");
             if (screenArea.equals(Rectangle2D.EMPTY)) {
                 screenToWorld = worldToScreen = null;
                 hasCenteringTransforms = false;
@@ -148,7 +147,7 @@ public class MapViewport {
             }
 
             needToRecompute = false;
-        } else System.out.println("Re-using xforms");
+        }
     }
 
     /**
