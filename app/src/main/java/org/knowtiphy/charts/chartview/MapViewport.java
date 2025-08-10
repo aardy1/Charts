@@ -1,5 +1,6 @@
 package org.knowtiphy.charts.chartview;
 
+import org.knowtiphy.charts.geotools.RendererUtilities;
 import javafx.geometry.Point2D;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.transform.Affine;
@@ -7,7 +8,6 @@ import javafx.scene.transform.NonInvertibleTransformException;
 import org.geotools.api.referencing.operation.TransformException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.knowtiphy.charts.geotools.Coordinates;
-import static org.knowtiphy.charts.geotools.Coordinates.toCM;
 import org.knowtiphy.charts.platform.IUnderlyingPlatform;
 
 /**
@@ -104,23 +104,26 @@ public class MapViewport {
      * @return
      */
     public double dScale() {
-        var acrossKM = Coordinates.distanceAcross(getBounds());
-        var screenAreaWidthPX = getScreenArea().getWidth();
-        var screenAreaWidthCM = platform.windowWidthCM(screenAreaWidthPX);
-        //        System.out.println("dist across M = " + acrossKM);
-        //        System.out.println("screenAreaWidthPx = " + screenAreaWidthPX);
-        //        System.out.println("screenAreaWidthCM = " + screenAreaWidthCM);
-        //        System.out.println("dscale width = " + toCM(acrossKM / screenAreaWidthCM));
+        return Coordinates.dScale(getBounds(), getScreenArea().getWidth(), platform);
+        //        var acrossKM = Coordinates.distanceAcross(getBounds());
+        //        var screenAreaWidthPX = getScreenArea().getWidth();
+        //        var screenAreaWidthCM = platform.windowWidthCM(screenAreaWidthPX);
+        //        //        System.out.println("dist across M = " + acrossKM);
+        //        //        System.out.println("screenAreaWidthPx = " + screenAreaWidthPX);
+        //        //        System.out.println("screenAreaWidthCM = " + screenAreaWidthCM);
+        //        //        System.out.println("dscale width = " + toCM(acrossKM /
+        // screenAreaWidthCM));
+        //
+        //        //        var downKM = Coordinates.distanceDown(bounds());
+        //        //        var screenAreaHeightPX = screenArea().getHeight();
+        //        //        var screenAreaHeightCM = platform.windowHeightCM(screenAreaHeightPX);
+        //        //        System.out.println("dist down M = " + downKM);
+        //        //        System.out.println("screenAreaHeightPx = " + screenAreaHeightPX);
+        //        //        System.out.println("screenAreaHeightCM = " + screenAreaHeightCM);
+        //        //        System.out.println("dscale height = " + toCM(downKM /
+        // screenAreaHeightCM));
 
-        //        var downKM = Coordinates.distanceDown(bounds());
-        //        var screenAreaHeightPX = screenArea().getHeight();
-        //        var screenAreaHeightCM = platform.windowHeightCM(screenAreaHeightPX);
-        //        System.out.println("dist down M = " + downKM);
-        //        System.out.println("screenAreaHeightPx = " + screenAreaHeightPX);
-        //        System.out.println("screenAreaHeightCM = " + screenAreaHeightCM);
-        //        System.out.println("dscale height = " + toCM(downKM / screenAreaHeightCM));
-
-        return toCM(acrossKM / screenAreaWidthCM);
+        //        return toCM(acrossKM / screenAreaWidthCM);
     }
 
     private void calculateTransforms() throws TransformException, NonInvertibleTransformException {

@@ -2,21 +2,24 @@ package org.knowtiphy.charts.chartlocker;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.StreamSupport;
 import javax.xml.stream.XMLStreamException;
 import org.geotools.api.feature.simple.SimpleFeatureType;
 import org.geotools.api.feature.type.Name;
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.data.store.ContentFeatureSource;
 import org.knowtiphy.charts.chartview.MapDisplayOptions;
-import org.knowtiphy.charts.model.MapLayer;
-import org.knowtiphy.charts.model.MapModel;
 import org.knowtiphy.charts.enc.ENCCell;
-import static org.knowtiphy.charts.geotools.FileUtils.listShapeFilePaths;
 import org.knowtiphy.charts.memstore.MemFeature;
 import org.knowtiphy.charts.memstore.MemStore;
 import org.knowtiphy.charts.memstore.StyleReader;
+import org.knowtiphy.charts.model.MapLayer;
+import org.knowtiphy.charts.model.MapModel;
 import org.knowtiphy.charts.ontology.S57;
 import org.knowtiphy.charts.settings.AppSettings;
 import org.knowtiphy.shapemap.style.parser.StyleSyntaxException;
@@ -113,8 +116,8 @@ public class MapModelReader {
 
         var map =
                 new MapModel<SimpleFeatureType, MemFeature>(
-                        cell.bounds(), cell.cScale(), cell.lname());
-        var store = new MemStore(map);
+                        cell.bounds(), cell.cScale(), cell.title());
+        var store = new MemStore();
 
         for (var featureTypeName : LAYER_ORDER) {
             for (var fileName : fileNames) {
@@ -181,6 +184,16 @@ public class MapModelReader {
             case S57.OC_WRECKS -> displayOptions.getShowWrecks();
             default -> true;
         };
+    }
+
+    private static List<String> listShapeFilePaths(Path dir) {
+        try (var stream = Files.newDirectoryStream(dir, "*.shp")) {
+            return StreamSupport.stream(stream.spliterator(), false)
+                    .map(x -> x.toFile().getAbsolutePath())
+                    .toList();
+        } catch (IOException x) {
+            return List.of();
+        }
     }
 }
 

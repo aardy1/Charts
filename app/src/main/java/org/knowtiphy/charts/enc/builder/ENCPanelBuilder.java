@@ -10,22 +10,41 @@ import static org.knowtiphy.charts.enc.Constants.GEOMETRY_FACTORY;
 import org.knowtiphy.charts.enc.ENCPanel;
 import org.locationtech.jts.geom.Coordinate;
 
-/** An ENC Panel builder. */
+/** A builder for panels in an ENC cell. */
 public class ENCPanelBuilder {
 
     // the boundary points of the panel
-    private final List<Coordinate> vertices = new ArrayList<>();
+    private final List<Coordinate> vertices;
 
-    public void vertex(Coordinate vertex) {
-        this.vertices.add(vertex);
+    public ENCPanelBuilder() {
+        vertices = new ArrayList<>();
     }
 
-    public ENCPanel build() {
-        var pts = new Coordinate[vertices.size()];
-        for (var i = 0; i < vertices.size(); i++) {
-            pts[i] = vertices.get(i);
-        }
+    /**
+     * Add a vertex to the panel being built.
+     *
+     * @param vertex the vertex
+     * @return the builder;
+     */
+    public ENCPanelBuilder addVertex(Coordinate vertex) {
+        this.vertices.add(vertex);
+        return this;
+    }
 
-        return new ENCPanel(vertices, GEOMETRY_FACTORY.createPolygon(pts));
+    /**
+     * Build the panel as an ENCPanel.
+     *
+     * @return the panel.
+     */
+    public ENCPanel build() {
+
+        //  compute the geometry polygon for the panel
+        var boundaryPoints = new Coordinate[vertices.size()];
+        for (var i = 0; i < vertices.size(); i++) {
+            boundaryPoints[i] = vertices.get(i);
+        }
+        var geometry = GEOMETRY_FACTORY.createPolygon(boundaryPoints);
+
+        return new ENCPanel(vertices, geometry);
     }
 }

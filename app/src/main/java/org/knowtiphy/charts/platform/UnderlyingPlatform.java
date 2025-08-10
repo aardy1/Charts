@@ -7,6 +7,7 @@ package org.knowtiphy.charts.platform;
 
 import java.io.InputStream;
 import java.nio.file.Path;
+import java.util.Map;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.image.Image;
 import javafx.stage.Screen;
@@ -15,6 +16,24 @@ import org.apache.commons.lang3.SystemUtils;
 
 /** Base class for all abstractions of the underlying platform */
 public abstract class UnderlyingPlatform {
+
+    /**
+     * Either gets a DPI from the hints, or return the OGC standard, stating that a pixel is 0.28 mm
+     * (the result is a non integer DPI...)
+     *
+     * @return DPI as doubles, to avoid issues with integer trunking in scale computation expression
+     */
+    public static double getDpi(Map<String, Object> hints)
+    {
+        if (hints != null && hints.containsKey("dpi"))
+        {
+            return ((Number) hints.get("dpi")).doubleValue();
+        }
+        else
+        {
+            return 25.4 / 0.28; // 90 = OGC standard
+        }
+    }
     private final Path root;
 
     // private final DisplayService display;

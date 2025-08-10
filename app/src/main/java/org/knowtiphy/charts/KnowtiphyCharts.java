@@ -107,7 +107,8 @@ public class KnowtiphyCharts extends Application {
 
         var cell = chartLocker.getCell("Gulf of Mexico", 2_160_000);
         var quilt =
-                chartLocker.loadQuilt(cell.bounds(), cell.cScale(), appSettings, displayOptions);
+                chartLocker.loadQuilt(
+                        cell.bounds(), cell.cScale(), appSettings, displayOptions);
         // this won't be right after the info bar is done, but that will be resized later
         var viewPort =
                 new MapViewport(

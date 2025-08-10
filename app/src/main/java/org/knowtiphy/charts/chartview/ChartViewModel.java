@@ -117,7 +117,7 @@ public class ChartViewModel implements IShapeMapViewModel<SimpleFeatureType, Mem
     public double aScale() {
         var swIn = platform.screenDimensions().getWidth() / platform.ppi();
         var adjustment = swIn / 22;
-        return dScale() / 3; // * adjustment;
+        return dScale() * adjustment / 3;
     }
 
     @Override
@@ -286,13 +286,12 @@ public class ChartViewModel implements IShapeMapViewModel<SimpleFeatureType, Mem
 
     public void loadNewChart(ENCCell cell) {
         System.out.println("load new chart");
+        setViewPortBounds(cell.bounds());
         setQuilt(chartLocker.loadQuilt(cell.bounds(), aScale(), appSettings, mapDisplayOptions));
     }
 
     public void loadMostDetailedChart(Point point) {
-        var cell = chartLocker.getMostDetailedCell(point);
-        setViewPortBounds(cell.bounds());
-        setQuilt(chartLocker.loadQuilt(cell.bounds(), aScale(), appSettings, mapDisplayOptions));
+        loadNewChart(chartLocker.getMostDetailedCell(point));
     }
 
     public ReferencedEnvelope tinyPolygon(double x, double y, int radius)
@@ -319,11 +318,6 @@ public class ChartViewModel implements IShapeMapViewModel<SimpleFeatureType, Mem
         return new ReferencedEnvelope(minX, minX + width, minY, minY + height, crs());
     }
 
-    public ReferencedEnvelope tinyPolygon(double x, double y)
-            throws TransformException, NonInvertibleTransformException {
-        return tinyPolygon(x, y, 1);
-    }
-
     private void setQuilt(Quilt<SimpleFeatureType, MemFeature> newQuilt) {
         //  TODO this is a hack :-)
         if (newQuilt.maps().isEmpty()) return;
@@ -335,24 +329,21 @@ public class ChartViewModel implements IShapeMapViewModel<SimpleFeatureType, Mem
     }
 
     //  when the viewport bounds change we have to recompute the quilt
-    private void recomputeQuilt() {
+    //  aScale will be correct since its based on the viewport bounds which have already changed
 
-        //  adjustscale will be correct since its based on the viewport bounds which have already
-        // changed
-        var newQuilt =
-                chartLocker.loadQuilt(viewPort.getBounds(),
-                        aScale(),
-                        appSettings,
-                        mapDisplayOptions);
-        System.err.println("--------------------");
-        System.err.println("VP bounds change");
-        System.err.println("quilt size = " + newQuilt.maps().size());
-        //        System.err.println("old bounds = " + oldBounds);
-        System.err.println("new bounds = " + viewPort.getBounds());
-        System.err.println("adjusted display scale = " + aScale());
-        for (var map : newQuilt.maps()) {
-            System.err.println("\tmap " + map.title() + " scale " + map.cScale());
-        }
-        setQuilt(newQuilt);
+    private void recomputeQuilt() {
+        setQuilt(
+                chartLocker.loadQuilt(
+                        viewPort.getBounds(), aScale(), appSettings, mapDisplayOptions));
     }
 }
+
+//     System.err.println("--------------------");
+//        System.err.println("VP bounds change");
+//        System.err.println("quilt size = " + newQuilt.maps().size());
+//        //        System.err.println("old bounds = " + oldBounds);
+//        System.err.println("new bounds = " + viewPort.getBounds());
+//        System.err.println("adjusted display scale = " + aScale());
+//        for (var map : newQuilt.maps()) {
+//            System.err.println("\tmap " + map.title() + " scale " + map.cScale());
+//        }

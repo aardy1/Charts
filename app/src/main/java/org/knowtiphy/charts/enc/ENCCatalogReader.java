@@ -13,7 +13,7 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import org.knowtiphy.charts.enc.builder.ENCCellBuilder;
 import org.knowtiphy.charts.enc.builder.ENCPanelBuilder;
-import org.knowtiphy.charts.enc.builder.ENCProductCatalogBuilder;
+import org.knowtiphy.charts.enc.builder.ENCCatalogBuilder;
 import org.knowtiphy.charts.enc.builder.VertexBuilder;
 
 /** A reader of ENC Catalogs (in XML format) from a path. */
@@ -62,7 +62,7 @@ public class ENCCatalogReader {
     public ENCCatalog read() throws XMLStreamException {
         XMLEventReader reader = XMLInputFactory.newInstance().createXMLEventReader(stream);
 
-        ENCProductCatalogBuilder catalogBuilder = new ENCProductCatalogBuilder(chartsDir);
+        ENCCatalogBuilder catalogBuilder = new ENCCatalogBuilder(chartsDir);
         ENCCellBuilder cellBuilder = null;
         ENCPanelBuilder panelBuilder = null;
         VertexBuilder vertexBuilder = null;
@@ -75,7 +75,7 @@ public class ENCCatalogReader {
                 switch (startElement.getName().getLocalPart()) {
                     case TITLE -> {
                         assert catalogBuilder != null;
-                        catalogBuilder.title(reader.nextEvent().asCharacters().getData());
+                        catalogBuilder.setTitle(reader.nextEvent().asCharacters().getData());
                     }
                     case CELL -> {
                         cellBuilder = new ENCCellBuilder();
@@ -83,12 +83,12 @@ public class ENCCatalogReader {
                     case CELL_NAME -> {
                         assert cellBuilder != null;
                         var cellName = reader.nextEvent().asCharacters().getData();
-                        cellBuilder.name(cellName);
+                        cellBuilder.setName(cellName);
                         cellBuilder.location(catalogBuilder.cellPath(cellName));
                     }
                     case CELL_LNAME -> {
                         assert cellBuilder != null;
-                        cellBuilder.lName(reader.nextEvent().asCharacters().getData());
+                        cellBuilder.setTitle(reader.nextEvent().asCharacters().getData());
                     }
                     case CSCALE -> {
                         assert cellBuilder != null;
@@ -97,7 +97,7 @@ public class ENCCatalogReader {
                     }
                     case STATUS -> {
                         assert cellBuilder != null;
-                        cellBuilder.active(
+                        cellBuilder.setActive(
                                 reader.nextEvent()
                                         .asCharacters()
                                         .getData()
@@ -108,22 +108,15 @@ public class ENCCatalogReader {
                         cellBuilder.zipFileLocation(reader.nextEvent().asCharacters().getData());
                     }
                     case PANEL -> panelBuilder = new ENCPanelBuilder();
-                    //                    case PANEL_NO ->
-                    //                    {
-                    //                        assert panel != null;
-                    //                        panel.setPanelNumber(
-                    //
-                    // Integer.parseInt(reader.nextEvent().asCharacters().getData()));
-                    //                    }
                     case VERTEX -> vertexBuilder = new VertexBuilder();
                     case LONG -> {
                         assert vertexBuilder != null;
-                        vertexBuilder.longitude(
+                        vertexBuilder.setLongitude(
                                 Double.parseDouble(reader.nextEvent().asCharacters().getData()));
                     }
                     case LAT -> {
                         assert vertexBuilder != null;
-                        vertexBuilder.latitude(
+                        vertexBuilder.setLatitude(
                                 Double.parseDouble(reader.nextEvent().asCharacters().getData()));
                     }
                     default -> {
@@ -138,7 +131,9 @@ public class ENCCatalogReader {
                     case CELL -> {
                         assert catalogBuilder != null;
                         assert cellBuilder != null;
-                        catalogBuilder.cell(cellBuilder.build());
+                        var cell = cellBuilder.build();
+                        //  cell null means the cell was marked as inactive so ignore it
+                        if (cell != null) catalogBuilder.addCell(cell);
                     }
                     case PANEL -> {
                         assert panelBuilder != null;
@@ -148,7 +143,7 @@ public class ENCCatalogReader {
                     case VERTEX -> {
                         assert panelBuilder != null;
                         assert vertexBuilder != null;
-                        panelBuilder.vertex(vertexBuilder.build());
+                        panelBuilder.addVertex(vertexBuilder.build());
                     }
                     default -> {
                         // ignore other tags

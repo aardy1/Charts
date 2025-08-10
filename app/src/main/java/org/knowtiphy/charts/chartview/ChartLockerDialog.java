@@ -168,7 +168,7 @@ public class ChartLockerDialog {
 
             var row = 0;
             for (var cell : catalog.cells()) {
-                var name = new Label(cell.lname());
+                var name = new Label(cell.title());
                 var scale = new Label(" 1:" + cell.cScale());
                 var show = showButton(cell);
                 show.setDisable(!cell.isLoaded());

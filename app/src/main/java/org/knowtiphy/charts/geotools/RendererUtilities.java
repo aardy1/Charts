@@ -1,4 +1,4 @@
-package org.knowtiphy.charts.chartview;
+package org.knowtiphy.charts.geotools;
 
 import java.text.MessageFormat;
 import javafx.geometry.Rectangle2D;

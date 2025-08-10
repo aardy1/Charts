@@ -134,8 +134,7 @@ public class InfoBar extends StackPane {
 
         chartLocker
                 .history()
-                .addListener(
-                        (ListChangeListener<ENCCell>)
+                .addListener((ListChangeListener<ENCCell>)
                                 _ -> history.getItems().setAll(historyMenuItems()));
 
         return new ToolBar(
@@ -151,7 +150,7 @@ public class InfoBar extends StackPane {
                         Coordinates.distanceAcross(chart.viewPortBounds()),
                         unitProfile::metersToMapUnits));
         displayScale.setText("DS = " + formatDecimal(chart.dScale(), 2) + "");
-        adjustedDisplayScale.setText("AS = " + formatDecimal(chart.adjustedDisplayScale(), 2) + "");
+        adjustedDisplayScale.setText("AS = " + formatDecimal(chart.aScale(), 2) + "");
         //        zoomLevel.setText(Coordinates.twoDec(chart.zoom()));
     }
 
@@ -160,7 +159,7 @@ public class InfoBar extends StackPane {
 
         var items = new ArrayList<MenuItem>();
         for (var description : chartLocker.history()) {
-            var menuItem = new MenuItem(description.lname() + "  1:" + description.cScale());
+            var menuItem = new MenuItem(description.title() + "  1:" + description.cScale());
             menuItem.setOnAction(_ -> loadChart(description));
             items.add(menuItem);
         }

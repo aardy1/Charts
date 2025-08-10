@@ -114,7 +114,7 @@ public class SingleCanvasShapeMapView<S, F> extends Region {
                                 screenArea,
                                 viewModel.viewPortWorldToScreen(),
                                 viewModel.viewPortScreenToWorld(),
-                                viewModel.adjustedDisplayScale(),
+                                viewModel.aScale(),
                                 viewModel.featureAdapter(),
                                 viewModel.renderablePolygonProvider(),
                                 viewModel.svgProvider(),

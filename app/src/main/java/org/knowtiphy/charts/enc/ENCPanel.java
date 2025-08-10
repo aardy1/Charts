@@ -10,14 +10,14 @@ import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Polygon;
 
 /**
- * An ENC Panel -- a list of boundary points making up a polygon.
+ * An ENC Panel -- a list of boundary points making up a polygonal area.
  *
  * @param vertices the list of boundary points
- * @param geom the polygon geometry formed by the vertices
+ * @param geometry the polygon geometry formed by the vertices
  */
-public record ENCPanel(List<Coordinate> vertices, Polygon geom) {
+public record ENCPanel(List<Coordinate> vertices, Polygon geometry) {
 
     public boolean intersects(Geometry envelope) {
-        return envelope.intersects(geom());
+        return envelope.intersects(geometry());
     }
 }

@@ -7,22 +7,39 @@ package org.knowtiphy.charts.enc.builder;
 
 import org.locationtech.jts.geom.Coordinate;
 
-/**
- * @author graham
- */
+/** A builder for vertices in an ENC panel. */
 public class VertexBuilder {
 
-    public double longitude;
-    public double latitude;
+    private double longitude;
+    private double latitude;
 
-    public void latitude(double latitude) {
+    /**
+     * Set the latitude of the vertex being built.
+     *
+     * @param latitude the latitude
+     * @return the builder
+     */
+    public VertexBuilder setLatitude(double latitude) {
         this.latitude = latitude;
+        return this;
     }
 
-    public void longitude(double longitude) {
+    /**
+     * Set the longitude of the vertex being built.
+     *
+     * @param longitude the longitude
+     * @return the builder
+     */
+    public VertexBuilder setLongitude(double longitude) {
         this.longitude = longitude;
+        return this;
     }
 
+    /**
+     * Build the vertex as a coordinate.
+     *
+     * @return the coordinate.
+     */
     public Coordinate build() {
         return new Coordinate(longitude, latitude);
     }

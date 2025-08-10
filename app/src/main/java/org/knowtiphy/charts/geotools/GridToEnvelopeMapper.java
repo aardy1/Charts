@@ -3,7 +3,7 @@
  * All rights reserved.
  */
 
-package org.knowtiphy.charts.chartview;
+package org.knowtiphy.charts.geotools;
 
 import java.awt.image.BufferedImage;
 import javafx.scene.transform.Affine;

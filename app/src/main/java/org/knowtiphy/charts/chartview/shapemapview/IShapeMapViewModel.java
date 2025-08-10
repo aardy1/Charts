@@ -38,7 +38,7 @@ public interface IShapeMapViewModel<S, F> {
 
     Rectangle2D viewPortScreenArea();
 
-    double adjustedDisplayScale();
+    double aScale();
 
     Affine viewPortScreenToWorld() throws TransformException, NonInvertibleTransformException;
 

@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * An ENC (product )catalog -- a named/titled collection of ENC cells. (there are other fields other
- * than the name/title but we don't keep them for the moment)
+ * An ENC (product )catalog -- a named/titled collection of ENC cells (there are other fields in an
+ * ENC catalog other than the name/title but for the moment we don't store them).
  *
  * @param title the title of the catalog
  * @param cells the cells in the catalog

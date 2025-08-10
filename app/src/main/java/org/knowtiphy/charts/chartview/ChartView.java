@@ -14,7 +14,7 @@ import org.knowtiphy.charts.dynamics.AISModel;
 import org.knowtiphy.charts.settings.UnitProfile;
 import org.knowtiphy.shapemap.context.SVGCache;
 
-/** A control to show ENC charts and quilts of charts. */
+/** A control to show (quilts of) ENC charts. */
 public class ChartView extends Control {
 
     public enum SkinType {

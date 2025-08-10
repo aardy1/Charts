@@ -8,20 +8,31 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
 import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.MultiPolygon;
 
-/** An ENC cell -- a list of ENC panels plus some metadata. */
+/**
+ * An ENC cell -- a list of ENC panels plus metadata.
+ *
+ * @param panels the panels in the cell
+ * @param name the name of the cell
+ * @param title the title of the cell
+ * @param compilationScale the compilation scale of the cell
+ * @param zipFileLocation the location of the actual data file?
+ * @param location the path to the cell on the local disk drive (this needs to be generalized)
+ * @param geometry the geometry of the cell (so the union of the geometries of each panel)
+ * @param bounds the bounds of the cell (a rectangular area that contains all the panels)
+ */
 public record ENCCell(
         List<ENCPanel> panels,
-        MultiPolygon geom,
         String name,
-        String lname,
+        //  the lname field
+        String title,
         int cScale,
-        boolean active,
         String zipFileLocation,
-        Path location) {
+        Path location,
+        MultiPolygon geometry,
+        ReferencedEnvelope bounds) {
 
     public boolean isLoaded() {
         return location.toFile().exists();
@@ -29,26 +40,6 @@ public record ENCCell(
 
     public boolean intersects(Geometry envelope) {
         return panels.stream().anyMatch(p -> p.intersects(envelope));
-    }
-
-    //  should cache this?
-    public ReferencedEnvelope bounds() {
-        var minX = Double.POSITIVE_INFINITY;
-        var minY = Double.POSITIVE_INFINITY;
-        var maxX = Double.NEGATIVE_INFINITY;
-        var maxY = Double.NEGATIVE_INFINITY;
-
-        for (var panel : panels) {
-            for (var coordinate : panel.vertices()) {
-                minX = Math.min(minX, coordinate.x);
-                minY = Math.min(minY, coordinate.y);
-                maxX = Math.max(maxX, coordinate.x);
-                maxY = Math.max(maxY, coordinate.y);
-            }
-        }
-
-        // TODO -- get the CRS from the cell file
-        return new ReferencedEnvelope(minX, maxX, minY, maxY, DefaultGeographicCRS.WGS84);
     }
 
     //  TODO -- how can we tell if two ENCs are the same? Do we need this?

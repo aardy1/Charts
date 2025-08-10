@@ -1,4 +1,4 @@
-package org.knowtiphy.charts.chartview;
+package org.knowtiphy.charts.geotools;
 
 import javafx.scene.shape.Rectangle;
 import org.geotools.api.coverage.grid.GridEnvelope;

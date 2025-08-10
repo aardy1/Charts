@@ -14,6 +14,8 @@ import java.util.List;
 import javax.xml.stream.XMLStreamException;
 
 /**
+ * Convert an ENC chart file into a collection of shape files.
+ *
  * @author graham
  */
 public class Setup {

@@ -12,6 +12,7 @@ import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.knowtiphy.charts.model.MapModel;
+import org.knowtiphy.charts.platform.IUnderlyingPlatform;
 import si.uom.SI;
 
 /** */
@@ -25,16 +26,6 @@ public class Coordinates {
     public static double distanceDown(ReferencedEnvelope referencedEnvelope) {
         var degreeDiff = referencedEnvelope.getMaxY() - referencedEnvelope.getMinY();
         return toMeters(degreeDiff, referencedEnvelope.getCoordinateReferenceSystem());
-    }
-
-    public static ReferencedEnvelope zoom(ReferencedEnvelope envelope, double zoomFactor) {
-        var newWidth = envelope.getWidth() * zoomFactor;
-        var newHeight = envelope.getHeight() * zoomFactor;
-        // expanding mutates the envelope so copy it
-        var copy = new ReferencedEnvelope(envelope);
-        copy.expandBy((newWidth - envelope.getWidth()) / 2, (newHeight - envelope.getHeight()) / 2);
-        return copy;
-        //    clip(maxExtent, copy, crs);
     }
 
     //  compute a bounding box for a collection of maps.
@@ -58,9 +49,107 @@ public class Coordinates {
         return new ReferencedEnvelope(minX, maxX, minY, maxY, DefaultGeographicCRS.WGS84);
     }
 
-    private static final double DEFAULT_WIDTH = 3;
 
-    private static final double DEFAULT_HEIGHT = 3;
+    static final double OGC_DEGREE_TO_METERS = 6378137.0 * 2.0 * Math.PI / 360;
+
+    private static final Logger LOGGER =
+            org.geotools.util.logging.Logging.getLogger(Coordinates.class);
+
+    /**
+     * Enable unit correction in {@link #toMeters(double, CoordinateReferenceSystem)} calculation.
+     *
+     * <p>Toggle for a bug fix that will invalidate a good number of SLDs out there (and thus, we
+     * allow people to turn off the fix).
+     */
+    static boolean SCALE_UNIT_COMPENSATION =
+            Boolean.parseBoolean(
+                    System.getProperty("org.geotoools.render.lite.scale.unitCompensation", "true"));
+
+    /**
+     * Method used by the OGC scale calculation to turn a given length in the specified CRS towards
+     * meters.
+     *
+     * <p>GeographicCRS uses {@link #OGC_DEGREE_TO_METERS} for conversion of lat/lon measures
+     *
+     * <p>Otherwise the horizontal component of the CRS is assumed to have a uniform axis unit of
+     * measure providing the Unit used for conversion. To ignore unit disable {@link
+     * #SCALE_UNIT_COMPENSATION} to for the unaltered size.
+     *
+     * @return size adjusted for GeographicCRS or CRS units
+     */
+    public static double toMeters(double size, CoordinateReferenceSystem crs) {
+        if (crs == null) {
+            LOGGER.finer(
+                    "toMeters: assuming the original size is in meters already, as crs is null");
+            return size;
+        }
+        if (crs instanceof GeographicCRS) {
+            return size * OGC_DEGREE_TO_METERS;
+        }
+        if (!SCALE_UNIT_COMPENSATION) {
+            return size;
+        }
+        CoordinateReferenceSystem horizontal = CRS.getHorizontalCRS(crs);
+        if (horizontal != null) {
+            crs = horizontal;
+        }
+        @SuppressWarnings("unchecked")
+        Unit<Length> unit = (Unit<Length>) crs.getCoordinateSystem().getAxis(0).getUnit();
+        if (unit == null) {
+            LOGGER.finer(
+                    "toMeters: assuming the original size is in meters already, as the first crs axis unit "
+                            + "is"
+                            + " null. CRS is "
+                            + crs);
+            return size;
+        }
+        if (!unit.isCompatible(SI.METRE)) {
+            LOGGER.warning("toMeters: could not convert unit " + unit + " to meters");
+            return size;
+        }
+        return unit.getConverterTo(SI.METRE).convert(size);
+    }
+
+    public static double toCM(double size) {
+        return size * 100;
+    }
+
+    public static double dScale(
+            ReferencedEnvelope bounds, double screenAreaWidthPX, IUnderlyingPlatform platform) {
+        var acrossKM = Coordinates.distanceAcross(bounds);
+        //        var screenAreaWidthPX = getScreenArea().getWidth();
+        var screenAreaWidthCM = platform.windowWidthCM(screenAreaWidthPX);
+        //        System.out.println("dist across M = " + acrossKM);
+        //        System.out.println("screenAreaWidthPx = " + screenAreaWidthPX);
+        //        System.out.println("screenAreaWidthCM = " + screenAreaWidthCM);
+        //        System.out.println("dscale width = " + toCM(acrossKM / screenAreaWidthCM));
+
+        //        var downKM = Coordinates.distanceDown(bounds());
+        //        var screenAreaHeightPX = screenArea().getHeight();
+        //        var screenAreaHeightCM = platform.windowHeightCM(screenAreaHeightPX);
+        //        System.out.println("dist down M = " + downKM);
+        //        System.out.println("screenAreaHeightPx = " + screenAreaHeightPX);
+        //        System.out.println("screenAreaHeightCM = " + screenAreaHeightCM);
+        //        System.out.println("dscale height = " + toCM(downKM / screenAreaHeightCM));
+
+        return toCM(acrossKM / screenAreaWidthCM);
+    }
+
+    private static final NumberFormat TWO_PLACES = NumberFormat.getNumberInstance();
+
+    static {
+        TWO_PLACES.setMaximumFractionDigits(2);
+        TWO_PLACES.setMinimumFractionDigits(2);
+    }
+
+    public static String twoDec(double value) {
+        return TWO_PLACES.format(Math.round(value));
+    }
+}
+
+    //    private static final double DEFAULT_WIDTH = 3;
+    //
+    //    private static final double DEFAULT_HEIGHT = 3;
 
     //      TODO -- keep this as its needed when not quilting.
     //  public static <S, F> ReferencedEnvelope clip(
@@ -132,92 +221,13 @@ public class Coordinates {
     //        return widthMeters / (screenWidth / getDpi(Map.of("dpi", dpi)) * 0.0254);
     //    }
 
-    /**
-     * Either gets a DPI from the hints, or return the OGC standard, stating that a pixel is 0.28 mm
-     * (the result is a non integer DPI...)
-     *
-     * @return DPI as doubles, to avoid issues with integer trunking in scale computation expression
-     */
-    public static double getDpi(Map<String, Object> hints) {
-        if (hints != null && hints.containsKey("dpi")) {
-            return ((Number) hints.get("dpi")).doubleValue();
-        } else {
-            return 25.4 / 0.28; // 90 = OGC standard
-        }
-    }
-
-    static final double OGC_DEGREE_TO_METERS = 6378137.0 * 2.0 * Math.PI / 360;
-
-    private static final Logger LOGGER =
-            org.geotools.util.logging.Logging.getLogger(Coordinates.class);
-
-    /**
-     * Enable unit correction in {@link #toMeters(double, CoordinateReferenceSystem)} calculation.
-     *
-     * <p>Toggle for a bug fix that will invalidate a good number of SLDs out there (and thus, we
-     * allow people to turn off the fix).
-     */
-    static boolean SCALE_UNIT_COMPENSATION =
-            Boolean.parseBoolean(
-                    System.getProperty("org.geotoools.render.lite.scale.unitCompensation", "true"));
-
-    /**
-     * Method used by the OGC scale calculation to turn a given length in the specified CRS towards
-     * meters.
-     *
-     * <p>GeographicCRS uses {@link #OGC_DEGREE_TO_METERS} for conversion of lat/lon measures
-     *
-     * <p>Otherwise the horizontal component of the CRS is assumed to have a uniform axis unit of
-     * measure providing the Unit used for conversion. To ignore unit disable {@link
-     * #SCALE_UNIT_COMPENSATION} to for the unaltered size.
-     *
-     * @return size adjusted for GeographicCRS or CRS units
-     */
-    public static double toMeters(double size, CoordinateReferenceSystem crs) {
-        if (crs == null) {
-            LOGGER.finer(
-                    "toMeters: assuming the original size is in meters already, as crs is null");
-            return size;
-        }
-        if (crs instanceof GeographicCRS) {
-            return size * OGC_DEGREE_TO_METERS;
-        }
-        if (!SCALE_UNIT_COMPENSATION) {
-            return size;
-        }
-        CoordinateReferenceSystem horizontal = CRS.getHorizontalCRS(crs);
-        if (horizontal != null) {
-            crs = horizontal;
-        }
-        @SuppressWarnings("unchecked")
-        Unit<Length> unit = (Unit<Length>) crs.getCoordinateSystem().getAxis(0).getUnit();
-        if (unit == null) {
-            LOGGER.finer(
-                    "toMeters: assuming the original size is in meters already, as the first crs axis unit "
-                            + "is"
-                            + " null. CRS is "
-                            + crs);
-            return size;
-        }
-        if (!unit.isCompatible(SI.METRE)) {
-            LOGGER.warning("toMeters: could not convert unit " + unit + " to meters");
-            return size;
-        }
-        return unit.getConverterTo(SI.METRE).convert(size);
-    }
-
-    public static double toCM(double size) {
-        return size * 100;
-    }
-
-    private static final NumberFormat TWO_PLACES = NumberFormat.getNumberInstance();
-
-    static {
-        TWO_PLACES.setMaximumFractionDigits(2);
-        TWO_PLACES.setMinimumFractionDigits(2);
-    }
-
-    public static String twoDec(double value) {
-        return TWO_PLACES.format(Math.round(value));
-    }
-}
+    //    public static ReferencedEnvelope zoom(ReferencedEnvelope envelope, double zoomFactor) {
+    //        var newWidth = envelope.getWidth() * zoomFactor;
+    //        var newHeight = envelope.getHeight() * zoomFactor;
+    //        // expanding mutates the envelope so copy it
+    //        var copy = new ReferencedEnvelope(envelope);
+    //        copy.expandBy((newWidth - envelope.getWidth()) / 2, (newHeight - envelope.getHeight())
+    // / 2);
+    //        return copy;
+    //        //    clip(maxExtent, copy, crs);
+    //    }

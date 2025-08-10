@@ -40,8 +40,6 @@ import org.locationtech.jts.geom.TopologyException;
  */
 public class ChartLocker {
 
-    private final Path catalogsDir;
-
     private final Path chartsDir;
 
     private final ENCCellLoader cellLoader;
@@ -56,9 +54,9 @@ public class ChartLocker {
     public ChartLocker(Path catalogsDir, Path chartsDir, ENCCellLoader cellLoader)
             throws IOException, XMLStreamException {
 
-        this.catalogsDir = catalogsDir;
         this.chartsDir = chartsDir;
         this.cellLoader = cellLoader;
+
         //  load cached catalogs
         for (var catalogFile : readAvailableCatalogs(catalogsDir)) {
             var catalog = new ENCCatalogReader(chartsDir, catalogFile).read();
@@ -66,29 +64,20 @@ public class ChartLocker {
         }
     }
 
-    public List<ENCCell> intersections(ReferencedEnvelope envelope) {
-        var bounds = JTS.toGeometry(envelope);
-
-        var result = new ArrayList<ENCCell>();
-        for (var catalog : availableCatalogs()) {
-            for (var cell : catalog.cells()) {
-                if (cell.intersects(bounds)) {
-                    result.add(cell);
-                }
-            }
-        }
-
-        return result;
-    }
-
-    public ENCCell mostDetailedCell(Point p) {
+    /**
+     * Find the cell with smallest compilation scale containing a given point.
+     *
+     * @param point the point
+     * @return the cell
+     */
+    public ENCCell getMostDetailedCell(Point point) {
 
         var smallestScale = Integer.MAX_VALUE;
         ENCCell mostDetailed = null;
 
         for (var catalog : availableCatalogs()) {
             for (var cell : catalog.cells()) {
-                if (cell.geom().contains(p)) {
+                if (cell.geometry().contains(point)) {
                     if (cell.cScale() < smallestScale) {
                         smallestScale = cell.cScale();
                         mostDetailed = cell;
@@ -100,26 +89,24 @@ public class ChartLocker {
         return mostDetailed;
     }
 
-    public Quilt<SimpleFeatureType, MemFeature> loadMostDetailedQuilt(
-            Point point,
-            double adjustedDisplayScale,
-            AppSettings settings,
-            MapDisplayOptions mapDisplayOptions) {
-
-        var mostDetailed = mostDetailedCell(point);
-        System.out.println("Most detailed cell : " + mostDetailed);
-        return loadQuilt(mostDetailed.bounds(), mostDetailed.cScale(), settings, mapDisplayOptions);
-    }
-
+    /**
+     * Load a quilt of ENC charts covering a given envelope.
+     *
+     * @param envelope
+     * @param adjustedDisplayScale
+     * @param settings
+     * @param mapDisplayOptions
+     * @return the quilt
+     */
     @SuppressWarnings("CallToPrintStackTrace")
     public Quilt<SimpleFeatureType, MemFeature> loadQuilt(
-            ReferencedEnvelope bounds,
+            ReferencedEnvelope envelope,
             double adjustedDisplayScale,
             AppSettings settings,
             MapDisplayOptions mapDisplayOptions) {
 
-        System.out.println("LOAD QUILT " + bounds);
-        var quilt = computeQuiltCellGeomPairs(bounds, adjustedDisplayScale);
+        System.out.println("LOAD QUILT " + envelope);
+        var quilt = computeQuiltCellGeomPairs(envelope, adjustedDisplayScale);
         System.out.println("Quilt size = " + quilt.size());
         var maps = new LinkedList<MapModel<SimpleFeatureType, MemFeature>>();
         for (var entry : quilt) {
@@ -149,9 +136,10 @@ public class ChartLocker {
 
     // TODO -- needs to go away or be smarter
     public ENCCell getCell(String lname, int cscale) {
+
         for (var catalog : availableCatalogs) {
             for (var cell : catalog.cells()) {
-                if (cell.lname().equals(lname) && cell.cScale() == cscale) {
+                if (cell.title().equals(lname) && cell.cScale() == cscale) {
                     return cell;
                 }
             }
@@ -183,6 +171,22 @@ public class ChartLocker {
         ChartDownloader.downloadCell(cell, chartsDir, notifier);
     }
 
+    private List<ENCCell> intersections(ReferencedEnvelope envelope) {
+
+        var bounds = JTS.toGeometry(envelope);
+
+        var result = new ArrayList<ENCCell>();
+        for (var catalog : availableCatalogs()) {
+            for (var cell : catalog.cells()) {
+                if (cell.intersects(bounds)) {
+                    result.add(cell);
+                }
+            }
+        }
+
+        return result;
+    }
+
     private List<Pair<ENCCell, Geometry>> computeQuiltCellGeomPairs(
             ReferencedEnvelope viewPortBounds, double scale) {
 
@@ -196,7 +200,7 @@ public class ChartLocker {
         System.out.println("Intersection size = " + intersections.size());
         for (var foo : intersections) {
             System.out.println(
-                    foo.lname()
+                    foo.title()
                             + " : "
                             + foo.cScale()
                             + " :  "
@@ -229,7 +233,7 @@ public class ChartLocker {
         //      used = used.union(ithGeom);
         //    }
         var cell = intersections.get(0);
-        var geom = cell.geom().intersection(extent);
+        var geom = cell.geometry().intersection(extent);
         cellGeomPairs.add(Pair.of(cell, geom));
         var remaining = extent.difference(geom);
 
@@ -239,12 +243,12 @@ public class ChartLocker {
             }
 
             var ithCell = intersections.get(i);
-            var ithGeom = ithCell.geom().intersection(extent);
+            var ithGeom = ithCell.geometry().intersection(extent);
             cellGeomPairs.add(Pair.of(ithCell, ithGeom.intersection(remaining)));
             try {
                 remaining = remaining.difference(ithGeom);
             } catch (TopologyException | IllegalArgumentException ex) {
-                System.err.println("ith geom = " + ithCell.geom().intersection(extent));
+                System.err.println("ith geom = " + ithCell.geometry().intersection(extent));
             }
         }
 
@@ -261,3 +265,16 @@ public class ChartLocker {
         }
     }
 }
+
+    //
+    //    public Quilt<SimpleFeatureType, MemFeature> loadMostDetailedQuilt(
+    //            Point point,
+    //            double adjustedDisplayScale,
+    //            AppSettings settings,
+    //            MapDisplayOptions mapDisplayOptions) {
+    //
+    //        var mostDetailed = mostDetailedCell(point);
+    //        System.out.println("Most detailed cell : " + mostDetailed);
+    //        return loadQuilt(mostDetailed.bounds(), mostDetailed.cScale(), settings,
+    // mapDisplayOptions);
+    //    }
