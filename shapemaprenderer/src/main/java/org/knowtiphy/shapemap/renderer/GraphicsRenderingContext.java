@@ -6,16 +6,23 @@
 package org.knowtiphy.shapemap.renderer;
 
 import javafx.scene.canvas.GraphicsContext;
-import org.knowtiphy.shapemap.api.RenderingContext;
+import org.knowtiphy.shapemap.api.IFeatureAdapter;
+import org.knowtiphy.shapemap.api.IRenderablePolygonProvider;
+import org.knowtiphy.shapemap.api.ISVGProvider;
+import org.knowtiphy.shapemap.api.ITextAdapter;
 
 /**
  * @author graham
  */
-public record GraphicsRenderingContext<S, F, E>(
-        RenderingContext<S, F, E> renderingContext,
+public record GraphicsRenderingContext<F>(
+        //        RenderingContext<S, F, E> renderingContext,
         // the canvas being drawn to
         GraphicsContext graphicsContext,
         Transformation worldToScreen, // world to screen transformation
+        IFeatureAdapter<F> featureAdapter,
+        IRenderablePolygonProvider renderablePolygonProvider,
+        ITextAdapter textSizeProvider,
+        ISVGProvider svgProvider,
         double onePixelX, // one pixel width in x direction in world coordinates
         double onePixelY // , // one pixel width in y direction in world coordinates
         //        Quadtree blocked, // screen coordinates blocked from having text over them

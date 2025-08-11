@@ -37,9 +37,10 @@ public class ENCCellLoader {
      *
      * @param cell the cell
      * @return a map with the map data stored in a mem store.
-     * @throws IOException
-     * @throws XMLStreamException
-     * @throws StyleSyntaxException
+     * @throws IOException on some sort of IO exception when reading style sheets
+     * @throws XMLStreamException if any XML style sheet for the cell is malformed XML
+     * @throws StyleSyntaxException if any style sheet for the cell is valid XML but invalid in
+     *     other ways
      */
     public synchronized Map<SimpleFeatureType, MemFeature> loadCell(ENCCell cell)
             throws IOException, XMLStreamException, StyleSyntaxException {

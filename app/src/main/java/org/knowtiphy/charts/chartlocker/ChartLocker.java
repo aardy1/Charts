@@ -36,9 +36,7 @@ import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.TopologyException;
 
-/**
- * @author graham
- */
+/** A chart locker. */
 public class ChartLocker {
 
     private final Path chartsDir;
@@ -106,7 +104,6 @@ public class ChartLocker {
             AppSettings settings,
             MapDisplayOptions mapDisplayOptions) {
 
-        System.out.println("LOAD QUILT " + envelope);
         var quilt = computeQuiltCellGeomPairs(envelope, adjustedDisplayScale);
         System.out.println("Quilt size = " + quilt.size());
         var maps = new LinkedList<Map<SimpleFeatureType, MemFeature>>();
@@ -122,8 +119,7 @@ public class ChartLocker {
             }
         }
 
-        var bounds = Coordinates.bounds(maps);
-        return new Quilt<>(maps, bounds);
+        return new Quilt<>(maps, Coordinates.bounds(maps));
     }
 
     public ObservableList<ENCCell> history() {
@@ -136,7 +132,7 @@ public class ChartLocker {
         }
     }
 
-    // TODO -- needs to go away or be smarter
+    // TODO -- needs to go away or be smarter -- only used to demo
     public ENCCell getCell(String lname, int cscale) {
 
         for (var catalog : availableCatalogs) {

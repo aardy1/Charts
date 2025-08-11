@@ -27,11 +27,11 @@ import org.knowtiphy.shapemap.style.parser.expression.ExpressionParser;
  */
 public class TextSymbolizerParser {
 
-    public static <S, F> TextSymbolizer<S, F> parse(
+    public static <F> TextSymbolizer<F> parse(
             IStyleCompiler<F> parsingContext, XMLEventReader reader)
             throws XMLStreamException, StyleSyntaxException {
 
-        var builder = new TextSymbolizerBuilder<S, F>();
+        var builder = new TextSymbolizerBuilder<F>();
 
         var done = false;
         while (!done && reader.hasNext()) {

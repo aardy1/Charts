@@ -15,8 +15,7 @@ public class Text {
      * @param context the rendering context
      * @param strokeInfo the stroke information
      */
-    public static <S, F, E> void setup(
-            GraphicsRenderingContext<S, F, E> context, StrokeInfo strokeInfo) {
+    public static void setup(GraphicsRenderingContext<?> context, StrokeInfo strokeInfo) {
         var gc = context.graphicsContext();
         gc.setStroke(strokeInfo.stroke());
         gc.setLineWidth(strokeInfo.strokeWidth());

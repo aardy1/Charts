@@ -16,7 +16,7 @@ import org.knowtiphy.shapemap.renderer.symbolizer.basic.StrokeInfo;
 /**
  * @author graham
  */
-public class TextSymbolizerBuilder<S, F> {
+public class TextSymbolizerBuilder<F> {
 
     private IFeatureFunction<F, String> label = (f, g) -> null;
 
@@ -29,32 +29,32 @@ public class TextSymbolizerBuilder<S, F> {
 
     private LabelPlacement labelPlacement;
 
-    public TextSymbolizerBuilder<S, F> font(Font font) {
+    public TextSymbolizerBuilder<F> font(Font font) {
         this.font = font;
         return this;
     }
 
-    public TextSymbolizerBuilder<S, F> label(IFeatureFunction<F, String> label) {
+    public TextSymbolizerBuilder<F> label(IFeatureFunction<F, String> label) {
         this.label = label;
         return this;
     }
 
-    public TextSymbolizerBuilder<S, F> labelPlacement(LabelPlacement labelPlacement) {
+    public TextSymbolizerBuilder<F> labelPlacement(LabelPlacement labelPlacement) {
         this.labelPlacement = labelPlacement;
         return this;
     }
 
-    public TextSymbolizerBuilder<S, F> fillInfo(FillInfo fillInfo) {
+    public TextSymbolizerBuilder<F> fillInfo(FillInfo fillInfo) {
         this.fillInfo = fillInfo;
         return this;
     }
 
-    public TextSymbolizerBuilder<S, F> strokeInfo(StrokeInfo strokeInfo) {
+    public TextSymbolizerBuilder<F> strokeInfo(StrokeInfo strokeInfo) {
         this.strokeInfo = strokeInfo;
         return this;
     }
 
-    public TextSymbolizer<S, F> build() {
+    public TextSymbolizer<F> build() {
         if (strokeInfo == null && fillInfo == null) {
             fillInfo = new FillInfoBuilder().fill(Color.BLACK).opacity(1).build();
         }

@@ -10,11 +10,9 @@ import org.knowtiphy.shapemap.api.IFeatureFunction;
 import org.knowtiphy.shapemap.renderer.symbolizer.ISymbolizer;
 import org.knowtiphy.shapemap.renderer.symbolizer.TextSymbolizer;
 
-/**
- * @author graham
- */
-public record Rule<S, F>(
+/** A rule in an SLD */
+public record Rule<F>(
         IFeatureFunction<F, Boolean> filter,
-        List<ISymbolizer<S, F>> graphicSymbolizers,
-        List<TextSymbolizer<S, F>> textSymbolizers,
+        List<ISymbolizer<F>> graphicSymbolizers,
+        List<TextSymbolizer<F>> textSymbolizers,
         boolean elseFilter) {}

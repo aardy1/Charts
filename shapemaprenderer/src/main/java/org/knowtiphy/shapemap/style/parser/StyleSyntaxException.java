@@ -8,6 +8,7 @@ package org.knowtiphy.shapemap.style.parser;
 /**
  * @author graham
  */
+@SuppressWarnings("serial")
 public class StyleSyntaxException extends Exception {
 
     public StyleSyntaxException(String message) {

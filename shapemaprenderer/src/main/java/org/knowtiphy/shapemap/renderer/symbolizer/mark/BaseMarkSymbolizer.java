@@ -11,7 +11,7 @@ import org.knowtiphy.shapemap.renderer.symbolizer.basic.StrokeInfo;
 /**
  * @author graham
  */
-public abstract class BaseMarkSymbolizer<S, F> implements IMarkSymbolizer<S, F> {
+public abstract class BaseMarkSymbolizer<F> implements IMarkSymbolizer<F> {
 
     protected final FillInfo fillInfo;
 

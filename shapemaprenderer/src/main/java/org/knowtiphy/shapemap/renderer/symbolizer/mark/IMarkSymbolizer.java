@@ -12,11 +12,11 @@ import org.locationtech.jts.geom.Point;
 /**
  * @author graham
  */
-public interface IMarkSymbolizer<S, F> {
+public interface IMarkSymbolizer<F> {
 
     void render(
-            GraphicsRenderingContext<S, F, ?> context,
+            GraphicsRenderingContext<F> context,
             F feature,
             Point pt,
-            PointSymbolizer<S, F> pointSymbolizer);
+            PointSymbolizer<F> pointSymbolizer);
 }

@@ -13,9 +13,9 @@ import org.knowtiphy.shapemap.renderer.symbolizer.mark.IMarkSymbolizer;
 /**
  * @author graham
  */
-public class PointSymbolizer<S, F> implements ISymbolizer<S, F> {
+public class PointSymbolizer<F> implements ISymbolizer<F> {
 
-    private final IMarkSymbolizer<S, F> markSymbolizer;
+    private final IMarkSymbolizer<F> markSymbolizer;
 
     private final IFeatureFunction<F, Number> size;
 
@@ -24,7 +24,7 @@ public class PointSymbolizer<S, F> implements ISymbolizer<S, F> {
     private final double opacity;
 
     public PointSymbolizer(
-            IMarkSymbolizer<S, F> markSymbolizer,
+            IMarkSymbolizer<F> markSymbolizer,
             IFeatureFunction<F, Number> size,
             double opacity,
             IFeatureFunction<F, Number> rotation) {
@@ -43,10 +43,10 @@ public class PointSymbolizer<S, F> implements ISymbolizer<S, F> {
     }
 
     @Override
-    public void render(GraphicsRenderingContext<S, F, ?> context, F feature) {
+    public void render(GraphicsRenderingContext<F> context, F feature) {
 
         DrawPoint.setup(context, opacity);
-        var geom = context.renderingContext().featureAdapter().defaultGeometry(feature);
+        var geom = context.featureAdapter().defaultGeometry(feature);
         for (var i = 0; i < geom.getNumGeometries(); i++) {
             markSymbolizer.render(
                     context, feature, DrawPoint.choosePoint(geom.getGeometryN(i)), this);

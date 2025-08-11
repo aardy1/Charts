@@ -23,10 +23,10 @@ import org.knowtiphy.shapemap.style.parser.symbolizer.TextSymbolizerParser;
  */
 public class RuleParser {
 
-    public static <S, F> Rule<S, F> parse(IStyleCompiler<F> parsingContext, XMLEventReader reader)
+    public static <F> Rule<F> parse(IStyleCompiler<F> parsingContext, XMLEventReader reader)
             throws FileNotFoundException, XMLStreamException, StyleSyntaxException {
 
-        var builder = new RuleBuilder<S, F>();
+        var builder = new RuleBuilder<F>();
 
         var done = false;
         while (!done && reader.hasNext()) {

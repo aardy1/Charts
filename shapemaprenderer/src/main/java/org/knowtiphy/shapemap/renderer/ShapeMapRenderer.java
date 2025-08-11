@@ -34,9 +34,12 @@ public class ShapeMapRenderer<S, F, E> {
 
         var graphicsRenderingContext =
                 new GraphicsRenderingContext<>(
-                        renderingContext,
                         graphics,
                         new Transformation(renderingContext.worldToScreen()),
+                        renderingContext.featureAdapter(),
+                        renderingContext.renderablePolygonProvider(),
+                        renderingContext.textSizeProvider(),
+                        renderingContext.svgProvider(),
                         onePixelX(renderingContext.screenToWorld()),
                         onePixelY(renderingContext.screenToWorld()));
 
@@ -72,7 +75,7 @@ public class ShapeMapRenderer<S, F, E> {
     }
 
     private void renderGraphics(
-            GraphicsRenderingContext<S, F, E> context,
+            GraphicsRenderingContext<F> context,
             boolean[] appliedRule,
             boolean[] layerNeedsTextLayout)
             throws Exception {
@@ -91,7 +94,7 @@ public class ShapeMapRenderer<S, F, E> {
                         layer.featureSource()
                                 .features(
                                         viewPortBounds,
-                                        renderingContext.displayScale(),
+                                        renderingContext.dScale(),
                                         layer.isScaleLess())) {
                     for (var feature : iterator) {
                         featureCount++;
@@ -110,7 +113,7 @@ public class ShapeMapRenderer<S, F, E> {
     }
 
     private void renderText(
-            GraphicsRenderingContext<S, F, E> context,
+            GraphicsRenderingContext<F> context,
             boolean[] appliedRule,
             boolean[] layerNeedsTextLayout)
             throws Exception {
@@ -124,8 +127,7 @@ public class ShapeMapRenderer<S, F, E> {
         for (var layer : layers) {
             if (layerNeedsTextLayout[layerPos]) {
                 try (var iterator =
-                        layer.featureSource()
-                                .features(viewPortBounds, renderingContext.displayScale())) {
+                        layer.featureSource().features(viewPortBounds, renderingContext.dScale())) {
                     for (var feature : iterator) {
                         var rp = rulePos;
                         for (var rule : layer.style().rules()) {
@@ -145,8 +147,8 @@ public class ShapeMapRenderer<S, F, E> {
     }
 
     private boolean applyStyle(
-            FeatureTypeStyle<S, F> style,
-            GraphicsRenderingContext<S, F, E> context,
+            FeatureTypeStyle<F> style,
+            GraphicsRenderingContext<F> context,
             F feature,
             boolean[] appliedRule,
             int startPos) {
@@ -179,8 +181,8 @@ public class ShapeMapRenderer<S, F, E> {
     }
 
     private boolean applyGraphicsRule(
-            Rule<S, F> rule, GraphicsRenderingContext<S, F, E> context, F feature) {
-        var featureAdapter = context.renderingContext().featureAdapter();
+            Rule<F> rule, GraphicsRenderingContext<F> context, F feature) {
+        var featureAdapter = context.featureAdapter();
         if (rule.filter() != null
                 && rule.filter().apply(feature, featureAdapter.defaultGeometry(feature))) {
             for (var symbolizer : rule.graphicSymbolizers()) {
@@ -193,9 +195,8 @@ public class ShapeMapRenderer<S, F, E> {
         return false;
     }
 
-    private void applyTextRule(
-            Rule<S, F> rule, GraphicsRenderingContext<S, F, E> context, F feature) {
-        var featureAdapter = context.renderingContext().featureAdapter();
+    private void applyTextRule(Rule<F> rule, GraphicsRenderingContext<F> context, F feature) {
+        var featureAdapter = context.featureAdapter();
         if (rule.filter().apply(feature, featureAdapter.defaultGeometry(feature))) {
             for (var symbolizer : rule.textSymbolizers()) {
                 symbolizer.render(context, feature);

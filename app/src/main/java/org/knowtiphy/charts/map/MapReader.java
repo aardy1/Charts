@@ -29,12 +29,12 @@ public class MapReader {
     private final AppSettings settings;
 
     // conversion issue SBDAREA is a bunch of points, should be a bunch of polys?
-    private final StyleReader<SimpleFeatureType, MemFeature> styleReader;
+    private final StyleReader<MemFeature> styleReader;
 
     private final MapDisplayOptions displayOptions;
 
     public MapReader(
-            StyleReader<SimpleFeatureType, MemFeature> styleReader,
+            StyleReader<MemFeature> styleReader,
             AppSettings settings,
             MapDisplayOptions displayOptions) {
 

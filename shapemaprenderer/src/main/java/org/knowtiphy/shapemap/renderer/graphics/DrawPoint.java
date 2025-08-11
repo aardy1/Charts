@@ -18,7 +18,7 @@ public class DrawPoint {
      * @param context the rendering context
      * @param opacity the opacity for the points
      */
-    public static <S, F> void setup(GraphicsRenderingContext<S, F, ?> context, double opacity) {
+    public static void setup(GraphicsRenderingContext<?> context, double opacity) {
         context.graphicsContext().setGlobalAlpha(opacity);
     }
 

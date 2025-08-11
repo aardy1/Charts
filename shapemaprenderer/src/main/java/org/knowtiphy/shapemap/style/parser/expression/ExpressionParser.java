@@ -5,21 +5,19 @@
 
 package org.knowtiphy.shapemap.style.parser.expression;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.function.BiFunction;
+import java.util.function.Function;
+import javax.xml.stream.XMLEventReader;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.events.StartElement;
+import javax.xml.stream.events.XMLEvent;
 import org.knowtiphy.shapemap.api.IFeatureFunction;
 import org.knowtiphy.shapemap.api.IStyleCompiler;
 import org.knowtiphy.shapemap.renderer.Functions;
 import org.knowtiphy.shapemap.renderer.Operators;
 import org.knowtiphy.shapemap.style.parser.Utils;
-
-import javax.xml.stream.XMLEventReader;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.events.StartElement;
-import javax.xml.stream.events.XMLEvent;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.function.BiFunction;
-import java.util.function.Function;
-
 import static org.knowtiphy.shapemap.style.parser.Utils.normalize;
 import static org.knowtiphy.shapemap.style.parser.Utils.normalizeKey;
 
@@ -158,6 +156,7 @@ public class ExpressionParser {
         return endFrame(stack).pop();
     }
 
+    @SuppressWarnings("unchecked")
     public static <F, T> IFeatureFunction<F, T> parseOrLiteral(
             IStyleCompiler<F> parsingContext,
             XMLEventReader reader,

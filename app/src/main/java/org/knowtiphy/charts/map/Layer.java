@@ -6,23 +6,28 @@ import org.knowtiphy.shapemap.api.IMapLayer;
 import org.knowtiphy.shapemap.renderer.FeatureTypeStyle;
 
 /**
- * A layer in a map -- a feature source, a style, and some event streams.
+ * A layer in a map -- a feature source, a style.
  *
  * @param <S> the type of the schema for the feature source
  * @param <F> the type of the features provided by the feature source
  */
 public class Layer<S, F> implements IMapLayer<S, F, ReferencedEnvelope> {
+
+    //  the feature source containing the features for this layer
     private final IFeatureSource<S, F, ReferencedEnvelope> featureSource;
 
-    private final FeatureTypeStyle<S, F> style;
+    //  the style used to render this layer
+    private final FeatureTypeStyle<F> style;
 
+    //  is the layer visible
     private boolean visible;
 
+    //  is the layer scaleless (used to make feature queries faster)
     private final boolean scaleLess;
 
     public Layer(
             IFeatureSource<S, F, ReferencedEnvelope> featureSource,
-            FeatureTypeStyle<S, F> style,
+            FeatureTypeStyle<F> style,
             boolean visible,
             boolean scaleLess) {
 
@@ -38,7 +43,7 @@ public class Layer<S, F> implements IMapLayer<S, F, ReferencedEnvelope> {
     }
 
     @Override
-    public FeatureTypeStyle<S, F> style() {
+    public FeatureTypeStyle<F> style() {
         return style;
     }
 

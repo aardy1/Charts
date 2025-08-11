@@ -10,7 +10,7 @@ import org.knowtiphy.shapemap.renderer.GraphicsRenderingContext;
 /**
  * @author graham
  */
-public interface ISymbolizer<S, F> {
+public interface ISymbolizer<F> {
 
-    void render(GraphicsRenderingContext<S, F, ?> context, F feature);
+    void render(GraphicsRenderingContext<F> context, F feature);
 }

@@ -21,7 +21,7 @@ import org.locationtech.jts.geom.Point;
 /**
  * @author graham
  */
-public class TextSymbolizer<S, F> {
+public class TextSymbolizer<F> {
 
     private final IFeatureFunction<F, String> label;
 
@@ -47,7 +47,7 @@ public class TextSymbolizer<S, F> {
         this.labelPlacement = labelPlacement;
     }
 
-    public void render(GraphicsRenderingContext<S, F, ?> context, F feature) {
+    public void render(GraphicsRenderingContext<F> context, F feature) {
 
         if (fillInfo != null) {
             Fill.setup(context, fillInfo);
@@ -61,13 +61,10 @@ public class TextSymbolizer<S, F> {
             context.graphicsContext().setFont(font);
         }
 
-        text(
-                context,
-                feature,
-                context.renderingContext().featureAdapter().defaultGeometry(feature));
+        text(context, feature, context.featureAdapter().defaultGeometry(feature));
     }
 
-    private void text(GraphicsRenderingContext<S, F, ?> context, F feature, Geometry geom) {
+    private void text(GraphicsRenderingContext<F> context, F feature, Geometry geom) {
 
         // TODO -- switch on strings is brain dead
         switch (geom.getGeometryType()) {
@@ -83,7 +80,7 @@ public class TextSymbolizer<S, F> {
         }
     }
 
-    private void textPoint(GraphicsRenderingContext<S, F, ?> context, F feature, Point point) {
+    private void textPoint(GraphicsRenderingContext<F> context, F feature, Point point) {
 
         if (point != null && label != null) {
             var text = label.apply(feature, point);
@@ -110,7 +107,7 @@ public class TextSymbolizer<S, F> {
 
                 //                var textDimensions = textDude.canFit(font, text);
 
-                if (context.renderingContext().textSizeProvider().canFit(font, text, x, y)) {
+                if (context.textSizeProvider().canFit(font, text, x, y)) {
 
                     if (fillInfo != null) {
                         graphicsContext.fillText(text, x, y);
@@ -127,7 +124,7 @@ public class TextSymbolizer<S, F> {
     // TODO -- text along line strings ...
 
     // only necessary if a multi-X, can contain another multi-X, rather than just X's
-    private void recurse(GraphicsRenderingContext<S, F, ?> context, F feature, Geometry geom) {
+    private void recurse(GraphicsRenderingContext<F> context, F feature, Geometry geom) {
         for (int i = 0; i < geom.getNumGeometries(); i++) {
             text(context, feature, geom.getGeometryN(i));
         }

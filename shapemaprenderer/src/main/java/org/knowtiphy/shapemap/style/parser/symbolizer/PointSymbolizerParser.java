@@ -24,11 +24,10 @@ import static org.knowtiphy.shapemap.style.parser.Utils.normalize;
  */
 public class PointSymbolizerParser {
 
-    public static <S, F> ISymbolizer<S, F> parse(
-            IStyleCompiler<F> parsingContext, XMLEventReader reader)
+    public static <F> ISymbolizer<F> parse(IStyleCompiler<F> parsingContext, XMLEventReader reader)
             throws XMLStreamException, StyleSyntaxException {
 
-        var builder = new PointSymbolizerBuilder<S, F>();
+        var builder = new PointSymbolizerBuilder<F>();
 
         var done = false;
         while (!done && reader.hasNext()) {
@@ -43,7 +42,7 @@ public class PointSymbolizerParser {
                         // ignore
                     }
                     case XML.MARK ->
-                            builder.markSymbolizer(new MarkSymbolizerParser<S, F>().parse(reader));
+                            builder.markSymbolizer(new MarkSymbolizerParser<F>().parse(reader));
                     case XML.SIZE ->
                             builder.size(
                                     ExpressionParser.parseOrLiteral(

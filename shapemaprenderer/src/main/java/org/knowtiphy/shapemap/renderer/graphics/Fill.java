@@ -28,7 +28,7 @@ public class Fill {
      * @param context the rendering context
      * @param fillInfo the fill information
      */
-    public static void setup(GraphicsRenderingContext<?, ?, ?> context, FillInfo fillInfo) {
+    public static void setup(GraphicsRenderingContext<?> context, FillInfo fillInfo) {
         context.graphicsContext().setFill(fillInfo.fill());
         context.graphicsContext().setGlobalAlpha(fillInfo.opacity());
     }
@@ -41,10 +41,10 @@ public class Fill {
      * @param context the rendering context
      * @param geom the geometry to render
      */
-    public static void fill(GraphicsRenderingContext<?, ?, ?> context, Geometry geom) {
+    public static void fill(GraphicsRenderingContext<?> context, Geometry geom) {
 
         // TODO -- switch on strings is brain dead
-        switch (context.renderingContext().featureAdapter().geomType(geom)) {
+        switch (context.featureAdapter().geomType(geom)) {
             case POINT -> fillPoint(context, (Point) geom);
             case LINE_STRING, LINEAR_RING -> fillLineString(context, (LineString) geom);
             case POLYGON -> fillPolygon(context, (Polygon) geom);
@@ -72,9 +72,7 @@ public class Fill {
     }
 
     public static void fill(
-            GraphicsRenderingContext<?, ?, ?> context,
-            Geometry geom,
-            FeatureGeomType featureGeomType) {
+            GraphicsRenderingContext<?> context, Geometry geom, FeatureGeomType featureGeomType) {
 
         switch (featureGeomType) {
             case POINT -> fillPoint(context, (Point) geom);
@@ -104,19 +102,18 @@ public class Fill {
         }
     }
 
-    private static void fillPoint(GraphicsRenderingContext<?, ?, ?> context, Point point) {
+    private static void fillPoint(GraphicsRenderingContext<?> context, Point point) {
         context.graphicsContext()
                 .fillRect(point.getX(), point.getY(), context.onePixelX(), context.onePixelY());
     }
 
-    private static void fillLineString(
-            GraphicsRenderingContext<?, ?, ?> context, LineString lineString) {
+    private static void fillLineString(GraphicsRenderingContext<?> context, LineString lineString) {
         var tx = context.worldToScreen();
         tx.copyCoordinatesG(lineString);
         context.graphicsContext().fillPolygon(tx.getXs(), tx.getYs(), tx.getXs().length);
     }
 
-    private static void fillPolygon(GraphicsRenderingContext<?, ?, ?> context, Polygon polygon) {
+    private static void fillPolygon(GraphicsRenderingContext<?> context, Polygon polygon) {
 
         // TODO -- sort this out -- finding stuff not in the bounding box
         //    if(!polygon.intersects(JTS.toGeometry(context.bounds())))
@@ -127,7 +124,7 @@ public class Fill {
 
         var tx = context.worldToScreen();
         var gc = context.graphicsContext();
-        var renderGeom = context.renderingContext().renderablePolygonProvider().apply(polygon);
+        var renderGeom = context.renderablePolygonProvider().apply(polygon);
         tx.copyCoordinatesG(renderGeom);
         gc.fillPolygon(tx.getXs(), tx.getYs(), tx.getXs().length);
     }

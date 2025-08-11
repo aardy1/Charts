@@ -1,4 +1,4 @@
-package org.knowtiphy.charts.chartview;
+package org.knowtiphy.charts.chartlocker;
 
 import java.net.MalformedURLException;
 import java.net.URL;

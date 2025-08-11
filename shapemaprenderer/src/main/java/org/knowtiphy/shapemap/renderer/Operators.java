@@ -4,11 +4,10 @@
  */
 package org.knowtiphy.shapemap.renderer;
 
+import java.text.NumberFormat;
 import org.apache.commons.lang3.StringUtils;
 import org.knowtiphy.shapemap.api.IFeatureFunction;
 import org.locationtech.jts.geom.Geometry;
-
-import java.text.NumberFormat;
 
 /**
  * @author graham
@@ -25,21 +24,25 @@ public class Operators {
         return !eq(l, r, feature, geom);
     }
 
+    @SuppressWarnings("unchecked")
     public static <F> boolean le(
             IFeatureFunction<F, ?> l, IFeatureFunction<F, ?> r, F feature, Geometry geom) {
         return ((Comparable) l.apply(feature, geom)).compareTo(r.apply(feature, geom)) <= 0;
     }
 
+    @SuppressWarnings("unchecked")
     public static <F> boolean lt(
             IFeatureFunction<F, ?> l, IFeatureFunction<F, ?> r, F feature, Geometry geom) {
         return ((Comparable) l.apply(feature, geom)).compareTo(r.apply(feature, geom)) < 0;
     }
 
+    @SuppressWarnings("unchecked")
     public static <F> boolean ge(
             IFeatureFunction<F, ?> l, IFeatureFunction<F, ?> r, F feature, Geometry geom) {
         return ((Comparable) l.apply(feature, geom)).compareTo(r.apply(feature, geom)) >= 0;
     }
 
+    @SuppressWarnings("unchecked")
     public static <F> boolean gt(
             IFeatureFunction<F, ?> l, IFeatureFunction<F, ?> r, F feature, Geometry geom) {
         return ((Comparable) l.apply(feature, geom)).compareTo(r.apply(feature, geom)) > 0;

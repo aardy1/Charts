@@ -12,7 +12,7 @@ import org.knowtiphy.shapemap.renderer.symbolizer.basic.StrokeInfo;
 /**
  * @author graham
  */
-public class LineSymbolizer<S, F> implements ISymbolizer<S, F> {
+public class LineSymbolizer<F> implements ISymbolizer<F> {
 
     private final StrokeInfo strokeInfo;
 
@@ -21,11 +21,11 @@ public class LineSymbolizer<S, F> implements ISymbolizer<S, F> {
     }
 
     @Override
-    public void render(GraphicsRenderingContext<S, F, ?> context, F feature) {
+    public void render(GraphicsRenderingContext<F> context, F feature) {
         Stroke.setup(context, strokeInfo);
         Stroke.stroke(
                 context,
-                context.renderingContext().featureAdapter().defaultGeometry(feature),
-                context.renderingContext().featureAdapter().geomType(feature));
+                context.featureAdapter().defaultGeometry(feature),
+                context.featureAdapter().geomType(feature));
     }
 }

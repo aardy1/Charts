@@ -11,21 +11,20 @@ import org.knowtiphy.shapemap.renderer.symbolizer.ISymbolizer;
 import org.knowtiphy.shapemap.style.builder.LineSymbolizerBuilder;
 import org.knowtiphy.shapemap.style.parser.StyleSyntaxException;
 import org.knowtiphy.shapemap.style.parser.Utils;
+import static org.knowtiphy.shapemap.style.parser.Utils.normalize;
 import org.knowtiphy.shapemap.style.parser.VendorOptionParser;
 import org.knowtiphy.shapemap.style.parser.XML;
 import org.knowtiphy.shapemap.style.parser.basic.StrokeParser;
-
-import static org.knowtiphy.shapemap.style.parser.Utils.normalize;
 
 /**
  * @author graham
  */
 public class LineSymbolizerParser {
 
-    public static <S, F> ISymbolizer<S, F> parse(XMLEventReader reader)
+    public static <F> ISymbolizer<F> parse(XMLEventReader reader)
             throws XMLStreamException, StyleSyntaxException {
 
-        var builder = new LineSymbolizerBuilder<S, F>();
+        var builder = new LineSymbolizerBuilder<F>();
 
         var done = false;
         while (!done && reader.hasNext()) {

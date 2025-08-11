@@ -16,7 +16,7 @@ import org.locationtech.jts.geom.Point;
  * @param <S> the type of the feature schema
  * @param <F> the type of the features conforming to the schema
  */
-public class SVGMarkSymbolizer<S, F> extends BaseMarkSymbolizer<S, F> {
+public class SVGMarkSymbolizer<F> extends BaseMarkSymbolizer<F> {
 
     private final PathInfo pathInfo;
 
@@ -27,10 +27,10 @@ public class SVGMarkSymbolizer<S, F> extends BaseMarkSymbolizer<S, F> {
 
     @Override
     public void render(
-            GraphicsRenderingContext<S, F, ?> context,
+            GraphicsRenderingContext<F> context,
             F feature,
             Point pt,
-            PointSymbolizer<S, F> pointSymbolizer) {
+            PointSymbolizer<F> pointSymbolizer) {
 
         var szo = pointSymbolizer.size().apply(feature, pt);
         if (szo == null) {
@@ -42,10 +42,7 @@ public class SVGMarkSymbolizer<S, F> extends BaseMarkSymbolizer<S, F> {
                         ? null
                         : pointSymbolizer.rotation().apply(feature, pt);
         var rotation = rotationO == null ? 0 : rotationO.doubleValue();
-        var image =
-                context.renderingContext()
-                        .svgProvider()
-                        .get(pathInfo.name(), szo.intValue(), rotation);
+        var image = context.svgProvider().get(pathInfo.name(), szo.intValue(), rotation);
 
         var x = pt.getX();
         var y = pt.getY();

@@ -16,5 +16,5 @@ public interface IMapLayer<S, F, E> {
 
     boolean isVisible();
 
-    FeatureTypeStyle<S, F> style();
+    FeatureTypeStyle<F> style();
 }

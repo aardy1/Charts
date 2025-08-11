@@ -15,7 +15,7 @@ import org.locationtech.jts.geom.Point;
 /**
  * @author graham
  */
-public class XMarkSymbolizer<S, F> extends BaseMarkSymbolizer<S, F> {
+public class XMarkSymbolizer<F> extends BaseMarkSymbolizer<F> {
 
     public XMarkSymbolizer(FillInfo fillInfo, StrokeInfo strokeInfo) {
         super(fillInfo, strokeInfo);
@@ -23,10 +23,10 @@ public class XMarkSymbolizer<S, F> extends BaseMarkSymbolizer<S, F> {
 
     @Override
     public void render(
-            GraphicsRenderingContext<S, F, ?> context,
+            GraphicsRenderingContext<F> context,
             F feature,
             Point pt,
-            PointSymbolizer<S, F> pointSymbolizer) {
+            PointSymbolizer<F> pointSymbolizer) {
 
         var szo = pointSymbolizer.size().apply(feature, pt);
         if (szo == null) return;

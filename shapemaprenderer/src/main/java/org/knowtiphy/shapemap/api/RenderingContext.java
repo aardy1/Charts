@@ -17,7 +17,7 @@ public record RenderingContext<S, F, E>(
         Rectangle2D screenArea,
         Affine worldToScreen,
         Affine screenToWorld,
-        double displayScale,
+        double dScale,
         IFeatureAdapter<F> featureAdapter,
         IRenderablePolygonProvider renderablePolygonProvider,
         ISVGProvider svgProvider,

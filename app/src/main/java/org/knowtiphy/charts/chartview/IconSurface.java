@@ -19,15 +19,13 @@ import org.knowtiphy.shapemap.renderer.Transformation;
 import org.locationtech.jts.geom.Geometry;
 import org.reactfx.Change;
 import org.reactfx.EventStream;
-import org.reactfx.Subscription;
 
 /**
  * @author graham
  */
 public class IconSurface extends Pane {
-    private ChartViewModel chart;
 
-    private final List<Subscription> subscriptions = new ArrayList<>();
+    private ChartViewModel chart;
 
     public IconSurface(ChartViewModel chart) {
         this.chart = chart;

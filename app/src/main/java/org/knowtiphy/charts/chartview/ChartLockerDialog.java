@@ -32,7 +32,7 @@ import org.controlsfx.glyphfont.Glyph;
 import org.knowtiphy.charts.Fonts;
 import org.knowtiphy.charts.chartlocker.ChartLocker;
 import org.knowtiphy.charts.chartlocker.ENCChartDownloadNotifier;
-import static org.knowtiphy.charts.chartview.AvailableCatalogs.BUILTIN_CATALOGS;
+import static org.knowtiphy.charts.chartlocker.AvailableCatalogs.BUILTIN_CATALOGS;
 import org.knowtiphy.charts.enc.ENCCell;
 import org.knowtiphy.charts.utils.FXUtils;
 import static org.knowtiphy.charts.utils.FXUtils.alwaysGrow;

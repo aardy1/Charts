@@ -32,9 +32,9 @@ import org.knowtiphy.shapemap.style.parser.basic.StrokeParser;
  */
 
 // TODO -- this class is a mess
-public class MarkSymbolizerParser<S, F> {
+public class MarkSymbolizerParser<F> {
 
-    private final Map<String, BiFunction<FillInfo, StrokeInfo, IMarkSymbolizer<S, F>>> WKN =
+    private final Map<String, BiFunction<FillInfo, StrokeInfo, IMarkSymbolizer<F>>> WKN =
             Map.of(
                     "circle", CircleMarkSymbolizer::new,
                     "square", SquareMarkSymbolizer::new,
@@ -44,7 +44,7 @@ public class MarkSymbolizerParser<S, F> {
                     //  star
                     );
 
-    public final Map<String, BiFunction<FillInfo, StrokeInfo, IMarkSymbolizer<S, F>>> S52 =
+    public final Map<String, BiFunction<FillInfo, StrokeInfo, IMarkSymbolizer<F>>> S52 =
             Map.of(
                     "Hazard-Lighthouse",
                     (f, s) -> new SVGMarkSymbolizer<>(new PathInfo("Hazard-Lighthouse.svg"), f, s),
@@ -68,10 +68,10 @@ public class MarkSymbolizerParser<S, F> {
                     "Radar-Beacon",
                     (f, s) -> new SVGMarkSymbolizer<>(new PathInfo("Radar-Beacon.svg"), f, s));
 
-    public IMarkSymbolizer<S, F> parse(XMLEventReader reader)
+    public IMarkSymbolizer<F> parse(XMLEventReader reader)
             throws XMLStreamException, StyleSyntaxException {
 
-        var builder = new MarkSymbolizerBuilder<S, F>();
+        var builder = new MarkSymbolizerBuilder<F>();
 
         var done = false;
         while (!done && reader.hasNext()) {
@@ -97,7 +97,7 @@ public class MarkSymbolizerParser<S, F> {
         return builder.build();
     }
 
-    private BiFunction<FillInfo, StrokeInfo, IMarkSymbolizer<S, F>> getMarkSymbolizer(String name)
+    private BiFunction<FillInfo, StrokeInfo, IMarkSymbolizer<F>> getMarkSymbolizer(String name)
             throws StyleSyntaxException {
 
         var parts = name.split(":");

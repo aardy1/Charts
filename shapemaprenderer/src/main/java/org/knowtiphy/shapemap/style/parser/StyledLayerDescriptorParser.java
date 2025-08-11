@@ -5,21 +5,19 @@
 
 package org.knowtiphy.shapemap.style.parser;
 
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
 import org.knowtiphy.shapemap.api.IStyleCompiler;
 import org.knowtiphy.shapemap.renderer.FeatureTypeStyle;
 import org.knowtiphy.shapemap.style.builder.FeatureTypeStyleBuilder;
-
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamException;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-
 import static org.knowtiphy.shapemap.style.parser.Utils.normalize;
 
 /**
  * @author graham
  */
-public class StyledLayerDescriptorParser<S, F> {
+public class StyledLayerDescriptorParser<F> {
 
     private final InputStream input;
 
@@ -30,13 +28,13 @@ public class StyledLayerDescriptorParser<S, F> {
         this.parsingContext = parsingContext;
     }
 
-    public FeatureTypeStyle<S, F> read()
+    public FeatureTypeStyle<F> read()
             throws FileNotFoundException, XMLStreamException, StyleSyntaxException {
 
         var xmlInputFactory = XMLInputFactory.newInstance();
         var reader = xmlInputFactory.createXMLEventReader(input);
 
-        var builder = new FeatureTypeStyleBuilder<S, F>();
+        var builder = new FeatureTypeStyleBuilder<F>();
 
         var done = false;
         while (!done && reader.hasNext()) {

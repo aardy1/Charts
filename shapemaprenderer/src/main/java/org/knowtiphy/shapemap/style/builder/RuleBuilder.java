@@ -15,13 +15,13 @@ import org.knowtiphy.shapemap.renderer.symbolizer.basic.Rule;
 /**
  * @author graham
  */
-public class RuleBuilder<S, F> {
+public class RuleBuilder<F> {
 
     private IFeatureFunction<F, Boolean> filter = (f, g) -> true;
 
-    private final List<ISymbolizer<S, F>> graphicSymbolizers = new ArrayList<>();
+    private final List<ISymbolizer<F>> graphicSymbolizers = new ArrayList<>();
 
-    private final List<TextSymbolizer<S, F>> textSymbolizers = new ArrayList<>();
+    private final List<TextSymbolizer<F>> textSymbolizers = new ArrayList<>();
 
     private boolean elseFilter = false;
 
@@ -29,11 +29,11 @@ public class RuleBuilder<S, F> {
         this.filter = filter;
     }
 
-    public void graphicSymbolizer(ISymbolizer<S, F> symbolizer) {
+    public void graphicSymbolizer(ISymbolizer<F> symbolizer) {
         graphicSymbolizers.add(symbolizer);
     }
 
-    public void textSymbolizer(TextSymbolizer<S, F> symbolizer) {
+    public void textSymbolizer(TextSymbolizer<F> symbolizer) {
         textSymbolizers.add(symbolizer);
     }
 
@@ -41,7 +41,7 @@ public class RuleBuilder<S, F> {
         this.elseFilter = true;
     }
 
-    public Rule<S, F> build() {
+    public Rule<F> build() {
         return new Rule<>(filter, graphicSymbolizers, textSymbolizers, elseFilter);
     }
 }

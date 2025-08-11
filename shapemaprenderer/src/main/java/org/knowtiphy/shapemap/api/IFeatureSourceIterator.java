@@ -12,5 +12,4 @@ import java.util.Iterator;
  *
  * @param <F> the type of the features.
  */
-
-public interface IFeatureSourceIterator<F> extends Iterator<F>, Iterable<F>, AutoCloseable{}
+public interface IFeatureSourceIterator<F> extends Iterator<F>, Iterable<F>, AutoCloseable {}

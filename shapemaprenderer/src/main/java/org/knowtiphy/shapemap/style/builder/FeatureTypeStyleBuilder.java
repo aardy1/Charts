@@ -13,26 +13,26 @@ import org.knowtiphy.shapemap.renderer.symbolizer.basic.Rule;
 /**
  * @author graham
  */
-public class FeatureTypeStyleBuilder<S, F> {
+public class FeatureTypeStyleBuilder<F> {
 
     private String featureType;
 
-    private final List<Rule<S, F>> rules = new ArrayList<>();
+    private final List<Rule<F>> rules = new ArrayList<>();
 
     private boolean hasTextSymbolizers = false;
 
-    public FeatureTypeStyleBuilder<S, F> rule(Rule<S, F> rule) {
+    public FeatureTypeStyleBuilder<F> rule(Rule<F> rule) {
         rules.add(rule);
         hasTextSymbolizers |= !rule.textSymbolizers().isEmpty();
         return this;
     }
 
-    public FeatureTypeStyleBuilder<S, F> featureType(String featureType) {
+    public FeatureTypeStyleBuilder<F> featureType(String featureType) {
         this.featureType = featureType;
         return this;
     }
 
-    public FeatureTypeStyle<S, F> build() {
+    public FeatureTypeStyle<F> build() {
         return new FeatureTypeStyle<>(featureType, hasTextSymbolizers, rules);
     }
 }
