@@ -11,10 +11,10 @@ import org.knowtiphy.shapemap.renderer.FeatureTypeStyle;
  * @param <S> the type of the schema for the feature source
  * @param <F> the type of the features provided by the feature source
  */
-public class Layer<S, F> implements IMapLayer<S, F, ReferencedEnvelope> {
+public class Layer<F> implements IMapLayer<F, ReferencedEnvelope> {
 
     //  the feature source containing the features for this layer
-    private final IFeatureSource<S, F, ReferencedEnvelope> featureSource;
+    private final IFeatureSource<F, ReferencedEnvelope> featureSource;
 
     //  the style used to render this layer
     private final FeatureTypeStyle<F> style;
@@ -26,7 +26,7 @@ public class Layer<S, F> implements IMapLayer<S, F, ReferencedEnvelope> {
     private final boolean scaleLess;
 
     public Layer(
-            IFeatureSource<S, F, ReferencedEnvelope> featureSource,
+            IFeatureSource<F, ReferencedEnvelope> featureSource,
             FeatureTypeStyle<F> style,
             boolean visible,
             boolean scaleLess) {
@@ -38,7 +38,7 @@ public class Layer<S, F> implements IMapLayer<S, F, ReferencedEnvelope> {
     }
 
     @Override
-    public IFeatureSource<S, F, ReferencedEnvelope> featureSource() {
+    public IFeatureSource<F, ReferencedEnvelope> featureSource() {
         return featureSource;
     }
 
@@ -56,10 +56,10 @@ public class Layer<S, F> implements IMapLayer<S, F, ReferencedEnvelope> {
         this.visible = visible;
     }
 
-    @Override
-    public boolean isScaleLess() {
-        return scaleLess;
-    }
+    //
+    //    public boolean isScaleLess() {
+    //        return scaleLess;
+    //    }
 
     public String name() {
         return style.featureType();

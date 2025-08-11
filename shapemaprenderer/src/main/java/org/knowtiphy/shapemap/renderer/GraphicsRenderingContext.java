@@ -15,7 +15,6 @@ import org.knowtiphy.shapemap.api.ITextAdapter;
  * @author graham
  */
 public record GraphicsRenderingContext<F>(
-        //        RenderingContext<S, F, E> renderingContext,
         // the canvas being drawn to
         GraphicsContext graphicsContext,
         Transformation worldToScreen, // world to screen transformation
@@ -25,5 +24,4 @@ public record GraphicsRenderingContext<F>(
         ISVGProvider svgProvider,
         double onePixelX, // one pixel width in x direction in world coordinates
         double onePixelY // , // one pixel width in y direction in world coordinates
-        //        Quadtree blocked, // screen coordinates blocked from having text over them
         ) {}

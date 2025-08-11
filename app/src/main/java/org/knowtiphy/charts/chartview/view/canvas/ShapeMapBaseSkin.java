@@ -3,8 +3,8 @@ package org.knowtiphy.charts.chartview.view.canvas;
 import javafx.scene.control.Skin;
 import javafx.scene.control.SkinBase;
 
-public abstract class ShapeMapBaseSkin<S, F> extends SkinBase<ShapeMapControl<S, F>>
-        implements Skin<ShapeMapControl<S, F>> {
+public abstract class ShapeMapBaseSkin<F> extends SkinBase<ShapeMapControl<F>>
+        implements Skin<ShapeMapControl<F>> {
 
     private static final double MINIMUM_WIDTH = 8;
 
@@ -14,7 +14,7 @@ public abstract class ShapeMapBaseSkin<S, F> extends SkinBase<ShapeMapControl<S,
 
     private static final double MAXIMUM_HEIGHT = Double.MAX_VALUE;
 
-    protected ShapeMapBaseSkin(ShapeMapControl<S, F> surface) {
+    protected ShapeMapBaseSkin(ShapeMapControl<F> surface) {
         super(surface);
     }
 
@@ -58,7 +58,7 @@ public abstract class ShapeMapBaseSkin<S, F> extends SkinBase<ShapeMapControl<S,
         return MAXIMUM_HEIGHT;
     }
 
-    protected ShapeMapControl<S, F> S() {
+    protected ShapeMapControl<F> S() {
         return getSkinnable();
     }
 }

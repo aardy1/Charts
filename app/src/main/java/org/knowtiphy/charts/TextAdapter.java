@@ -29,11 +29,14 @@ public class TextAdapter implements ITextAdapter {
     public boolean canFit(Font font, String s, double x, double y) {
 
         var fxBounds = FXUtils.textSizeFast(font, s);
+        assert fxBounds.getWidth() != 0 && fxBounds.getHeight() != 0;
+
         var textBounds =
                 new ReferencedEnvelope(
                         x,
                         x + fxBounds.getWidth(),
-                        y,
+                        //  TODO -- need to work out which it is
+                        y - fxBounds.getHeight(),
                         y + fxBounds.getHeight(),
                         DefaultEngineeringCRS.CARTESIAN_2D);
 

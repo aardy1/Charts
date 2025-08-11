@@ -8,9 +8,12 @@ package org.knowtiphy.shapemap.api;
 import java.util.Collection;
 
 /**
- * @author graham
+ * A compiler of property accesses and function calls in style sheets into feature functions.
+ *
+ * @param <F> the feature type of the feature functions
  */
-public interface IStyleCompiler<F> {
+public interface IStylePopertyAndFunctionCompiler<F> {
+
     IFeatureFunction<F, Object> compilePropertyAccess(String propertyName);
 
     IFeatureFunction<F, Object> compileFunctionCall(

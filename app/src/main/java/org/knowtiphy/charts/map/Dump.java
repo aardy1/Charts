@@ -11,17 +11,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.geotools.api.feature.simple.SimpleFeatureType;
 import org.geotools.api.feature.type.Name;
 import org.geotools.api.feature.type.PropertyDescriptor;
 import org.geotools.api.filter.identity.FeatureId;
 import org.knowtiphy.charts.chartview.ChartViewModel;
-import org.knowtiphy.charts.map.Layer;
 
 /**
  * @author graham
  */
-public class Dump<S extends SimpleFeatureType, F> {
+public class Dump<F> {
     private final ChartViewModel mapContent;
 
     private final Set<PropertyDescriptor> descriptors = new HashSet<>();
@@ -57,13 +55,13 @@ public class Dump<S extends SimpleFeatureType, F> {
         //    }
     }
 
-    public void dumpSchema(Layer<S, F> layer) throws IOException {
+    public void dumpSchema(Layer<F> layer) throws IOException {
         //
         //    var schema = layer.featureSource().getSchema();
         //    descriptors.addAll(schema.getDescriptors());
     }
 
-    public void dumpAttributeValues(Layer<S, F> layer) throws IOException {
+    public void dumpAttributeValues(Layer<F> layer) throws IOException {
 
         // var featureName =
         // layer.getFeatureSource().getSchema().getName().getLocalPart();

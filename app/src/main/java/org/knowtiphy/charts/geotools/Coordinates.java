@@ -29,7 +29,7 @@ public class Coordinates {
 
     //  compute a bounding box for a collection of maps.
 
-    public static <S, F> ReferencedEnvelope bounds(List<Map<S, F>> maps) {
+    public static <F> ReferencedEnvelope bounds(List<Map<F>> maps) {
 
         var minX = Double.POSITIVE_INFINITY;
         var minY = Double.POSITIVE_INFINITY;

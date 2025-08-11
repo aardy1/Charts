@@ -9,10 +9,10 @@ import javafx.geometry.Rectangle2D;
 import javafx.scene.transform.Affine;
 
 /** The information the shape map renderer needs to render a map. */
-public record RenderingContext<S, F, E>(
-        Collection<? extends IMapLayer<S, F, E>> layers,
+public record RenderingContext<F, E>(
+        Collection<? extends IMap<F, E>> maps,
         //  what does this do?
-        int totalRuleCount,
+        //        int totalRuleCount,
         E viewPortBounds,
         Rectangle2D screenArea,
         Affine worldToScreen,

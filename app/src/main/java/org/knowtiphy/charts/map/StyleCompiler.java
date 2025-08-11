@@ -12,12 +12,12 @@ import org.geotools.api.feature.simple.SimpleFeatureType;
 import org.knowtiphy.charts.memstore.MemFeature;
 import org.knowtiphy.charts.settings.AppSettings;
 import org.knowtiphy.shapemap.api.IFeatureFunction;
-import org.knowtiphy.shapemap.api.IStyleCompiler;
+import org.knowtiphy.shapemap.api.IStylePopertyAndFunctionCompiler;
 
 /**
  * @author graham
  */
-public class StyleCompiler implements IStyleCompiler<MemFeature> {
+public class StyleCompiler implements IStylePopertyAndFunctionCompiler<MemFeature> {
 
     private static final Map<
                     String,

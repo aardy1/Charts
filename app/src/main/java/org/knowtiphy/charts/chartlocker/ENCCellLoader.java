@@ -8,7 +8,6 @@ package org.knowtiphy.charts.chartlocker;
 import java.io.IOException;
 import java.util.HashMap;
 import javax.xml.stream.XMLStreamException;
-import org.geotools.api.feature.simple.SimpleFeatureType;
 import org.knowtiphy.charts.enc.ENCCell;
 import org.knowtiphy.charts.map.Map;
 import org.knowtiphy.charts.map.MapReader;
@@ -25,8 +24,7 @@ public class ENCCellLoader {
     private final MapReader mapReader;
 
     //  loaded cells cache
-    private final java.util.Map<ENCCell, Map<SimpleFeatureType, MemFeature>> loaded =
-            new HashMap<>();
+    private final java.util.Map<ENCCell, Map<MemFeature>> loaded = new HashMap<>();
 
     public ENCCellLoader(MapReader mapReader) {
         this.mapReader = mapReader;
@@ -42,7 +40,7 @@ public class ENCCellLoader {
      * @throws StyleSyntaxException if any style sheet for the cell is valid XML but invalid in
      *     other ways
      */
-    public synchronized Map<SimpleFeatureType, MemFeature> loadCell(ENCCell cell)
+    public synchronized Map<MemFeature> loadCell(ENCCell cell)
             throws IOException, XMLStreamException, StyleSyntaxException {
 
         var map = loaded.get(cell);

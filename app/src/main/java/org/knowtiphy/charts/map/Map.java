@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.knowtiphy.shapemap.api.IMap;
 import org.knowtiphy.shapemap.api.IMapLayer;
 import org.locationtech.jts.geom.Geometry;
 
@@ -15,7 +16,7 @@ import org.locationtech.jts.geom.Geometry;
  * @param <S> the type of the schema for the map layers
  * @param <F> the type of the features for the map layers
  */
-public class Map<S, F> {
+public class Map<F> implements IMap<F, ReferencedEnvelope> {
 
     private final ReferencedEnvelope bounds;
 
@@ -23,14 +24,11 @@ public class Map<S, F> {
 
     private final String title;
 
-    private final List<IMapLayer<S, F, ReferencedEnvelope>> layers = new LinkedList<>();
+    private final List<IMapLayer<F, ReferencedEnvelope>> layers = new LinkedList<>();
 
-    private final java.util.Map<String, Layer<S, F>> nameToLayer = new LinkedHashMap<>();
+    private final java.util.Map<String, Layer<F>> nameToLayer = new LinkedHashMap<>();
 
     private Geometry geometry;
-
-    // possibly shouldnt be here -- but it makes for faster rendering
-    private int totalRuleCount = 0;
 
     public Map(ReferencedEnvelope bounds, int cScale, String title) {
         this.bounds = bounds;
@@ -58,25 +56,20 @@ public class Map<S, F> {
         this.geometry = geometry;
     }
 
-    public Collection<? extends IMapLayer<S, F, ReferencedEnvelope>> layers() {
+    public Collection<? extends IMapLayer<F, ReferencedEnvelope>> layers() {
         return layers;
     }
 
-    public void addLayer(String layerName, Layer<S, F> layer) {
+    public void addLayer(String layerName, Layer<F> layer) {
         assert !nameToLayer.containsKey(layerName);
         assert layerName.equals(layer.style().featureType())
                 : (layerName + " : " + layer.style().featureType());
         layers.add(layer);
         nameToLayer.put(layerName, layer);
-        totalRuleCount += layer.style().rules().size();
     }
 
-    public Layer<S, F> layer(String type) {
+    public Layer<F> layer(String type) {
         return nameToLayer.get(type);
-    }
-
-    public int totalRuleCount() {
-        return totalRuleCount;
     }
 
     public CoordinateReferenceSystem crs() {

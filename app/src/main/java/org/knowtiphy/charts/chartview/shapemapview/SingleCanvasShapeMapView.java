@@ -6,7 +6,6 @@ import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.scene.transform.NonInvertibleTransformException;
 import org.geotools.api.referencing.operation.TransformException;
-import org.geotools.geometry.jts.JTS;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.knowtiphy.shapemap.api.RenderingContext;
 import org.knowtiphy.shapemap.renderer.ShapeMapRenderer;
@@ -25,7 +24,7 @@ public class SingleCanvasShapeMapView<S, F> extends Region {
     //  for debugging
     private static int paintCount = 0;
 
-    private final IShapeMapViewModel<S, F> viewModel;
+    private final IShapeMapViewModel<F> viewModel;
 
     private final Color background;
 
@@ -33,7 +32,7 @@ public class SingleCanvasShapeMapView<S, F> extends Region {
 
     private GraphicsContext gctx;
 
-    public SingleCanvasShapeMapView(IShapeMapViewModel<S, F> viewModel, Color background) {
+    public SingleCanvasShapeMapView(IShapeMapViewModel<F> viewModel, Color background) {
 
         this.viewModel = viewModel;
         this.background = background;
@@ -102,31 +101,35 @@ public class SingleCanvasShapeMapView<S, F> extends Region {
         }
 
         //  render each map from the view model into the shared canvas
-        int whichMap = 0; //  for debugging
-        for (var map : viewModel.maps()) {
-            System.err.println("Map # = " + whichMap);
-            try {
-                var rendererContext =
-                        new RenderingContext<S, F, ReferencedEnvelope>(
-                                map.layers(),
-                                map.totalRuleCount(),
-                                JTS.toEnvelope(map.geometry()),
-                                screenArea,
-                                viewModel.viewPortWorldToScreen(),
-                                viewModel.viewPortScreenToWorld(),
-                                viewModel.aScale(),
-                                viewModel.featureAdapter(),
-                                viewModel.renderablePolygonProvider(),
-                                viewModel.svgProvider(),
-                                viewModel.textSizeProvider());
 
-                var renderer = new ShapeMapRenderer<>(rendererContext, gctx);
-                renderer.paint();
-                whichMap++;
-            } catch (NonInvertibleTransformException | TransformException e) {
-                e.printStackTrace();
-            }
+        //        int whichMap = 0; //  for debugging
+        //        var textSizeProvider = viewModel.textSizeProvider();
+        //        for (var map : viewModel.maps()) {
+        //        System.err.println(
+        //                "Map #= = " + whichMap + " title = " + map.title() + " cscale = " +
+        // map.cScale());
+        try {
+            var rendererContext =
+                    new RenderingContext<F, ReferencedEnvelope>(
+                            viewModel.maps(),
+                            //                            map.totalRuleCount(),
+                            viewModel.viewPortBounds(),
+                            screenArea,
+                            viewModel.viewPortWorldToScreen(),
+                            viewModel.viewPortScreenToWorld(),
+                            viewModel.aScale(),
+                            viewModel.featureAdapter(),
+                            viewModel.renderablePolygonProvider(),
+                            viewModel.svgProvider(),
+                            viewModel.textSizeProvider());
+
+            var renderer = new ShapeMapRenderer<>(rendererContext, gctx);
+            renderer.paint();
+            //            whichMap++;
+        } catch (NonInvertibleTransformException | TransformException e) {
+            e.printStackTrace();
         }
+        //        }
     }
 
     private void setCanvasBackground(double width, double height) {

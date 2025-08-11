@@ -14,12 +14,12 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import org.knowtiphy.shapemap.api.IFeatureFunction;
-import org.knowtiphy.shapemap.api.IStyleCompiler;
 import org.knowtiphy.shapemap.renderer.Functions;
 import org.knowtiphy.shapemap.renderer.Operators;
 import org.knowtiphy.shapemap.style.parser.Utils;
 import static org.knowtiphy.shapemap.style.parser.Utils.normalize;
 import static org.knowtiphy.shapemap.style.parser.Utils.normalizeKey;
+import org.knowtiphy.shapemap.api.IStylePopertyAndFunctionCompiler;
 
 /**
  * @author graham
@@ -27,7 +27,7 @@ import static org.knowtiphy.shapemap.style.parser.Utils.normalizeKey;
 public class ExpressionParser {
 
     public static <F> IFeatureFunction<F, ?> parse(
-            IStyleCompiler<F> parsingContext, XMLEventReader reader, String finishTag)
+            IStylePopertyAndFunctionCompiler<F> parsingContext, XMLEventReader reader, String finishTag)
             throws XMLStreamException {
 
         var stack = new LinkedList<LinkedList<IFeatureFunction<F, Object>>>();
@@ -158,7 +158,7 @@ public class ExpressionParser {
 
     @SuppressWarnings("unchecked")
     public static <F, T> IFeatureFunction<F, T> parseOrLiteral(
-            IStyleCompiler<F> parsingContext,
+            IStylePopertyAndFunctionCompiler<F> parsingContext,
             XMLEventReader reader,
             String finishTag,
             Function<XMLEvent, T> literalParser)
@@ -175,7 +175,7 @@ public class ExpressionParser {
     }
 
     public static <F> IFeatureFunction<F, Boolean> predicate(
-            IStyleCompiler<F> parsingContext, XMLEventReader reader, String finishTag)
+            IStylePopertyAndFunctionCompiler<F> parsingContext, XMLEventReader reader, String finishTag)
             throws XMLStreamException {
 
         var function = parse(parsingContext, reader, finishTag);
@@ -217,7 +217,7 @@ public class ExpressionParser {
     }
 
     private static <F> IFeatureFunction<F, Object> makeFunctionCall(
-            IStyleCompiler<F> parsingContext, LinkedList<IFeatureFunction<F, Object>> frame)
+            IStylePopertyAndFunctionCompiler<F> parsingContext, LinkedList<IFeatureFunction<F, Object>> frame)
             throws XMLStreamException {
 
         int size = frame.size();

@@ -9,7 +9,6 @@ import java.util.List;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.transform.Affine;
 import javafx.scene.transform.NonInvertibleTransformException;
-import org.geotools.api.feature.simple.SimpleFeatureType;
 import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.api.referencing.operation.TransformException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
@@ -17,7 +16,6 @@ import org.knowtiphy.charts.TextAdapter;
 import org.knowtiphy.charts.chartlocker.ChartLocker;
 import org.knowtiphy.charts.chartview.shapemapview.IShapeMapViewModel;
 import org.knowtiphy.charts.enc.ENCCell;
-import org.knowtiphy.charts.map.Layer;
 import org.knowtiphy.charts.map.Map;
 import org.knowtiphy.charts.map.Quilt;
 import org.knowtiphy.charts.memstore.MemFeature;
@@ -38,7 +36,7 @@ import org.reactfx.EventStream;
  * An ENC chart view model -- a quilt of ENC cells (loaded from a chart locker) together with a
  * viewport, event streams, etc.
  */
-public class ChartViewModel implements IShapeMapViewModel<SimpleFeatureType, MemFeature> {
+public class ChartViewModel implements IShapeMapViewModel<MemFeature> {
 
     private static final double DEFAULT_WIDTH = 3;
 
@@ -48,25 +46,26 @@ public class ChartViewModel implements IShapeMapViewModel<SimpleFeatureType, Mem
     private static final double ZOOM_FACTOR_MULTIPLIER = 0.7;
 
     //  the quilt can change to a whole new quilt object
-    private Quilt<SimpleFeatureType, MemFeature> quilt;
+    private Quilt<MemFeature> quilt;
 
     private final MapViewport viewPort;
     private final ChartLocker chartLocker;
     private final AppSettings appSettings;
     private final MapDisplayOptions mapDisplayOptions;
     private final IUnderlyingPlatform platform;
+
     private final IFeatureAdapter<MemFeature> featureAdapter;
     private final IRenderablePolygonProvider renderablePolygonProvider;
     private final ISVGProvider svgProvider;
     //    private final ITextBoundsFunction textBoundsFunction;
 
-    private final EventSource<Change<Quilt<SimpleFeatureType, MemFeature>>> quiltChangeEvent;
+    private final EventSource<Change<Quilt<MemFeature>>> quiltChangeEvent;
     private final EventSource<Change<ReferencedEnvelope>> viewPortBoundsEvent;
     private final EventStream<Change<Rectangle2D>> viewPortScreenAreaEvent;
     private final EventSource<Change<Boolean>> layerVisibilityEvent;
 
     public ChartViewModel(
-            Quilt<SimpleFeatureType, MemFeature> quilt,
+            Quilt<MemFeature> quilt,
             MapViewport viewPort,
             ChartLocker chartLocker,
             AppSettings appSettings,
@@ -96,7 +95,7 @@ public class ChartViewModel implements IShapeMapViewModel<SimpleFeatureType, Mem
     }
 
     @Override
-    public List<Map<SimpleFeatureType, MemFeature>> maps() {
+    public List<Map<MemFeature>> maps() {
         return quilt.maps();
     }
 
@@ -139,7 +138,7 @@ public class ChartViewModel implements IShapeMapViewModel<SimpleFeatureType, Mem
     }
 
     @Override
-    public EventStream<Change<Quilt<SimpleFeatureType, MemFeature>>> quiltChangeEvent() {
+    public EventStream<Change<Quilt<MemFeature>>> quiltChangeEvent() {
         return quiltChangeEvent;
     }
 
@@ -250,12 +249,15 @@ public class ChartViewModel implements IShapeMapViewModel<SimpleFeatureType, Mem
         viewPort.setScreenArea(screenArea);
     }
 
-    public void setLayerVisible(Layer<SimpleFeatureType, MemFeature> layer, boolean newValue) {
-        if (newValue != layer.isVisible()) {
-            var oldValue = layer.isVisible();
-            layer.setVisible(newValue);
-            layerVisibilityEvent.push(new Change<>(oldValue, layer.isVisible()));
+    public void setLayerVisible(String featureType, Change<Boolean> change) {
+
+        for (var map : quilt.maps()) {
+            var layer = map.layer(featureType);
+            assert layer != null : featureType;
+            layer.setVisible(change.getNewValue());
         }
+
+        layerVisibilityEvent.push(change);
     }
 
     // need to make this adaptive --  like 1/2 the maxX
@@ -318,7 +320,7 @@ public class ChartViewModel implements IShapeMapViewModel<SimpleFeatureType, Mem
         return new ReferencedEnvelope(minX, minX + width, minY, minY + height, crs());
     }
 
-    private void setQuilt(Quilt<SimpleFeatureType, MemFeature> newQuilt) {
+    private void setQuilt(Quilt<MemFeature> newQuilt) {
         //  TODO this is a hack :-)
         if (newQuilt.maps().isEmpty()) return;
         var oldQuilt = quilt;

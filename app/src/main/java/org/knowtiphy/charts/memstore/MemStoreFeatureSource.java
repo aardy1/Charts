@@ -6,11 +6,9 @@
 package org.knowtiphy.charts.memstore;
 
 import java.util.ArrayList;
-import java.util.List;
 import org.geotools.api.feature.simple.SimpleFeatureType;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
-import org.knowtiphy.charts.ontology.S57;
 import org.knowtiphy.shapemap.api.IFeatureSource;
 import org.knowtiphy.shapemap.api.IFeatureSourceIterator;
 import org.locationtech.jts.index.strtree.STRtree;
@@ -20,7 +18,7 @@ import org.locationtech.jts.index.strtree.STRtree;
  */
 public record MemStoreFeatureSource(
         SimpleFeatureType featureType, STRtree featureIndex, boolean scaleLess)
-        implements IFeatureSource<SimpleFeatureType, MemFeature, ReferencedEnvelope> {
+        implements IFeatureSource<MemFeature, ReferencedEnvelope> {
 
     private static final ReferencedEnvelope EVERYTHING =
             new ReferencedEnvelope(
@@ -37,25 +35,30 @@ public record MemStoreFeatureSource(
     }
 
     @Override
-    public IFeatureSourceIterator<MemFeature> features(
-            ReferencedEnvelope bounds, double dScale, boolean scaleLess) {
-
-        List<MemFeature> featuresInBounds = featureIndex.query(bounds);
+    public IFeatureSourceIterator<MemFeature> features(ReferencedEnvelope bounds, double dScale) {
 
         var featuresInScale = new ArrayList<MemFeature>();
-        for (var feature : featuresInBounds) {
-            var featureMinScale = feature.getAttribute(S57.AT_SCAMIN);
-            if (scaleLess || featureMinScale == null || (int) featureMinScale >= dScale) {
-                featuresInScale.add(feature);
-            }
-        }
+        featureIndex.query(
+                bounds,
+                (Object obj) -> {
+                    MemFeature feature = (MemFeature) obj;
+                    var featureScaMin = feature.scaMin();
+                    if (scaleLess || featureScaMin == null || (int) featureScaMin >= dScale) {
+                        featuresInScale.add(feature);
+                    }
+                });
+
+        //        List<MemFeature> featuresInBounds = featureIndex.query(bounds);
+        //        var featuresInScale = new ArrayList<MemFeature>(2 * featuresInBounds.size());
+        //        for (var feature : featuresInBounds) {
+        //            var featureScaMin = feature.scaMin();
+        //            if (scaleLess || featureScaMin == null || (int) featureScaMin >= dScale) {
+        //                featuresInScale.add(feature);
+        //            }
+        //        }
+        //  assert featuresInScale.size() == featuresInScale2.size();
 
         return new MemStoreFeatureIterator(featuresInScale.iterator());
-    }
-
-    @Override
-    public IFeatureSourceIterator<MemFeature> features(ReferencedEnvelope bounds, double dScale) {
-        return features(bounds, dScale, scaleLess);
     }
 
     public int size() {

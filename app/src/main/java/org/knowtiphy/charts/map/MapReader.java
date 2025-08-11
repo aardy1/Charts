@@ -43,13 +43,12 @@ public class MapReader {
         this.displayOptions = displayOptions;
     }
 
-    public Map<SimpleFeatureType, MemFeature> read(ENCCell cell)
+    public Map<MemFeature> read(ENCCell cell)
             throws IOException, XMLStreamException, StyleSyntaxException {
 
         var fileNames = listShapeFilePaths(cell.location());
 
-        var map =
-                new Map<SimpleFeatureType, MemFeature>(cell.bounds(), cell.cScale(), cell.title());
+        var map = new Map<MemFeature>(cell.bounds(), cell.cScale(), cell.title());
         var store = new MemStore();
 
         for (var featureTypeName : LayerOrder.LAYER_ORDER) {
@@ -72,7 +71,7 @@ public class MapReader {
         return map;
     }
 
-    private Layer<SimpleFeatureType, MemFeature> readLayer(
+    private Layer<MemFeature> readLayer(
             String foo, ContentFeatureSource featureSource, MemStore store)
             throws IOException, XMLStreamException, StyleSyntaxException {
 

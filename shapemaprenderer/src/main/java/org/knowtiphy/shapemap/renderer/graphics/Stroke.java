@@ -7,7 +7,6 @@ package org.knowtiphy.shapemap.renderer.graphics;
 
 import org.knowtiphy.shapemap.api.FeatureGeomType;
 import org.knowtiphy.shapemap.renderer.GraphicsRenderingContext;
-import org.knowtiphy.shapemap.renderer.Transformation;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.StrokeInfo;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
@@ -130,7 +129,7 @@ public class Stroke {
             gc.lineTo(pt.getX(), pt.getY());
         }
         var foo = gc.getTransform();
-        gc.setTransform(Transformation.IDENTITY);
+        //        gc.setTransform(Transformation.IDENTITY);
         // TODO -- fix this
         gc.setLineWidth(1);
         gc.stroke();

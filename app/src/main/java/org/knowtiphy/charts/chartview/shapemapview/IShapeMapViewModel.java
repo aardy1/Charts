@@ -5,6 +5,7 @@
 
 package org.knowtiphy.charts.chartview.shapemapview;
 
+import java.util.Collection;
 import java.util.List;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.transform.Affine;
@@ -12,15 +13,15 @@ import javafx.scene.transform.NonInvertibleTransformException;
 import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.api.referencing.operation.TransformException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.knowtiphy.charts.map.Map;
 import org.knowtiphy.charts.map.Quilt;
 import org.knowtiphy.shapemap.api.IFeatureAdapter;
 import org.knowtiphy.shapemap.api.IFeatureSourceIterator;
+import org.knowtiphy.shapemap.api.IMap;
 import org.knowtiphy.shapemap.api.IRenderablePolygonProvider;
 import org.knowtiphy.shapemap.api.ISVGProvider;
+import org.knowtiphy.shapemap.api.ITextAdapter;
 import org.reactfx.Change;
 import org.reactfx.EventStream;
-import org.knowtiphy.shapemap.api.ITextAdapter;
 
 /**
  * A view model for maps of features conforming to some schema.
@@ -28,9 +29,9 @@ import org.knowtiphy.shapemap.api.ITextAdapter;
  * @param <S> the type of the schema for the map
  * @param <F> the type of the features for the map
  */
-public interface IShapeMapViewModel<S, F> {
+public interface IShapeMapViewModel<F> {
 
-    List<Map<S, F>> maps();
+    Collection<? extends IMap<F, ReferencedEnvelope>> maps();
 
     CoordinateReferenceSystem crs();
 
@@ -55,7 +56,7 @@ public interface IShapeMapViewModel<S, F> {
     List<IFeatureSourceIterator<F>> featuresNearXYWorld(double x, double y, int radius)
             throws TransformException, NonInvertibleTransformException;
 
-    EventStream<Change<Quilt<S, F>>> quiltChangeEvent();
+    EventStream<Change<Quilt<F>>> quiltChangeEvent();
 
     EventStream<Change<ReferencedEnvelope>> viewPortBoundsEvent();
 

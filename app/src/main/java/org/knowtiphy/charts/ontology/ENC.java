@@ -30,8 +30,7 @@ public class ENC {
     }
 
     // I don't think this conversion is correct
-    public static <S, F> double encScale(Map<S, F> map)
-            throws TransformException, FactoryException {
+    public static double encScale(Map<?> map) throws TransformException, FactoryException {
         var meters = Coordinates.distanceAcross(map.bounds());
         return encScaleKM(meters / 1000);
     }

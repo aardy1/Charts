@@ -13,4 +13,4 @@ import org.geotools.geometry.jts.ReferencedEnvelope;
  * @param maps the maps that make up the quilt
  * @param bounds the bounds of the quilt of maps
  */
-public record Quilt<S, F>(List<Map<S, F>> maps, ReferencedEnvelope bounds) {}
+public record Quilt< F>(List<Map<F>> maps, ReferencedEnvelope bounds) {}

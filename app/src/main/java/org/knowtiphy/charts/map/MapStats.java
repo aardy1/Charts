@@ -8,7 +8,6 @@ package org.knowtiphy.charts.map;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.function.IntBinaryOperator;
-import org.geotools.api.feature.simple.SimpleFeatureType;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.knowtiphy.charts.memstore.MemFeature;
 import static org.knowtiphy.charts.ontology.S57.AT_SCAMAX;
@@ -22,7 +21,7 @@ import org.locationtech.jts.geom.Geometry;
  */
 public class MapStats {
 
-    private final Quilt<SimpleFeatureType, MemFeature> quilt;
+    private final Quilt<MemFeature> quilt;
 
     private final java.util.Map<String, Integer> featuresPerType = new HashMap<>();
 
@@ -50,7 +49,7 @@ public class MapStats {
 
     private final java.util.Map<String, Integer> totGeoms = new HashMap<>();
 
-    public MapStats(Quilt<SimpleFeatureType, MemFeature> quilt) {
+    public MapStats(Quilt<MemFeature> quilt) {
         this.quilt = quilt;
     }
 
@@ -146,8 +145,7 @@ public class MapStats {
     }
 
     //  scan all features in a layer updating counts
-    private void scanFeatures(IMapLayer<SimpleFeatureType, MemFeature, ReferencedEnvelope> layer)
-            throws Exception {
+    private void scanFeatures(IMapLayer<MemFeature, ReferencedEnvelope> layer) throws Exception {
 
         try (var features = layer.featureSource().features()) {
             for (var feature : features) {

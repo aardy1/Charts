@@ -110,20 +110,14 @@ public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView
 
         displayOptions.showGridEvents.subscribe(c -> coordinateGrid.setVisible(c.getNewValue()));
 
-        for (var map : chart.maps()) {
-            displayOptions.showLightsEvents.subscribe(
-                    change ->
-                            chart.setLayerVisible(map.layer(S57.OC_LIGHTS), change.getNewValue()));
-            displayOptions.showPlatformEvents.subscribe(
-                    change ->
-                            chart.setLayerVisible(map.layer(S57.OC_OFSPLF), change.getNewValue()));
-            displayOptions.showWreckEvents.subscribe(
-                    change ->
-                            chart.setLayerVisible(map.layer(S57.OC_WRECKS), change.getNewValue()));
-            displayOptions.showSoundingsEvents.subscribe(
-                    change ->
-                            chart.setLayerVisible(map.layer(S57.OC_SOUNDG), change.getNewValue()));
-        }
+        displayOptions.showLightsEvents.subscribe(
+                change -> chart.setLayerVisible(S57.OC_LIGHTS, change));
+        displayOptions.showPlatformEvents.subscribe(
+                change -> chart.setLayerVisible(S57.OC_OFSPLF, change));
+        displayOptions.showWreckEvents.subscribe(
+                change -> chart.setLayerVisible(S57.OC_WRECKS, change));
+        displayOptions.showSoundingsEvents.subscribe(
+                change -> chart.setLayerVisible(S57.OC_SOUNDG, change));
     }
 
     private StackPane createRoot() {

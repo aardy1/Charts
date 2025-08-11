@@ -10,7 +10,7 @@ import java.util.Map;
 import org.geotools.api.feature.simple.SimpleFeatureType;
 import org.locationtech.jts.index.strtree.STRtree;
 
-/** An in memory store of features. */
+/** An in memory store of features -- one per loaded map */
 public final class MemStore {
 
     private final Map<String, STRtree> featureSets = new HashMap<>();
@@ -23,7 +23,7 @@ public final class MemStore {
     }
 
     public MemStoreFeatureSource featureSource(SimpleFeatureType type, boolean scaleLess) {
-        var features = this.featureSets.get(type.getTypeName());
+        var features = featureSets.get(type.getTypeName());
         var featureType = featureSetTypes.get(type.getTypeName());
         return new MemStoreFeatureSource(featureType, features, scaleLess);
     }

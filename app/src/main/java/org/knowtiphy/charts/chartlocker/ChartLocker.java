@@ -19,7 +19,6 @@ import javafx.collections.ObservableList;
 import javafx.collections.transformation.SortedList;
 import javax.xml.stream.XMLStreamException;
 import org.apache.commons.lang3.tuple.Pair;
-import org.geotools.api.feature.simple.SimpleFeatureType;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.knowtiphy.charts.chartview.MapDisplayOptions;
@@ -98,7 +97,7 @@ public class ChartLocker {
      * @return the quilt
      */
     @SuppressWarnings("CallToPrintStackTrace")
-    public Quilt<SimpleFeatureType, MemFeature> loadQuilt(
+    public Quilt<MemFeature> loadQuilt(
             ReferencedEnvelope envelope,
             double adjustedDisplayScale,
             AppSettings settings,
@@ -106,7 +105,7 @@ public class ChartLocker {
 
         var quilt = computeQuiltCellGeomPairs(envelope, adjustedDisplayScale);
         System.out.println("Quilt size = " + quilt.size());
-        var maps = new LinkedList<Map<SimpleFeatureType, MemFeature>>();
+        var maps = new LinkedList<Map<MemFeature>>();
         for (var entry : quilt) {
             var cell = entry.getKey();
             addChartHistory(cell);

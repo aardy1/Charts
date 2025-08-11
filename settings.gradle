@@ -45,7 +45,6 @@ dependencyResolutionManagement {
 
   include 'app'
   include 'shapemaprenderer'
-  include 'shapemapview'
 }
 
 //version('attach', '4.0.19')

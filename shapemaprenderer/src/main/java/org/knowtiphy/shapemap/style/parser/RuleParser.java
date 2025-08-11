@@ -8,7 +8,6 @@ package org.knowtiphy.shapemap.style.parser;
 import java.io.FileNotFoundException;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
-import org.knowtiphy.shapemap.api.IStyleCompiler;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.Rule;
 import org.knowtiphy.shapemap.style.builder.RuleBuilder;
 import static org.knowtiphy.shapemap.style.parser.Utils.normalize;
@@ -17,13 +16,14 @@ import org.knowtiphy.shapemap.style.parser.symbolizer.LineSymbolizerParser;
 import org.knowtiphy.shapemap.style.parser.symbolizer.PointSymbolizerParser;
 import org.knowtiphy.shapemap.style.parser.symbolizer.PolygonSymbolizerParser;
 import org.knowtiphy.shapemap.style.parser.symbolizer.TextSymbolizerParser;
+import org.knowtiphy.shapemap.api.IStylePopertyAndFunctionCompiler;
 
 /**
  * @author graham
  */
 public class RuleParser {
 
-    public static <F> Rule<F> parse(IStyleCompiler<F> parsingContext, XMLEventReader reader)
+    public static <F> Rule<F> parse(IStylePopertyAndFunctionCompiler<F> parsingContext, XMLEventReader reader)
             throws FileNotFoundException, XMLStreamException, StyleSyntaxException {
 
         var builder = new RuleBuilder<F>();

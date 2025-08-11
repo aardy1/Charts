@@ -17,25 +17,25 @@ import org.knowtiphy.charts.chartview.shapemapview.IShapeMapViewModel;
  * @param <S> the type of the schema
  * @param <F> the type of the features
  */
-public class ShapeMapControl<S, F> extends Control {
+public class ShapeMapControl<F> extends Control {
 
     public enum SkinType {
         CANVAS
     }
 
     // CSS styling
-    private static final StyleablePropertyFactory<ShapeMapControl<?, ?>> FACTORY =
+    private static final StyleablePropertyFactory<ShapeMapControl<?>> FACTORY =
             new StyleablePropertyFactory<>(Control.getClassCssMetaData());
 
     private static String DEFAULT_STYLE_SHEET;
 
     private final SkinType skinType;
 
-    private final IShapeMapViewModel<S, F> viewModel;
+    private final IShapeMapViewModel<F> viewModel;
 
     private final Color background;
 
-    public ShapeMapControl(IShapeMapViewModel<S, F> viewModel, Color background) {
+    public ShapeMapControl(IShapeMapViewModel<F> viewModel, Color background) {
         this.viewModel = viewModel;
         this.background = background;
         this.skinType = SkinType.CANVAS;
@@ -43,7 +43,7 @@ public class ShapeMapControl<S, F> extends Control {
     }
 
     @Override
-    protected Skin<ShapeMapControl<S, F>> createDefaultSkin() {
+    protected Skin<ShapeMapControl<F>> createDefaultSkin() {
         return switch (skinType) {
             default -> new CanvasShapeMapSkin<>(this, viewModel, background);
         };
