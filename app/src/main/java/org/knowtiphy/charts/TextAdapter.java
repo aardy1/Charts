@@ -35,8 +35,8 @@ public class TextAdapter implements ITextAdapter {
                 new ReferencedEnvelope(
                         x,
                         x + fxBounds.getWidth(),
-                        //  TODO -- need to work out which it is
-                        y - fxBounds.getHeight(),
+                        //  TODO -- need to work out which way y's go for text height
+                        y,
                         y + fxBounds.getHeight(),
                         DefaultEngineeringCRS.CARTESIAN_2D);
 

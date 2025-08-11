@@ -1,6 +1,7 @@
 package org.knowtiphy.shapemap.renderer;
 
 import javafx.scene.transform.Affine;
+import org.knowtiphy.shapemap.api.Renderable;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Polygon;
 
@@ -48,14 +49,11 @@ public class Transformation {
         }
     }
 
-    public double[] apply(Polygon polygon) {
-        var coords = polygon.getCoordinates();
-        var pts = new double[coords.length * 2];
-        for (int i = 0, j = 0; i < coords.length; i++, j += 2) {
-            var coord = coords[i];
-            apply(coord.x, coord.y);
-            pts[j] = dest[0];
-            pts[j + 1] = dest[1];
+    public double[] apply(Renderable polygon) {
+        var pts = new double[polygon.xs().length * 2];
+        for (int i = 0, j = 0; i < polygon.xs().length; i++, j += 2) {
+            pts[j] = polygon.xs()[i];
+            pts[j + 1] = polygon.ys()[i];
         }
 
         return pts;

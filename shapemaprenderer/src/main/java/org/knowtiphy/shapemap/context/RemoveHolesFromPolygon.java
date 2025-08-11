@@ -10,7 +10,9 @@ import java.util.HashMap;
 import java.util.List;
 import org.apache.commons.lang3.tuple.Pair;
 import org.knowtiphy.shapemap.api.IRenderablePolygonProvider;
+import org.knowtiphy.shapemap.api.Renderable;
 import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LinearRing;
 import org.locationtech.jts.geom.Polygon;
@@ -25,13 +27,13 @@ public class RemoveHolesFromPolygon implements IRenderablePolygonProvider {
     }
 
     @Override
-    public Polygon apply(Polygon polygon) {
+    public Renderable apply(Polygon polygon) {
         return renderGeomCache.computeIfAbsent(polygon, this::remove);
     }
 
-    private Polygon remove(Polygon polygon) {
+    private Renderable remove(Polygon polygon) {
         if (polygon.getNumInteriorRing() == 0) {
-            return polygon;
+            return convert(polygon);
         } else {
             // get the holes in the polygon
             var holes = holes(polygon);
@@ -48,7 +50,7 @@ public class RemoveHolesFromPolygon implements IRenderablePolygonProvider {
                 newBoundary = removeHole(hole, newBoundary);
             }
 
-            return GF.createPolygon(GF.createLinearRing(newBoundary.toArray(Coordinate[]::new)));
+            return convert(GF.createLinearRing(newBoundary.toArray(Coordinate[]::new)));
         }
     }
 
@@ -180,5 +182,20 @@ public class RemoveHolesFromPolygon implements IRenderablePolygonProvider {
         }
 
         return res;
+    }
+
+    private Renderable convert(Geometry g) {
+        var numPts = g.getNumPoints();
+        var xs = new double[numPts];
+        var ys = new double[numPts];
+        // TODO -- this is potentially a copy. JTS docs have a comment on how to avoid
+        // this
+        var coords = g.getCoordinates();
+        for (var i = 0; i < numPts; i++) {
+            xs[i] = coords[i].getX();
+            ys[i] = coords[i].getY();
+        }
+
+        return new Renderable(xs, ys);
     }
 }

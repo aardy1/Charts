@@ -122,11 +122,9 @@ public class Fill {
         //      return;
         //    }
 
-        var tx = context.worldToScreen();
-        var gc = context.graphicsContext();
         var renderGeom = context.renderablePolygonProvider().apply(polygon);
-        tx.copyCoordinatesG(renderGeom);
-        gc.fillPolygon(tx.getXs(), tx.getYs(), tx.getXs().length);
+        context.graphicsContext()
+                .fillPolygon(renderGeom.xs(), renderGeom.ys(), renderGeom.xs().length);
     }
 
     // only necessary if a multi-X, can contain another multi-X, rather than just X's

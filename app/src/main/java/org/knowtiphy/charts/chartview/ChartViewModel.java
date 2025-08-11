@@ -116,7 +116,7 @@ public class ChartViewModel implements IShapeMapViewModel<MemFeature> {
     public double aScale() {
         var swIn = platform.screenDimensions().getWidth() / platform.ppi();
         var adjustment = swIn / 22;
-        return dScale() * adjustment / 3;
+        return dScale() * adjustment / 2;
     }
 
     @Override
