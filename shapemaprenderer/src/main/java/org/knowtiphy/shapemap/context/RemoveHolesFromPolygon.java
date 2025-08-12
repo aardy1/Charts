@@ -9,10 +9,16 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import org.apache.commons.lang3.tuple.Pair;
-import org.knowtiphy.shapemap.api.RenderableShape;
 import org.knowtiphy.shapemap.api.RenderableGeometry;
+import org.knowtiphy.shapemap.api.RenderableShape;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
+import static org.locationtech.jts.geom.Geometry.TYPENAME_LINEARRING;
+import static org.locationtech.jts.geom.Geometry.TYPENAME_LINESTRING;
+import static org.locationtech.jts.geom.Geometry.TYPENAME_MULTILINESTRING;
+import static org.locationtech.jts.geom.Geometry.TYPENAME_MULTIPOINT;
+import static org.locationtech.jts.geom.Geometry.TYPENAME_POINT;
+import static org.locationtech.jts.geom.Geometry.TYPENAME_POLYGON;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.LinearRing;
@@ -27,20 +33,15 @@ public class RemoveHolesFromPolygon {
 
     public static RenderableGeometry remove(Geometry geometry) {
 
-        //  we don't convert all geometry types yet
+        //  only missing collections?
         return switch (geometry.getGeometryType()) {
-            case Geometry.TYPENAME_POINT,
-                    Geometry.TYPENAME_LINESTRING,
-                    Geometry.TYPENAME_LINEARRING -> {
+            case TYPENAME_POINT, TYPENAME_LINESTRING, TYPENAME_LINEARRING -> {
                 var converted = List.of(convertSimple(geometry));
                 yield new RenderableGeometry(converted, converted);
             }
-
-            case Geometry.TYPENAME_POLYGON -> removePolygon((Polygon) geometry);
-
-            case Geometry.TYPENAME_MULTIPOINT -> convertMultiPoint((MultiPoint) geometry);
-            case Geometry.TYPENAME_MULTILINESTRING ->
-                    convertMultiLineString((MultiLineString) geometry);
+            case TYPENAME_POLYGON -> removePolygon((Polygon) geometry);
+            case TYPENAME_MULTIPOINT -> convertMultiPoint((MultiPoint) geometry);
+            case TYPENAME_MULTILINESTRING -> convertMultiLineString((MultiLineString) geometry);
             case Geometry.TYPENAME_MULTIPOLYGON -> convertMultiPolygon((MultiPolygon) geometry);
             default -> null;
         };
@@ -122,32 +123,6 @@ public class RemoveHolesFromPolygon {
         }
 
         return new RenderableGeometry(List.of(converted), boundary);
-    }
-
-    public static Geometry removePolygonG(Polygon polygon) {
-
-        if (polygon.getNumInteriorRing() == 0) {
-            return polygon;
-        }
-
-        // get the holes in the polygon
-        var holes = holes(polygon);
-
-        // copy the boundary of the polygon
-        List<Coordinate> newBoundary = new ArrayList<>();
-        var extRing = polygon.getExteriorRing();
-        for (int i = 0; i < extRing.getNumPoints(); i++) {
-            newBoundary.add(extRing.getCoordinateN(i));
-        }
-
-        // remove each hole in order, building a new polygon boundary each time
-        for (var hole : holes) {
-            newBoundary = removeHole(hole, newBoundary);
-        }
-
-        return GF.createPolygon(GF.createLinearRing(newBoundary.toArray(Coordinate[]::new)));
-
-        //            System.out.println("res = " + result);
     }
 
     /**
@@ -298,3 +273,29 @@ public class RemoveHolesFromPolygon {
         return new RenderableShape(xs, ys);
     }
 }
+
+//    public static Geometry removePolygonG(Polygon polygon) {
+//
+//        if (polygon.getNumInteriorRing() == 0) {
+//            return polygon;
+//        }
+//
+//        // get the holes in the polygon
+//        var holes = holes(polygon);
+//
+//        // copy the boundary of the polygon
+//        List<Coordinate> newBoundary = new ArrayList<>();
+//        var extRing = polygon.getExteriorRing();
+//        for (int i = 0; i < extRing.getNumPoints(); i++) {
+//            newBoundary.add(extRing.getCoordinateN(i));
+//        }
+//
+//        // remove each hole in order, building a new polygon boundary each time
+//        for (var hole : holes) {
+//            newBoundary = removeHole(hole, newBoundary);
+//        }
+//
+//        return GF.createPolygon(GF.createLinearRing(newBoundary.toArray(Coordinate[]::new)));
+//
+//        //            System.out.println("res = " + result);
+//    }
