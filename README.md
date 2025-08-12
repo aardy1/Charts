@@ -1,5 +1,7 @@
 # Knowtiphy Charts
 
+[to contact me see the gist on my profile]
+
 The project has two goals:
 
 1. build a pure JavaFX ESRI shape file renderer (so no use of AWT or bridges to AWT)
