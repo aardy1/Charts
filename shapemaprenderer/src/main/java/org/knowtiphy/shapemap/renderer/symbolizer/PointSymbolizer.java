@@ -28,6 +28,7 @@ public class PointSymbolizer<F> implements ISymbolizer<F> {
             IFeatureFunction<F, Number> size,
             double opacity,
             IFeatureFunction<F, Number> rotation) {
+
         this.markSymbolizer = markSymbolizer;
         this.size = size;
         this.opacity = opacity;
@@ -49,7 +50,7 @@ public class PointSymbolizer<F> implements ISymbolizer<F> {
         var geom = context.featureAdapter().defaultGeometry(feature);
         for (var i = 0; i < geom.getNumGeometries(); i++) {
             markSymbolizer.render(
-                    context, feature, DrawPoint.choosePoint(geom.getGeometryN(i)), this);
+                    context, feature, DrawPoint.choosePoint(context, geom.getGeometryN(i)), this);
         }
     }
 }

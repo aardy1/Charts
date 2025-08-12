@@ -39,6 +39,8 @@ public class Fill {
 
         var renderableGeom = context.renderablePolygonProvider().getRenderableGeometry(feature);
 
+        //  TODO -- seems kind of silly to cache points and multi-points -- indeed anything but
+        // (multi) polys
         if (renderableGeom == null) {
             //  fallback to using the geometries directly
             fill(context, context.featureAdapter().defaultGeometry(feature));
@@ -55,10 +57,11 @@ public class Fill {
         }
     }
 
-    private static void fillPoint(RenderingContext<?> context, RenderableGeometry renderableGeom) {
-        assert renderableGeom != null;
+    private static void fillPoint(
+            RenderingContext<?> context, RenderableGeometry renderableGeometry) {
+        assert renderableGeometry != null;
 
-        for (var shape : renderableGeom.forFill()) {
+        for (var shape : renderableGeometry.forFill()) {
             var x = shape.xs()[0];
             var y = shape.ys()[0];
             context.graphicsContext().fillRect(x, y, context.onePixelX(), context.onePixelY());
@@ -67,6 +70,7 @@ public class Fill {
 
     private static void fillAsPolygon(
             RenderingContext<?> context, RenderableGeometry renderableGeometry) {
+        assert renderableGeometry != null;
 
         for (var shape : renderableGeometry.forFill()) {
             var xs = shape.xs();
@@ -79,11 +83,13 @@ public class Fill {
     // converting geometries to renderable geometries as we go
     private static void fill(RenderingContext<?> context, Geometry geom) {
 
+        //  this is a switch on strings in disguise
         switch (context.featureAdapter().geomType(geom)) {
             case LINE_STRING, LINEAR_RING, POLYGON, MULTI_LINE_STRING, MULTI_POLYGON ->
                     fillAsPolygon(
                             context,
                             context.renderablePolygonProvider().getRenderableGeometry(geom));
+            //  could do the next two with renderable geom but seems sort of pointless
             case POINT -> fillPoint(context, (Point) geom);
             case MULTI_POINT -> {
                 for (int i = 0; i < geom.getNumGeometries(); i++) {

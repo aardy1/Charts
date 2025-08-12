@@ -21,6 +21,8 @@ public class Text {
         gc.setLineWidth(strokeInfo.strokeWidth());
         gc.setGlobalAlpha(strokeInfo.opacity());
     }
+}
+
     //
     // public static void text(RenderingContext context, SimpleFeature feature, Geometry
     // geom) {
@@ -94,4 +96,3 @@ public class Text {
     // text(context, feature, geom.getGeometryN(i));
     // }
     // }
-}

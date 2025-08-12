@@ -2,8 +2,6 @@ package org.knowtiphy.shapemap.renderer;
 
 import javafx.scene.transform.Affine;
 import org.knowtiphy.shapemap.api.RenderableGeometry;
-import org.locationtech.jts.geom.LineString;
-import org.locationtech.jts.geom.Polygon;
 
 /** */
 public class Transformation {
@@ -52,34 +50,6 @@ public class Transformation {
         return pts;
     }
 
-    // TODO -- it would be nice to get rid of this -- maybe when we load the geoms?
-    public void copyCoordinatesG(LineString g) {
-        var numPts = g.getNumPoints();
-        xs = new double[numPts];
-        ys = new double[numPts];
-        for (var i = 0; i < numPts; i++) {
-            var coord = g.getCoordinateN(i);
-            xs[i] = coord.getX();
-            ys[i] = coord.getY();
-        }
-    }
-
-    // TODO -- it would be nice to get rid of this -- maybe when we load the geoms?
-    // polys don't have a getCoordinate() method?!?!
-    public void copyCoordinatesG(Polygon g) {
-
-        var numPts = g.getNumPoints();
-        xs = new double[numPts];
-        ys = new double[numPts];
-        // TODO -- this is potentially a copy. JTS docs have a comment on how to avoid
-        // this
-        var coords = g.getCoordinates();
-        for (var i = 0; i < numPts; i++) {
-            xs[i] = coords[i].getX();
-            ys[i] = coords[i].getY();
-        }
-    }
-
     public double getX() {
         return dest[0];
     }
@@ -97,6 +67,34 @@ public class Transformation {
     }
 }
 
+//
+//    // TODO -- it would be nice to get rid of this -- maybe when we load the geoms?
+//    public void copyCoordinatesG(LineString g) {
+//        var numPts = g.getNumPoints();
+//        xs = new double[numPts];
+//        ys = new double[numPts];
+//        for (var i = 0; i < numPts; i++) {
+//            var coord = g.getCoordinateN(i);
+//            xs[i] = coord.getX();
+//            ys[i] = coord.getY();
+//        }
+//    }
+//
+//    // TODO -- it would be nice to get rid of this -- maybe when we load the geoms?
+//    // polys don't have a getCoordinate() method?!?!
+//    public void copyCoordinatesG(Polygon g) {
+//
+//        var numPts = g.getNumPoints();
+//        xs = new double[numPts];
+//        ys = new double[numPts];
+//        // TODO -- this is potentially a copy. JTS docs have a comment on how to avoid
+//        // this
+//        var coords = g.getCoordinates();
+//        for (var i = 0; i < numPts; i++) {
+//            xs[i] = coords[i].getX();
+//            ys[i] = coords[i].getY();
+//        }
+//    }
     //    public void apply(double[] pts) {
     //        var size = pts.length / 2;
     //        xs = new double[size];

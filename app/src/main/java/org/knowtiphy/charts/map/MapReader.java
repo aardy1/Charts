@@ -91,16 +91,13 @@ public class MapReader {
                 var defaultGeometry = (Geometry) geoFeature.getDefaultGeometry();
                 var geometryType = geometryType(defaultGeometry);
 
-                var prop = (Integer) geoFeature.getProperty(S57.AT_SCAMIN).getValue();
-                //                var renderableGeom =
-                // RemoveHolesFromPolygon.remove(defaultGeometry);
-                //                if (geometryType == FeatureGeomType.MULTI_LINE_STRING)
-                // renderableGeom = null;
-                var feature = new MemFeature(geoFeature, defaultGeometry, prop, geometryType);
+                //  can the getProperty itself be null?
+                var scaMin = (Integer) geoFeature.getProperty(S57.AT_SCAMIN).getValue();
+                var feature = new MemFeature(geoFeature, defaultGeometry, scaMin, geometryType);
 
                 index.insert(defaultGeometry.getEnvelopeInternal(), feature);
 
-                if (prop != null && prop != null) {
+                if (scaMin != null) {
                     hasScale = true;
                 }
             }

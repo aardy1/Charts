@@ -30,13 +30,13 @@ public class DrawPoint {
      * @param geom the geometry to render
      * @return the chosen point
      */
-    public static Point choosePoint(Geometry geom) {
+    public static <F> Point choosePoint(RenderingContext<F> context, Geometry geom) {
 
-        return switch (geom.getGeometryType()) {
-            case Geometry.TYPENAME_POINT -> (Point) geom;
-            case Geometry.TYPENAME_LINESTRING, Geometry.TYPENAME_LINEARRING ->
-                    ((LineString) geom).getStartPoint();
-            case Geometry.TYPENAME_POLYGON, Geometry.TYPENAME_MULTIPOLYGON -> geom.getCentroid();
+        //  this is a switch on strings in disguise
+        return switch (context.featureAdapter().geomType(geom)) {
+            case POINT -> (Point) geom;
+            case LINE_STRING, LINEAR_RING -> ((LineString) geom).getStartPoint();
+            case POLYGON, MULTI_POLYGON -> geom.getCentroid();
             default -> throw new IllegalArgumentException(geom.getGeometryType());
         };
     }
