@@ -1,7 +1,7 @@
 package org.knowtiphy.shapemap.renderer;
 
 import javafx.scene.transform.Affine;
-import org.knowtiphy.shapemap.api.Renderable;
+import org.knowtiphy.shapemap.api.RenderableGeometry;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Polygon;
 
@@ -38,22 +38,15 @@ public class Transformation {
         transformation.transform2DPoints(src, 0, dest, 0, 1);
     }
 
-    public void apply(double[] pts) {
-        var size = pts.length / 2;
-        xs = new double[size];
-        ys = new double[size];
-        for (int i = 0; i < pts.length; i += 2) {
-            apply(pts[i], pts[i + 1]);
-            pts[i] = dest[0];
-            pts[i + 1] = dest[1];
-        }
-    }
+    public double[] apply(RenderableGeometry renderGeom) {
 
-    public double[] apply(Renderable polygon) {
-        var pts = new double[polygon.xs().length * 2];
-        for (int i = 0, j = 0; i < polygon.xs().length; i++, j += 2) {
-            pts[j] = polygon.xs()[i];
-            pts[j + 1] = polygon.ys()[i];
+        var xs = renderGeom.forFill().get(0).xs();
+        var ys = renderGeom.forFill().get(0).ys();
+        var pts = new double[xs.length * 2];
+        for (int i = 0, j = 0; i < xs.length; i++, j += 2) {
+            apply(xs[i], ys[i]);
+            pts[j] = dest[0];
+            pts[j + 1] = dest[1];
         }
 
         return pts;
@@ -103,3 +96,30 @@ public class Transformation {
         return ys;
     }
 }
+
+    //    public void apply(double[] pts) {
+    //        var size = pts.length / 2;
+    //        xs = new double[size];
+    //        ys = new double[size];
+    //        for (int i = 0; i < pts.length; i += 2) {
+    //            apply(pts[i], pts[i + 1]);
+    //            pts[i] = dest[0];
+    //            pts[i + 1] = dest[1];
+    //        }
+    //    }
+
+    // TODO -- it would be nice to get rid of this -- maybe when we load the geoms?
+    // polys don't have a getCoordinate() method?!?!
+    //    public void copyCoordinatesG(Polygon g) {
+    //
+    //        var numPts = g.getNumPoints();
+    //        xs = new double[numPts];
+    //        ys = new double[numPts];
+    //        // TODO -- this is potentially a copy. JTS docs have a comment on how to avoid
+    //        // this
+    //        var coords = g.getCoordinates();
+    //        for (var i = 0; i < numPts; i++) {
+    //            xs[i] = coords[i].getX();
+    //            ys[i] = coords[i].getY();
+    //        }
+    //    }

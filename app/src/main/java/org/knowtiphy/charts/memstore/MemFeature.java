@@ -7,8 +7,9 @@ package org.knowtiphy.charts.memstore;
 
 import org.geotools.api.feature.simple.SimpleFeature;
 import org.geotools.feature.simple.SimpleFeatureImpl;
-import org.knowtiphy.charts.ontology.S57;
 import org.knowtiphy.shapemap.api.FeatureGeomType;
+import org.knowtiphy.shapemap.api.RenderableGeometry;
+import org.knowtiphy.shapemap.context.RemoveHolesFromPolygon;
 import org.locationtech.jts.geom.Geometry;
 
 /** A feature in an in memory feature store. */
@@ -21,16 +22,23 @@ public final class MemFeature extends SimpleFeatureImpl {
     private final FeatureGeomType geometryType;
 
     // the features scamin
-    private final Object scaMin;
+    private final Integer scaMin;
+
+    //  the feature's geometry for stroking and filling as a renderable polygon, line, etc
+
+    private RenderableGeometry renderableGeometry;
 
     public MemFeature(
-            SimpleFeature feature, Geometry defaultGeometry, FeatureGeomType geometryType) {
+            SimpleFeature feature,
+            Geometry defaultGeometry,
+            Integer scaMin,
+            FeatureGeomType geometryType) {
 
         super(feature.getAttributes(), feature.getFeatureType(), feature.getIdentifier());
 
         this.defaultGeometry = defaultGeometry;
         this.geometryType = geometryType;
-        scaMin = feature.getAttribute(S57.AT_SCAMIN);
+        this.scaMin = scaMin;
     }
 
     /**
@@ -56,7 +64,14 @@ public final class MemFeature extends SimpleFeatureImpl {
      *
      * @return the scamin
      */
-    public Object scaMin() {
+    public Integer scaMin() {
         return scaMin;
+    }
+
+    public RenderableGeometry getRenderableGeometry() {
+        if (renderableGeometry == null) {
+            renderableGeometry = RemoveHolesFromPolygon.remove(defaultGeometry);
+        }
+        return renderableGeometry;
     }
 }

@@ -51,8 +51,6 @@ public class MapViewport {
 
     public synchronized void setBounds(ReferencedEnvelope newBounds) {
 
-        System.out.println("set bounds old = " + bounds);
-        System.out.println("set bounds new = " + newBounds);
         var oldBounds = bounds;
         this.bounds = newBounds;
         if (!oldBounds.equals(bounds)) {

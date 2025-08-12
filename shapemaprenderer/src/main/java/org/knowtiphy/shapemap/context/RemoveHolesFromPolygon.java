@@ -9,32 +9,92 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import org.apache.commons.lang3.tuple.Pair;
-import org.knowtiphy.shapemap.api.IRenderablePolygonProvider;
-import org.knowtiphy.shapemap.api.Renderable;
+import org.knowtiphy.shapemap.api.RenderableShape;
+import org.knowtiphy.shapemap.api.RenderableGeometry;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.LinearRing;
+import org.locationtech.jts.geom.MultiLineString;
+import org.locationtech.jts.geom.MultiPoint;
+import org.locationtech.jts.geom.MultiPolygon;
+import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.Polygon;
 
-public class RemoveHolesFromPolygon implements IRenderablePolygonProvider {
+public class RemoveHolesFromPolygon {
     private static final GeometryFactory GF = new GeometryFactory();
 
-    private final RenderGeomCache renderGeomCache;
+    public static RenderableGeometry remove(Geometry geometry) {
 
-    public RemoveHolesFromPolygon(RenderGeomCache renderGeomCache) {
-        this.renderGeomCache = renderGeomCache;
+        //  we don't convert all geometry types yet
+        return switch (geometry.getGeometryType()) {
+            case Geometry.TYPENAME_POINT,
+                    Geometry.TYPENAME_LINESTRING,
+                    Geometry.TYPENAME_LINEARRING -> {
+                var converted = List.of(convertSimple(geometry));
+                yield new RenderableGeometry(converted, converted);
+            }
+
+            case Geometry.TYPENAME_POLYGON -> removePolygon((Polygon) geometry);
+
+            case Geometry.TYPENAME_MULTIPOINT -> convertMultiPoint((MultiPoint) geometry);
+            case Geometry.TYPENAME_MULTILINESTRING ->
+                    convertMultiLineString((MultiLineString) geometry);
+            case Geometry.TYPENAME_MULTIPOLYGON -> convertMultiPolygon((MultiPolygon) geometry);
+            default -> null;
+        };
     }
 
-    @Override
-    public Renderable apply(Polygon polygon) {
-        return renderGeomCache.computeIfAbsent(polygon, this::remove);
+    private static RenderableGeometry convertMultiPoint(MultiPoint multiPoint) {
+
+        var converted = new ArrayList<RenderableShape>(multiPoint.getNumGeometries());
+
+        for (var i = 0; i < multiPoint.getNumGeometries(); i++) {
+            var point = multiPoint.getGeometryN(i);
+            assert point instanceof Point;
+            converted.add(convertSimple(point));
+        }
+
+        return new RenderableGeometry(converted, converted);
     }
 
-    private Renderable remove(Polygon polygon) {
+    private static RenderableGeometry convertMultiLineString(MultiLineString multiLine) {
+
+        var converted = new ArrayList<RenderableShape>(multiLine.getNumGeometries());
+
+        for (var i = 0; i < multiLine.getNumGeometries(); i++) {
+            var line = multiLine.getGeometryN(i);
+            assert line instanceof LineString;
+            converted.add(convertSimple(line));
+        }
+
+        return new RenderableGeometry(converted, converted);
+    }
+
+    private static RenderableGeometry convertMultiPolygon(MultiPolygon multiPolygon) {
+
+        var forFill = new ArrayList<RenderableShape>(multiPolygon.getNumGeometries());
+        var forStroke = new ArrayList<RenderableShape>(multiPolygon.getNumGeometries());
+
+        for (var i = 0; i < multiPolygon.getNumGeometries(); i++) {
+            var poly = multiPolygon.getGeometryN(i);
+            assert poly instanceof Polygon;
+            var rPoly = removePolygon((Polygon) poly);
+            forFill.addAll(rPoly.forFill());
+            forStroke.addAll(rPoly.forStroke());
+        }
+
+        return new RenderableGeometry(forFill, forStroke);
+    }
+
+    private static RenderableGeometry removePolygon(Polygon polygon) {
+
+        RenderableShape converted;
         if (polygon.getNumInteriorRing() == 0) {
-            return convert(polygon);
+            converted = convertSimple(polygon);
         } else {
+
             // get the holes in the polygon
             var holes = holes(polygon);
 
@@ -50,8 +110,44 @@ public class RemoveHolesFromPolygon implements IRenderablePolygonProvider {
                 newBoundary = removeHole(hole, newBoundary);
             }
 
-            return convert(GF.createLinearRing(newBoundary.toArray(Coordinate[]::new)));
+            converted =
+                    convertSimple(
+                            GF.createPolygon(
+                                    GF.createLinearRing(newBoundary.toArray(Coordinate[]::new))));
         }
+
+        var boundary = new ArrayList<RenderableShape>(polygon.getNumInteriorRing());
+        for (int i = 0; i < polygon.getNumInteriorRing(); i++) {
+            boundary.add(convertSimple(polygon.getInteriorRingN(i)));
+        }
+
+        return new RenderableGeometry(List.of(converted), boundary);
+    }
+
+    public static Geometry removePolygonG(Polygon polygon) {
+
+        if (polygon.getNumInteriorRing() == 0) {
+            return polygon;
+        }
+
+        // get the holes in the polygon
+        var holes = holes(polygon);
+
+        // copy the boundary of the polygon
+        List<Coordinate> newBoundary = new ArrayList<>();
+        var extRing = polygon.getExteriorRing();
+        for (int i = 0; i < extRing.getNumPoints(); i++) {
+            newBoundary.add(extRing.getCoordinateN(i));
+        }
+
+        // remove each hole in order, building a new polygon boundary each time
+        for (var hole : holes) {
+            newBoundary = removeHole(hole, newBoundary);
+        }
+
+        return GF.createPolygon(GF.createLinearRing(newBoundary.toArray(Coordinate[]::new)));
+
+        //            System.out.println("res = " + result);
     }
 
     /**
@@ -61,7 +157,7 @@ public class RemoveHolesFromPolygon implements IRenderablePolygonProvider {
      * @param polygon the polygon
      * @return the list of pairs of a hole and the "top most" coordinate
      */
-    private List<Pair<LinearRing, Integer>> holes(Polygon polygon) {
+    private static List<Pair<LinearRing, Integer>> holes(Polygon polygon) {
 
         var map = new HashMap<LinearRing, Integer>();
         var result = new ArrayList<LinearRing>();
@@ -85,15 +181,16 @@ public class RemoveHolesFromPolygon implements IRenderablePolygonProvider {
         return result.stream().map(ring -> Pair.of(ring, map.get(ring))).toList();
     }
 
-    private int compareY(Coordinate a, Coordinate b) {
+    private static int compareY(Coordinate a, Coordinate b) {
         return -Double.compare(a.y, b.y);
     }
 
-    private boolean northOf(Coordinate a, Coordinate b) {
+    private static boolean northOf(Coordinate a, Coordinate b) {
         return compareY(a, b) < 0;
     }
 
-    private List<Coordinate> removeHole(Pair<LinearRing, Integer> hole, List<Coordinate> polygon) {
+    private static List<Coordinate> removeHole(
+            Pair<LinearRing, Integer> hole, List<Coordinate> polygon) {
 
         var ring = hole.getLeft();
         var holeTop = ring.getCoordinateN(hole.getRight());
@@ -165,7 +262,7 @@ public class RemoveHolesFromPolygon implements IRenderablePolygonProvider {
      *     <p>c) the y-coordinate of the intersection point on (v_i, v_(i+1)) is minimal among all
      *     possible choices for i
      */
-    private int boundaryIntersection(Coordinate pt, List<Coordinate> poly) {
+    private static int boundaryIntersection(Coordinate pt, List<Coordinate> poly) {
 
         var res = -1;
 
@@ -184,18 +281,20 @@ public class RemoveHolesFromPolygon implements IRenderablePolygonProvider {
         return res;
     }
 
-    private Renderable convert(Geometry g) {
+    //  convert a geometry with one sub-geometry -- so a simple line, simple polygon etc
+    private static RenderableShape convertSimple(Geometry g) {
+
+        assert g.getNumGeometries() == 1;
         var numPts = g.getNumPoints();
         var xs = new double[numPts];
         var ys = new double[numPts];
-        // TODO -- this is potentially a copy. JTS docs have a comment on how to avoid
-        // this
+        // TODO -- this is potentially a copy. JTS docs have a comment on how to avoid it
         var coords = g.getCoordinates();
         for (var i = 0; i < numPts; i++) {
             xs[i] = coords[i].getX();
             ys[i] = coords[i].getY();
         }
 
-        return new Renderable(xs, ys);
+        return new RenderableShape(xs, ys);
     }
 }

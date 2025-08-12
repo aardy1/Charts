@@ -9,9 +9,12 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.transform.Affine;
+import org.knowtiphy.shapemap.api.IFeatureAdapter;
 import org.knowtiphy.shapemap.api.IMap;
 import org.knowtiphy.shapemap.api.IMapLayer;
-import org.knowtiphy.shapemap.api.RenderingContext;
+import org.knowtiphy.shapemap.api.IRenderablePolygonProvider;
+import org.knowtiphy.shapemap.api.ISVGProvider;
+import org.knowtiphy.shapemap.api.ITextAdapter;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.Rule;
 
 /**
@@ -21,13 +24,42 @@ public class ShapeMapRenderer<F, E> {
 
     private int featureCount = 0;
 
-    private final RenderingContext<F, E> renderingContext;
-
     private final GraphicsContext graphics;
 
-    public ShapeMapRenderer(RenderingContext<F, E> renderingContext, GraphicsContext graphics) {
-        this.renderingContext = renderingContext;
+    private final Collection<? extends IMap<F, E>> maps;
+    //  what does this do?
+    //        int totalRuleCount,
+    private final E viewPortBounds;
+    private final Affine worldToScreen;
+    private final Affine screenToWorld;
+    private final double dScale;
+    private final IFeatureAdapter<F> featureAdapter;
+    private final IRenderablePolygonProvider<F> renderablePolygonProvider;
+    private final ISVGProvider svgProvider;
+    private final ITextAdapter textSizeProvider;
+
+    public ShapeMapRenderer(
+            GraphicsContext graphics,
+            Collection<? extends IMap<F, E>> maps,
+            E viewPortBounds,
+            Affine worldToScreen,
+            Affine screenToWorld,
+            double dScale,
+            IFeatureAdapter<F> featureAdapter,
+            IRenderablePolygonProvider<F> renderablePolygonProvider,
+            ISVGProvider svgProvider,
+            ITextAdapter textSizeProvider) {
+
         this.graphics = graphics;
+        this.maps = maps;
+        this.viewPortBounds = viewPortBounds;
+        this.worldToScreen = worldToScreen;
+        this.screenToWorld = screenToWorld;
+        this.dScale = dScale;
+        this.featureAdapter = featureAdapter;
+        this.renderablePolygonProvider = renderablePolygonProvider;
+        this.svgProvider = svgProvider;
+        this.textSizeProvider = textSizeProvider;
     }
 
     public void paint() {
@@ -37,15 +69,15 @@ public class ShapeMapRenderer<F, E> {
         var start = System.currentTimeMillis();
 
         var graphicsRenderingContext =
-                new GraphicsRenderingContext<>(
+                new RenderingContext<>(
                         graphics,
-                        new Transformation(renderingContext.worldToScreen()),
-                        renderingContext.featureAdapter(),
-                        renderingContext.renderablePolygonProvider(),
-                        renderingContext.textSizeProvider(),
-                        renderingContext.svgProvider(),
-                        onePixelX(renderingContext.screenToWorld()),
-                        onePixelY(renderingContext.screenToWorld()));
+                        new Transformation(worldToScreen),
+                        featureAdapter,
+                        renderablePolygonProvider,
+                        textSizeProvider,
+                        svgProvider,
+                        onePixelX(screenToWorld),
+                        onePixelY(screenToWorld));
 
         try {
 
@@ -63,16 +95,13 @@ public class ShapeMapRenderer<F, E> {
             var layerMap = new HashMap<IMap<F, E>, HashMap<IMapLayer<F, E>, TextInfo>>();
 
             //  set coordinate xform for all graphics operations
-            graphics.setTransform(renderingContext.worldToScreen());
+            graphics.setTransform(worldToScreen);
 
-            for (var map : renderingContext.maps()) {
+            for (var map : maps) {
                 System.out.println("Map # = " + whichMap);
                 reversedMaps.addFirst(map);
                 var textInfo =
-                        renderGraphics(
-                                graphicsRenderingContext,
-                                map.layers(),
-                                renderingContext.viewPortBounds());
+                        renderGraphics(graphicsRenderingContext, map.layers(), viewPortBounds);
                 layerMap.put(map, textInfo);
                 whichMap++;
             }
@@ -89,26 +118,21 @@ public class ShapeMapRenderer<F, E> {
             for (var map : reversedMaps) {
                 System.out.println("Map # = " + whichMap);
                 renderText(
-                        graphicsRenderingContext,
-                        map.layers(),
-                        renderingContext.viewPortBounds(),
-                        layerMap.get(map));
+                        graphicsRenderingContext, map.layers(), viewPortBounds, layerMap.get(map));
                 whichMap--;
             }
             System.out.println("Text time = " + (System.currentTimeMillis() - tStart));
 
         } catch (Exception ex) {
-            System.out.println("Rendering exception");
             ex.printStackTrace(System.err);
         }
 
         System.out.println("Rendering time " + (System.currentTimeMillis() - start));
-        System.out.println("\n\n\n");
         System.out.println("Total features " + featureCount);
     }
 
     private HashMap<IMapLayer<F, E>, TextInfo> renderGraphics(
-            GraphicsRenderingContext<F> context,
+            RenderingContext<F> context,
             Collection<? extends IMapLayer<F, E>> layers,
             E viewPortBounds)
             throws Exception {
@@ -120,8 +144,7 @@ public class ShapeMapRenderer<F, E> {
                 var appliedRule = new boolean[layer.style().rules().size()];
                 var layerNeedsTextLayout = false;
                 var style = layer.style();
-                try (var iterator =
-                        layer.featureSource().features(viewPortBounds, renderingContext.dScale())) {
+                try (var iterator = layer.featureSource().features(viewPortBounds, dScale)) {
                     for (var feature : iterator) {
                         featureCount++;
                         layerNeedsTextLayout |= applyStyle(style, context, feature, appliedRule);
@@ -139,7 +162,7 @@ public class ShapeMapRenderer<F, E> {
     }
 
     private void renderText(
-            GraphicsRenderingContext<F> context,
+            RenderingContext<F> context,
             Collection<? extends IMapLayer<F, E>> layers,
             E viewPortBounds,
             HashMap<IMapLayer<F, E>, TextInfo> layerMap)
@@ -149,9 +172,7 @@ public class ShapeMapRenderer<F, E> {
             if (layer.isVisible()) {
                 var textInfo = layerMap.get(layer);
                 if (textInfo.layerNeedsTextLayout()) {
-                    try (var iterator =
-                            layer.featureSource()
-                                    .features(viewPortBounds, renderingContext.dScale())) {
+                    try (var iterator = layer.featureSource().features(viewPortBounds, dScale)) {
                         for (var feature : iterator) {
                             var rp = 0;
                             for (var rule : layer.style().rules()) {
@@ -170,7 +191,7 @@ public class ShapeMapRenderer<F, E> {
 
     private boolean applyStyle(
             FeatureTypeStyle<F> style,
-            GraphicsRenderingContext<F> context,
+            RenderingContext<F> context,
             F feature,
             boolean[] appliedRule) {
 
@@ -201,8 +222,7 @@ public class ShapeMapRenderer<F, E> {
         return appliedSomeRule;
     }
 
-    private boolean applyGraphicsRule(
-            Rule<F> rule, GraphicsRenderingContext<F> context, F feature) {
+    private boolean applyGraphicsRule(Rule<F> rule, RenderingContext<F> context, F feature) {
 
         if (rule.filter() != null
                 && rule.filter()
@@ -217,7 +237,7 @@ public class ShapeMapRenderer<F, E> {
         return false;
     }
 
-    private void applyTextRule(Rule<F> rule, GraphicsRenderingContext<F> context, F feature) {
+    private void applyTextRule(Rule<F> rule, RenderingContext<F> context, F feature) {
         var featureAdapter = context.featureAdapter();
         if (rule.filter().apply(feature, featureAdapter.defaultGeometry(feature))) {
             for (var symbolizer : rule.textSymbolizers()) {

@@ -14,12 +14,12 @@ import org.knowtiphy.shapemap.api.ITextAdapter;
 /**
  * @author graham
  */
-public record GraphicsRenderingContext<F>(
+public record RenderingContext<F>(
         // the canvas being drawn to
         GraphicsContext graphicsContext,
         Transformation worldToScreen, // world to screen transformation
         IFeatureAdapter<F> featureAdapter,
-        IRenderablePolygonProvider renderablePolygonProvider,
+        IRenderablePolygonProvider<F> renderablePolygonProvider,
         ITextAdapter textSizeProvider,
         ISVGProvider svgProvider,
         double onePixelX, // one pixel width in x direction in world coordinates

@@ -5,7 +5,7 @@
 
 package org.knowtiphy.shapemap.renderer.symbolizer;
 
-import org.knowtiphy.shapemap.renderer.GraphicsRenderingContext;
+import org.knowtiphy.shapemap.renderer.RenderingContext;
 import org.knowtiphy.shapemap.renderer.graphics.Fill;
 import org.knowtiphy.shapemap.renderer.graphics.Stroke;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.FillInfo;
@@ -26,23 +26,17 @@ public class PolygonSymbolizer<F> implements ISymbolizer<F> {
     }
 
     @Override
-    public void render(GraphicsRenderingContext<F> context, F feature) {
+    public void render(RenderingContext<F> context, F feature) {
 
         var featureAdapter = context.featureAdapter();
         if (fillInfo != null) {
             Fill.setup(context, fillInfo);
-            Fill.fill(
-                    context,
-                    featureAdapter.defaultGeometry(feature),
-                    context.featureAdapter().geomType(feature));
+            Fill.fill(context, feature);
         }
 
         if (strokeInfo != null) {
             Stroke.setup(context, strokeInfo);
-            Stroke.stroke(
-                    context,
-                    featureAdapter.defaultGeometry(feature),
-                    context.featureAdapter().geomType(feature));
+            Stroke.stroke(context, feature);
         }
     }
 }

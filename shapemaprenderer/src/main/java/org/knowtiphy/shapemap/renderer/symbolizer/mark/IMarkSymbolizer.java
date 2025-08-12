@@ -5,7 +5,7 @@
 
 package org.knowtiphy.shapemap.renderer.symbolizer.mark;
 
-import org.knowtiphy.shapemap.renderer.GraphicsRenderingContext;
+import org.knowtiphy.shapemap.renderer.RenderingContext;
 import org.knowtiphy.shapemap.renderer.symbolizer.PointSymbolizer;
 import org.locationtech.jts.geom.Point;
 
@@ -15,7 +15,7 @@ import org.locationtech.jts.geom.Point;
 public interface IMarkSymbolizer<F> {
 
     void render(
-            GraphicsRenderingContext<F> context,
+            RenderingContext<F> context,
             F feature,
             Point pt,
             PointSymbolizer<F> pointSymbolizer);

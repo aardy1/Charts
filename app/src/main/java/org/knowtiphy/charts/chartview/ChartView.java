@@ -12,7 +12,6 @@ import javafx.scene.paint.Color;
 import org.knowtiphy.charts.chartlocker.ChartLocker;
 import org.knowtiphy.charts.dynamics.AISModel;
 import org.knowtiphy.charts.settings.UnitProfile;
-import org.knowtiphy.shapemap.context.SVGCache;
 
 /** A control to show (quilts of) ENC charts. */
 public class ChartView extends Control {
@@ -51,9 +50,8 @@ public class ChartView extends Control {
             ChartViewModel chart,
             AISModel dynamics,
             UnitProfile unitProfile,
-            MapDisplayOptions displayOptions,
-            SVGCache svgCache) {
-        this(chartLocker, chart, dynamics, unitProfile, displayOptions, svgCache, SkinType.CANVAS);
+            MapDisplayOptions displayOptions) {
+        this(chartLocker, chart, dynamics, unitProfile, displayOptions, SkinType.CANVAS);
     }
 
     public ChartView(
@@ -62,7 +60,6 @@ public class ChartView extends Control {
             AISModel dynamics,
             UnitProfile unitProfile,
             MapDisplayOptions displayOptions,
-            SVGCache svgCache,
             SkinType skinType) {
 
         this.chartLocker = chartLocker;

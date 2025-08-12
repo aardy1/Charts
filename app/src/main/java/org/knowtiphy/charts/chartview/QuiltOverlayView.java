@@ -19,7 +19,6 @@ import javafx.scene.transform.NonInvertibleTransformException;
 import org.geotools.api.referencing.operation.TransformException;
 import org.knowtiphy.charts.Fonts;
 import org.knowtiphy.shapemap.context.RemoveHolesFromPolygon;
-import org.knowtiphy.shapemap.context.RenderGeomCache;
 import org.knowtiphy.shapemap.renderer.Transformation;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Polygon;
@@ -97,22 +96,21 @@ public class QuiltOverlayView extends StackPane {
         try {
             tx = new Transformation(viewModel.viewPortWorldToScreen());
         } catch (TransformException | NonInvertibleTransformException ex) {
-            ex.printStackTrace();
+            ex.printStackTrace(System.err);
             return;
         }
 
         //  TODO -- need a null catch here
-        var remover = new RemoveHolesFromPolygon(new RenderGeomCache());
 
         for (int i = 0; i < geom.getNumGeometries(); i++) {
             //  TODO -- what if its not a polygon -- do what? Is that even possible?
             if (geom.getGeometryN(i) instanceof Polygon pl) {
-                var polyGeom = remover.apply(pl);
+                var polyGeom = RemoveHolesFromPolygon.remove(pl);
                 var polygon = new javafx.scene.shape.Polygon(tx.apply(polyGeom));
                 polygon.setFill(Color.BROWN);
                 polygon.setOpacity(0.4);
                 overlaySurface.getChildren().add(polygon);
-            }
+            } else System.out.println("NOT A POLY");
         }
     }
 }

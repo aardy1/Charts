@@ -90,12 +90,17 @@ public class MapReader {
 
                 var defaultGeometry = (Geometry) geoFeature.getDefaultGeometry();
                 var geometryType = geometryType(defaultGeometry);
-                var feature = new MemFeature(geoFeature, defaultGeometry, geometryType);
+
+                var prop = (Integer) geoFeature.getProperty(S57.AT_SCAMIN).getValue();
+                //                var renderableGeom =
+                // RemoveHolesFromPolygon.remove(defaultGeometry);
+                //                if (geometryType == FeatureGeomType.MULTI_LINE_STRING)
+                // renderableGeom = null;
+                var feature = new MemFeature(geoFeature, defaultGeometry, prop, geometryType);
 
                 index.insert(defaultGeometry.getEnvelopeInternal(), feature);
 
-                var prop = feature.getProperty(S57.AT_SCAMIN);
-                if (prop != null && prop.getValue() != null) {
+                if (prop != null && prop != null) {
                     hasScale = true;
                 }
             }

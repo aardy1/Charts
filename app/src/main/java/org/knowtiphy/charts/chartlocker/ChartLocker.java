@@ -104,7 +104,7 @@ public class ChartLocker {
             MapDisplayOptions mapDisplayOptions) {
 
         var quilt = computeQuiltCellGeomPairs(envelope, adjustedDisplayScale);
-        System.out.println("Quilt size = " + quilt.size());
+        //        System.out.println("Quilt size = " + quilt.size());
         var maps = new LinkedList<Map<MemFeature>>();
         for (var entry : quilt) {
             var cell = entry.getKey();
@@ -187,24 +187,24 @@ public class ChartLocker {
     private List<Pair<ENCCell, Geometry>> computeQuiltCellGeomPairs(
             ReferencedEnvelope viewPortBounds, double scale) {
 
-        System.out.println("Compute QGP scale = " + scale);
-        System.out.println("Compute QGP vpb = " + viewPortBounds);
+        //        System.out.println("Compute QGP scale = " + scale);
+        //        System.out.println("Compute QGP vpb = " + viewPortBounds);
         var intersections =
                 intersections(viewPortBounds).stream()
                         .filter(cell -> cell.cScale() >= scale)
                         .sorted(Comparator.comparingInt(ENCCell::cScale))
                         .toList();
-        System.out.println("Intersection size = " + intersections.size());
-        for (var foo : intersections) {
-            System.out.println(
-                    foo.title()
-                            + " : "
-                            + foo.cScale()
-                            + " :  "
-                            + scale
-                            + " : "
-                            + (foo.cScale() > scale));
-        }
+        //        System.out.println("Intersection size = " + intersections.size());
+        //        for (var foo : intersections) {
+        //            System.out.println(
+        //                    foo.title()
+        //                            + " : "
+        //                            + foo.cScale()
+        //                            + " :  "
+        //                            + scale
+        //                            + " : "
+        //                            + (foo.cScale() > scale));
+        //        }
         if (intersections.isEmpty()) {
             return new ArrayList<>();
         }

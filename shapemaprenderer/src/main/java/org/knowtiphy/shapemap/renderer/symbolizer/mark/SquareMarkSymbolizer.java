@@ -5,7 +5,7 @@
 
 package org.knowtiphy.shapemap.renderer.symbolizer.mark;
 
-import org.knowtiphy.shapemap.renderer.GraphicsRenderingContext;
+import org.knowtiphy.shapemap.renderer.RenderingContext;
 import org.knowtiphy.shapemap.renderer.graphics.Fill;
 import org.knowtiphy.shapemap.renderer.graphics.Stroke;
 import org.knowtiphy.shapemap.renderer.symbolizer.PointSymbolizer;
@@ -24,7 +24,7 @@ public class SquareMarkSymbolizer<F> extends BaseMarkSymbolizer<F> {
 
     @Override
     public void render(
-            GraphicsRenderingContext<F> context,
+            RenderingContext<F> context,
             F feature,
             Point pt,
             PointSymbolizer<F> pointSymbolizer) {

@@ -19,6 +19,6 @@ public record RenderingContext<F, E>(
         Affine screenToWorld,
         double dScale,
         IFeatureAdapter<F> featureAdapter,
-        IRenderablePolygonProvider renderablePolygonProvider,
+        IRenderablePolygonProvider<F> renderablePolygonProvider,
         ISVGProvider svgProvider,
         ITextAdapter textSizeProvider) {}

@@ -6,18 +6,28 @@
 package org.knowtiphy.shapemap.context;
 
 import java.util.HashMap;
-import java.util.function.Function;
-import org.knowtiphy.shapemap.api.Renderable;
-import org.locationtech.jts.geom.Polygon;
+import org.knowtiphy.shapemap.api.IFeatureAdapter;
+import org.knowtiphy.shapemap.api.IRenderablePolygonProvider;
+import org.knowtiphy.shapemap.api.RenderableGeometry;
+import org.locationtech.jts.geom.Geometry;
 
 /** A simple cache of rendering geometries.. */
-public class RenderGeomCache {
+public abstract class RenderGeomCache<F> implements IRenderablePolygonProvider<F> {
 
-    public RenderGeomCache() {}
+    private final HashMap<Geometry, RenderableGeometry> cache = new HashMap<>();
 
-    private final HashMap<Polygon, Renderable> cache = new HashMap<>();
+    private final IFeatureAdapter<F> featureAdapter;
 
-    public Renderable computeIfAbsent(Polygon key, Function<Polygon, Renderable> func) {
-        return cache.computeIfAbsent(key, func);
+    public RenderGeomCache(IFeatureAdapter<F> featureAdapter) {
+        this.featureAdapter = featureAdapter;
+    }
+
+    @Override
+    public RenderableGeometry getRenderableGeometry(Geometry geometry) {
+        return cache.computeIfAbsent(geometry, this::remove);
+    }
+
+    private RenderableGeometry remove(Geometry geometry) {
+        return RemoveHolesFromPolygon.remove(geometry);
     }
 }

@@ -5,12 +5,12 @@
 
 package org.knowtiphy.shapemap.renderer.symbolizer;
 
-import org.knowtiphy.shapemap.renderer.GraphicsRenderingContext;
+import org.knowtiphy.shapemap.renderer.RenderingContext;
 
 /**
  * @author graham
  */
 public interface ISymbolizer<F> {
 
-    void render(GraphicsRenderingContext<F> context, F feature);
+    void render(RenderingContext<F> context, F feature);
 }

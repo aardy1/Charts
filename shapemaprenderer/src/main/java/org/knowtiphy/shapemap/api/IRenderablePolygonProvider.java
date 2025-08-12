@@ -5,8 +5,12 @@
 
 package org.knowtiphy.shapemap.api;
 
-import java.util.function.Function;
-import org.locationtech.jts.geom.Polygon;
+import org.locationtech.jts.geom.Geometry;
 
 /** A provider of polygons that can be rendered (have no holes). */
-public interface IRenderablePolygonProvider extends Function<Polygon, Renderable> {}
+public interface IRenderablePolygonProvider<F> {
+
+    RenderableGeometry getRenderableGeometry(Geometry geometry);
+
+    RenderableGeometry getRenderableGeometry(F feature);
+}

@@ -61,7 +61,6 @@ public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView
         this.chart = chart;
         this.unitProfile = unitProfile;
         this.displayOptions = displayOptions;
-
         initGraphics();
         registerListeners();
     }
@@ -126,7 +125,8 @@ public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView
 
             @Override
             public void layoutChildren() {
-                System.out.println("Skin layout children : " + getWidth() + " : " + getHeight());
+                //                System.out.println("Skin layout children : " + getWidth() + " : "
+                // + getHeight());
                 // TODO -- is this sane? set the screen area of the viewport before laying out the
                 // children
                 chart.setViewPortScreenArea(new Rectangle2D(0, 0, getWidth(), getHeight()));

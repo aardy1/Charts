@@ -8,7 +8,7 @@ package org.knowtiphy.shapemap.renderer.symbolizer;
 import javafx.scene.text.Font;
 import org.apache.commons.lang3.StringUtils;
 import org.knowtiphy.shapemap.api.IFeatureFunction;
-import org.knowtiphy.shapemap.renderer.GraphicsRenderingContext;
+import org.knowtiphy.shapemap.renderer.RenderingContext;
 import org.knowtiphy.shapemap.renderer.graphics.Fill;
 import org.knowtiphy.shapemap.renderer.graphics.Text;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.FillInfo;
@@ -47,7 +47,7 @@ public class TextSymbolizer<F> {
         this.labelPlacement = labelPlacement;
     }
 
-    public void render(GraphicsRenderingContext<F> context, F feature) {
+    public void render(RenderingContext<F> context, F feature) {
 
         if (fillInfo != null) {
             Fill.setup(context, fillInfo);
@@ -64,7 +64,7 @@ public class TextSymbolizer<F> {
         text(context, feature, context.featureAdapter().defaultGeometry(feature));
     }
 
-    private void text(GraphicsRenderingContext<F> context, F feature, Geometry geom) {
+    private void text(RenderingContext<F> context, F feature, Geometry geom) {
 
         // TODO -- switch on strings is brain dead
         switch (geom.getGeometryType()) {
@@ -80,7 +80,7 @@ public class TextSymbolizer<F> {
         }
     }
 
-    private void textPoint(GraphicsRenderingContext<F> context, F feature, Point point) {
+    private void textPoint(RenderingContext<F> context, F feature, Point point) {
 
         if (point != null && label != null) {
             var text = label.apply(feature, point);
@@ -124,7 +124,7 @@ public class TextSymbolizer<F> {
     // TODO -- text along line strings ...
 
     // only necessary if a multi-X, can contain another multi-X, rather than just X's
-    private void recurse(GraphicsRenderingContext<F> context, F feature, Geometry geom) {
+    private void recurse(RenderingContext<F> context, F feature, Geometry geom) {
         for (int i = 0; i < geom.getNumGeometries(); i++) {
             text(context, feature, geom.getGeometryN(i));
         }

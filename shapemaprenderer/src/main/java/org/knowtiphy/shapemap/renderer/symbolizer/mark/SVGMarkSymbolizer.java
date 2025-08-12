@@ -4,7 +4,7 @@
  */
 package org.knowtiphy.shapemap.renderer.symbolizer.mark;
 
-import org.knowtiphy.shapemap.renderer.GraphicsRenderingContext;
+import org.knowtiphy.shapemap.renderer.RenderingContext;
 import org.knowtiphy.shapemap.renderer.symbolizer.PointSymbolizer;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.FillInfo;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.PathInfo;
@@ -27,7 +27,7 @@ public class SVGMarkSymbolizer<F> extends BaseMarkSymbolizer<F> {
 
     @Override
     public void render(
-            GraphicsRenderingContext<F> context,
+            RenderingContext<F> context,
             F feature,
             Point pt,
             PointSymbolizer<F> pointSymbolizer) {
@@ -51,8 +51,6 @@ public class SVGMarkSymbolizer<F> extends BaseMarkSymbolizer<F> {
         var halfSizeX = sizeX / 2;
         var halfSizeY = sizeY / 2;
 
-        // TODO -- make the image fetcher into a feature function of some sort and put the
-        // provider in there
         context.graphicsContext().drawImage(image, x - halfSizeX, y - halfSizeY, sizeX, sizeY);
     }
 }

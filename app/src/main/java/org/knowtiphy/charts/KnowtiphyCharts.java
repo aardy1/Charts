@@ -50,8 +50,6 @@ import static org.knowtiphy.charts.utils.FXUtils.nonResizeable;
 import static org.knowtiphy.charts.utils.FXUtils.resizeable;
 import static org.knowtiphy.charts.utils.FXUtils.systemMenuBar;
 import org.knowtiphy.charts.utils.ToggleModel;
-import org.knowtiphy.shapemap.context.RemoveHolesFromPolygon;
-import org.knowtiphy.shapemap.context.RenderGeomCache;
 import org.knowtiphy.shapemap.context.SVGCache;
 
 /** The Knowtiphy Charts application. */
@@ -124,7 +122,7 @@ public class KnowtiphyCharts extends Application {
                         displayOptions,
                         platform,
                         MemFeatureAdapter.ADAPTER,
-                        new RemoveHolesFromPolygon(new RenderGeomCache()),
+                        new MemRenderGeomCache(MemFeatureAdapter.ADAPTER),
                         svgCache);
 
         var stats = new MapStats(quilt).compute();
@@ -155,8 +153,7 @@ public class KnowtiphyCharts extends Application {
                                 chart,
                                 dynamicsModel,
                                 appSettings.unitProfile(),
-                                displayOptions,
-                                svgCache));
+                                displayOptions));
 
         //  the chart options pane that slides in and out when toggled on and off
         var toggle = new ToggleModel();

@@ -25,7 +25,6 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import org.apache.commons.lang3.tuple.Pair;
 
 /** Collection of utility classes for JavaFX. */
 public class FXUtils {
@@ -104,19 +103,9 @@ public class FXUtils {
         return menuBar;
     }
 
-    public static Pair<Double, Double> textSize(Font font, String s) {
-        TEXT.setText(s);
-        TEXT.setFont(font);
-        return Pair.of(TEXT.getBoundsInLocal().getWidth(), TEXT.getBoundsInLocal().getHeight());
-    }
-
-    public static Pair<Double, Double> textSize(Font font) {
-        return textSize(font, "A");
-    }
-
     public static Bounds textSizeFast(Font font, String s) {
-        TEXT.setText(s);
         TEXT.setFont(font);
+        TEXT.setText(s);
         return TEXT.getBoundsInLocal();
     }
 

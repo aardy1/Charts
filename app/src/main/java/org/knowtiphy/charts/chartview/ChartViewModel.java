@@ -116,7 +116,7 @@ public class ChartViewModel implements IShapeMapViewModel<MemFeature> {
     public double aScale() {
         var swIn = platform.screenDimensions().getWidth() / platform.ppi();
         var adjustment = swIn / 22;
-        return dScale() * adjustment / 2;
+        return dScale() * adjustment / 3;
     }
 
     @Override
@@ -326,7 +326,6 @@ public class ChartViewModel implements IShapeMapViewModel<MemFeature> {
         var oldQuilt = quilt;
         quilt = newQuilt;
         //        viewPort.setBounds(quilt.bounds());
-        System.out.println("SwtQuilt : " + viewPortBounds());
         quiltChangeEvent.push(new Change<>(oldQuilt, newQuilt));
     }
 

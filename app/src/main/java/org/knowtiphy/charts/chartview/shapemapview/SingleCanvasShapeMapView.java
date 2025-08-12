@@ -6,8 +6,6 @@ import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.scene.transform.NonInvertibleTransformException;
 import org.geotools.api.referencing.operation.TransformException;
-import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.knowtiphy.shapemap.api.RenderingContext;
 import org.knowtiphy.shapemap.renderer.ShapeMapRenderer;
 
 //  TODO -- extract the background color into a style sheet
@@ -48,13 +46,7 @@ public class SingleCanvasShapeMapView<S, F> extends Region {
 
     private void registerListeners() {
         viewModel.viewPortBoundsEvent().subscribe(_ -> requestLayout());
-        viewModel
-                .quiltChangeEvent()
-                .subscribe(
-                        _ -> {
-                            System.out.println("change event " + viewModel.viewPortBounds());
-                            requestLayout();
-                        });
+        viewModel.quiltChangeEvent().subscribe(_ -> requestLayout());
         viewModel.layerVisibilityEvent().subscribe(_ -> requestLayout());
     }
 
@@ -80,10 +72,10 @@ public class SingleCanvasShapeMapView<S, F> extends Region {
         var screenArea = viewModel.viewPortScreenArea();
         var width = screenArea.getWidth();
         var height = screenArea.getHeight();
-        System.out.println("repaint ");
-        System.out.println("\tpaint count = " + paintCount);
-        System.out.println("\tSA w, h = " + width + ", " + height);
-        System.out.println("\tRegion w, h = " + getWidth() + ", " + getHeight());
+        //        System.out.println("repaint ");
+        //        System.out.println("\tpaint count = " + paintCount);
+        //        System.out.println("\tSA w, h = " + width + ", " + height);
+        //        System.out.println("\tRegion w, h = " + getWidth() + ", " + getHeight());
 
         if (width == 0 || height == 0) {
             return;
@@ -109,25 +101,23 @@ public class SingleCanvasShapeMapView<S, F> extends Region {
         //                "Map #= = " + whichMap + " title = " + map.title() + " cscale = " +
         // map.cScale());
         try {
-            var rendererContext =
-                    new RenderingContext<F, ReferencedEnvelope>(
+
+            new ShapeMapRenderer<>(
+                            gctx,
                             viewModel.maps(),
                             //                            map.totalRuleCount(),
                             viewModel.viewPortBounds(),
-                            screenArea,
                             viewModel.viewPortWorldToScreen(),
                             viewModel.viewPortScreenToWorld(),
                             viewModel.aScale(),
                             viewModel.featureAdapter(),
                             viewModel.renderablePolygonProvider(),
                             viewModel.svgProvider(),
-                            viewModel.textSizeProvider());
-
-            var renderer = new ShapeMapRenderer<>(rendererContext, gctx);
-            renderer.paint();
+                            viewModel.textSizeProvider())
+                    .paint();
             //            whichMap++;
         } catch (NonInvertibleTransformException | TransformException e) {
-            e.printStackTrace();
+            e.printStackTrace(System.err);
         }
         //        }
     }
