@@ -8,7 +8,9 @@ package org.knowtiphy.shapemap.renderer.symbolizer;
 import org.knowtiphy.shapemap.renderer.RenderingContext;
 
 /**
- * @author graham
+ * A symbolizer for features.
+ *
+ * @param <F> the type of the features.
  */
 public interface ISymbolizer<F> {
 

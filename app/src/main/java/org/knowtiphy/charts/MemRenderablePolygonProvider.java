@@ -13,10 +13,10 @@ import org.locationtech.jts.geom.Geometry;
 /**
  * @author graham
  */
-public class MemRenderGeomCache implements IRenderablePolygonProvider<MemFeature> {
+public class MemRenderablePolygonProvider implements IRenderablePolygonProvider<MemFeature> {
 
-    //  TODO -- can do better than this -- don't store or cache renderable geoms for points and
-    // multi-points
+    //  TODO -- can do better than this -- don't store or cache renderable geoms for points (and
+    // multi-points?) -- HUH?
     /**
      * This method should never be called as the renderable geometries are cached in the features
      * themselves.
@@ -27,18 +27,23 @@ public class MemRenderGeomCache implements IRenderablePolygonProvider<MemFeature
      */
     @Override
     public RenderableGeometry getRenderableGeometry(Geometry geometry) {
-        throw new UnsupportedOperationException();
+        return null;
+        // throw new UnsupportedOperationException();
     }
 
     /**
-     * Compute a renderable geometry for a feature's default geometry.
+     * Compute a renderable geometry for a feature's default geometry, caching the computed geometry
+     * in the feature.
      *
      * @param feature the feature
      * @return the renderable geometry
      */
     @Override
     public RenderableGeometry getRenderableGeometry(MemFeature feature) {
-        return feature.getRenderableGeometry();
+        return switch (feature.geometryType()) {
+            case POLYGON, MULTI_POLYGON, MULTI_LINE_STRING -> feature.getRenderableGeometry();
+            default -> null;
+        };
     }
 }
 

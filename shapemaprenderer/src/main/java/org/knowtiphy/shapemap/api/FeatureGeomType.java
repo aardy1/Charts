@@ -14,8 +14,8 @@ public enum FeatureGeomType {
     MULTI_POINT,
     LINE_STRING,
     LINEAR_RING,
-    MULTI_LINE_STRING,
     POLYGON,
+    MULTI_LINE_STRING,
     MULTI_POLYGON,
     GEOMETRY_COLLECTION
 }

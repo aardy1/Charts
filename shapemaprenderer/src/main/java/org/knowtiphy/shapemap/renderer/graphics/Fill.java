@@ -36,12 +36,11 @@ public class Fill {
     }
 
     /**
-     * Called by a polygon symbolizer to fill a feature's geometry. Note that polygon symbolizers
-     * can be used on any geometry.
+     * Called to fill a feature's geometry.
      *
-     * @param <F> the type of the feature
      * @param context the rendering context
      * @param feature the feature to render
+     * @param <F> the type of the feature
      */
     public static <F> void fill(RenderingContext<F> context, F feature) {
 
@@ -51,14 +50,15 @@ public class Fill {
             //  fallback to using the geometries directly
             fill(context, context.featureAdapter().defaultGeometry(feature));
         } else {
-            switch (context.featureAdapter().geomType(feature)) {
+            switch (context.featureAdapter().geometryType(feature)) {
                 case POINT, MULTI_POINT -> fillPoint(context, renderableGeometry);
-                case LINE_STRING, LINEAR_RING, MULTI_LINE_STRING, POLYGON, MULTI_POLYGON ->
+                case LINE_STRING, LINEAR_RING, POLYGON, MULTI_LINE_STRING, MULTI_POLYGON ->
                         fillAsPolygon(context, renderableGeometry);
+                // TODO -- support for geom collections
                 default ->
                         throw new IllegalArgumentException(
-                                "Unknown geometry type "
-                                        + context.featureAdapter().geomType(feature));
+                                "Unsupported geometry type "
+                                        + context.featureAdapter().geometryType(feature));
             }
         }
     }
@@ -89,27 +89,31 @@ public class Fill {
     // converting geometries to renderable geometries as we go
     private static void fill(RenderingContext<?> context, Geometry geometry) {
 
-        //  this is a switch on strings in disguise in the geomType call
-        switch (context.featureAdapter().geomType(geometry)) {
+        //  this is a switch on strings in disguise in the geomType() call
+        switch (context.featureAdapter().geometryType(geometry)) {
             case POINT -> fillPoint(context, (Point) geometry);
             case LINE_STRING, LINEAR_RING -> fillLineString(context, (LineString) geometry);
             case POLYGON -> fillPolygon(context, (Polygon) geometry);
             case MULTI_POINT -> fillMultiPoint(context, (MultiPoint) geometry);
             case MULTI_LINE_STRING -> fillMultLineString(context, (MultiLineString) geometry);
             case MULTI_POLYGON -> fillMultiPolygon(context, (MultiPolygon) geometry);
+            // TODO -- support for geom collections
             default ->
                     throw new IllegalArgumentException(
-                            "Unknown geometry type " + context.featureAdapter().geomType(geometry));
+                            "Unknown geometry type "
+                                    + context.featureAdapter().geometryType(geometry));
         }
     }
 
     private static void fillPoint(RenderingContext<?> context, Point point) {
+
         var renderableGeometry = context.renderablePolygonProvider().getRenderableGeometry(point);
-        if (renderableGeometry != null) {
-            fillPoint(context, renderableGeometry);
-        } else {
+
+        if (renderableGeometry == null) {
             context.graphicsContext()
                     .fillRect(point.getX(), point.getY(), context.onePixelX(), context.onePixelY());
+        } else {
+            fillPoint(context, renderableGeometry);
         }
     }
 
@@ -118,12 +122,12 @@ public class Fill {
         var renderableGeometry =
                 context.renderablePolygonProvider().getRenderableGeometry(lineString);
 
-        if (renderableGeometry != null) {
-            fillAsPolygon(context, renderableGeometry);
-        } else {
+        if (renderableGeometry == null) {
             var tx = context.worldToScreen();
             tx.copyCoordinates(lineString);
             context.graphicsContext().fillPolygon(tx.getXs(), tx.getYs(), tx.getXs().length);
+        } else {
+            fillAsPolygon(context, renderableGeometry);
         }
     }
 
@@ -131,10 +135,11 @@ public class Fill {
 
         var renderableGeometry = context.renderablePolygonProvider().getRenderableGeometry(polygon);
 
-        if (renderableGeometry != null) {
-            fillAsPolygon(context, renderableGeometry);
-        } else {
+        if (renderableGeometry == null) {
+            //  removing holes in polygons would be way too slow
             throw new IllegalArgumentException("Expected a renderable geometry for polyon");
+        } else {
+            fillAsPolygon(context, renderableGeometry);
         }
     }
 
@@ -143,12 +148,12 @@ public class Fill {
         var renderableGeometry =
                 context.renderablePolygonProvider().getRenderableGeometry(multiPoint);
 
-        if (renderableGeometry != null) {
-            fillPoint(context, renderableGeometry);
-        } else {
+        if (renderableGeometry == null) {
             for (int i = 0; i < multiPoint.getNumGeometries(); i++) {
                 fillPoint(context, (Point) multiPoint.getGeometryN(i));
             }
+        } else {
+            fillPoint(context, renderableGeometry);
         }
     }
 
@@ -158,12 +163,12 @@ public class Fill {
         var renderableGeometry =
                 context.renderablePolygonProvider().getRenderableGeometry(multiLineString);
 
-        if (renderableGeometry != null) {
-            fillAsPolygon(context, renderableGeometry);
-        } else {
+        if (renderableGeometry == null) {
             for (int i = 0; i < multiLineString.getNumGeometries(); i++) {
                 fillLineString(context, (LineString) multiLineString.getGeometryN(i));
             }
+        } else {
+            fillAsPolygon(context, renderableGeometry);
         }
     }
 
@@ -171,178 +176,12 @@ public class Fill {
 
         var renderableGeometry = context.renderablePolygonProvider().getRenderableGeometry(polygon);
 
-        if (renderableGeometry != null) {
-            fillAsPolygon(context, renderableGeometry);
-        } else {
+        if (renderableGeometry == null) {
             for (int i = 0; i < polygon.getNumGeometries(); i++) {
                 fillPolygon(context, (Polygon) polygon.getGeometryN(i));
             }
+        } else {
+            fillAsPolygon(context, renderableGeometry);
         }
     }
-    //        // TODO -- sort this out -- finding stuff not in the bounding box
-    //        //    if(!polygon.intersects(JTS.toGeometry(context.bounds())))
-    //        //    {
-    //        ////      System.err.println("DUMB POLY");
-    //        //      return;
-    //        //    }
-    //
-    //        var geom = RemoveHolesFromPolygon.removePolygonG(polygon);
-    //        var tx = context.worldToScreen();
-    //        tx.copyCoordinatesG((Polygon) geom);
-    //        context.graphicsContext().fillPolygon(tx.getXs(), tx.getYs(), tx.getXs().length);
-    //    }
 }
-
-  //                var renderGeom =
-            // context.renderablePolygonProvider().getRenderableGeometry(geom);
-            //                for (var poly : renderGeom.forFill()) {
-            //                    var xs = poly.xs();
-            //                    var ys = poly.ys();
-            //                    context.graphicsContext().fillPolygon(xs, ys, xs.length);
-            //                }
-            //                for (int i = 0; i < geom.getNumGeometries(); i++) {
-            //                    var renderGeom =
-            //                            context.renderablePolygonProvider()
-            //                                    .getRenderable(((Polygon)
-            // geom.getGeometryN(i)));
-            //                    var xs = renderGeom.converted().get(0).xs();
-            //                    var ys = renderGeom.converted().get(0).ys();
-            //                    context.graphicsContext().fillPolygon(xs, ys, xs.length);
-            //                    fillPolygon(context, (Polygon) geom.getGeometryN(i));
-            //                    fillPolygon(
-            //                            context,
-            //                            context.renderablePolygonProvider()
-            //                                    .getRenderable(geom.getGeometryN(i)));
-
-            //    }
-
-//
-//    private static void fillPolygon(RenderingContext<?> context, Polygon polygon) {
-//
-
-    // only necessary if a multi-X, can contain another multi-X, rather than just X's
-    // private static void recurse(GraphicsRenderingContext context, Geometry geom) {
-    // for (int i = 0; i < geom.getNumGeometries(); i++) {
-    // fill(context, geom.getGeometryN(i));
-    // }
-    // }
-//
-//
-//  // TODO -- switch on strings is brain dead
-//        switch (geom.getGeometryType()) {
-//            case Geometry.TYPENAME_POINT -> fillPoint(context, (Point) geom);
-//            case Geometry.TYPENAME_LINESTRING, Geometry.TYPENAME_LINEARRING ->
-//                    fillLineString(context, (LineString) geom);
-//            case Geometry.TYPENAME_POLYGON -> fillPolygon(context, (Polygon) geom);
-//            case Geometry.TYPENAME_MULTIPOINT -> {
-//                for (int i = 0; i < geom.getNumGeometries(); i++) {
-//                    fillPoint(context, (Point) geom.getGeometryN(i));
-//                }
-//            }
-//            case Geometry.TYPENAME_MULTILINESTRING -> {
-//                for (int i = 0; i < geom.getNumGeometries(); i++) {
-//                    fillLineString(context, (LineString) geom.getGeometryN(i));
-//                }
-//            }
-//            case Geometry.TYPENAME_MULTIPOLYGON -> {
-//                for (int i = 0; i < geom.getNumGeometries(); i++) {
-//                    fillPolygon(context, (Polygon) geom.getGeometryN(i));
-//                }
-//            }
-//            default -> {
-//                for (int i = 0; i < geom.getNumGeometries(); i++) {
-//                    fill(context, geom.getGeometryN(i));
-//                } // recurse(context, geom);
-//            }
-//        }
-//    }
-//
-//    public static void fill(
-//            GraphicsRenderingContext<?, ?> context,
-//            Geometry geom,
-//            FeatureGeomType featureGeomType) {
-//
-//        switch (featureGeomType) {
-//            case POINT -> fillPoint(context, (Point) geom);
-//            case LINE_STRING, LINEAR_RING -> fillLineString(context, (LineString) geom);
-//            case POLYGON -> fillPolygon(context, (Polygon) geom);
-//            case MULTI_POINT -> {
-//                for (int i = 0; i < geom.getNumGeometries(); i++) {
-//                    fillPoint(context, (Point) geom.getGeometryN(i));
-//                }
-//            }
-//            case MULTI_LINE_STRING -> {
-//                for (int i = 0; i < geom.getNumGeometries(); i++) {
-//                    fillLineString(context, (LineString) geom.getGeometryN(i));
-//                }
-//            }
-//            case MULTI_POLYGON -> {
-//                for (int i = 0; i < geom.getNumGeometries(); i++) {
-//                    fillPolygon(context, (Polygon) geom.getGeometryN(i));
-//                }
-//            }
-//            default -> {
-//                // TODO -- recurses wrong, fix
-//                for (int i = 0; i < geom.getNumGeometries(); i++) {
-//                    fill(context, geom.getGeometryN(i));
-//                }
-//            }
-//        }
-
-    //
-    //    public static void fill(
-    //            RenderingContext<?> context, Geometry geom, FeatureGeomType featureGeomType) {
-    //
-    //        switch (featureGeomType) {
-    //            case POINT -> fillPoint(context, (Point) geom);
-    //            case LINE_STRING, LINEAR_RING -> fillLineString(context, (LineString) geom);
-    //            case POLYGON -> fillPolygon(context, (Polygon) geom);
-    //            case MULTI_POINT -> {
-    //                for (int i = 0; i < geom.getNumGeometries(); i++) {
-    //                    fillPoint(context, (Point) geom.getGeometryN(i));
-    //                }
-    //            }
-    //            case MULTI_LINE_STRING -> {
-    //                for (int i = 0; i < geom.getNumGeometries(); i++) {
-    //                    fillLineString(context, (LineString) geom.getGeometryN(i));
-    //                }
-    //            }
-    //            case MULTI_POLYGON -> {
-    //                for (int i = 0; i < geom.getNumGeometries(); i++) {
-    //                    fillPolygon(context, (Polygon) geom.getGeometryN(i));
-    //                }
-    //            }
-    //            default -> {
-    //                // TODO -- recurses wrong, fix
-    //                for (int i = 0; i < geom.getNumGeometries(); i++) {
-    //                    fill(context, geom.getGeometryN(i));
-    //                }
-    //            }
-    //        }
-    //    }
-    //    private static void fillLineString(RenderingContext<?> context, Converted converted) {
-    //        var xs = converted.xs();
-    //        var ys = converted.ys();
-    //        context.graphicsContext().fillPolygon(xs, ys, xs.length);
-    //    }
-
-    //    private static void fillLine(RenderingContext<?> context, RenderableGeometry
-    // renderableGeom) {
-    //        assert renderableGeom != null;
-    //
-    //        for (var converted : renderableGeom.forFill()) {
-    //            var xs = converted.xs();
-    //            var ys = converted.ys();
-    //            context.graphicsContext().fillPolygon(xs, ys, xs.length);
-    //        }
-    //    }
-//
-//    private static void fillAsPolygon(
-//            RenderingContext<?> context, Collection<RenderableShape> shapes) {
-//
-//        for (var shape : shapes) {
-//            var xs = shape.xs();
-//            var ys = shape.ys();
-//            context.graphicsContext().fillPolygon(xs, ys, xs.length);
-//        }
-//    }

@@ -238,8 +238,7 @@ public class ShapeMapRenderer<F, E> {
     }
 
     private void applyTextRule(Rule<F> rule, RenderingContext<F> context, F feature) {
-        var featureAdapter = context.featureAdapter();
-        if (rule.filter().apply(feature, featureAdapter.defaultGeometry(feature))) {
+        if (rule.filter().apply(feature, context.featureAdapter().defaultGeometry(feature))) {
             for (var symbolizer : rule.textSymbolizers()) {
                 symbolizer.render(context, feature);
             }

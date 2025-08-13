@@ -78,7 +78,7 @@ public class KnowtiphyCharts extends Application {
     //  the global cache of SVG "images"
     private SVGCache svgCache;
 
-    private MemRenderGeomCache memRenderGeomCache;
+    private MemRenderablePolygonProvider memRenderGeomCache;
     // the global chart locker
     private ChartLocker chartLocker;
 
@@ -95,7 +95,7 @@ public class KnowtiphyCharts extends Application {
 
         //  create the global caches
         svgCache = new SVGCache(MarkIconsResourceLoader.class);
-        memRenderGeomCache = new MemRenderGeomCache();
+        memRenderGeomCache = new MemRenderablePolygonProvider();
         //  create the global chart locker
         var mapReader =
                 new MapReader(new StyleReader<>(ResourceLoader.class), appSettings, displayOptions);

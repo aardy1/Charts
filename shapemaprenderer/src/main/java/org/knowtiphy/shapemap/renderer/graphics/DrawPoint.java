@@ -5,6 +5,9 @@
 
 package org.knowtiphy.shapemap.renderer.graphics;
 
+import static org.knowtiphy.shapemap.api.FeatureGeomType.MULTI_LINE_STRING;
+import static org.knowtiphy.shapemap.api.FeatureGeomType.MULTI_POINT;
+import static org.knowtiphy.shapemap.api.FeatureGeomType.MULTI_POLYGON;
 import org.knowtiphy.shapemap.renderer.RenderingContext;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
@@ -23,20 +26,20 @@ public class DrawPoint {
     }
 
     /**
-     * Called by a point symbolizer to compute a point for various geometries.
+     * Called by a symbolizer to compute a point for various geometries.
      *
-     * <p>Note: point symbolizers can be used on any geometry.
-     *
-     * @param geom the geometry to render
-     * @return the chosen point
+     * @param context the rendering context
+     * @param geom the geometry
+     * @return the point
      */
-    public static <F> Point choosePoint(RenderingContext<F> context, Geometry geom) {
+    public static Point choosePoint(RenderingContext<?> context, Geometry geom) {
 
         //  this is a switch on strings in disguise
-        return switch (context.featureAdapter().geomType(geom)) {
+        return switch (context.featureAdapter().geometryType(geom)) {
             case POINT -> (Point) geom;
             case LINE_STRING, LINEAR_RING -> ((LineString) geom).getStartPoint();
-            case POLYGON, MULTI_POLYGON -> geom.getCentroid();
+            case POLYGON, MULTI_POINT, MULTI_LINE_STRING, MULTI_POLYGON -> geom.getCentroid();
+            // TODO geom collections?
             default -> throw new IllegalArgumentException(geom.getGeometryType());
         };
     }

@@ -23,7 +23,7 @@ public class ENCCellLoader {
     //  a reader of maps
     private final MapReader mapReader;
 
-    //  loaded cells cache
+    //  loaded cells cache -- probably should limit the size of this
     private final java.util.Map<ENCCell, Map<MemFeature>> loaded = new HashMap<>();
 
     public ENCCellLoader(MapReader mapReader) {
