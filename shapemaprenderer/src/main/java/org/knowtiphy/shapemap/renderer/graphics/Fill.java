@@ -5,14 +5,22 @@
 
 package org.knowtiphy.shapemap.renderer.graphics;
 
+import static org.knowtiphy.shapemap.api.FeatureGeomType.LINEAR_RING;
+import static org.knowtiphy.shapemap.api.FeatureGeomType.LINE_STRING;
 import static org.knowtiphy.shapemap.api.FeatureGeomType.MULTI_LINE_STRING;
 import static org.knowtiphy.shapemap.api.FeatureGeomType.MULTI_POLYGON;
 import static org.knowtiphy.shapemap.api.FeatureGeomType.POINT;
+import static org.knowtiphy.shapemap.api.FeatureGeomType.POLYGON;
 import org.knowtiphy.shapemap.api.RenderableGeometry;
 import org.knowtiphy.shapemap.renderer.RenderingContext;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.FillInfo;
 import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.LineString;
+import org.locationtech.jts.geom.MultiLineString;
+import org.locationtech.jts.geom.MultiPoint;
+import org.locationtech.jts.geom.MultiPolygon;
 import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.Polygon;
 
 public class Fill {
 
@@ -37,18 +45,16 @@ public class Fill {
      */
     public static <F> void fill(RenderingContext<F> context, F feature) {
 
-        var renderableGeom = context.renderablePolygonProvider().getRenderableGeometry(feature);
+        var renderableGeometry = context.renderablePolygonProvider().getRenderableGeometry(feature);
 
-        //  TODO -- seems kind of silly to cache points and multi-points -- indeed anything but
-        // (multi) polys
-        if (renderableGeom == null) {
+        if (renderableGeometry == null) {
             //  fallback to using the geometries directly
             fill(context, context.featureAdapter().defaultGeometry(feature));
         } else {
             switch (context.featureAdapter().geomType(feature)) {
-                case POINT, MULTI_POINT -> fillPoint(context, renderableGeom);
+                case POINT, MULTI_POINT -> fillPoint(context, renderableGeometry);
                 case LINE_STRING, LINEAR_RING, MULTI_LINE_STRING, POLYGON, MULTI_POLYGON ->
-                        fillAsPolygon(context, renderableGeom);
+                        fillAsPolygon(context, renderableGeometry);
                 default ->
                         throw new IllegalArgumentException(
                                 "Unknown geometry type "
@@ -79,33 +85,112 @@ public class Fill {
         }
     }
 
-    // if we don't have a renderable geometry for a geometry then fall back to dynamically
+    // if we don't have a renderable geometry for a feature then fall back to dynamically
     // converting geometries to renderable geometries as we go
-    private static void fill(RenderingContext<?> context, Geometry geom) {
+    private static void fill(RenderingContext<?> context, Geometry geometry) {
 
-        //  this is a switch on strings in disguise
-        switch (context.featureAdapter().geomType(geom)) {
-            case LINE_STRING, LINEAR_RING, POLYGON, MULTI_LINE_STRING, MULTI_POLYGON ->
-                    fillAsPolygon(
-                            context,
-                            context.renderablePolygonProvider().getRenderableGeometry(geom));
-            //  could do the next two with renderable geom but seems sort of pointless
-            case POINT -> fillPoint(context, (Point) geom);
-            case MULTI_POINT -> {
-                for (int i = 0; i < geom.getNumGeometries(); i++) {
-                    fillPoint(context, (Point) geom.getGeometryN(i));
-                }
-            }
+        //  this is a switch on strings in disguise in the geomType call
+        switch (context.featureAdapter().geomType(geometry)) {
+            case POINT -> fillPoint(context, (Point) geometry);
+            case LINE_STRING, LINEAR_RING -> fillLineString(context, (LineString) geometry);
+            case POLYGON -> fillPolygon(context, (Polygon) geometry);
+            case MULTI_POINT -> fillMultiPoint(context, (MultiPoint) geometry);
+            case MULTI_LINE_STRING -> fillMultLineString(context, (MultiLineString) geometry);
+            case MULTI_POLYGON -> fillMultiPolygon(context, (MultiPolygon) geometry);
             default ->
                     throw new IllegalArgumentException(
-                            "Unknown geometry type " + context.featureAdapter().geomType(geom));
+                            "Unknown geometry type " + context.featureAdapter().geomType(geometry));
         }
     }
 
     private static void fillPoint(RenderingContext<?> context, Point point) {
-        context.graphicsContext()
-                .fillRect(point.getX(), point.getY(), context.onePixelX(), context.onePixelY());
+        var renderableGeometry = context.renderablePolygonProvider().getRenderableGeometry(point);
+        if (renderableGeometry != null) {
+            fillPoint(context, renderableGeometry);
+        } else {
+            context.graphicsContext()
+                    .fillRect(point.getX(), point.getY(), context.onePixelX(), context.onePixelY());
+        }
     }
+
+    private static void fillLineString(RenderingContext<?> context, LineString lineString) {
+
+        var renderableGeometry =
+                context.renderablePolygonProvider().getRenderableGeometry(lineString);
+
+        if (renderableGeometry != null) {
+            fillAsPolygon(context, renderableGeometry);
+        } else {
+            var tx = context.worldToScreen();
+            tx.copyCoordinates(lineString);
+            context.graphicsContext().fillPolygon(tx.getXs(), tx.getYs(), tx.getXs().length);
+        }
+    }
+
+    private static void fillPolygon(RenderingContext<?> context, Polygon polygon) {
+
+        var renderableGeometry = context.renderablePolygonProvider().getRenderableGeometry(polygon);
+
+        if (renderableGeometry != null) {
+            fillAsPolygon(context, renderableGeometry);
+        } else {
+            throw new IllegalArgumentException("Expected a renderable geometry for polyon");
+        }
+    }
+
+    private static void fillMultiPoint(RenderingContext<?> context, MultiPoint multiPoint) {
+
+        var renderableGeometry =
+                context.renderablePolygonProvider().getRenderableGeometry(multiPoint);
+
+        if (renderableGeometry != null) {
+            fillPoint(context, renderableGeometry);
+        } else {
+            for (int i = 0; i < multiPoint.getNumGeometries(); i++) {
+                fillPoint(context, (Point) multiPoint.getGeometryN(i));
+            }
+        }
+    }
+
+    private static void fillMultLineString(
+            RenderingContext<?> context, MultiLineString multiLineString) {
+
+        var renderableGeometry =
+                context.renderablePolygonProvider().getRenderableGeometry(multiLineString);
+
+        if (renderableGeometry != null) {
+            fillAsPolygon(context, renderableGeometry);
+        } else {
+            for (int i = 0; i < multiLineString.getNumGeometries(); i++) {
+                fillLineString(context, (LineString) multiLineString.getGeometryN(i));
+            }
+        }
+    }
+
+    private static void fillMultiPolygon(RenderingContext<?> context, MultiPolygon polygon) {
+
+        var renderableGeometry = context.renderablePolygonProvider().getRenderableGeometry(polygon);
+
+        if (renderableGeometry != null) {
+            fillAsPolygon(context, renderableGeometry);
+        } else {
+            for (int i = 0; i < polygon.getNumGeometries(); i++) {
+                fillPolygon(context, (Polygon) polygon.getGeometryN(i));
+            }
+        }
+    }
+    //        // TODO -- sort this out -- finding stuff not in the bounding box
+    //        //    if(!polygon.intersects(JTS.toGeometry(context.bounds())))
+    //        //    {
+    //        ////      System.err.println("DUMB POLY");
+    //        //      return;
+    //        //    }
+    //
+    //        var geom = RemoveHolesFromPolygon.removePolygonG(polygon);
+    //        var tx = context.worldToScreen();
+    //        tx.copyCoordinatesG((Polygon) geom);
+    //        context.graphicsContext().fillPolygon(tx.getXs(), tx.getYs(), tx.getXs().length);
+    //    }
 }
 
   //                var renderGeom =
@@ -130,26 +215,11 @@ public class Fill {
             //                                    .getRenderable(geom.getGeometryN(i)));
 
             //    }
-//    private static void fillLineString(RenderingContext<?> context, LineString lineString) {
-//        var tx = context.worldToScreen();
-//        tx.copyCoordinatesG(lineString);
-//        context.graphicsContext().fillPolygon(tx.getXs(), tx.getYs(), tx.getXs().length);
-//    }
+
 //
 //    private static void fillPolygon(RenderingContext<?> context, Polygon polygon) {
 //
-//        // TODO -- sort this out -- finding stuff not in the bounding box
-//        //    if(!polygon.intersects(JTS.toGeometry(context.bounds())))
-//        //    {
-//        ////      System.err.println("DUMB POLY");
-//        //      return;
-//        //    }
-//
-//        var geom = RemoveHolesFromPolygon.removePolygonG(polygon);
-//        var tx = context.worldToScreen();
-//        tx.copyCoordinatesG((Polygon) geom);
-//        context.graphicsContext().fillPolygon(tx.getXs(), tx.getYs(), tx.getXs().length);
-//    }
+
     // only necessary if a multi-X, can contain another multi-X, rather than just X's
     // private static void recurse(GraphicsRenderingContext context, Geometry geom) {
     // for (int i = 0; i < geom.getNumGeometries(); i++) {

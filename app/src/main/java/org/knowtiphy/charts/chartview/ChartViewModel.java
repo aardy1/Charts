@@ -240,6 +240,7 @@ public class ChartViewModel implements IShapeMapViewModel<MemFeature> {
 
     public void setViewPortBounds(ReferencedEnvelope newBounds) {
 
+        //  TODO -- what happens if building the quilt fails -- then the viewport bounds are wrong
         viewPort.setBounds(newBounds);
         //  only need to do this if the viewport bounds have actually changed
         recomputeQuilt();

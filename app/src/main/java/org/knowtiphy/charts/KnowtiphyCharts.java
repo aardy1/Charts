@@ -78,6 +78,7 @@ public class KnowtiphyCharts extends Application {
     //  the global cache of SVG "images"
     private SVGCache svgCache;
 
+    private MemRenderGeomCache memRenderGeomCache;
     // the global chart locker
     private ChartLocker chartLocker;
 
@@ -92,9 +93,9 @@ public class KnowtiphyCharts extends Application {
         displayOptions = new MapDisplayOptions();
         appSettings = new AppSettings(new UnitProfile());
 
-        //  create the global svg cache
+        //  create the global caches
         svgCache = new SVGCache(MarkIconsResourceLoader.class);
-
+        memRenderGeomCache = new MemRenderGeomCache();
         //  create the global chart locker
         var mapReader =
                 new MapReader(new StyleReader<>(ResourceLoader.class), appSettings, displayOptions);
@@ -122,7 +123,7 @@ public class KnowtiphyCharts extends Application {
                         displayOptions,
                         platform,
                         MemFeatureAdapter.ADAPTER,
-                        new MemRenderGeomCache(MemFeatureAdapter.ADAPTER),
+                        memRenderGeomCache,
                         svgCache);
 
         var stats = new MapStats(quilt).compute();

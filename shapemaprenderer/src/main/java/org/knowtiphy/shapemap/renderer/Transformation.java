@@ -2,6 +2,7 @@ package org.knowtiphy.shapemap.renderer;
 
 import javafx.scene.transform.Affine;
 import org.knowtiphy.shapemap.api.RenderableGeometry;
+import org.locationtech.jts.geom.LineString;
 
 /** */
 public class Transformation {
@@ -48,6 +49,17 @@ public class Transformation {
         }
 
         return pts;
+    }
+
+    public void copyCoordinates(LineString g) {
+        var numPts = g.getNumPoints();
+        xs = new double[numPts];
+        ys = new double[numPts];
+        for (var i = 0; i < numPts; i++) {
+            var coord = g.getCoordinateN(i);
+            xs[i] = coord.getX();
+            ys[i] = coord.getY();
+        }
     }
 
     public double getX() {
