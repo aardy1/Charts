@@ -100,8 +100,7 @@ public class ShapeMapRenderer<F, E> {
             for (var map : maps) {
                 System.out.println("Map # = " + whichMap);
                 reversedMaps.addFirst(map);
-                var textInfo =
-                        renderGraphics(graphicsRenderingContext, map.layers(), viewPortBounds);
+                var textInfo = renderGraphics(graphicsRenderingContext, map, viewPortBounds);
                 layerMap.put(map, textInfo);
                 whichMap++;
             }
@@ -132,19 +131,17 @@ public class ShapeMapRenderer<F, E> {
     }
 
     private HashMap<IMapLayer<F, E>, TextInfo> renderGraphics(
-            RenderingContext<F> context,
-            Collection<? extends IMapLayer<F, E>> layers,
-            E viewPortBounds)
-            throws Exception {
+            RenderingContext<F> context, IMap<F, E> map, E viewPortBounds) throws Exception {
 
         var layerTextInfo = new HashMap<IMapLayer<F, E>, TextInfo>();
+        var layers = map.layers();
 
         for (var layer : layers) {
             if (layer.isVisible()) {
                 var appliedRule = new boolean[layer.style().rules().size()];
                 var layerNeedsTextLayout = false;
                 var style = layer.style();
-                try (var iterator = layer.featureSource().features(viewPortBounds, dScale)) {
+                try (var iterator = layer.featureSource().features(map.bounds(), dScale)) {
                     for (var feature : iterator) {
                         featureCount++;
                         layerNeedsTextLayout |= applyStyle(style, context, feature, appliedRule);

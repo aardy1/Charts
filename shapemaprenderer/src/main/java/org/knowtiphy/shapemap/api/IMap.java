@@ -10,4 +10,6 @@ import java.util.Collection;
  */
 public interface IMap<F, E> {
     Collection<? extends IMapLayer<F, E>> layers();
+
+    E bounds();
 }

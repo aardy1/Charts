@@ -119,6 +119,7 @@ public class KnowtiphyCharts extends Application {
                         quilt,
                         viewPort,
                         chartLocker,
+                        new AISModel(),
                         appSettings,
                         displayOptions,
                         platform,

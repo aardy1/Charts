@@ -85,7 +85,8 @@ public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView
         var quiltingOverlayView = createQuiltingOverlayView();
         coordinateGrid = createCoordinateGrid(unitProfile);
 
-        root.getChildren().addAll(mapView, quiltingOverlayView, coordinateGrid); // ,
+        var dynamicsView = new DynamicsView(chart);
+        root.getChildren().addAll(mapView, quiltingOverlayView, coordinateGrid, dynamicsView);
         getChildren().addAll(root);
     }
 
@@ -239,58 +240,7 @@ public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView
 //  old stuff
 
     // private final Pane aisPane;
-    // private final AISModel dynamics;
 
-    // boat glyphs
-//    private final Map<Long, Pair<AISInformation, Glyph>> boats = new HashMap<>();
-
-        //        subscriptions.add(chartLocker.chartEvents().subscribe(change -> updateBoats()));
-        // subscriptions.add(dynamics.aisEvents.subscribe(this::updateAISInformation));
-
-//
-//    private void updateAISInformation(AISEvent event) {
-//        var asInfo = event.aisInformation();
-//        var id = asInfo.getId();
-//        if (!boats.containsKey(id)) {
-//            var newBoat = Fonts.boat();
-//            boats.put(id, Pair.of(asInfo, newBoat));
-//            setBoatPosition(newBoat, asInfo);
-//            // later(() -> aisPane.getChildren().add(newBoat));
-//        } else {
-//            var boat = boats.get(id).getRight();
-//            boats.put(id, Pair.of(asInfo, boat));
-//            setBoatPosition(boat, asInfo);
-//        }
-//    }
-//
-//    @SuppressWarnings("CallToPrintStackTrace")
-//    private void setBoatPosition(Glyph boat, AISInformation aisInfo) {
-//        // need to clip the position?
-//        Transformation tx;
-//        try {
-//            tx = new Transformation(chart.viewPortWorldToScreen());
-//        } catch (TransformException | NonInvertibleTransformException ex) {
-//            ex.printStackTrace();
-//            return;
-//        }
-//        tx.apply(aisInfo.getPosition().x, aisInfo.getPosition().y);
-//        boat.setTranslateX(tx.getX());
-//        boat.setTranslateY(tx.getY());
-//    }
-//
-//    private void updateBoats() {
-//        for (var boat : boats.values()) {
-//            setBoatPosition(boat.getRight(), boat.getLeft());
-//        }
-//    }
-//
-//    private Pane makeDynamicsSurface() {
-//        var pane = new Pane();
-//        pane.setPickOnBounds(false);
-//        pane.widthProperty().addListener(cl -> updateBoats());
-//        pane.heightProperty().addListener(cl -> updateBoats());
-//        return pane;
-//    }
 //
 //    private Pane makeIconsSurface() {
 //        return new IconSurface(chart);

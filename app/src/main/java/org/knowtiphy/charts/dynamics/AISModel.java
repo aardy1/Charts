@@ -4,14 +4,14 @@
  */
 package org.knowtiphy.charts.dynamics;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 import org.apache.commons.lang3.tuple.Pair;
 import org.geotools.geometry.Position2D;
-import org.reactfx.EventSource;
-
 import static org.knowtiphy.charts.utils.FXUtils.later;
+import org.reactfx.EventSource;
+import org.reactfx.EventStream;
 
 /**
  * @author graham
@@ -19,15 +19,23 @@ import static org.knowtiphy.charts.utils.FXUtils.later;
 public class AISModel {
 
     // AIS event changes
-    public EventSource<AISEvent> aisEvents = new EventSource<>();
+    private final EventSource<AISEvent> aisEvents;
 
     // effectively the database of boat AIS information
-    private final Map<Long, AISInformation> boats = new HashMap<>();
+    //    private final Map<Long, AISInformation> boats = new HashMap<>();
+
+    private final Timer fakeTimer;
 
     public AISModel() {
 
+        aisEvents = new EventSource<>();
         // fake AIS updates
+        fakeTimer = new Timer("AIS", true);
         generateFakeAISEvents();
+    }
+
+    public EventStream<AISEvent> aisEvents() {
+        return aisEvents;
     }
 
     // for generating fake AIS events
@@ -42,35 +50,27 @@ public class AISModel {
             };
 
     private void generateFakeAISEvents() {
-        var thread =
-                new Thread(
-                        () -> {
-                            while (true) {
-                                delay(random.nextInt(20));
-                                var n = random.nextInt(BOAT_TEST_DATA.length);
-                                var boat = BOAT_TEST_DATA[n];
-                                var id = boat.getLeft();
-                                var position = boat.getRight();
-                                var deltaX = random.nextDouble(2) * (Math.random() < 0.5 ? -1 : 1);
-                                var deltaY = random.nextDouble(2) * (Math.random() < 0.5 ? -1 : 1);
-                                var newPos =
-                                        new Position2D(position.x + deltaX, position.y + deltaY);
-                                BOAT_TEST_DATA[n] = Pair.of(id, newPos);
-                                var aisInformation = new AISInformation(id, position);
-                                boats.put(id, aisInformation);
-                                later(() -> aisEvents.push(new AISEvent(aisInformation)));
-                            }
-                        });
-
-        thread.setDaemon(true);
-        thread.start();
-    }
-
-    private static void delay(int n) {
-        try {
-            Thread.sleep(n * 1000);
-        } catch (InterruptedException ex) {
-            //
-        }
+        fakeTimer.scheduleAtFixedRate(
+                new TimerTask() {
+                    @Override
+                    public void run() {
+                        var n = random.nextInt(BOAT_TEST_DATA.length);
+                        double moveBy = 0.5;
+                        var boat = BOAT_TEST_DATA[n];
+                        var id = boat.getLeft();
+                        var position = boat.getRight();
+                        var deltaX =
+                                random.nextDouble(2) * (Math.random() < 0.5 ? -moveBy : moveBy);
+                        var deltaY =
+                                random.nextDouble(2) * (Math.random() < 0.5 ? -moveBy : moveBy);
+                        var newPos = new Position2D(position.x + deltaX, position.y + deltaY);
+                        BOAT_TEST_DATA[n] = Pair.of(id, newPos);
+                        var aisInformation = new AISInformation(id, position);
+                        //                        boats.put(id, aisInformation);
+                        later(() -> aisEvents.push(new AISEvent(aisInformation)));
+                    }
+                },
+                3000,
+                10000);
     }
 }

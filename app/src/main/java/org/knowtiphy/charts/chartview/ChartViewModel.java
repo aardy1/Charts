@@ -15,10 +15,14 @@ import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.knowtiphy.charts.TextAdapter;
 import org.knowtiphy.charts.chartlocker.ChartLocker;
 import org.knowtiphy.charts.chartview.shapemapview.IShapeMapViewModel;
+import org.knowtiphy.charts.dynamics.AISEvent;
+import org.knowtiphy.charts.dynamics.AISModel;
 import org.knowtiphy.charts.enc.ENCCell;
+import org.knowtiphy.charts.map.Layer;
 import org.knowtiphy.charts.map.Map;
 import org.knowtiphy.charts.map.Quilt;
 import org.knowtiphy.charts.memstore.MemFeature;
+import org.knowtiphy.charts.ontology.S57;
 import org.knowtiphy.charts.platform.IUnderlyingPlatform;
 import org.knowtiphy.charts.settings.AppSettings;
 import org.knowtiphy.shapemap.api.IFeatureAdapter;
@@ -63,11 +67,13 @@ public class ChartViewModel implements IShapeMapViewModel<MemFeature> {
     private final EventSource<Change<ReferencedEnvelope>> viewPortBoundsEvent;
     private final EventStream<Change<Rectangle2D>> viewPortScreenAreaEvent;
     private final EventSource<Change<Boolean>> layerVisibilityEvent;
+    private final EventSource<AISEvent> aisEvent;
 
     public ChartViewModel(
             Quilt<MemFeature> quilt,
             MapViewport viewPort,
             ChartLocker chartLocker,
+            AISModel aisModel,
             AppSettings appSettings,
             MapDisplayOptions mapDisplayOptions,
             IUnderlyingPlatform platform,
@@ -92,6 +98,14 @@ public class ChartViewModel implements IShapeMapViewModel<MemFeature> {
         viewPortBoundsEvent = new EventSource<>();
         viewPortScreenAreaEvent = new EventSource<>();
         layerVisibilityEvent = new EventSource<>();
+        aisEvent = new EventSource<>();
+        aisModel.aisEvents()
+                .subscribe(
+                        event -> {
+                            if (viewPortBounds().contains(event.aisInformation().getPosition()))
+                                aisEvent.push(event);
+                            else System.out.println("IGNORE OUT OF VP");
+                        });
     }
 
     @Override
@@ -155,6 +169,10 @@ public class ChartViewModel implements IShapeMapViewModel<MemFeature> {
     @Override
     public EventStream<Change<Boolean>> layerVisibilityEvent() {
         return layerVisibilityEvent;
+    }
+
+    public EventStream<AISEvent> aisEvent() {
+        return aisEvent;
     }
 
     @Override
@@ -327,7 +345,18 @@ public class ChartViewModel implements IShapeMapViewModel<MemFeature> {
         var oldQuilt = quilt;
         quilt = newQuilt;
         //        viewPort.setBounds(quilt.bounds());
+        //  have to set the visibility since cached maps may have different visibility for layers
+        for (var map : quilt.maps()) {
+            setVis(map.layer(S57.OC_LIGHTS), mapDisplayOptions.getShowLights());
+            setVis(map.layer(S57.OC_OFSPLF), mapDisplayOptions.getShowPlatforms());
+            setVis(map.layer(S57.OC_WRECKS), mapDisplayOptions.getShowWrecks());
+            setVis(map.layer(S57.OC_SOUNDG), mapDisplayOptions.getShowSoundings());
+        }
         quiltChangeEvent.push(new Change<>(oldQuilt, newQuilt));
+    }
+
+    private void setVis(Layer<?> layer, boolean value) {
+        if (layer != null) layer.setVisible(value);
     }
 
     //  when the viewport bounds change we have to recompute the quilt
