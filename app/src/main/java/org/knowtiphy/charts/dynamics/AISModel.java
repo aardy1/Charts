@@ -41,6 +41,7 @@ public class AISModel {
     // for generating fake AIS events
     private static final Random random = new Random();
 
+    //  the boat database :-)
     @SuppressWarnings("unchecked")
     private static final Pair<Long, Position2D>[] BOAT_TEST_DATA =
             new Pair[] {

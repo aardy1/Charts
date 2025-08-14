@@ -9,7 +9,7 @@ import org.geotools.api.feature.simple.SimpleFeature;
 import org.geotools.feature.simple.SimpleFeatureImpl;
 import org.knowtiphy.shapemap.api.FeatureGeomType;
 import org.knowtiphy.shapemap.api.RenderableGeometry;
-import org.knowtiphy.shapemap.context.RemoveHolesFromPolygon;
+import org.knowtiphy.shapemap.context.ComputeRenderableGeometry;
 import org.locationtech.jts.geom.Geometry;
 
 /** A feature in an in memory feature store. */
@@ -70,7 +70,7 @@ public final class MemFeature extends SimpleFeatureImpl {
 
     public RenderableGeometry getRenderableGeometry() {
         if (renderableGeometry == null) {
-            renderableGeometry = RemoveHolesFromPolygon.remove(defaultGeometry);
+            renderableGeometry = ComputeRenderableGeometry.compute(defaultGeometry);
         }
         return renderableGeometry;
     }

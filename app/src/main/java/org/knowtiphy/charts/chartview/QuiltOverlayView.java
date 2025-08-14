@@ -18,7 +18,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.transform.NonInvertibleTransformException;
 import org.geotools.api.referencing.operation.TransformException;
 import org.knowtiphy.charts.Fonts;
-import org.knowtiphy.shapemap.context.RemoveHolesFromPolygon;
+import org.knowtiphy.shapemap.context.ComputeRenderableGeometry;
 import org.knowtiphy.shapemap.renderer.Transformation;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Polygon;
@@ -105,7 +105,7 @@ public class QuiltOverlayView extends StackPane {
         for (int i = 0; i < geom.getNumGeometries(); i++) {
             //  TODO -- what if its not a polygon -- do what? Is that even possible?
             if (geom.getGeometryN(i) instanceof Polygon pl) {
-                var polyGeom = RemoveHolesFromPolygon.remove(pl);
+                var polyGeom = ComputeRenderableGeometry.compute(pl);
                 var polygon = new javafx.scene.shape.Polygon(tx.apply(polyGeom));
                 polygon.setFill(Color.BROWN);
                 polygon.setOpacity(0.4);

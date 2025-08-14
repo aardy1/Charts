@@ -21,7 +21,8 @@
                             <CssParameter name = "font-Size">9</CssParameter>
                         </Font>
                         <Fill>
-                            <CssParameter name = "fill">#91a3b0</CssParameter>
+                            <!--                            <CssParameter name = "fill">#91a3b0</CssParameter>-->
+                            <CssParameter name = "fill">#2d2d2d</CssParameter>
                         </Fill>
                     </TextSymbolizer>
                 </Rule>

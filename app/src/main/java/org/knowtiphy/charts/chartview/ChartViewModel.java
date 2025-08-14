@@ -47,7 +47,7 @@ public class ChartViewModel implements IShapeMapViewModel<MemFeature> {
     private static final double DEFAULT_HEIGHT = 3;
 
     //  on zoom in change the view port to be smaller by this factor
-    private static final double ZOOM_FACTOR_MULTIPLIER = 0.7;
+    private static final double ZOOM_FACTOR_MULTIPLIER = 0.6;
 
     //  the quilt can change to a whole new quilt object
     private Quilt<MemFeature> quilt;
@@ -306,7 +306,6 @@ public class ChartViewModel implements IShapeMapViewModel<MemFeature> {
     }
 
     public void loadNewChart(ENCCell cell) {
-        System.out.println("load new chart");
         setViewPortBounds(cell.bounds());
         setQuilt(chartLocker.loadQuilt(cell.bounds(), aScale(), appSettings, mapDisplayOptions));
     }
