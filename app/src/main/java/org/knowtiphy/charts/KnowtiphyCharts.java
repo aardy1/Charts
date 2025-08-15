@@ -50,7 +50,6 @@ import static org.knowtiphy.charts.utils.FXUtils.nonResizeable;
 import static org.knowtiphy.charts.utils.FXUtils.resizeable;
 import static org.knowtiphy.charts.utils.FXUtils.systemMenuBar;
 import org.knowtiphy.charts.utils.ToggleModel;
-import org.knowtiphy.shapemap.context.SVGCache;
 
 /** The Knowtiphy Charts application. */
 public class KnowtiphyCharts extends Application {

@@ -4,14 +4,12 @@ plugins {
 }
 
 repositories {
-    maven { url 'https://jitpack.io' }
     maven { url  'https://mvnrepository.com' }
     mavenCentral()
 }
 
 dependencies {
     implementation("org.locationtech.jts:jts-core:1.20.0")
-    implementation libs.fxsvgimage
     implementation libs.commons.lang3
     implementation libs.stax.api
     implementation libs.fx.base

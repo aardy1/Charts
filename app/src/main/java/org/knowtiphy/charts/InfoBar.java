@@ -28,7 +28,6 @@ import static org.knowtiphy.charts.utils.FXUtils.menuButton;
 import static org.knowtiphy.charts.utils.FXUtils.nonResizeable;
 import org.knowtiphy.charts.utils.ToggleModel;
 import static org.knowtiphy.charts.utils.Utils.formatDecimal;
-import org.knowtiphy.shapemap.context.SVGCache;
 
 /**
  * The info bar at the bottom of the chart view.

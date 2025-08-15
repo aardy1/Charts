@@ -33,28 +33,28 @@ public class ComputeRenderableGeometry {
                 var converted = List.of(convertSimple(geometry));
                 yield new RenderableGeometry(converted, converted);
             }
-            case TYPENAME_POLYGON -> convertPolygon((Polygon) geometry);
-            case TYPENAME_MULTIPOINT -> convertMultiPoint((MultiPoint) geometry);
-            case TYPENAME_MULTILINESTRING -> convertMultiLineString((MultiLineString) geometry);
-            case Geometry.TYPENAME_MULTIPOLYGON -> convertMultiPolygon((MultiPolygon) geometry);
+            case TYPENAME_POLYGON -> convert((Polygon) geometry);
+            case TYPENAME_MULTIPOINT -> convert((MultiPoint) geometry);
+            case TYPENAME_MULTILINESTRING -> convert((MultiLineString) geometry);
+            case Geometry.TYPENAME_MULTIPOLYGON -> convert((MultiPolygon) geometry);
             default -> null;
         };
     }
 
-    public static RenderableGeometry convertPolygon(Polygon polygon) {
+    public static RenderableGeometry convert(Polygon polygon) {
 
-        var simplePoly = RemoveHolesFromPolygon.remove(polygon);
-        var converted = convertSimple(simplePoly);
+        var holeLessPolygon = RemoveHolesFromPolygon.remove(polygon);
+        var renderablePolygon = convertSimple(holeLessPolygon);
 
-        var boundary = new ArrayList<RenderableShape>(polygon.getNumInteriorRing());
-        for (int i = 0; i < simplePoly.getNumInteriorRing(); i++) {
-            boundary.add(convertSimple(simplePoly.getInteriorRingN(i)));
+        var renderableBoundary = new ArrayList<RenderableShape>(polygon.getNumInteriorRing());
+        for (int i = 0; i < holeLessPolygon.getNumInteriorRing(); i++) {
+            renderableBoundary.add(convertSimple(holeLessPolygon.getInteriorRingN(i)));
         }
 
-        return new RenderableGeometry(List.of(converted), boundary);
+        return new RenderableGeometry(List.of(renderablePolygon), renderableBoundary);
     }
 
-    private static RenderableGeometry convertMultiPoint(MultiPoint multiPoint) {
+    private static RenderableGeometry convert(MultiPoint multiPoint) {
 
         var converted = new ArrayList<RenderableShape>(multiPoint.getNumGeometries());
 
@@ -67,7 +67,7 @@ public class ComputeRenderableGeometry {
         return new RenderableGeometry(converted, converted);
     }
 
-    private static RenderableGeometry convertMultiLineString(MultiLineString multiLine) {
+    private static RenderableGeometry convert(MultiLineString multiLine) {
 
         var converted = new ArrayList<RenderableShape>(multiLine.getNumGeometries());
 
@@ -80,7 +80,7 @@ public class ComputeRenderableGeometry {
         return new RenderableGeometry(converted, converted);
     }
 
-    private static RenderableGeometry convertMultiPolygon(MultiPolygon multiPolygon) {
+    private static RenderableGeometry convert(MultiPolygon multiPolygon) {
 
         var forFill = new ArrayList<RenderableShape>(multiPolygon.getNumGeometries());
         var forStroke = new ArrayList<RenderableShape>(multiPolygon.getNumGeometries());
@@ -88,7 +88,7 @@ public class ComputeRenderableGeometry {
         for (var i = 0; i < multiPolygon.getNumGeometries(); i++) {
             var poly = multiPolygon.getGeometryN(i);
             assert poly instanceof Polygon;
-            var rPoly = convertPolygon((Polygon) poly);
+            var rPoly = ComputeRenderableGeometry.convert((Polygon) poly);
             forFill.addAll(rPoly.forFill());
             forStroke.addAll(rPoly.forStroke());
         }
@@ -113,29 +113,3 @@ public class ComputeRenderableGeometry {
         return new RenderableShape(xs, ys);
     }
 }
-
-//    public static Geometry removePolygonG(Polygon polygon) {
-//
-//        if (polygon.getNumInteriorRing() == 0) {
-//            return polygon;
-//        }
-//
-//        // get the holes in the polygon
-//        var holes = holes(polygon);
-//
-//        // copy the boundary of the polygon
-//        List<Coordinate> newBoundary = new ArrayList<>();
-//        var extRing = polygon.getExteriorRing();
-//        for (int i = 0; i < extRing.getNumPoints(); i++) {
-//            newBoundary.add(extRing.getCoordinateN(i));
-//        }
-//
-//        // remove each hole in order, building a new polygon boundary each time
-//        for (var hole : holes) {
-//            newBoundary = removeHole(hole, newBoundary);
-//        }
-//
-//        return GF.createPolygon(GF.createLinearRing(newBoundary.toArray(Coordinate[]::new)));
-//
-//        //            System.out.println("res = " + result);
-//    }

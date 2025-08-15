@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import org.apache.commons.lang3.tuple.Pair;
-import org.knowtiphy.shapemap.api.RenderableShape;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LinearRing;
@@ -21,7 +20,6 @@ public class RemoveHolesFromPolygon {
 
     public static Polygon remove(Polygon polygon) {
 
-        RenderableShape converted;
         if (polygon.getNumInteriorRing() == 0) {
             return polygon;
         } else {
@@ -176,47 +174,3 @@ public class RemoveHolesFromPolygon {
         return res;
     }
 }
-//
-//    //  convert a geometry with one sub-geometry -- so a simple line, simple polygon etc
-//    private static RenderableShape convertSimple(Geometry g) {
-//
-//        assert g.getNumGeometries() == 1;
-//        var numPts = g.getNumPoints();
-//        var xs = new double[numPts];
-//        var ys = new double[numPts];
-//        // TODO -- this is potentially a copy. JTS docs have a comment on how to avoid it
-//        var coords = g.getCoordinates();
-//        for (var i = 0; i < numPts; i++) {
-//            xs[i] = coords[i].getX();
-//            ys[i] = coords[i].getY();
-//        }
-//
-//        return new RenderableShape(xs, ys);
-//    }
-// }
-//
-////    public static Geometry removePolygonG(Polygon polygon) {
-////
-////        if (polygon.getNumInteriorRing() == 0) {
-////            return polygon;
-////        }
-////
-////        // get the holes in the polygon
-////        var holes = holes(polygon);
-////
-////        // copy the boundary of the polygon
-////        List<Coordinate> newBoundary = new ArrayList<>();
-////        var extRing = polygon.getExteriorRing();
-////        for (int i = 0; i < extRing.getNumPoints(); i++) {
-////            newBoundary.add(extRing.getCoordinateN(i));
-////        }
-////
-////        // remove each hole in order, building a new polygon boundary each time
-////        for (var hole : holes) {
-////            newBoundary = removeHole(hole, newBoundary);
-////        }
-////
-////        return GF.createPolygon(GF.createLinearRing(newBoundary.toArray(Coordinate[]::new)));
-////
-////        //            System.out.println("res = " + result);
-////    }
