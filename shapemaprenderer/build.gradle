@@ -10,12 +10,9 @@ repositories {
 
 dependencies {
     implementation("org.locationtech.jts:jts-core:1.20.0")
-    implementation libs.commons.lang3
-    implementation libs.stax.api
     implementation libs.fx.base
     implementation libs.fx.graphics
     implementation libs.fx.controls
-    implementation libs.reactfx
 }
 
 java {

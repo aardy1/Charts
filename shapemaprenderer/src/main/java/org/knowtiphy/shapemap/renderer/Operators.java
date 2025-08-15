@@ -5,8 +5,8 @@
 package org.knowtiphy.shapemap.renderer;
 
 import java.text.NumberFormat;
-import org.apache.commons.lang3.StringUtils;
 import org.knowtiphy.shapemap.api.IFeatureFunction;
+import org.knowtiphy.shapemap.util.StringUtils;
 import org.locationtech.jts.geom.Geometry;
 
 /**
@@ -59,7 +59,7 @@ public class Operators {
             IFeatureFunction<F, ?> l, IFeatureFunction<F, ?> r, F feature, Geometry geom) {
         var first = l.apply(feature, geom);
         if (first instanceof String firstStr) {
-            return StringUtils.isBlank(firstStr) ? r.apply(feature, geom) : first;
+            return StringUtils.isEmpty(firstStr) ? r.apply(feature, geom) : first;
         } else {
             return first == null ? r.apply(feature, geom) : first;
         }

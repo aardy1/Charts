@@ -6,7 +6,6 @@
 package org.knowtiphy.shapemap.renderer.symbolizer;
 
 import javafx.scene.text.Font;
-import org.apache.commons.lang3.StringUtils;
 import org.knowtiphy.shapemap.api.IFeatureFunction;
 import org.knowtiphy.shapemap.renderer.RenderingContext;
 import org.knowtiphy.shapemap.renderer.graphics.Fill;
@@ -14,6 +13,7 @@ import org.knowtiphy.shapemap.renderer.graphics.Text;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.FillInfo;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.LabelPlacement;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.StrokeInfo;
+import org.knowtiphy.shapemap.util.StringUtils;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Point;
@@ -85,7 +85,7 @@ public class TextSymbolizer<F> {
         if (point != null && label != null) {
             var text = label.apply(feature, point);
 
-            if (!StringUtils.isBlank(text)) {
+            if (!StringUtils.isEmpty(text)) {
                 var graphicsContext = context.graphicsContext();
                 var tx = context.worldToScreen();
                 //                var blocked = context.blocked();

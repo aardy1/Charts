@@ -8,7 +8,7 @@ package org.knowtiphy.shapemap.context;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import org.apache.commons.lang3.tuple.Pair;
+import org.knowtiphy.shapemap.util.Pair;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LinearRing;
@@ -85,8 +85,8 @@ public class RemoveHolesFromPolygon {
     private static List<Coordinate> removeHole(
             Pair<LinearRing, Integer> hole, List<Coordinate> polygon) {
 
-        var ring = hole.getLeft();
-        var holeTop = ring.getCoordinateN(hole.getRight());
+        var ring = hole.left();
+        var holeTop = ring.getCoordinateN(hole.right());
 
         // find the (v_b, v_(b_1)) segment on the boundary "directly above" the top most
         // point of the hole
@@ -122,15 +122,15 @@ public class RemoveHolesFromPolygon {
 
         // add the hole boundary to the new boundary, maintaining counter-clockwise
         // orientation of the hole
-        for (int i = hole.getRight(); i < ring.getNumPoints() - 1; i++) {
+        for (int i = hole.right(); i < ring.getNumPoints() - 1; i++) {
             newBoundary.add(ring.getCoordinateN(i));
         }
 
-        for (int i = 0; i < hole.getRight(); i++) {
+        for (int i = 0; i < hole.right(); i++) {
             newBoundary.add(ring.getCoordinateN(i));
         }
 
-        newBoundary.add(ring.getCoordinateN(hole.getRight()));
+        newBoundary.add(ring.getCoordinateN(hole.right()));
 
         // close the bridge back to to the old boundary
         newBoundary.add(bridgePt);
