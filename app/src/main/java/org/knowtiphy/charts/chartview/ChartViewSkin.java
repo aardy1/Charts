@@ -105,8 +105,8 @@ public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView
                         createContextMenu(event)
                                 .show(mapView, event.getScreenX(), event.getScreenY()));
 
-        unitProfile.unitChangeEvents().subscribe(_ -> mapView.requestLayout());
-        chart.layerVisibilityEvent().subscribe(_ -> mapView.requestLayout());
+        unitProfile.unitChangeEvents().subscribe(_foo -> mapView.requestLayout());
+        chart.layerVisibilityEvent().subscribe(_foo -> mapView.requestLayout());
 
         displayOptions.showGridEvents.subscribe(c -> coordinateGrid.setVisible(c.getNewValue()));
 
@@ -227,10 +227,10 @@ public class ChartViewSkin extends SkinBase<ChartView> implements Skin<ChartView
         var contextMenu = new ContextMenu();
 
         var maxDetail = new MenuItem("Max Detail Here");
-        maxDetail.setOnAction(_ -> showMaxDetail(mouseEvent));
+        maxDetail.setOnAction(_foo -> showMaxDetail(mouseEvent));
 
         var whatsHere = new MenuItem("What's here");
-        whatsHere.setOnAction(_ -> showInfo(mouseEvent));
+        whatsHere.setOnAction(_foo -> showInfo(mouseEvent));
 
         contextMenu.getItems().addAll(maxDetail, whatsHere);
         return contextMenu;

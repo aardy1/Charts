@@ -11,4 +11,4 @@ import java.util.List;
  * @param forStroke the shapes used when stroking this geometry
  */
 
-public record RenderableGeometry(List<RenderableShape> forFill, List<RenderableShape> forStroke ) {}
+public record RenderableGeometry(List<RenderableShape> forFill, List<RenderableShape> forStroke ) implements IRenderableGeometry{}

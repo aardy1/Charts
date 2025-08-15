@@ -10,7 +10,7 @@ import org.locationtech.jts.geom.Geometry;
 /** A provider of polygons that can be rendered (have no holes). */
 public interface IRenderablePolygonProvider<F> {
 
-    RenderableGeometry getRenderableGeometry(Geometry geometry);
+    IRenderableGeometry getRenderableGeometry(Geometry geometry);
 
-    RenderableGeometry getRenderableGeometry(F feature);
+    IRenderableGeometry getRenderableGeometry(F feature);
 }

@@ -48,10 +48,10 @@ public class CoordinateGrid extends Pane {
     }
 
     private void registerListeners() {
-        widthProperty().addListener(_ -> drawGrid());
-        heightProperty().addListener(_ -> drawGrid());
-        unitProfile.unitChangeEvents().subscribe(_ -> drawGrid());
-        chart.viewPortBoundsEvent().subscribe(_ -> drawGrid());
+        widthProperty().addListener(_foo -> drawGrid());
+        heightProperty().addListener(_foo -> drawGrid());
+        unitProfile.unitChangeEvents().subscribe(_foo -> drawGrid());
+        chart.viewPortBoundsEvent().subscribe(_foo -> drawGrid());
     }
 
     @SuppressWarnings("CallToPrintStackTrace")

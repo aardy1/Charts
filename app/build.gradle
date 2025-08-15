@@ -1,36 +1,51 @@
 plugins {
-  id "application"
-  id "org.openjfx.javafxplugin" version "0.1.0"
-  id 'com.gluonhq.gluonfx-gradle-plugin' version '1.0.22'
+	id "application"
+	id "org.openjfx.javafxplugin" version "0.1.0"
+	id 'com.gluonhq.gluonfx-gradle-plugin' version '1.0.22'
 }
 
 repositories {
-  maven { url 'https://repo.osgeo.org/repository/release/' }
-  maven { url 'https://repo.osgeo.org/repository/snapshot/' }
-  maven { url 'https://nexus.gluonhq.com/nexus/content/repositories/releases/' }
-  maven { url 'https://jitpack.io' }
-  mavenCentral()
+	maven { url 'https://repo.osgeo.org/repository/release/' }
+	maven { url 'https://repo.osgeo.org/repository/snapshot/' }
+	maven { url 'https://nexus.gluonhq.com/nexus/content/repositories/releases/' }
+	maven { url 'https://jitpack.io' }
+	mavenCentral()
 }
 
+dependencies {
+
+	implementation project(':shapemaprenderer')
+
+	implementation libs.geotools.shapefile
+	implementation libs.geotools.sld
+
+	implementation libs.reactfx
+	implementation libs.controlsfx
+	implementation libs.fxsvgimage
+
+	implementation libs.fx.base
+	implementation libs.fx.graphics
+	implementation libs.fx.controls
+}			
+
 application {
-//    mainClassName = "org.knowtiphy.charts.ios.KnowtiphyChartsMobile"
-  mainClassName = "org.knowtiphy.charts.KnowtiphyCharts"
-  applicationDefaultJvmArgs = ['-Xms2G', '-Xmx2G']
+	mainClassName = "org.knowtiphy.charts.KnowtiphyCharts"
+	applicationDefaultJvmArgs = ['-Xms2G', '-Xmx2G']
 }
 
 java {
-  toolchain {
-    languageVersion.set(JavaLanguageVersion.of(24))
-  }
+	toolchain {
+		languageVersion.set(JavaLanguageVersion.of(17))
+	}
 }
 
 compileJava {
-//    options.compilerArgs.addAll(['-Xlint'])
+	//options.compilerArgs.addAll(['-Xlint'])
 }
 
 javafx {
-  version = "21"
-  modules = ['javafx.base', 'javafx.graphics', 'javafx.controls', 'javafx.web', 'javafx.fxml']
+	version = "17"
+	modules = ['javafx.base', 'javafx.graphics', 'javafx.controls', 'javafx.web', 'javafx.fxml']
 }
 
 def buildTarget = findProperty('target') ?: 'host'
@@ -68,28 +83,10 @@ gluonfx {
 }
 
 tasks.withType(JavaExec) {
-  enableAssertions = true
+	enableAssertions = true
 }
+			
 
-dependencies {
-
-  implementation project(':shapemaprenderer')
-
-  implementation libs.geotools.shapefile
-  implementation libs.geotools.sld
-  implementation libs.geotools.metadata
-
-  implementation libs.fx.base
-  implementation libs.fx.graphics
-  implementation libs.fx.controls
-
-  implementation libs.commons.lang3
-  implementation libs.stax.api
-
-  implementation libs.reactfx
-  implementation libs.controlsfx
-  implementation libs.fxsvgimage
-}
 
 // attachConfig {
 //     version = "$attach"

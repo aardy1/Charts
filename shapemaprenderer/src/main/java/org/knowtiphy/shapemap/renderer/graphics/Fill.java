@@ -11,7 +11,7 @@ import static org.knowtiphy.shapemap.api.FeatureGeomType.MULTI_LINE_STRING;
 import static org.knowtiphy.shapemap.api.FeatureGeomType.MULTI_POLYGON;
 import static org.knowtiphy.shapemap.api.FeatureGeomType.POINT;
 import static org.knowtiphy.shapemap.api.FeatureGeomType.POLYGON;
-import org.knowtiphy.shapemap.api.RenderableGeometry;
+import org.knowtiphy.shapemap.api.IRenderableGeometry;
 import org.knowtiphy.shapemap.renderer.RenderingContext;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.FillInfo;
 import org.locationtech.jts.geom.Geometry;
@@ -64,7 +64,7 @@ public class Fill {
     }
 
     private static void fillPoint(
-            RenderingContext<?> context, RenderableGeometry renderableGeometry) {
+            RenderingContext<?> context, IRenderableGeometry renderableGeometry) {
         assert renderableGeometry != null;
 
         for (var shape : renderableGeometry.forFill()) {
@@ -75,7 +75,7 @@ public class Fill {
     }
 
     private static void fillAsPolygon(
-            RenderingContext<?> context, RenderableGeometry renderableGeometry) {
+            RenderingContext<?> context, IRenderableGeometry renderableGeometry) {
         assert renderableGeometry != null;
 
         for (var shape : renderableGeometry.forFill()) {

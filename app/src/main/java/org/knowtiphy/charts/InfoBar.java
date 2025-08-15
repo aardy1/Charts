@@ -107,24 +107,24 @@ public class InfoBar extends StackPane {
     }
 
     private void registerListeners() {
-        widthProperty().addListener(_ -> updateChartInfo());
-        heightProperty().addListener(_ -> updateChartInfo());
-        unitProfile.unitChangeEvents().subscribe(_ -> updateChartInfo());
-        chart.viewPortBoundsEvent().subscribe(_ -> updateChartInfo());
-        chart.quiltChangeEvent().subscribe(_ -> updateChartInfo());
+        widthProperty().addListener(_foo -> updateChartInfo());
+        heightProperty().addListener(_foo -> updateChartInfo());
+        unitProfile.unitChangeEvents().subscribe(_foo -> updateChartInfo());
+        chart.viewPortBoundsEvent().subscribe(_foo -> updateChartInfo());
+        chart.quiltChangeEvent().subscribe(_foo -> updateChartInfo());
     }
 
     private ToolBar makeControlsBar() {
 
         //  zoom  buttons
-        var zoomIn = button(Fonts.plus(), _ -> chart.incZoom(), new Tooltip("Zoom In"));
-        var zoomOut = button(Fonts.minus(), _ -> chart.decZoom(), new Tooltip("Zoom Out"));
+        var zoomIn = button(Fonts.plus(), _foo -> chart.incZoom(), new Tooltip("Zoom In"));
+        var zoomOut = button(Fonts.minus(), _foo -> chart.decZoom(), new Tooltip("Zoom Out"));
 
         //  chart display settings button
         var chartDisplaySettings =
                 button(
                         Fonts.setting(),
-                        _ -> toggleModel.toggle(),
+                        _foo -> toggleModel.toggle(),
                         new Tooltip("Configure Map Visuals"));
 
         //  history menu
@@ -133,8 +133,9 @@ public class InfoBar extends StackPane {
 
         chartLocker
                 .history()
-                .addListener((ListChangeListener<ENCCell>)
-                                _ -> history.getItems().setAll(historyMenuItems()));
+                .addListener(
+                        (ListChangeListener<ENCCell>)
+                                _foo -> history.getItems().setAll(historyMenuItems()));
 
         return new ToolBar(
                 zoomIn, zoomOut, new Separator(), history, new Separator(), chartDisplaySettings);
@@ -159,7 +160,7 @@ public class InfoBar extends StackPane {
         var items = new ArrayList<MenuItem>();
         for (var description : chartLocker.history()) {
             var menuItem = new MenuItem(description.title() + "  1:" + description.cScale());
-            menuItem.setOnAction(_ -> loadChart(description));
+            menuItem.setOnAction(_foo -> loadChart(description));
             items.add(menuItem);
         }
 

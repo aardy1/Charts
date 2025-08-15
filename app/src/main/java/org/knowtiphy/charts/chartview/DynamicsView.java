@@ -42,9 +42,9 @@ public class DynamicsView extends Pane {
     }
 
     private void registerListeners() {
-        widthProperty().addListener(_ -> updateBoatPositions());
-        heightProperty().addListener(_ -> updateBoatPositions());
-        chart.quiltChangeEvent().subscribe(_ -> updateBoatPositions());
+        widthProperty().addListener(_foo -> updateBoatPositions());
+        heightProperty().addListener(_foo -> updateBoatPositions());
+        chart.quiltChangeEvent().subscribe(_foo -> updateBoatPositions());
         chart.aisEvent().subscribe(event -> updateAISInformation(event));
     }
 

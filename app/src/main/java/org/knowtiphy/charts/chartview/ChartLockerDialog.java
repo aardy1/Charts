@@ -30,9 +30,9 @@ import javafx.stage.StageStyle;
 import org.controlsfx.dialog.ProgressDialog;
 import org.controlsfx.glyphfont.Glyph;
 import org.knowtiphy.charts.Fonts;
+import static org.knowtiphy.charts.chartlocker.AvailableCatalogs.BUILTIN_CATALOGS;
 import org.knowtiphy.charts.chartlocker.ChartLocker;
 import org.knowtiphy.charts.chartlocker.ENCChartDownloadNotifier;
-import static org.knowtiphy.charts.chartlocker.AvailableCatalogs.BUILTIN_CATALOGS;
 import org.knowtiphy.charts.enc.ENCCell;
 import org.knowtiphy.charts.utils.FXUtils;
 import static org.knowtiphy.charts.utils.FXUtils.alwaysGrow;
@@ -207,7 +207,7 @@ public class ChartLockerDialog {
 
     private Button showButton(ENCCell cell) {
         var button =
-                FXUtils.button("Show", null, _ -> chart.loadNewChart(cell), new Tooltip("FFF"));
+                FXUtils.button("Show", null, _foo -> chart.loadNewChart(cell), new Tooltip("FFF"));
 
         return button;
     }

@@ -195,9 +195,9 @@ public class KnowtiphyCharts extends Application {
         appSettings
                 .unitProfile()
                 .unitChangeEvents()
-                .subscribe(_ -> setStageTitle(primaryStage, chart));
-        chart.viewPortBoundsEvent().subscribe(_ -> setStageTitle(primaryStage, chart));
-        chart.quiltChangeEvent().subscribe(_ -> setStageTitle(primaryStage, chart));
+                .subscribe(_foo -> setStageTitle(primaryStage, chart));
+        chart.viewPortBoundsEvent().subscribe(_foo -> setStageTitle(primaryStage, chart));
+        chart.quiltChangeEvent().subscribe(_foo -> setStageTitle(primaryStage, chart));
     }
 
     //  the chart specific options pane
@@ -212,7 +212,11 @@ public class KnowtiphyCharts extends Application {
         propertiesView.setOnMouseExited(evt -> toggle.toggle());
         toggle.getStateProperty()
                 .addListener(
-                        _ -> later(() -> options.setRight(toggle.isOn() ? propertiesView : null)));
+                        _foo ->
+                                later(
+                                        () ->
+                                                options.setRight(
+                                                        toggle.isOn() ? propertiesView : null)));
 
         return options;
     }
@@ -229,7 +233,7 @@ public class KnowtiphyCharts extends Application {
         showSettings.setAccelerator(
                 new KeyCodeCombination(KeyCode.COMMA, KeyCombination.META_DOWN));
         showSettings.setOnAction(
-                _ ->
+                _foo ->
                         AppSettingsDialog.create(
                                         stage, SETTINGS_WIDTH, SETTINGS_HEIGHT, appSettings)
                                 .showAndWait());
@@ -239,7 +243,7 @@ public class KnowtiphyCharts extends Application {
 
         var showChartLocker = new MenuItem("Chart Locker");
         showChartLocker.setOnAction(
-                _ ->
+                _foo ->
                         new ChartLockerDialog(stage, chartLocker, chart, displayOptions)
                                 .create(CHART_LOCKER_WIDTH, CHART_LOCKER_HEIGHT)
                                 .showAndWait());

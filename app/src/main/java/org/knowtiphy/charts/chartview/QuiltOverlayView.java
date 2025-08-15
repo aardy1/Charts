@@ -60,10 +60,10 @@ public class QuiltOverlayView extends StackPane {
     }
 
     private void setupListeners() {
-        widthProperty().addListener(_ -> createQuiltOverlay());
-        heightProperty().addListener(_ -> createQuiltOverlay());
-        viewModel.quiltChangeEvent().subscribe(_ -> createQuiltOverlay());
-        viewModel.viewPortBoundsEvent().subscribe(_ -> createQuiltOverlay());
+        widthProperty().addListener(_foo -> createQuiltOverlay());
+        heightProperty().addListener(_foo -> createQuiltOverlay());
+        viewModel.quiltChangeEvent().subscribe(_foo -> createQuiltOverlay());
+        viewModel.viewPortBoundsEvent().subscribe(_foo -> createQuiltOverlay());
     }
 
     @SuppressWarnings("CallToPrintStackTrace")
@@ -80,8 +80,8 @@ public class QuiltOverlayView extends StackPane {
             label.setBackground(
                     new Background(new BackgroundFill(color, CornerRadii.EMPTY, Insets.EMPTY)));
 
-            label.setOnMouseEntered(_ -> showQuiltGeometry(map.geometry()));
-            label.setOnMouseExited(_ -> overlaySurface.getChildren().clear());
+            label.setOnMouseEntered(_foo -> showQuiltGeometry(map.geometry()));
+            label.setOnMouseExited(_foo -> overlaySurface.getChildren().clear());
 
             cellNames.getChildren().add(label);
         }

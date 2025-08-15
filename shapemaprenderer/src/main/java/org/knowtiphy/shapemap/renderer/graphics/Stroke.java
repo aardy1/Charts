@@ -12,7 +12,7 @@ import static org.knowtiphy.shapemap.api.FeatureGeomType.MULTI_POINT;
 import static org.knowtiphy.shapemap.api.FeatureGeomType.MULTI_POLYGON;
 import static org.knowtiphy.shapemap.api.FeatureGeomType.POINT;
 import static org.knowtiphy.shapemap.api.FeatureGeomType.POLYGON;
-import org.knowtiphy.shapemap.api.RenderableGeometry;
+import org.knowtiphy.shapemap.api.IRenderableGeometry;
 import org.knowtiphy.shapemap.renderer.RenderingContext;
 import org.knowtiphy.shapemap.renderer.symbolizer.basic.StrokeInfo;
 import org.locationtech.jts.geom.Geometry;
@@ -69,7 +69,7 @@ public class Stroke {
     }
 
     private static void strokePoint(
-            RenderingContext<?> context, RenderableGeometry renderableGeometry) {
+            RenderingContext<?> context, IRenderableGeometry renderableGeometry) {
         assert renderableGeometry != null;
 
         for (var shape : renderableGeometry.forStroke()) {
@@ -80,7 +80,7 @@ public class Stroke {
     }
 
     private static void strokeAsPolygon(
-            RenderingContext<?> context, RenderableGeometry renderableGeometry) {
+            RenderingContext<?> context, IRenderableGeometry renderableGeometry) {
         assert renderableGeometry != null;
 
         for (var shape : renderableGeometry.forStroke()) {
