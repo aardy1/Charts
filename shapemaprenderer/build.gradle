@@ -1,36 +1,34 @@
 plugins {
-    id "java"
-    id "org.openjfx.javafxplugin" version "0.1.0"
+	id "java"
+	id "org.openjfx.javafxplugin" version "0.1.0"
 }
 
 repositories {
-    maven { url  'https://mvnrepository.com' }
-    mavenCentral()
+	mavenCentral()
 }
 
 dependencies {
-    implementation("org.locationtech.jts:jts-core:1.20.0")
-    implementation libs.fx.base
-    implementation libs.fx.graphics
-    implementation libs.fx.controls
+	implementation("org.locationtech.jts:jts-core:1.20.0")
+	implementation libs.fx.base
+	implementation libs.fx.graphics
+	implementation libs.fx.controls
 }
 
 java {
-    toolchain {
-        languageVersion.set(JavaLanguageVersion.of(24))
-    }
+	toolchain {
+		languageVersion.set(JavaLanguageVersion.of(24))
+	}
 }
 
 compileJava {
-    options.compilerArgs.addAll(['-Xlint'])
+	options.compilerArgs.addAll(['-Xlint'])
 }
 
 javafx {
-    version = "21"
-    modules = [ 'javafx.base', 'javafx.graphics', 'javafx.controls' ]
+	version = "21"
+	modules = [ 'javafx.base', 'javafx.graphics', 'javafx.controls' ]
 }
 
-//tasks.withType(JavaExec) {
-//    enableAssertions = true
-//}
-//   maven { url 'https://nexus.gluonhq.com/nexus/content/repositories/releases/' }
+tasks.withType(JavaExec) {
+	enableAssertions = true
+}
