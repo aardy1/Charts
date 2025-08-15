@@ -15,7 +15,7 @@ The project has basic stuff working -- some screen recordings of it running on m
 
 You need three things:
 1. Gradle
-2. a JVM (you might need one with JavaFX linked in? -- see below).
+2. a JVM
 3. some charts
 
 **Note**: on a Mac you must have a JVM built for ARM.
