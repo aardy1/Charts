@@ -20,7 +20,7 @@ You need three things:
 
 **Note**: on a Mac you must have a JVM built for ARM.
 
-I use Gradle 8.3 and java 22.1.0.1.r17-gln (a gluon build), both installed via the wonderful [sdkman](https://sdkman.io/).
+I use Gradle 8.3 and java 22.1.0.1.r17-gln (a Gluon build), both installed via the wonderful [sdkman](https://sdkman.io/).
 
 There are two charts (the ones used in the videos) [here](https://github.com/aardy1/Charts/files/13483291/ENC.zip). You need to unzip the charts file into `HOME/Documents/Knowtipy Charts`, where `HOME` is your home directory, so you will have `HOME/Documents/Knowtipy Charts/ENC/US_REGION08/*`.
 
