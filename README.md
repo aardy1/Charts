@@ -20,7 +20,7 @@ You need three things:
 
 **Note**: on a Mac you must have a JVM built for ARM.
 
-I use Gradle 8.3 and java 17.0.9-amzn, both installed via the wonderful [sdkman](https://sdkman.io/).
+I use Gradle 8.3 and java 22.1.0.1.r17-gln (a Gluon build), both installed via the wonderful [sdkman](https://sdkman.io/).
 
 There are two charts (the ones used in the videos) [here](https://github.com/aardy1/Charts/files/13483291/ENC.zip). You need to unzip the charts file into `HOME/Documents/Knowtipy Charts`, where `HOME` is your home directory, so you will have `HOME/Documents/Knowtipy Charts/ENC/US_REGION08/*`.
 
@@ -40,16 +40,16 @@ The gradle build is configured for native image builds using Graal.
 To get the build to work you will need some things:
 
 1. Gradle
-2. Graal -- get it from [Gluon](https://github.com/gluonhq/graal/releases/tag/gluon-22.1.0.1-Final)
-3. set `GRAALVM_HOME` environment variable to the parent of the bin directory in 1. So for me that is `export GRAALVM_HOME=/Users/.../Downloads/graalvm-svm-java17-darwin-m1-gluon-22.1.0.1-Final/Contents/Home`
+2. Graal -- get it from Gluon or use the 22.1.0.1.r17-gln mentioned above via sdkman
+3. set `GRAALVM_HOME` environment variable to the parent of the bin directory in 1. So for me that is `export GRAALVM_HOME=/Users/graham/.sdkman/candidates/java/22.1.0.1.r17-gln`.
 
 In theory that should be it :-)
 
 To build and run a native image, go the project root dir, and do:
 ```
-gradle -Ptarget=host nativeCompile nativeLink nativePackage nativeInstall
+./gradlew -Ptarget=host nativeBuild
 ```
-The native image will be installed under `X/build/gluonfx/A` where X is the project root, and A is your architecture and operating system (e.g. aarch64-darwin).
+The native build will take a while and the binary image will be installed under `X/build/gluonfx/A` where X is the project root, and A is your architecture and operating system (e.g. aarch64-darwin).
 
 I have tested this process on MacOS X.
 
@@ -57,7 +57,7 @@ I have tested this process on MacOS X.
 
 To run the app as a native image do:
 ```
-gradle -Ptarget=X nativeCompile nativeLink nativePackage nativeInstall nativeRun
+gradle -Ptarget=host nativeBuild nativeRun
 ```
 Or just `gradle -Ptarget=host nativeRun` if you have already built it, or just double click the native image that was previously built.
 
@@ -69,7 +69,7 @@ Good luck :-)
 
 This bit is usually a pain in the neck and is different for every platform and IDE. There are some instructions [here](https://openjfx.io/openjfx-docs/#introduction).
 
-For Apache Netbeans (with UI build actions delegated to gradle), you shouldn't have to do anything.
+For Apache Netbeans (with UI build actions delegated to gradle), you shouldn't have to do very much. You can just click the run button and the app should run on the JVM.
 
 For IntelliJ I followed the [instructions](https://openjfx.io/openjfx-docs/#IDE-Intellij) for "Non-modular projects" -- except Step 1 of course since you already have a project! 
 
