@@ -65,8 +65,5 @@
                 ]
             }
         ]
-    },
-    {
-        "name": "javafx.scene.shape.Polyline"
     }
 ]

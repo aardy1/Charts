@@ -1,7 +1,7 @@
 package org.knowtiphy.shapemap.renderer;
 
 import javafx.scene.transform.Affine;
-import org.knowtiphy.shapemap.api.RenderableGeometry;
+import org.knowtiphy.shapemap.api.IRenderableGeometry;
 import org.locationtech.jts.geom.LineString;
 
 /** */
@@ -37,10 +37,11 @@ public class Transformation {
         transformation.transform2DPoints(src, 0, dest, 0, 1);
     }
 
-    public double[] apply(RenderableGeometry renderGeom) {
+    public double[] applyForFill(IRenderableGeometry renderGeom) {
 
-        var xs = renderGeom.forFill().get(0).xs();
-        var ys = renderGeom.forFill().get(0).ys();
+        var shape = renderGeom.forFill().iterator().next();
+        var xs = shape.xs();
+        var ys = shape.ys();
         var pts = new double[xs.length * 2];
         for (int i = 0, j = 0; i < xs.length; i++, j += 2) {
             apply(xs[i], ys[i]);

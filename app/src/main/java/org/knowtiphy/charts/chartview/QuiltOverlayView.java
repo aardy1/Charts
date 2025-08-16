@@ -106,7 +106,7 @@ public class QuiltOverlayView extends StackPane {
             //  TODO -- what if its not a polygon -- do what? Is that even possible?
             if (geom.getGeometryN(i) instanceof Polygon pl) {
                 var polyGeom = ComputeRenderableGeometry.compute(pl);
-                var polygon = new javafx.scene.shape.Polygon(tx.apply(polyGeom));
+                var polygon = new javafx.scene.shape.Polygon(tx.applyForFill(polyGeom));
                 polygon.setFill(Color.BROWN);
                 polygon.setOpacity(0.4);
                 overlaySurface.getChildren().add(polygon);
